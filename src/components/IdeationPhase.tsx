@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap, Info, RefreshCw, Eye } from "lucide-react";
 
 interface LeanCanvasData {
   problem: string;
@@ -21,6 +22,25 @@ interface LeanCanvasData {
 interface IdeationPhaseProps {
   onComplete: () => void;
   onBack: () => void;
+}
+
+// Vision Phase data interfaces
+interface VisionProjectData {
+  name: string;
+  slogan: string;
+}
+
+interface VisionERRCData {
+  eliminate: string[];
+  reduce: string[];
+  raise: string[];
+  create: string[];
+}
+
+interface VisionData {
+  projectData: VisionProjectData;
+  errcData: VisionERRCData;
+  visionStatement: string;
 }
 
 const leanCanvasFields = [
@@ -118,11 +138,59 @@ const generateLeanCanvasAnalysis = async (data: LeanCanvasData): Promise<AIAnaly
   };
 };
 
+// Vision Phase data loading and mapping functions
+const loadVisionPhaseData = (): VisionData | null => {
+  try {
+    const projectData = localStorage.getItem("vision_project_data");
+    const errcData = localStorage.getItem("vision_errc_data");
+    const visionStatement = localStorage.getItem("vision_statement");
+    
+    if (projectData && errcData && visionStatement) {
+      return {
+        projectData: JSON.parse(projectData),
+        errcData: JSON.parse(errcData),
+        visionStatement: JSON.parse(visionStatement)
+      };
+    }
+  } catch (error) {
+    console.warn("Failed to load Vision Phase data:", error);
+  }
+  return null;
+};
+
+const mapVisionToLeanCanvas = (visionData: VisionData): Partial<LeanCanvasData> => {
+  const { projectData, errcData, visionStatement } = visionData;
+  
+  // Helper function to format array items
+  const formatArrayItems = (items: string[], prefix: string = "") => {
+    return items.filter(item => item.trim()).map(item => `${prefix}${item}`).join(", ");
+  };
+  
+  // Create unique value proposition by combining different sources
+  const uniqueValueParts = [
+    visionStatement || "",
+    projectData.slogan || "",
+    formatArrayItems(errcData.raise, "Vylepšujeme: "),
+    formatArrayItems(errcData.create, "Vytváříme: ")
+  ].filter(part => part.trim());
+  
+  return {
+    solution: formatArrayItems(errcData.create, "Vytváříme: "),
+    uniqueValueProposition: uniqueValueParts.join(". "),
+    existingAlternatives: formatArrayItems(errcData.eliminate, "Na trhu eliminujeme: "),
+    costStructure: formatArrayItems(errcData.reduce, "Redukujeme náklady na: ")
+  };
+};
+
 export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
   const [showIntro, setShowIntro] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [showVisualization, setShowVisualization] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  // Pre-fill state
+  const [isPreFilled, setIsPreFilled] = useState(false);
+  const [preFilledFields, setPreFilledFields] = useState<string[]>([]);
   
   // Persisted data
   const [leanCanvasData, setLeanCanvasData] = usePersistedState<LeanCanvasData>("ideation_lean_canvas", {
@@ -137,6 +205,43 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
   });
   
   const [analysis, setAnalysis] = usePersistedState<AIAnalysis | null>("ideation_analysis", null);
+  
+  // Pre-fill data on component mount
+  useEffect(() => {
+    const visionData = loadVisionPhaseData();
+    if (visionData) {
+      const preFilledData = mapVisionToLeanCanvas(visionData);
+      const fieldsToUpdate = Object.keys(preFilledData) as (keyof LeanCanvasData)[];
+      
+      // Only pre-fill if current data is empty
+      const hasEmptyFields = fieldsToUpdate.some(field => !leanCanvasData[field]?.trim());
+      
+      if (hasEmptyFields) {
+        setLeanCanvasData(prev => ({
+          ...prev,
+          ...preFilledData
+        }));
+        setIsPreFilled(true);
+        setPreFilledFields(fieldsToUpdate);
+      }
+    }
+  }, []);
+  
+  // Reset to empty form
+  const resetForm = () => {
+    setLeanCanvasData({
+      problem: "",
+      solution: "",
+      uniqueValueProposition: "",
+      customerSegments: "",
+      existingAlternatives: "",
+      channels: "",
+      costStructure: "",
+      revenueStreams: ""
+    });
+    setIsPreFilled(false);
+    setPreFilledFields([]);
+  };
   
   const filledFields = Object.values(leanCanvasData).filter(value => value.trim().length > 0).length;
   const progressPercentage = (filledFields / leanCanvasFields.length) * 100;
@@ -410,6 +515,29 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
           </div>
           <Progress value={progressPercentage} className="h-2" />
         </Card>
+        
+        {/* Pre-filled Data Notification */}
+        {isPreFilled && (
+          <Alert className="mb-6 border-primary/30 bg-primary/5">
+            <Info className="h-4 w-4 text-primary" />
+            <AlertDescription>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">
+                  Některá pole byla předvyplněna z Vision fáze ({preFilledFields.length} polí): <Eye className="w-4 h-4 inline ml-1" />
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetForm}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <RefreshCw className="w-4 h-4 mr-1" />
+                  Resetovat
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
         
         {/* Form */}
         <div className="space-y-6">
