@@ -119,6 +119,30 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
     ));
   };
 
+  const updateAttributeName = (attributeIndex: number, newName: string) => {
+    setValueCurve(prev => prev.map((attr, i) => 
+      i === attributeIndex ? { ...attr, name: newName } : attr
+    ));
+  };
+
+  const addCustomAttribute = () => {
+    if (valueCurve.length < 10) {
+      setValueCurve(prev => [...prev, { 
+        name: `Nový atribut ${valueCurve.length + 1}`, 
+        lowCost: 50, 
+        premium: 50, 
+        myProject: 50 
+      }]);
+    }
+  };
+
+  const removeCustomAttribute = (attributeIndex: number) => {
+    // Don't allow removal of the first attribute (Cena) or if less than 2 attributes
+    if (attributeIndex > 0 && valueCurve.length > 2) {
+      setValueCurve(prev => prev.filter((_, i) => i !== attributeIndex));
+    }
+  };
+
   const getCompletionProgress = () => {
     const completedCount = sections.filter(section => section.completed()).length;
     return (completedCount / sections.length) * 100;
@@ -562,9 +586,9 @@ ${analysis}`;
               <Line 
                 type="monotone" 
                 dataKey="Premium" 
-                stroke="hsl(var(--warning))" 
+                stroke="#f97316" 
                 strokeWidth={2}
-                dot={{ fill: "hsl(var(--warning))" }}
+                dot={{ fill: "#f97316" }}
               />
               <Line 
                 type="monotone" 
@@ -579,8 +603,22 @@ ${analysis}`;
 
         <div className="grid gap-4">
           {valueCurve.map((attr, index) => (
-            <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center p-4 bg-muted/30 rounded-lg">
-              <div className="font-medium">{attr.name}</div>
+            <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center p-4 bg-muted/30 rounded-lg">
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Atribut</label>
+                {attr.name === "Cena" ? (
+                  <div className="h-8 px-3 py-2 bg-muted/50 rounded-md text-sm font-medium text-muted-foreground flex items-center">
+                    {attr.name}
+                  </div>
+                ) : (
+                  <Input
+                    value={attr.name}
+                    onChange={(e) => updateAttributeName(index, e.target.value)}
+                    placeholder="Název atributu"
+                    className="h-8 text-sm"
+                  />
+                )}
+              </div>
               <div className="space-y-1">
                 <label className="text-xs text-muted-foreground">Low-cost</label>
                 <Input
@@ -614,8 +652,37 @@ ${analysis}`;
                   className="h-8 text-sm"
                 />
               </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Akce</label>
+                <div className="flex gap-2">
+                  {index > 0 && valueCurve.length > 2 && (
+                    <Button
+                      onClick={() => removeCustomAttribute(index)}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2 text-xs"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
+          
+          {valueCurve.length < 10 && (
+            <div className="p-4 bg-muted/20 rounded-lg border-2 border-dashed border-muted-foreground/20">
+              <Button
+                onClick={addCustomAttribute}
+                variant="ghost"
+                size="sm"
+                className="w-full h-12 text-sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Přidat vlastní atribut
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
     );
