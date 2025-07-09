@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, CheckCircle, Lightbulb, Users, Star, Wrench, Megaphone, DollarSign, TrendingDown, BarChart3, Shield, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap } from "lucide-react";
 
 interface LeanCanvasData {
   problem: string;
@@ -27,66 +27,57 @@ interface IdeationPhaseProps {
 const leanCanvasFields = [
   {
     key: "problem" as keyof LeanCanvasData,
-    title: "🧩 Problém",
-    placeholder: "Jaké 1–3 největší problémy řešíš pro zákazníka?",
-    hint: "Např.: 'Lidé nemají čas chodit nakupovat zdravé jídlo.'",
-    icon: AlertCircle
-  },
-  {
-    key: "customerSegment" as keyof LeanCanvasData,
-    title: "👥 Segment zákazníků",
-    placeholder: "Pro koho je tento problém nejpalčivější?",
-    hint: "Např.: 'Zaměstnaní lidé ve městech, 25–45 let, zaměření na zdravý životní styl.'",
-    icon: Users
-  },
-  {
-    key: "uniqueValue" as keyof LeanCanvasData,
-    title: "🌟 Unikátní hodnota (UVP)",
-    placeholder: "Co je hlavní důvod, proč si tě zákazník vybere?",
-    hint: "Např.: 'Bio jídlo doručené do 30 minut, garantovaně čerstvé.'",
-    icon: Star
+    title: "Problém",
+    placeholder: "Zaneprázdnění lidé nemají čas nakupovat zdravé bio potraviny. Supermarkety nabízejí málo bio produktů s nejistou čerstvostí. Složité hledání kvalitních místních dodavatelů.",
+    gridArea: "problem"
   },
   {
     key: "solution" as keyof LeanCanvasData,
-    title: "🛠 Řešení",
-    placeholder: "Jak konkrétně řešíš vybraný problém?",
-    hint: "Např.: 'Mobilní aplikace propojená s farmáři a kurýry.'",
-    icon: Wrench
+    title: "Řešení",
+    placeholder: "Mobilní aplikace s katalogem bio potravin od ověřených místních farmářů. Objednávka s doručením do 2 hodin. Garance čerstvosti a kvality. Jednoduché hodnocení dodavatelů.",
+    gridArea: "solution"
   },
   {
-    key: "channels" as keyof LeanCanvasData,
-    title: "📣 Kanály",
-    placeholder: "Jak se o tobě zákazníci dozví a jak tě budou používat?",
-    hint: "Např.: 'Instagram, TikTok, food blogeři, mobilní aplikace.'",
-    icon: Megaphone
-  },
-  {
-    key: "revenueModel" as keyof LeanCanvasData,
-    title: "💰 Příjmový model",
-    placeholder: "Za co ti lidé budou platit? Jaká je cenová strategie?",
-    hint: "Např.: 'Předplatné 499 Kč/měsíc nebo jednorázové objednávky.'",
-    icon: DollarSign
-  },
-  {
-    key: "costStructure" as keyof LeanCanvasData,
-    title: "💸 Nákladová struktura",
-    placeholder: "Jaké budou hlavní náklady a fixní výdaje?",
-    hint: "Např.: 'Vývoj aplikace, platy kurýrů, marketing.'",
-    icon: TrendingDown
-  },
-  {
-    key: "keyMetrics" as keyof LeanCanvasData,
-    title: "📊 Klíčové metriky",
-    placeholder: "Co budeš měřit, abys věděl, že rosteš?",
-    hint: "Např.: 'Počet aktivních uživatelů, počet objednávek, průměrná útrata.'",
-    icon: BarChart3
+    key: "uniqueValue" as keyof LeanCanvasData,
+    title: "Unikátní hodnota",
+    placeholder: "Bio potraviny od místních farmářů doručené do 2 hodin s garancí čerstvosti. Podpora lokálních producentů. Transparentnost původu každého produktu.",
+    gridArea: "unique-value"
   },
   {
     key: "competitiveAdvantage" as keyof LeanCanvasData,
-    title: "🛡 Konkurenční výhoda",
-    placeholder: "Co tě ochrání před tím, aby tě někdo zkopíroval?",
-    hint: "Např.: 'Exkluzivní smlouvy s bio farmami, vlastní technologie doručení.'",
-    icon: Shield
+    title: "Konkurenční výhoda",
+    placeholder: "Exkluzivní partnerství s bio farmami v regionu. Vlastní logistická síť pro rychlé doručení. Proprietární systém hodnocení kvality. Silná komunita věrných zákazníků.",
+    gridArea: "advantage"
+  },
+  {
+    key: "customerSegment" as keyof LeanCanvasData,
+    title: "Segmenty zákazníků",
+    placeholder: "Mladí profesionálové 28-42 let v Praze a Brně. Příjem 50K+ měsíčně. Aktivní životní styl, zájem o zdraví a udržitelnost. Ochotni platit více za kvalitu.",
+    gridArea: "customers"
+  },
+  {
+    key: "keyMetrics" as keyof LeanCanvasData,
+    title: "Klíčové metriky",
+    placeholder: "Počet aktivních uživatelů (MAU), průměrná hodnota objednávky (AOV), frekvence objednávek, retention rate, čas doručení, spokojenost zákazníků (NPS).",
+    gridArea: "metrics"
+  },
+  {
+    key: "channels" as keyof LeanCanvasData,
+    title: "Kanály",
+    placeholder: "Instagram a TikTok marketing, spolupráce s wellness influencery, Google Ads, mobilní aplikace v App Store/Google Play, doporučení od stávajících zákazníků.",
+    gridArea: "channels"
+  },
+  {
+    key: "costStructure" as keyof LeanCanvasData,
+    title: "Nákladová struktura",
+    placeholder: "Vývoj a údržba aplikace (200K/měsíc), platy kurýrů (300K/měsíc), marketing a reklama (150K/měsíc), skladování a logistika (100K/měsíc), provoz a administrativa (80K/měsíc).",
+    gridArea: "costs"
+  },
+  {
+    key: "revenueModel" as keyof LeanCanvasData,
+    title: "Zdroje příjmů",
+    placeholder: "Provize z prodeje 15% z každé objednávky, měsíční předplatné Premium za 299 Kč (rychlejší doručení), poplatek za doručení 49 Kč, partnership marketing s farmáři.",
+    gridArea: "revenue"
   }
 ];
 
@@ -254,13 +245,20 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
             {/* Lean Canvas Visualization */}
             <Card className="card-apple p-6">
               <h2 className="text-2xl font-bold text-foreground mb-6">Váš Lean Canvas</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {leanCanvasFields.map((field, index) => (
-                  <Card key={field.key} className="p-4 border-2 border-primary/20">
-                    <div className="flex items-center mb-2">
-                      <field.icon className="w-4 h-4 mr-2 text-primary" />
-                      <h3 className="font-semibold text-sm">{field.title}</h3>
-                    </div>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-auto"
+                   style={{
+                     gridTemplateAreas: `
+                       "problem problem solution solution customers"
+                       "problem problem unique-value unique-value customers"
+                       "advantage advantage unique-value unique-value channels"
+                       "metrics metrics unique-value unique-value channels"
+                       "costs costs costs revenue revenue"
+                     `
+                   }}>
+                {leanCanvasFields.map((field) => (
+                  <Card key={field.key} className="p-4 border-2 border-primary/20 min-h-[120px]" 
+                        style={{ gridArea: field.gridArea }}>
+                    <h3 className="font-semibold text-sm mb-2 text-foreground">{field.title}</h3>
                     <p className="text-sm text-muted-foreground">
                       {leanCanvasData[field.key] || "Nevyplněno"}
                     </p>
@@ -414,17 +412,18 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
         <div className="space-y-6">
           {leanCanvasFields.map((field, index) => (
             <Card key={field.key} className="card-apple p-6">
-              <div className="flex items-center mb-4">
-                <field.icon className="w-5 h-5 mr-2 text-primary" />
+              <div className="mb-4">
                 <h3 className="text-lg font-semibold text-foreground">{field.title}</h3>
               </div>
               
               <div className="space-y-3">
-                <p className="text-sm text-primary font-medium">{field.placeholder}</p>
-                <p className="text-xs text-muted-foreground">{field.hint}</p>
+                <div className="bg-accent/10 p-3 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-1">Vzorové vyplnění (EcoFood):</p>
+                  <p className="text-sm text-foreground italic">{field.placeholder}</p>
+                </div>
                 
                 <Textarea
-                  placeholder={field.placeholder}
+                  placeholder={`Napište svůj vlastní text pro: ${field.title}`}
                   value={leanCanvasData[field.key]}
                   onChange={(e) => handleFieldChange(field.key, e.target.value)}
                   className="min-h-[100px] resize-none"
