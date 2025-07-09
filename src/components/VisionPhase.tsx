@@ -66,7 +66,6 @@ const errcTemplate = {
 };
 
 export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
   
   // Form data
@@ -85,12 +84,12 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [canProceed, setCanProceed] = useState(false);
 
-  const steps = [
-    { id: 0, title: "Základní informace", icon: FileText },
-    { id: 1, title: "ERRC Matice", icon: Target },
-    { id: 2, title: "Hodnotová křivka", icon: TrendingUp },
-    { id: 3, title: "Vision Statement", icon: Eye },
-    { id: 4, title: "AI Validace", icon: Sparkles }
+  const sections = [
+    { id: "basic", title: "Základní informace", icon: FileText, completed: () => projectData.name.trim() && projectData.slogan.trim() },
+    { id: "errc", title: "ERRC Matice", icon: Target, completed: () => Object.values(errcData).every(arr => arr.some(item => item.trim())) },
+    { id: "curve", title: "Hodnotová křivka", icon: TrendingUp, completed: () => true },
+    { id: "vision", title: "Vision Statement", icon: Eye, completed: () => visionStatement.trim().length > 0 },
+    { id: "analysis", title: "AI Validace", icon: Sparkles, completed: () => analysis !== null }
   ];
 
   const updateERRCItem = (category: keyof ERRCData, index: number, value: string) => {
@@ -120,33 +119,23 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
     ));
   };
 
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else if (currentStep === 3) {
-      generateAnalysis();
-    }
+  const getCompletionProgress = () => {
+    const completedCount = sections.filter(section => section.completed()).length;
+    return (completedCount / sections.length) * 100;
   };
 
-  const handlePrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+  const canGenerateAnalysis = () => {
+    return sections.slice(0, 4).every(section => section.completed());
   };
 
-  const canContinue = () => {
-    switch (currentStep) {
-      case 0: return projectData.name.trim() && projectData.slogan.trim();
-      case 1: return Object.values(errcData).every(arr => arr.some(item => item.trim()));
-      case 2: return true; // Value curve always has default values
-      case 3: return visionStatement.trim().length > 0;
-      default: return false;
-    }
+  const allDataComplete = () => {
+    return sections.every(section => section.completed());
   };
 
   const generateAnalysis = async () => {
+    if (!canGenerateAnalysis()) return;
+    
     setIsGeneratingAnalysis(true);
-    setCurrentStep(4);
     
     // Simulace AI analýzy (zde by byla integrace s OpenAI)
     await new Promise(resolve => setTimeout(resolve, 3000));
@@ -414,27 +403,17 @@ ${analysis}`;
     );
   }
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return renderBasicInfo();
-      case 1:
-        return renderERRCMatrix();
-      case 2:
-        return renderValueCurve();
-      case 3:
-        return renderVisionStatement();
-      case 4:
-        return renderAIAnalysis();
-      default:
-        return null;
-    }
-  };
-
   const renderBasicInfo = () => (
-    <Card className="card-apple p-8">
-      <h2 className="text-apple-title mb-2">Základní informace o projektu</h2>
-      <p className="text-apple-body mb-8">Definujte název a slogan vašeho projektu</p>
+    <Card className="card-apple p-8 mb-8">
+      <div className="flex items-center mb-6">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
+          <FileText className="w-4 h-4" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold">Základní informace o projektu</h2>
+          <p className="text-sm text-muted-foreground">Definujte název a slogan vašeho projektu</p>
+        </div>
+      </div>
       
       <div className="space-y-6">
         <div>
@@ -465,9 +444,15 @@ ${analysis}`;
   );
 
   const renderERRCMatrix = () => (
-    <Card className="card-apple p-8">
-      <div className="flex items-center mb-4">
-        <h2 className="text-apple-title mr-2">ERRC Matice</h2>
+    <Card className="card-apple p-8 mb-8">
+      <div className="flex items-center mb-6">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
+          <Target className="w-4 h-4" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-xl font-semibold">ERRC Matice</h2>
+          <p className="text-sm text-muted-foreground">Definujte čtyři klíčové oblasti vaší strategie</p>
+        </div>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
@@ -479,7 +464,6 @@ ${analysis}`;
           </Tooltip>
         </TooltipProvider>
       </div>
-      <p className="text-apple-body mb-8">Definujte čtyři klíčové oblasti vaší strategie</p>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {Object.entries({
@@ -540,9 +524,15 @@ ${analysis}`;
     }));
 
     return (
-      <Card className="card-apple p-8">
-        <div className="flex items-center mb-4">
-          <h2 className="text-apple-title mr-2">Hodnotová křivka</h2>
+      <Card className="card-apple p-8 mb-8">
+        <div className="flex items-center mb-6">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
+            <TrendingUp className="w-4 h-4" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-xl font-semibold">Hodnotová křivka</h2>
+            <p className="text-sm text-muted-foreground">Nastavte hodnoty pro každý atribut (0-100)</p>
+          </div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -554,7 +544,6 @@ ${analysis}`;
             </Tooltip>
           </TooltipProvider>
         </div>
-        <p className="text-apple-body mb-8">Nastavte hodnoty pro každý atribut (0-100)</p>
         
         <div className="mb-8">
           <ResponsiveContainer width="100%" height={300}>
@@ -633,9 +622,16 @@ ${analysis}`;
   };
 
   const renderVisionStatement = () => (
-    <Card className="card-apple p-8">
-      <h2 className="text-apple-title mb-2">Vision Statement</h2>
-      <p className="text-apple-body mb-8">Shrňte svou vizi do jednoho odstavce (max 500 znaků)</p>
+    <Card className="card-apple p-8 mb-8">
+      <div className="flex items-center mb-6">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
+          <Eye className="w-4 h-4" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold">Vision Statement</h2>
+          <p className="text-sm text-muted-foreground">Shrňte svou vizi do jednoho odstavce (max 500 znaků)</p>
+        </div>
+      </div>
       
       <div className="space-y-4">
         <Textarea
@@ -653,18 +649,28 @@ ${analysis}`;
   );
 
   const renderAIAnalysis = () => (
-    <div className="space-y-6">
+    <Card className="card-apple p-8 mb-8">
+      <div className="flex items-center mb-6">
+        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
+          <Sparkles className="w-4 h-4" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-xl font-semibold">AI Validace</h2>
+          <p className="text-sm text-muted-foreground">Nechte AI vyhodnotit kvalitu vaší vize</p>
+        </div>
+      </div>
+
       {isGeneratingAnalysis ? (
-        <Card className="card-apple p-8 text-center">
+        <div className="text-center py-8">
           <Sparkles className="w-12 h-12 text-primary mx-auto mb-4 animate-spin" />
-          <h2 className="text-apple-title mb-2">Generuji AI analýzu...</h2>
-          <p className="text-apple-body">Vyhodnocuji vaši vizi podle Blue Ocean Strategy</p>
-        </Card>
+          <h3 className="text-lg font-semibold mb-2">Generuji AI analýzu...</h3>
+          <p className="text-muted-foreground">Vyhodnocuji vaši vizi podle Blue Ocean Strategy</p>
+        </div>
       ) : analysis ? (
-        <>
+        <div className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-1">
-              <Card className="card-apple p-6">
+              <div className="p-6 bg-muted/30 rounded-xl">
                 <h3 className="font-semibold mb-4 flex items-center">
                   <FileText className="w-4 h-4 mr-2" />
                   Shrnutí projektu
@@ -683,53 +689,46 @@ ${analysis}`;
                     <div className="text-primary font-semibold">{getVisionScore()}/10</div>
                   </div>
                 </div>
-              </Card>
+              </div>
             </div>
 
             <div className="lg:col-span-2">
-              <Card className="card-apple p-6">
+              <div className="p-6 bg-muted/30 rounded-xl">
                 <h3 className="font-semibold mb-4 flex items-center">
                   <Sparkles className="w-4 h-4 mr-2" />
                   AI Analýza
                 </h3>
                 <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-line text-apple-body">{analysis}</div>
+                  <div className="whitespace-pre-line text-sm text-muted-foreground">{analysis}</div>
                 </div>
-              </Card>
+              </div>
             </div>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={exportToPDF} className="btn-apple-secondary">
-              <Download className="mr-2 w-4 h-4" />
-              Exportovat do PDF
-            </Button>
-            
-            {canProceed ? (
-              <Button onClick={onComplete} className="btn-apple flex-1">
-                Pokračovat do fáze 2 - Ideation
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            ) : (
-              <Button 
-                onClick={() => setCurrentStep(0)} 
-                variant="outline" 
-                className="flex-1"
-              >
-                Vylepšit vizi
-                <ArrowLeft className="ml-2 w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        </>
-      ) : null}
-    </div>
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <Button 
+            onClick={generateAnalysis} 
+            disabled={!canGenerateAnalysis()}
+            className="btn-apple"
+          >
+            <Sparkles className="mr-2 w-4 h-4" />
+            Validovat vizi pomocí AI
+          </Button>
+          {!canGenerateAnalysis() && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Vyplňte všechny předchozí sekce pro spuštění AI validace
+            </p>
+          )}
+        </div>
+      )}
+    </Card>
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
-      <div className="max-w-4xl mx-auto py-8">
-        {/* Header & Progress */}
+      <div className="max-w-6xl mx-auto py-8">
+        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -740,101 +739,95 @@ ${analysis}`;
                 <Eye className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="text-apple-title">Vision</h1>
-                <p className="text-apple-subtitle">Blue Ocean Strategy</p>
+                <h1 className="text-2xl font-bold">Vision</h1>
+                <p className="text-sm text-muted-foreground">Blue Ocean Strategy</p>
               </div>
             </div>
-            <Badge variant="secondary">
-              {currentStep + 1} / {steps.length}
+            <Badge variant="secondary" className="px-3 py-1">
+              {Math.round(getCompletionProgress())}% hotovo
             </Badge>
           </div>
           
-          {/* Step indicators */}
-          <div className="flex items-center justify-between mb-4">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = index === currentStep;
-              const isCompleted = index < currentStep;
-              
-              return (
-                <div key={step.id} className="flex items-center">
-                  <div 
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-medium ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground' 
-                        : isCompleted 
-                        ? 'bg-green-500 text-white'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  {index < steps.length - 1 && (
+          {/* Horizontal Progress Bar */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              {sections.map((section, index) => {
+                const Icon = section.icon;
+                const isCompleted = section.completed();
+                
+                return (
+                  <div key={section.id} className="flex items-center">
                     <div 
-                      className={`h-0.5 w-16 mx-2 ${
-                        isCompleted ? 'bg-green-500' : 'bg-muted'
-                      }`} 
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="progress-apple">
-            <div 
-              className="progress-apple-fill"
-              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-            />
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium ${
+                        isCompleted 
+                          ? 'bg-green-500 text-white' 
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="ml-2 hidden lg:block">
+                      <div className={`text-sm font-medium ${isCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
+                        {section.title}
+                      </div>
+                    </div>
+                    {index < sections.length - 1 && (
+                      <div 
+                        className={`h-1 w-16 xl:w-24 mx-4 rounded-full ${
+                          isCompleted ? 'bg-green-500' : 'bg-muted'
+                        }`} 
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            
+            <div className="w-full bg-muted rounded-full h-2">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${getCompletionProgress()}%` }}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Step Content */}
-        <div className="mb-8">
-          {renderStepContent()}
+        {/* All Sections */}
+        <div className="space-y-0">
+          {renderBasicInfo()}
+          {renderERRCMatrix()}
+          {renderValueCurve()}
+          {renderVisionStatement()}
+          {renderAIAnalysis()}
         </div>
 
-        {/* Navigation */}
-        {currentStep < 4 && (
-          <div className="flex justify-between">
-            <Button 
-              onClick={handlePrev}
-              variant="ghost"
-              disabled={currentStep === 0}
-            >
-              <ArrowLeft className="mr-2 w-4 h-4" />
-              Předchozí
-            </Button>
-
-            {currentStep === 3 ? (
-              <Button 
-                onClick={handleNext}
-                disabled={!canContinue() || isGeneratingAnalysis}
-                className="btn-apple"
-              >
-                {isGeneratingAnalysis ? (
-                  <>
-                    <Sparkles className="mr-2 w-4 h-4 animate-spin" />
-                    Validuji vizi...
-                  </>
-                ) : (
-                  <>
-                    Validovat AI
-                    <Sparkles className="ml-2 w-4 h-4" />
-                  </>
-                )}
+        {/* Final Actions */}
+        {allDataComplete() && (
+          <Card className="card-apple p-6 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-green-600">Vision fáze dokončena!</h3>
+                <p className="text-sm text-muted-foreground">Vaše vize je validována a připravena k implementaci</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={exportToPDF} className="btn-apple-secondary">
+                <Download className="mr-2 w-4 h-4" />
+                Stáhnout výsledky (PDF)
               </Button>
-            ) : (
-              <Button 
-                onClick={handleNext}
-                disabled={!canContinue()}
-                className="btn-apple"
-              >
-                Další krok
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            )}
-          </div>
+              
+              {canProceed && (
+                <Button onClick={onComplete} className="btn-apple">
+                  Pokračovat do fáze 2 - Ideation
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          </Card>
         )}
       </div>
     </div>
