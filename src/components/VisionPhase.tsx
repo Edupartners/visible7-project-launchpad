@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,6 +47,8 @@ interface ValueCurveAttribute {
   lowCost: number;
   premium: number;
   myProject: number;
+  type?: string;
+  color?: string;
 }
 
 const defaultAttributes: ValueCurveAttribute[] = [
@@ -113,6 +115,76 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
     }));
   };
 
+  // ERRC to Value Curve conversion
+  const generateValueCurveFromERRC = () => {
+    const errcAttributes = [];
+    
+    // Add attributes from ERRC matrix in order: Eliminate → Reduce → Raise → Create
+    errcData.eliminate.filter(item => item.trim()).forEach(item => {
+      errcAttributes.push({
+        name: item,
+        lowCost: 50,
+        premium: 50,
+        myProject: 50,
+        type: 'eliminate',
+        color: '#ef4444' // red
+      });
+    });
+    
+    errcData.reduce.filter(item => item.trim()).forEach(item => {
+      errcAttributes.push({
+        name: item,
+        lowCost: 50,
+        premium: 50,
+        myProject: 50,
+        type: 'reduce',
+        color: '#f97316' // orange
+      });
+    });
+    
+    errcData.raise.filter(item => item.trim()).forEach(item => {
+      errcAttributes.push({
+        name: item,
+        lowCost: 50,
+        premium: 50,
+        myProject: 50,
+        type: 'raise',
+        color: '#3b82f6' // blue
+      });
+    });
+    
+    errcData.create.filter(item => item.trim()).forEach(item => {
+      errcAttributes.push({
+        name: item,
+        lowCost: 50,
+        premium: 50,
+        myProject: 50,
+        type: 'create',
+        color: '#10b981' // green
+      });
+    });
+    
+    return errcAttributes;
+  };
+
+  // Update value curve when ERRC data changes
+  React.useEffect(() => {
+    const errcAttributes = generateValueCurveFromERRC();
+    if (errcAttributes.length > 0) {
+      setValueCurve(prev => {
+        // Preserve existing values for matching attributes
+        const updatedAttributes = errcAttributes.map(newAttr => {
+          const existingAttr = prev.find(attr => attr.name === newAttr.name);
+          if (existingAttr) {
+            return { ...newAttr, lowCost: existingAttr.lowCost, premium: existingAttr.premium, myProject: existingAttr.myProject };
+          }
+          return newAttr;
+        });
+        return updatedAttributes;
+      });
+    }
+  }, [errcData]);
+
   const updateValueCurve = (attributeIndex: number, type: 'lowCost' | 'premium' | 'myProject', value: number) => {
     setValueCurve(prev => prev.map((attr, i) => 
       i === attributeIndex ? { ...attr, [type]: value } : attr
@@ -137,8 +209,7 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
   };
 
   const removeCustomAttribute = (attributeIndex: number) => {
-    // Don't allow removal of the first attribute (Cena) or if less than 2 attributes
-    if (attributeIndex > 0 && valueCurve.length > 2) {
+    if (attributeIndex >= 0 && valueCurve.length > 1) {
       setValueCurve(prev => prev.filter((_, i) => i !== attributeIndex));
     }
   };
@@ -544,8 +615,40 @@ ${analysis}`;
       name: attr.name,
       "Low-cost": attr.lowCost,
       "Premium": attr.premium,
-      "Můj projekt": attr.myProject
+      "Můj projekt": attr.myProject,
+      type: attr.type,
+      color: attr.color
     }));
+
+    const CustomXAxisTick = (props: any) => {
+      const { x, y, payload } = props;
+      const item = chartData.find(d => d.name === payload.value);
+      const color = item?.color || '#64748b';
+      
+      return (
+        <g transform={`translate(${x},${y})`}>
+          <text 
+            x={0} 
+            y={0} 
+            dy={16} 
+            textAnchor="middle" 
+            fill={color}
+            fontSize="12"
+            fontWeight="500"
+          >
+            {payload.value}
+          </text>
+          {item?.type && (
+            <circle 
+              cx={0} 
+              cy={-10} 
+              r={3} 
+              fill={color}
+            />
+          )}
+        </g>
+      );
+    };
 
     return (
       <Card className="card-apple p-8 mb-8">
@@ -555,7 +658,7 @@ ${analysis}`;
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-semibold">Hodnotová křivka</h2>
-            <p className="text-sm text-muted-foreground">Nastavte hodnoty pro každý atribut (0-100)</p>
+            <p className="text-sm text-muted-foreground">Atributy generované z ERRC matice s barevným kódováním</p>
           </div>
           <TooltipProvider>
             <Tooltip>
@@ -563,127 +666,141 @@ ${analysis}`;
                 <Info className="w-4 h-4 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Srovnání vašeho projektu s konkurencí podle klíčových atributů</p>
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center"><div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>Odstranit</div>
+                  <div className="flex items-center"><div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>Omezit</div>
+                  <div className="flex items-center"><div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>Pozvednout</div>
+                  <div className="flex items-center"><div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>Vytvořit</div>
+                </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
         
-        <div className="mb-8">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis domain={[0, 100]} />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="Low-cost" 
-                stroke="hsl(var(--destructive))" 
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--destructive))" }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="Premium" 
-                stroke="#f97316" 
-                strokeWidth={2}
-                dot={{ fill: "#f97316" }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="Můj projekt" 
-                stroke="hsl(var(--primary))" 
-                strokeWidth={3}
-                dot={{ fill: "hsl(var(--primary))" }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="grid gap-4">
-          {valueCurve.map((attr, index) => (
-            <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center p-4 bg-muted/30 rounded-lg">
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Atribut</label>
-                {attr.name === "Cena" ? (
-                  <div className="h-8 px-3 py-2 bg-muted/50 rounded-md text-sm font-medium text-muted-foreground flex items-center">
-                    {attr.name}
-                  </div>
-                ) : (
-                  <Input
-                    value={attr.name}
-                    onChange={(e) => updateAttributeName(index, e.target.value)}
-                    placeholder="Název atributu"
-                    className="h-8 text-sm"
+        {valueCurve.length > 0 ? (
+          <>
+            <div className="mb-8">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={<CustomXAxisTick />}
+                    height={60}
                   />
-                )}
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Low-cost</label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={attr.lowCost}
-                  onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value) || 0)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Premium</label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={attr.premium}
-                  onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value) || 0)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Můj projekt</label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={attr.myProject}
-                  onChange={(e) => updateValueCurve(index, 'myProject', parseInt(e.target.value) || 0)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Akce</label>
-                <div className="flex gap-2">
-                  {index > 0 && valueCurve.length > 2 && (
-                    <Button
-                      onClick={() => removeCustomAttribute(index)}
-                      variant="outline"
-                      size="sm"
-                      className="h-8 px-2 text-xs"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                  )}
+                  <YAxis domain={[0, 100]} />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="Low-cost" 
+                    stroke="hsl(var(--destructive))" 
+                    strokeWidth={2}
+                    dot={{ fill: "hsl(var(--destructive))" }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="Premium" 
+                    stroke="#f97316" 
+                    strokeWidth={2}
+                    dot={{ fill: "#f97316" }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="Můj projekt" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3}
+                    dot={{ fill: "hsl(var(--primary))" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="grid gap-4">
+              {valueCurve.map((attr, index) => (
+                <div 
+                  key={index} 
+                  className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center p-4 rounded-lg border-l-4"
+                  style={{ 
+                    borderLeftColor: attr.color || '#64748b',
+                    backgroundColor: attr.color ? `${attr.color}10` : undefined
+                  }}
+                >
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground flex items-center">
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2" 
+                        style={{ backgroundColor: attr.color || '#64748b' }}
+                      ></div>
+                      Atribut
+                      {attr.type && (
+                        <Badge 
+                          variant="outline" 
+                          className="ml-2 text-xs px-1 py-0"
+                          style={{ 
+                            borderColor: attr.color,
+                            color: attr.color 
+                          }}
+                        >
+                          {attr.type === 'eliminate' ? 'Odstranit' : 
+                           attr.type === 'reduce' ? 'Omezit' :
+                           attr.type === 'raise' ? 'Pozvednout' : 'Vytvořit'}
+                        </Badge>
+                      )}
+                    </label>
+                    <div className="h-8 px-3 py-2 bg-muted/50 rounded-md text-sm font-medium flex items-center">
+                      {attr.name}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Low-cost</label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={attr.lowCost}
+                      onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value) || 0)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Premium</label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={attr.premium}
+                      onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value) || 0)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Můj projekt</label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={attr.myProject}
+                      onChange={(e) => updateValueCurve(index, 'myProject', parseInt(e.target.value) || 0)}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Info</label>
+                    <div className="h-8 flex items-center text-xs text-muted-foreground">
+                      Z ERRC matice
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-          
-          {valueCurve.length < 10 && (
-            <div className="p-4 bg-muted/20 rounded-lg border-2 border-dashed border-muted-foreground/20">
-              <Button
-                onClick={addCustomAttribute}
-                variant="ghost"
-                size="sm"
-                className="w-full h-12 text-sm"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Přidat vlastní atribut
-              </Button>
-            </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">Zatím žádné atributy</h3>
+            <p className="text-sm">Vyplňte ERRC matici pro generování hodnotové křivky</p>
+          </div>
+        )}
       </Card>
     );
   };
