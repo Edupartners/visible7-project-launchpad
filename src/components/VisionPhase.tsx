@@ -613,9 +613,9 @@ ${analysis}`;
   const renderValueCurve = () => {
     const chartData = valueCurve.map(attr => ({
       name: attr.name,
-      "Low-cost": attr.lowCost,
-      "Premium": attr.premium,
-      "Můj projekt": attr.myProject,
+      "Low-cost": attr.lowCost === 0 ? null : attr.lowCost,
+      "Premium": attr.premium === 0 ? null : attr.premium,
+      "Můj projekt": attr.myProject === 0 ? null : attr.myProject,
       type: attr.type,
       color: attr.color
     }));
@@ -696,6 +696,7 @@ ${analysis}`;
                     stroke="hsl(var(--destructive))" 
                     strokeWidth={2}
                     dot={{ fill: "hsl(var(--destructive))" }}
+                    connectNulls={false}
                   />
                   <Line 
                     type="monotone" 
@@ -703,6 +704,7 @@ ${analysis}`;
                     stroke="#f97316" 
                     strokeWidth={2}
                     dot={{ fill: "#f97316" }}
+                    connectNulls={false}
                   />
                   <Line 
                     type="monotone" 
@@ -710,6 +712,7 @@ ${analysis}`;
                     stroke="hsl(var(--primary))" 
                     strokeWidth={3}
                     dot={{ fill: "hsl(var(--primary))" }}
+                    connectNulls={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
