@@ -1,42 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* VISIBLE7 Design System - Apple-inspired minimalism */
 
 @layer base {
   :root {
+    /* Apple-inspired color palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Apple-like blue */
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 210 100% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Subtle gray */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 210 100% 96%;
+    --accent-foreground: 210 100% 20%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 210 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 12px;
+
+    /* Apple-style gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 100% 50%), hsl(220 100% 60%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    
+    /* Apple-style shadows */
+    --shadow-card: 0 4px 25px -8px hsl(0 0% 0% / 0.1);
+    --shadow-button: 0 2px 8px -2px hsl(210 100% 50% / 0.25);
+    --shadow-elevated: 0 8px 32px -8px hsl(0 0% 0% / 0.15);
+
+    /* Animations */
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +117,61 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+}
+
+@layer components {
+  /* Apple-style button variants */
+  .btn-apple {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+    @apply transition-all duration-200 ease-out;
+    @apply shadow-[var(--shadow-button)] hover:shadow-lg;
+    @apply active:scale-[0.98];
+  }
+
+  .btn-apple-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl;
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+    @apply transition-all duration-200 ease-out;
+    @apply border border-border;
+    @apply active:scale-[0.98];
+  }
+
+  /* Apple-style cards */
+  .card-apple {
+    @apply bg-card rounded-2xl border border-border/50;
+    @apply shadow-[var(--shadow-card)];
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .card-apple-hover {
+    @apply card-apple hover:shadow-[var(--shadow-elevated)];
+    @apply hover:border-border hover:-translate-y-0.5;
+  }
+
+  /* Progress indicators */
+  .progress-apple {
+    @apply relative h-2 bg-secondary rounded-full overflow-hidden;
+  }
+
+  .progress-apple-fill {
+    @apply h-full bg-gradient-to-r from-primary to-primary/80 rounded-full;
+    @apply transition-all duration-500 ease-out;
+  }
+
+  /* Typography */
+  .text-apple-title {
+    @apply text-2xl font-semibold tracking-tight text-foreground;
+  }
+
+  .text-apple-subtitle {
+    @apply text-base text-muted-foreground font-normal;
+  }
+
+  .text-apple-body {
+    @apply text-sm text-foreground/80 leading-relaxed;
   }
 }
