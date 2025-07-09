@@ -19,7 +19,10 @@ import {
   Plus,
   Minus,
   TrendingUp,
-  Target
+  Target,
+  VideoIcon,
+  BookOpen,
+  ExternalLink
 } from "lucide-react";
 
 interface VisionPhaseProps {
@@ -241,52 +244,169 @@ ${analysis}`;
   if (showIntro) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          <Card className="card-apple p-8 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary mx-auto mb-6 flex items-center justify-center">
-              <Eye className="w-8 h-8" />
-            </div>
-            
-            <h1 className="text-apple-title mb-4">Fáze 1: Vision</h1>
-            <h2 className="text-xl text-primary font-medium mb-4">Strategie modrého oceánu</h2>
-            
-            <p className="text-apple-body mb-6 max-w-lg mx-auto">
-              Definujte svůj projekt pomocí ERRC matice, hodnotové křivky a AI validace. 
-              Najděte svůj jedinečný prostor na trhu podle Blue Ocean Strategy.
-            </p>
-
-            <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground mb-8">
-              <div className="flex items-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                4 kroky
+        <div className="max-w-4xl w-full">
+          <Card className="card-apple p-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary mx-auto mb-6 flex items-center justify-center">
+                <Eye className="w-8 h-8" />
               </div>
-              <div className="flex items-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                ~20 minut
-              </div>
-              <div className="flex items-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                AI validace
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <Button 
-                onClick={() => setShowIntro(false)}
-                className="btn-apple w-full h-12 text-base"
-              >
-                <Play className="mr-2 w-4 h-4" />
-                Začít s Vision
-              </Button>
               
-              <Button 
-                onClick={onBack}
-                variant="ghost"
-                className="w-full"
-              >
-                <ArrowLeft className="mr-2 w-4 h-4" />
-                Zpět na dashboard
-              </Button>
+              <h1 className="text-apple-title mb-4">Fáze 1: Vision</h1>
+              <h2 className="text-xl text-primary font-medium mb-6">Strategie modrého oceánu</h2>
+            </div>
+
+            {/* Video Section */}
+            <div className="mb-8">
+              <div className="relative bg-muted/50 rounded-xl p-8 mb-6">
+                <div className="flex flex-col lg:flex-row items-center gap-6">
+                  <div className="w-full lg:w-1/2">
+                    <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/20">
+                      <div className="text-center">
+                        <VideoIcon className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">2minutové představení Vision fáze</p>
+                        <p className="text-xs text-muted-foreground mt-1">(Video bude přidáno později)</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full lg:w-1/2 space-y-4 text-left">
+                    <h3 className="text-lg font-semibold">Co se v této fázi naučíte?</h3>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
+                        Blue Ocean Strategy - jak najít volný prostor na trhu
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
+                        ERRC matice - eliminace, redukce, pozvýšení a vytvoření hodnot
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
+                        Hodnotová křivka - positioning vůči konkurenci
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
+                        AI validace - ověření životaschopnosti vize
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Explanatory Text */}
+            <div className="mb-8 text-left">
+              <h3 className="text-lg font-semibold mb-4">Proč je Vision fáze klíčová?</h3>
+              <div className="prose prose-sm max-w-none text-muted-foreground space-y-4">
+                <p>
+                  <strong className="text-foreground">Blue Ocean Strategy</strong> vám pomůže najít neobsazený prostor na trhu, 
+                  kde můžete vytvořit novou poptávku místo konkurování v přeplněném "červeném oceánu". 
+                  Tato metodika byla úspěšně použita společnostmi jako Cirque du Soleil, Netflix nebo Southwest Airlines.
+                </p>
+                
+                <p>
+                  <strong className="text-foreground">ERRC matice</strong> (Eliminate-Reduce-Raise-Create) je srdcem této strategie. 
+                  Pomůže vám identifikovat co odstranit z trhu, co zlevnit, co vylepšit a co úplně nového vytvořit. 
+                  Výsledkem je jedinečná hodnotová propozice, která vás odliší od konkurence.
+                </p>
+                
+                <p>
+                  <strong className="text-foreground">Hodnotová křivka</strong> graficky zobrazuje, jak se váš projekt liší od 
+                  low-cost a premium konkurence napříč klíčovými atributy. Ideální křivka má jiný tvar než konkurence - 
+                  to znamená, že nabízíte jinou kombinaci hodnot.
+                </p>
+                
+                <p>
+                  <strong className="text-foreground">AI validace</strong> na konci vyhodnotí kvalitu vaší vize a poskytne 
+                  konkrétní doporučení pro zlepšení. Teprve s validovanou vizí můžete pokračovat do fáze Ideation.
+                </p>
+              </div>
+            </div>
+
+            {/* Supporting Materials */}
+            <div className="mb-8 p-6 bg-muted/30 rounded-xl">
+              <div className="flex items-center mb-4">
+                <BookOpen className="w-5 h-5 text-primary mr-2" />
+                <h3 className="text-lg font-semibold">Podpůrné materiály</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Stáhněte si pracovní šablony a metodické materiály pro lepší přípravu na Vision fázi.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
+                  <FileText className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium text-sm">Blue Ocean Strategy - Přehled</div>
+                    <div className="text-xs text-muted-foreground">Základy metodiky a příklady</div>
+                  </div>
+                </Button>
+                
+                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
+                  <FileText className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium text-sm">ERRC Matice - Worksheet</div>
+                    <div className="text-xs text-muted-foreground">Prázdná šablona pro offline práci</div>
+                  </div>
+                </Button>
+                
+                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
+                  <FileText className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium text-sm">Hodnotová křivka - Template</div>
+                    <div className="text-xs text-muted-foreground">Graf a návod k analýze</div>
+                  </div>
+                </Button>
+                
+                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
+                  <FileText className="w-4 h-4 mr-2" />
+                  <div className="text-left">
+                    <div className="font-medium text-sm">Vision Statement - Šablona</div>
+                    <div className="text-xs text-muted-foreground">Framework a inspirace</div>
+                  </div>
+                </Button>
+              </div>
+              
+              <p className="text-xs text-muted-foreground mt-3 italic">
+                💡 PDF materiály budou přidány později
+              </p>
+            </div>
+
+            {/* Stats and CTA */}
+            <div className="text-center">
+              <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground mb-8">
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                  5 kroků
+                </div>
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                  ~25 minut
+                </div>
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                  AI validace
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Button 
+                  onClick={() => setShowIntro(false)}
+                  className="btn-apple w-full h-12 text-base"
+                >
+                  <Play className="mr-2 w-4 h-4" />
+                  Začít s Vision
+                </Button>
+                
+                <Button 
+                  onClick={onBack}
+                  variant="ghost"
+                  className="w-full"
+                >
+                  <ArrowLeft className="mr-2 w-4 h-4" />
+                  Zpět na dashboard
+                </Button>
+              </div>
             </div>
           </Card>
         </div>
