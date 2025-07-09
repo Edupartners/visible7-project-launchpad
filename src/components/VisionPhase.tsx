@@ -172,15 +172,25 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
     const errcAttributes = generateValueCurveFromERRC();
     if (errcAttributes.length > 0) {
       setValueCurve(prev => {
-        // Preserve existing values for matching attributes
-        const updatedAttributes = errcAttributes.map(newAttr => {
+        // Always preserve "Cena" as first attribute
+        const cenaAttribute = prev.find(attr => attr.name === "Cena") || {
+          name: "Cena",
+          lowCost: 90,
+          premium: 20,
+          myProject: 60
+        };
+        
+        // Preserve existing values for matching ERRC attributes
+        const updatedERRCAttributes = errcAttributes.map(newAttr => {
           const existingAttr = prev.find(attr => attr.name === newAttr.name);
           if (existingAttr) {
             return { ...newAttr, lowCost: existingAttr.lowCost, premium: existingAttr.premium, myProject: existingAttr.myProject };
           }
           return newAttr;
         });
-        return updatedAttributes;
+        
+        // Return array with Cena first, followed by ERRC attributes
+        return [cenaAttribute, ...updatedERRCAttributes];
       });
     }
   }, [errcData]);
