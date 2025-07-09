@@ -9,14 +9,13 @@ import { ArrowLeft, CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertT
 
 interface LeanCanvasData {
   problem: string;
-  customerSegment: string;
-  uniqueValue: string;
   solution: string;
+  uniqueValueProposition: string;
+  customerSegments: string;
+  existingAlternatives: string;
   channels: string;
-  revenueModel: string;
   costStructure: string;
-  keyMetrics: string;
-  competitiveAdvantage: string;
+  revenueStreams: string;
 }
 
 interface IdeationPhaseProps {
@@ -27,57 +26,51 @@ interface IdeationPhaseProps {
 const leanCanvasFields = [
   {
     key: "problem" as keyof LeanCanvasData,
-    title: "Problém",
+    title: "Problem",
     placeholder: "Zaneprázdnění lidé nemají čas nakupovat zdravé bio potraviny. Supermarkety nabízejí málo bio produktů s nejistou čerstvostí. Složité hledání kvalitních místních dodavatelů.",
     gridArea: "problem"
   },
   {
     key: "solution" as keyof LeanCanvasData,
-    title: "Řešení",
+    title: "Solution",
     placeholder: "Mobilní aplikace s katalogem bio potravin od ověřených místních farmářů. Objednávka s doručením do 2 hodin. Garance čerstvosti a kvality. Jednoduché hodnocení dodavatelů.",
     gridArea: "solution"
   },
   {
-    key: "uniqueValue" as keyof LeanCanvasData,
-    title: "Unikátní hodnota",
+    key: "uniqueValueProposition" as keyof LeanCanvasData,
+    title: "Unique Value Proposition",
     placeholder: "Bio potraviny od místních farmářů doručené do 2 hodin s garancí čerstvosti. Podpora lokálních producentů. Transparentnost původu každého produktu.",
-    gridArea: "unique-value"
+    gridArea: "unique-value-proposition"
   },
   {
-    key: "competitiveAdvantage" as keyof LeanCanvasData,
-    title: "Konkurenční výhoda",
-    placeholder: "Exkluzivní partnerství s bio farmami v regionu. Vlastní logistická síť pro rychlé doručení. Proprietární systém hodnocení kvality. Silná komunita věrných zákazníků.",
-    gridArea: "advantage"
-  },
-  {
-    key: "customerSegment" as keyof LeanCanvasData,
-    title: "Segmenty zákazníků",
+    key: "customerSegments" as keyof LeanCanvasData,
+    title: "Customer Segments",
     placeholder: "Mladí profesionálové 28-42 let v Praze a Brně. Příjem 50K+ měsíčně. Aktivní životní styl, zájem o zdraví a udržitelnost. Ochotni platit více za kvalitu.",
-    gridArea: "customers"
+    gridArea: "customer-segments"
   },
   {
-    key: "keyMetrics" as keyof LeanCanvasData,
-    title: "Klíčové metriky",
-    placeholder: "Počet aktivních uživatelů (MAU), průměrná hodnota objednávky (AOV), frekvence objednávek, retention rate, čas doručení, spokojenost zákazníků (NPS).",
-    gridArea: "metrics"
+    key: "existingAlternatives" as keyof LeanCanvasData,
+    title: "Existing Alternatives",
+    placeholder: "Tesco, Albert bio sekce. Rohlik.cz, Košík.cz s bio produkty. Farmářské trhy o víkendech. Speciální bio obchody v centrech měst.",
+    gridArea: "existing-alternatives"
   },
   {
     key: "channels" as keyof LeanCanvasData,
-    title: "Kanály",
+    title: "Channels",
     placeholder: "Instagram a TikTok marketing, spolupráce s wellness influencery, Google Ads, mobilní aplikace v App Store/Google Play, doporučení od stávajících zákazníků.",
     gridArea: "channels"
   },
   {
     key: "costStructure" as keyof LeanCanvasData,
-    title: "Nákladová struktura",
+    title: "Cost Structure",
     placeholder: "Vývoj a údržba aplikace (200K/měsíc), platy kurýrů (300K/měsíc), marketing a reklama (150K/měsíc), skladování a logistika (100K/měsíc), provoz a administrativa (80K/měsíc).",
-    gridArea: "costs"
+    gridArea: "cost-structure"
   },
   {
-    key: "revenueModel" as keyof LeanCanvasData,
-    title: "Zdroje příjmů",
+    key: "revenueStreams" as keyof LeanCanvasData,
+    title: "Revenue Streams",
     placeholder: "Provize z prodeje 15% z každé objednávky, měsíční předplatné Premium za 299 Kč (rychlejší doručení), poplatek za doručení 49 Kč, partnership marketing s farmáři.",
-    gridArea: "revenue"
+    gridArea: "revenue-streams"
   }
 ];
 
@@ -134,14 +127,13 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
   // Persisted data
   const [leanCanvasData, setLeanCanvasData] = usePersistedState<LeanCanvasData>("ideation_lean_canvas", {
     problem: "",
-    customerSegment: "",
-    uniqueValue: "",
     solution: "",
+    uniqueValueProposition: "",
+    customerSegments: "",
+    existingAlternatives: "",
     channels: "",
-    revenueModel: "",
     costStructure: "",
-    keyMetrics: "",
-    competitiveAdvantage: ""
+    revenueStreams: ""
   });
   
   const [analysis, setAnalysis] = usePersistedState<AIAnalysis | null>("ideation_analysis", null);
@@ -245,19 +237,9 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
             {/* Lean Canvas Visualization */}
             <Card className="card-apple p-6">
               <h2 className="text-2xl font-bold text-foreground mb-6">Váš Lean Canvas</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-auto"
-                   style={{
-                     gridTemplateAreas: `
-                       "problem problem solution solution customers"
-                       "problem problem unique-value unique-value customers"
-                       "advantage advantage unique-value unique-value channels"
-                       "metrics metrics unique-value unique-value channels"
-                       "costs costs costs revenue revenue"
-                     `
-                   }}>
+              <div className="lean-canvas-grid">
                 {leanCanvasFields.map((field) => (
-                  <Card key={field.key} className="p-4 border-2 border-primary/20 min-h-[120px]" 
-                        style={{ gridArea: field.gridArea }}>
+                  <Card key={field.key} className={`p-4 border-2 border-primary/20 min-h-[120px] lean-canvas-${field.key.replace(/([A-Z])/g, '-$1').toLowerCase()}`}>
                     <h3 className="font-semibold text-sm mb-2 text-foreground">{field.title}</h3>
                     <p className="text-sm text-muted-foreground">
                       {leanCanvasData[field.key] || "Nevyplněno"}

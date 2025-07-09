@@ -174,4 +174,41 @@
   .text-apple-body {
     @apply text-sm text-foreground/80 leading-relaxed;
   }
+
+  /* Lean Canvas Grid Layout */
+  .lean-canvas-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(4, auto);
+    gap: 1rem;
+    grid-template-areas:
+      "problem problem solution solution customer-segments"
+      "existing-alternatives existing-alternatives unique-value-proposition unique-value-proposition customer-segments"  
+      "existing-alternatives existing-alternatives unique-value-proposition unique-value-proposition channels"
+      "cost-structure cost-structure cost-structure revenue-streams revenue-streams";
+  }
+
+  .lean-canvas-problem { grid-area: problem; }
+  .lean-canvas-solution { grid-area: solution; }
+  .lean-canvas-unique-value-proposition { grid-area: unique-value-proposition; }
+  .lean-canvas-customer-segments { grid-area: customer-segments; }
+  .lean-canvas-existing-alternatives { grid-area: existing-alternatives; }
+  .lean-canvas-channels { grid-area: channels; }
+  .lean-canvas-cost-structure { grid-area: cost-structure; }
+  .lean-canvas-revenue-streams { grid-area: revenue-streams; }
+
+  @media (max-width: 1024px) {
+    .lean-canvas-grid {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "problem"
+        "solution" 
+        "unique-value-proposition"
+        "customer-segments"
+        "existing-alternatives"
+        "channels"
+        "cost-structure"
+        "revenue-streams";
+    }
+  }
 }
