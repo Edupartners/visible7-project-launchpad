@@ -26,49 +26,49 @@ interface IdeationPhaseProps {
 const leanCanvasFields = [
   {
     key: "problem" as keyof LeanCanvasData,
-    title: "Problem",
+    title: "Problém",
     placeholder: "Zaneprázdnění lidé nemají čas nakupovat zdravé bio potraviny. Supermarkety nabízejí málo bio produktů s nejistou čerstvostí. Složité hledání kvalitních místních dodavatelů.",
     gridArea: "problem"
   },
   {
     key: "solution" as keyof LeanCanvasData,
-    title: "Solution",
+    title: "Řešení",
     placeholder: "Mobilní aplikace s katalogem bio potravin od ověřených místních farmářů. Objednávka s doručením do 2 hodin. Garance čerstvosti a kvality. Jednoduché hodnocení dodavatelů.",
     gridArea: "solution"
   },
   {
     key: "uniqueValueProposition" as keyof LeanCanvasData,
-    title: "Unique Value Proposition",
+    title: "Unikátní řešení nebo výhoda",
     placeholder: "Bio potraviny od místních farmářů doručené do 2 hodin s garancí čerstvosti. Podpora lokálních producentů. Transparentnost původu každého produktu.",
     gridArea: "unique-value-proposition"
   },
   {
     key: "customerSegments" as keyof LeanCanvasData,
-    title: "Customer Segments",
+    title: "Segment zákazníků",
     placeholder: "Mladí profesionálové 28-42 let v Praze a Brně. Příjem 50K+ měsíčně. Aktivní životní styl, zájem o zdraví a udržitelnost. Ochotni platit více za kvalitu.",
     gridArea: "customer-segments"
   },
   {
     key: "existingAlternatives" as keyof LeanCanvasData,
-    title: "Existing Alternatives",
+    title: "Existující alternativy",
     placeholder: "Tesco, Albert bio sekce. Rohlik.cz, Košík.cz s bio produkty. Farmářské trhy o víkendech. Speciální bio obchody v centrech měst.",
     gridArea: "existing-alternatives"
   },
   {
     key: "channels" as keyof LeanCanvasData,
-    title: "Channels",
+    title: "Marketingové kanály",
     placeholder: "Instagram a TikTok marketing, spolupráce s wellness influencery, Google Ads, mobilní aplikace v App Store/Google Play, doporučení od stávajících zákazníků.",
     gridArea: "channels"
   },
   {
     key: "costStructure" as keyof LeanCanvasData,
-    title: "Cost Structure",
+    title: "Náklady",
     placeholder: "Vývoj a údržba aplikace (200K/měsíc), platy kurýrů (300K/měsíc), marketing a reklama (150K/měsíc), skladování a logistika (100K/měsíc), provoz a administrativa (80K/měsíc).",
     gridArea: "cost-structure"
   },
   {
     key: "revenueStreams" as keyof LeanCanvasData,
-    title: "Revenue Streams",
+    title: "Předpokládané příjmy",
     placeholder: "Provize z prodeje 15% z každé objednávky, měsíční předplatné Premium za 299 Kč (rychlejší doručení), poplatek za doručení 49 Kč, partnership marketing s farmáři.",
     gridArea: "revenue-streams"
   }
