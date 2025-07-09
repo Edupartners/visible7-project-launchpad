@@ -237,15 +237,36 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
             {/* Lean Canvas Visualization */}
             <Card className="card-apple p-6">
               <h2 className="text-2xl font-bold text-foreground mb-6">Váš Lean Canvas</h2>
-              <div className="lean-canvas-grid">
-                {leanCanvasFields.map((field) => (
-                  <Card key={field.key} className={`p-4 border-2 border-primary/20 min-h-[120px] lean-canvas-${field.key.replace(/([A-Z])/g, '-$1').toLowerCase()}`}>
-                    <h3 className="font-semibold text-sm mb-2 text-foreground">{field.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {leanCanvasData[field.key] || "Nevyplněno"}
-                    </p>
-                  </Card>
-                ))}
+              <div className="lean-canvas-grid" style={{
+                // Add explicit debugging styles
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gridTemplateRows: 'repeat(4, auto)',
+                gap: '1rem',
+                gridTemplateAreas: `
+                  "problem problem solution solution customer-segments"
+                  "existing-alternatives existing-alternatives unique-value-proposition unique-value-proposition customer-segments"
+                  "existing-alternatives existing-alternatives unique-value-proposition unique-value-proposition channels"
+                  "cost-structure cost-structure cost-structure revenue-streams revenue-streams"
+                `,
+                border: '2px solid red' // Debug border
+              }}>
+                {leanCanvasFields.map((field) => {
+                  const className = `lean-canvas-${field.key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+                  console.log(`Field: ${field.key}, Generated class: ${className}, Grid area: ${field.gridArea}`);
+                  return (
+                    <Card key={field.key} className={`p-4 border-2 border-primary/20 min-h-[120px] ${className}`} 
+                          style={{ 
+                            gridArea: field.gridArea,
+                            border: '1px solid blue' // Debug border
+                          }}>
+                      <h3 className="font-semibold text-sm mb-2 text-foreground">{field.title}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {leanCanvasData[field.key] || "Nevyplněno"}
+                      </p>
+                    </Card>
+                  );
+                })}
               </div>
             </Card>
             
