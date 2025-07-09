@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { usePersistedState } from "@/hooks/usePersistedState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -70,20 +71,20 @@ const errcTemplate = {
 export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
   const [showIntro, setShowIntro] = useState(true);
   
-  // Form data
-  const [projectData, setProjectData] = useState<ProjectData>({ name: "", slogan: "" });
-  const [errcData, setERRCData] = useState<ERRCData>({
+  // Form data - persisted in localStorage
+  const [projectData, setProjectData] = usePersistedState<ProjectData>("vision_project_data", { name: "", slogan: "" });
+  const [errcData, setERRCData] = usePersistedState<ERRCData>("vision_errc_data", {
     eliminate: ["", ""],
     reduce: ["", ""],
     raise: ["", ""],
     create: ["", ""]
   });
-  const [valueCurve, setValueCurve] = useState<ValueCurveAttribute[]>(defaultAttributes);
-  const [visionStatement, setVisionStatement] = useState("");
+  const [valueCurve, setValueCurve] = usePersistedState<ValueCurveAttribute[]>("vision_value_curve", defaultAttributes);
+  const [visionStatement, setVisionStatement] = usePersistedState<string>("vision_statement", "");
   
-  // AI Analysis
+  // AI Analysis - persisted in localStorage
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
-  const [analysis, setAnalysis] = useState<string | null>(null);
+  const [analysis, setAnalysis] = usePersistedState<string | null>("vision_analysis", null);
   const [canProceed, setCanProceed] = useState(false);
 
   const sections = [
