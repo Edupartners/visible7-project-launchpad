@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown } from "lucide-react";
 
 interface StartupPlan {
@@ -21,14 +22,14 @@ interface StartupPlan {
 }
 
 interface ROICalculatorData {
-  // Marketingové náklady (měsíčně)
+  // Marketingové náklady (měsíčně - pole 12 hodnot)
   marketingCosts: {
-    ppc: number;
-    facebookAds: number;
-    bannerAds: number;
-    influencerMarketing: number;
-    emailMarketing: number;
-    seoContent: number;
+    ppc: number[];
+    facebookAds: number[];
+    bannerAds: number[];
+    influencerMarketing: number[];
+    emailMarketing: number[];
+    seoContent: number[];
   };
   
   // Provozní náklady (měsíčně)
@@ -103,12 +104,12 @@ const growthScenarios = {
 
 const defaultROIData: ROICalculatorData = {
   marketingCosts: {
-    ppc: 8000,
-    facebookAds: 5000,
-    bannerAds: 2000,
-    influencerMarketing: 3000,
-    emailMarketing: 1500,
-    seoContent: 4000
+    ppc: Array(12).fill(8000),
+    facebookAds: Array(12).fill(5000),
+    bannerAds: Array(12).fill(2000),
+    influencerMarketing: Array(12).fill(3000),
+    emailMarketing: Array(12).fill(1500),
+    seoContent: Array(12).fill(4000)
   },
   operationalCosts: {
     webDevelopment: 15000,
@@ -221,7 +222,10 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
     };
   }
 
-  const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, cost) => sum + cost, 0);
+  const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, costArray) => {
+    const averageCost = costArray.reduce((a, b) => a + b, 0) / costArray.length;
+    return sum + averageCost;
+  }, 0);
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
@@ -318,9 +322,14 @@ const generateChartData = (data: ROICalculatorData) => {
     return [];
   }
 
-  const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, cost) => sum + cost, 0);
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
-  const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
+  
+  // Function to calculate marketing costs for a specific month
+  const getMonthlyMarketingCosts = (monthIndex: number) => {
+    return Object.values(data.marketingCosts).reduce((sum, costArray) => {
+      return sum + (costArray[monthIndex] || 0);
+    }, 0);
+  };
   
   const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
   
@@ -352,6 +361,10 @@ const generateChartData = (data: ROICalculatorData) => {
     
     const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
     
+    // Calculate costs for this specific month
+    const monthlyMarketingCosts = getMonthlyMarketingCosts(currentMonthIndex);
+    const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
+    
     cumulativeRevenue += netMonthlyRevenue;
     cumulativeCosts += totalMonthlyCosts;
     cumulativeProfit = cumulativeRevenue - cumulativeCosts;
@@ -382,6 +395,20 @@ const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData)
       const item = localStorage.getItem(key);
       if (item) {
         const parsed = JSON.parse(item);
+        
+        // Migration logic for marketing costs (number -> number[])
+        const needsMarketingMigration = parsed.marketingCosts && 
+          Object.values(parsed.marketingCosts).some((value: any) => typeof value === 'number');
+        
+        if (needsMarketingMigration) {
+          const migratedMarketingCosts: any = {};
+          Object.entries(parsed.marketingCosts).forEach(([key, value]: [string, any]) => {
+            migratedMarketingCosts[key] = typeof value === 'number' ? Array(12).fill(value) : value;
+          });
+          parsed.marketingCosts = migratedMarketingCosts;
+          console.log('Migrated marketing costs from single values to monthly arrays');
+        }
+        
         // Migration logic - ensure all required properties exist
         if (!parsed.seasonalAdjustments || !parsed.startupPlan) {
           const migrated = {
@@ -442,12 +469,24 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
     setIsPreFilled(false);
   };
   
-  const updateMarketingCost = (key: keyof ROICalculatorData['marketingCosts'], value: number) => {
+  const updateMarketingCost = (key: keyof ROICalculatorData['marketingCosts'], monthIndex: number, value: number) => {
     setRoiData(prev => ({
       ...prev,
       marketingCosts: {
         ...prev.marketingCosts,
-        [key]: value
+        [key]: prev.marketingCosts[key].map((cost, index) => 
+          index === monthIndex ? value : cost
+        )
+      }
+    }));
+  };
+
+  const setAllMonthsMarketingCost = (key: keyof ROICalculatorData['marketingCosts'], value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      marketingCosts: {
+        ...prev.marketingCosts,
+        [key]: Array(12).fill(value)
       }
     }));
   };
@@ -542,7 +581,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   };
   
   const filledFieldsCount = [
-    ...Object.values(roiData.marketingCosts),
+    ...Object.values(roiData.marketingCosts).map(arr => arr.reduce((a, b) => a + b, 0)),
     ...Object.values(roiData.operationalCosts),
     ...Object.values(roiData.revenue),
     ...Object.values(roiData.taxes)
@@ -653,31 +692,100 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 <TrendingUp className="w-5 h-5 mr-2 text-primary" />
                 Marketingové náklady (měsíčně)
               </h2>
-              <div className="space-y-4">
+              
+              <div className="space-y-6">
                 {marketingFields.map((field) => (
-                  <div key={field.key} className="space-y-2">
-                    <Label htmlFor={field.key} className="text-sm font-medium">
-                      {field.label}
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id={field.key}
-                        type="number"
-                        value={roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts]}
-                        onChange={(e) => updateMarketingCost(
-                          field.key as keyof ROICalculatorData['marketingCosts'], 
-                          parseInt(e.target.value) || 0
-                        )}
-                        placeholder="0"
-                        className="pr-12"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        Kč
-                      </span>
+                  <div key={field.key} className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-medium">{field.label}</Label>
+                        <p className="text-xs text-muted-foreground">{field.hint}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="number"
+                          placeholder="Konstantní hodnota"
+                          className="w-32"
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            if (value > 0) {
+                              setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], value);
+                            }
+                          }}
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], 0)}
+                        >
+                          Reset
+                        </Button>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">{field.hint}</p>
+                    
+                    <div className="grid grid-cols-4 gap-2">
+                      {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].map((cost, monthIndex) => (
+                        <div key={monthIndex} className="space-y-1">
+                          <Label className="text-xs text-muted-foreground text-center block">
+                            {monthNames[monthIndex]}
+                          </Label>
+                          <Input
+                            type="number"
+                            value={cost}
+                            onChange={(e) => updateMarketingCost(
+                              field.key as keyof ROICalculatorData['marketingCosts'],
+                              monthIndex,
+                              parseInt(e.target.value) || 0
+                            )}
+                            className="text-center text-sm"
+                            min="0"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground text-center">
+                      Celkem za rok: {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].reduce((sum, cost) => sum + cost, 0).toLocaleString()} Kč
+                    </div>
                   </div>
                 ))}
+                
+                <div className="bg-accent/10 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium mb-2">💡 Rychlé akce:</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        marketingFields.forEach(field => {
+                          const constantValue = roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts][0];
+                          setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], constantValue);
+                        });
+                      }}
+                    >
+                      Konstantní hodnoty
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        marketingFields.forEach(field => {
+                          const baseValue = roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts][0];
+                          const newValues = Array.from({length: 12}, (_, i) => Math.round(baseValue * (1 + i * 0.1)));
+                          setRoiData(prev => ({
+                            ...prev,
+                            marketingCosts: {
+                              ...prev.marketingCosts,
+                              [field.key]: newValues
+                            }
+                          }));
+                        });
+                      }}
+                    >
+                      Postupný nárůst
+                    </Button>
+                  </div>
+                </div>
               </div>
             </Card>
             
