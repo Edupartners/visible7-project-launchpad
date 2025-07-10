@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCircle, Play, User, LogOut } from "lucide-react";
 import { VisionPhase } from "./VisionPhase";
 import { IdeationPhase } from "./IdeationPhase";
+import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
 import { PaymentModal } from "./PaymentModal";
 const phases = [{
   id: 1,
@@ -108,6 +109,10 @@ export const Dashboard = ({
   
   if (currentPhase === 2) {
     return <IdeationPhase onComplete={() => handlePhaseComplete(2)} onBack={() => setCurrentPhase(null)} />;
+  }
+  
+  if (currentPhase === 3) {
+    return <StrategyBusinessPhase onComplete={() => handlePhaseComplete(3)} onBack={() => setCurrentPhase(null)} />;
   }
   return <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
       {/* Header */}

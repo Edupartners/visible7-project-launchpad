@@ -1,0 +1,745 @@
+import React, { useState, useEffect } from "react";
+import { usePersistedState } from "@/hooks/usePersistedState";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw } from "lucide-react";
+
+interface ROICalculatorData {
+  // Marketingové náklady (měsíčně)
+  marketingCosts: {
+    ppc: number;
+    facebookAds: number;
+    bannerAds: number;
+    influencerMarketing: number;
+    emailMarketing: number;
+    seoContent: number;
+  };
+  
+  // Provozní náklady (měsíčně)
+  operationalCosts: {
+    webDevelopment: number;
+    hostingSoftware: number;
+    workforce: number;
+    warehouseLogistics: number;
+    fixedMonthlyOperations: number;
+    otherCosts: number;
+  };
+  
+  // Výnosy
+  revenue: {
+    productPrice: number;
+    monthlyOrders: number;
+  };
+  
+  // Daně a rezervy
+  taxes: {
+    incomeTaxRate: number; // %
+    growthReserveRate: number; // %
+  };
+}
+
+interface StrategyBusinessPhaseProps {
+  onComplete: () => void;
+  onBack: () => void;
+}
+
+interface LeanCanvasData {
+  costStructure: string;
+  revenueStreams: string;
+}
+
+interface ROIAnalysis {
+  roi: number;
+  pno: number;
+  breakEvenMonth: number;
+  isViable: boolean;
+  reasoning: string;
+  recommendations: string[];
+}
+
+const defaultROIData: ROICalculatorData = {
+  marketingCosts: {
+    ppc: 8000,
+    facebookAds: 5000,
+    bannerAds: 2000,
+    influencerMarketing: 3000,
+    emailMarketing: 1500,
+    seoContent: 4000
+  },
+  operationalCosts: {
+    webDevelopment: 15000,
+    hostingSoftware: 2000,
+    workforce: 25000,
+    warehouseLogistics: 8000,
+    fixedMonthlyOperations: 5000,
+    otherCosts: 3000
+  },
+  revenue: {
+    productPrice: 850,
+    monthlyOrders: 45
+  },
+  taxes: {
+    incomeTaxRate: 15,
+    growthReserveRate: 10
+  }
+};
+
+const marketingFields = [
+  { key: 'ppc', label: 'PPC (Google Ads)', hint: 'Reklama ve vyhledávači Google, obvyklý rozpočet 5-20k Kč/měsíc' },
+  { key: 'facebookAds', label: 'Facebook Ads', hint: 'Sociální média reklama, efektivní pro B2C, 3-15k Kč/měsíc' },
+  { key: 'bannerAds', label: 'Bannerová reklama', hint: 'Display reklama na webech, 1-5k Kč/měsíc' },
+  { key: 'influencerMarketing', label: 'Influencer marketing', hint: 'Spolupráce s influencery, 2-10k Kč/měsíc podle dosahu' },
+  { key: 'emailMarketing', label: 'E-mailing / remarketing', hint: 'Newsletter a remarketing kampaně, 500-3k Kč/měsíc' },
+  { key: 'seoContent', label: 'SEO a obsah', hint: 'Optimalizace pro vyhledávače a tvorba obsahu, 3-10k Kč/měsíc' }
+];
+
+const operationalFields = [
+  { key: 'webDevelopment', label: 'Vývoj webu / aplikace', hint: 'Programování, design, údržba webu, 10-30k Kč/měsíc' },
+  { key: 'hostingSoftware', label: 'Hosting / software', hint: 'Webhosting, domény, SaaS nástroje, 500-3k Kč/měsíc' },
+  { key: 'workforce', label: 'Pracovní síla / služby', hint: 'Zaměstnanci, freelanceři, agentury, 15-50k Kč/měsíc' },
+  { key: 'warehouseLogistics', label: 'Sklad / logistika', hint: 'Skladování, expedice, doprava, 5-20k Kč/měsíc' },
+  { key: 'fixedMonthlyOperations', label: 'Fixní měsíční provoz', hint: 'Kancelář, energie, pojištění, 3-10k Kč/měsíc' },
+  { key: 'otherCosts', label: 'Ostatní náklady', hint: 'Neočekávané výdaje, rezervy, 2-5k Kč/měsíc' }
+];
+
+const loadLeanCanvasData = (): LeanCanvasData | null => {
+  try {
+    const data = localStorage.getItem("ideation_lean_canvas");
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.warn("Failed to load Lean Canvas data:", error);
+    return null;
+  }
+};
+
+const extractNumbersFromText = (text: string): number[] => {
+  const numbers = text.match(/\d+[.,]?\d*/g);
+  return numbers ? numbers.map(n => parseInt(n.replace(/[.,]/g, ''), 10)).filter(n => !isNaN(n)) : [];
+};
+
+const preFillfromLeanCanvas = (leanCanvas: LeanCanvasData): Partial<ROICalculatorData> => {
+  const costNumbers = extractNumbersFromText(leanCanvas.costStructure || "");
+  const revenueNumbers = extractNumbersFromText(leanCanvas.revenueStreams || "");
+  
+  const preFilledData: Partial<ROICalculatorData> = {};
+  
+  // Pre-fill costs if we have numbers
+  if (costNumbers.length >= 3) {
+    preFilledData.operationalCosts = {
+      webDevelopment: costNumbers[0] || defaultROIData.operationalCosts.webDevelopment,
+      workforce: costNumbers[1] || defaultROIData.operationalCosts.workforce,
+      hostingSoftware: costNumbers[2] || defaultROIData.operationalCosts.hostingSoftware,
+      warehouseLogistics: defaultROIData.operationalCosts.warehouseLogistics,
+      fixedMonthlyOperations: defaultROIData.operationalCosts.fixedMonthlyOperations,
+      otherCosts: defaultROIData.operationalCosts.otherCosts
+    };
+  }
+  
+  // Pre-fill revenue if we have numbers
+  if (revenueNumbers.length >= 1) {
+    preFilledData.revenue = {
+      productPrice: revenueNumbers[0] || defaultROIData.revenue.productPrice,
+      monthlyOrders: defaultROIData.revenue.monthlyOrders
+    };
+  }
+  
+  return preFilledData;
+};
+
+const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
+  const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, cost) => sum + cost, 0);
+  const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
+  const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
+  
+  const monthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
+  const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
+  const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
+  
+  const monthlyProfit = netMonthlyRevenue - totalMonthlyCosts;
+  
+  // ROI calculation (annual)
+  const annualProfit = monthlyProfit * 12;
+  const annualCosts = totalMonthlyCosts * 12;
+  const roi = annualCosts > 0 ? (annualProfit / annualCosts) * 100 : 0;
+  
+  // PNO calculation
+  const pno = monthlyRevenue > 0 ? (monthlyMarketingCosts / monthlyRevenue) * 100 : 0;
+  
+  // Break-even calculation
+  let breakEvenMonth = 0;
+  let cumulativeProfit = 0;
+  for (let month = 1; month <= 24; month++) {
+    cumulativeProfit += monthlyProfit;
+    if (cumulativeProfit > 0) {
+      breakEvenMonth = month;
+      break;
+    }
+  }
+  if (breakEvenMonth === 0) breakEvenMonth = 25; // More than 24 months
+  
+  // Analysis
+  const isViable = roi > 20 && pno < 50 && breakEvenMonth <= 12;
+  
+  let reasoning = "";
+  const recommendations: string[] = [];
+  
+  if (roi < 20) {
+    reasoning += "Nízká návratnost investice. ";
+    recommendations.push("Zvažte optimalizaci nákladů nebo zvýšení ceny produktu");
+  }
+  
+  if (pno > 50) {
+    reasoning += "Vysoké marketingové náklady vůči obratu. ";
+    recommendations.push("Optimalizujte marketingové kanály a zaměřte se na nejefektivnější");
+  }
+  
+  if (breakEvenMonth > 12) {
+    reasoning += "Dlouhá doba návratnosti. ";
+    recommendations.push("Zvažte rychlejší škálování nebo snížení počátečních nákladů");
+  }
+  
+  if (isViable) {
+    reasoning = "Projekt vykazuje zdravé finanční ukazatele a má dobré předpoklady pro úspěch.";
+    recommendations.push("Projekt je připraven k implementaci");
+    recommendations.push("Doporučujeme zahájit MVP verzi a postupně škálovat");
+  }
+  
+  return {
+    roi,
+    pno,
+    breakEvenMonth,
+    isViable,
+    reasoning,
+    recommendations
+  };
+};
+
+const generateChartData = (data: ROICalculatorData) => {
+  const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, cost) => sum + cost, 0);
+  const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
+  const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
+  
+  const monthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
+  const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
+  const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
+  
+  const chartData = [];
+  let cumulativeRevenue = 0;
+  let cumulativeCosts = 0;
+  let cumulativeProfit = 0;
+  
+  for (let month = 1; month <= 12; month++) {
+    cumulativeRevenue += netMonthlyRevenue;
+    cumulativeCosts += totalMonthlyCosts;
+    cumulativeProfit = cumulativeRevenue - cumulativeCosts;
+    
+    chartData.push({
+      month: `M${month}`,
+      revenue: Math.round(cumulativeRevenue),
+      costs: Math.round(cumulativeCosts),
+      profit: Math.round(cumulativeProfit)
+    });
+  }
+  
+  return chartData;
+};
+
+export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPhaseProps) => {
+  const [showIntro, setShowIntro] = useState(true);
+  const [isPreFilled, setIsPreFilled] = useState(false);
+  const [roiData, setRoiData] = usePersistedState<ROICalculatorData>("strategy_roi_data", defaultROIData);
+  
+  const analysis = calculateROIMetrics(roiData);
+  const chartData = generateChartData(roiData);
+  
+  // Pre-fill from Lean Canvas on mount
+  useEffect(() => {
+    const leanCanvas = loadLeanCanvasData();
+    if (leanCanvas && !isPreFilled) {
+      const preFilledData = preFillfromLeanCanvas(leanCanvas);
+      if (Object.keys(preFilledData).length > 0) {
+        setRoiData(prev => ({
+          ...prev,
+          ...preFilledData
+        }));
+        setIsPreFilled(true);
+      }
+    }
+  }, []);
+  
+  const resetToDefaults = () => {
+    setRoiData(defaultROIData);
+    setIsPreFilled(false);
+  };
+  
+  const updateMarketingCost = (key: keyof ROICalculatorData['marketingCosts'], value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      marketingCosts: {
+        ...prev.marketingCosts,
+        [key]: value
+      }
+    }));
+  };
+  
+  const updateOperationalCost = (key: keyof ROICalculatorData['operationalCosts'], value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      operationalCosts: {
+        ...prev.operationalCosts,
+        [key]: value
+      }
+    }));
+  };
+  
+  const updateRevenue = (key: keyof ROICalculatorData['revenue'], value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      revenue: {
+        ...prev.revenue,
+        [key]: value
+      }
+    }));
+  };
+  
+  const updateTax = (key: keyof ROICalculatorData['taxes'], value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      taxes: {
+        ...prev.taxes,
+        [key]: value
+      }
+    }));
+  };
+  
+  const filledFieldsCount = [
+    ...Object.values(roiData.marketingCosts),
+    ...Object.values(roiData.operationalCosts),
+    ...Object.values(roiData.revenue),
+    ...Object.values(roiData.taxes)
+  ].filter(value => value > 0).length;
+  
+  const totalFields = 6 + 6 + 2 + 2; // marketing + operational + revenue + taxes
+  const progressPercentage = (filledFieldsCount / totalFields) * 100;
+  
+  if (showIntro) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
+        <div className="max-w-4xl mx-auto">
+          <Button 
+            onClick={onBack}
+            variant="ghost" 
+            className="mb-6 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Zpět na dashboard
+          </Button>
+          
+          <Card className="card-apple p-8">
+            <div className="text-center space-y-6">
+              <div className="p-4 bg-primary/10 rounded-full w-20 h-20 mx-auto flex items-center justify-center">
+                <Target className="w-10 h-10 text-primary" />
+              </div>
+              
+              <div className="space-y-3">
+                <h1 className="text-3xl font-bold text-foreground">Fáze 3: Strategy & Business</h1>
+                <p className="text-xl text-primary font-medium">Výpočet ROI a návratnosti</p>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Analyzujeme finanční stránku vašeho projektu. Spočítáme ROI, PNO a break-even point 
+                  aby zjistili, jestli se váš projekt ekonomicky vyplatí.
+                </p>
+              </div>
+              
+              <div className="bg-accent/10 p-4 rounded-lg">
+                <h3 className="font-semibold text-foreground mb-2">Co vás čeká:</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Zadání marketingových a provozních nákladů</li>
+                  <li>• Výpočet ROI a podílu nákladů na obratu (PNO)</li>
+                  <li>• Graf vývoje návratnosti v čase</li>
+                  <li>• AI doporučení pro optimalizaci</li>
+                </ul>
+              </div>
+              
+              {isPreFilled && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Některá pole byla předvyplněna z vašeho Lean Canvas. Můžete je upravit podle potřeby.
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                onClick={() => setShowIntro(false)}
+                className="btn-apple px-8 py-3 text-base"
+              >
+                Začít s analýzou ROI
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
+      <div className="max-w-7xl mx-auto">
+        <Button 
+          onClick={onBack}
+          variant="ghost" 
+          className="mb-6 text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Zpět na dashboard
+        </Button>
+        
+        {/* Progress Header */}
+        <Card className="card-apple p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">ROI Business Kalkulátor</h1>
+              <p className="text-muted-foreground">
+                Vyplněno {filledFieldsCount} z {totalFields} polí
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              {isPreFilled && (
+                <Button onClick={resetToDefaults} variant="outline" size="sm">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Reset na výchozí
+                </Button>
+              )}
+            </div>
+          </div>
+          <Progress value={progressPercentage} className="h-3" />
+        </Card>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Input Forms */}
+          <div className="space-y-6">
+            {/* Marketing Costs */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+                Marketingové náklady (měsíčně)
+              </h2>
+              <div className="space-y-4">
+                {marketingFields.map((field) => (
+                  <div key={field.key} className="space-y-2">
+                    <Label htmlFor={field.key} className="text-sm font-medium">
+                      {field.label}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id={field.key}
+                        type="number"
+                        value={roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts]}
+                        onChange={(e) => updateMarketingCost(
+                          field.key as keyof ROICalculatorData['marketingCosts'], 
+                          parseInt(e.target.value) || 0
+                        )}
+                        placeholder="0"
+                        className="pr-12"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        Kč
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{field.hint}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            
+            {/* Operational Costs */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <Calculator className="w-5 h-5 mr-2 text-primary" />
+                Provozní náklady (měsíčně)
+              </h2>
+              <div className="space-y-4">
+                {operationalFields.map((field) => (
+                  <div key={field.key} className="space-y-2">
+                    <Label htmlFor={field.key} className="text-sm font-medium">
+                      {field.label}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id={field.key}
+                        type="number"
+                        value={roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts]}
+                        onChange={(e) => updateOperationalCost(
+                          field.key as keyof ROICalculatorData['operationalCosts'], 
+                          parseInt(e.target.value) || 0
+                        )}
+                        placeholder="0"
+                        className="pr-12"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        Kč
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{field.hint}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            
+            {/* Revenue & Taxes */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <DollarSign className="w-5 h-5 mr-2 text-primary" />
+                Výnosy a daně
+              </h2>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="productPrice" className="text-sm font-medium">
+                      Cena produktu/služby
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="productPrice"
+                        type="number"
+                        value={roiData.revenue.productPrice}
+                        onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
+                        placeholder="0"
+                        className="pr-12"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        Kč
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="monthlyOrders" className="text-sm font-medium">
+                      Objednávky za měsíc
+                    </Label>
+                    <Input
+                      id="monthlyOrders"
+                      type="number"
+                      value={roiData.revenue.monthlyOrders}
+                      onChange={(e) => updateRevenue('monthlyOrders', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
+                      Daň z příjmu
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="incomeTaxRate"
+                        type="number"
+                        value={roiData.taxes.incomeTaxRate}
+                        onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
+                        placeholder="15"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        %
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="growthReserveRate" className="text-sm font-medium">
+                      Rezerva na růst
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="growthReserveRate"
+                        type="number"
+                        value={roiData.taxes.growthReserveRate}
+                        onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
+                        placeholder="10"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        %
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+          
+          {/* Right Column - Results & Analysis */}
+          <div className="space-y-6">
+            {/* Key Metrics */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4">Klíčové ukazatele</h2>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {analysis.roi.toFixed(1)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">ROI (roční)</div>
+                </div>
+                
+                <div className="text-center p-4 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {analysis.pno.toFixed(1)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">PNO</div>
+                </div>
+                
+                <div className="text-center p-4 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Break-even (měsíc)</div>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 rounded-lg border">
+                <div className="text-sm text-muted-foreground mb-1">Doporučená PNO pro e-shopy</div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full" 
+                      style={{ width: '30%' }}
+                    ></div>
+                  </div>
+                  <span className="text-sm text-muted-foreground">20-30%</span>
+                </div>
+              </div>
+            </Card>
+            
+            {/* Chart */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4">Vývoj návratnosti (12 měsíců)</h2>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [
+                        `${value.toLocaleString()} Kč`,
+                        name === 'revenue' ? 'Příjmy' : name === 'costs' ? 'Náklady' : 'Zisk'
+                      ]}
+                      labelFormatter={(label) => `Měsíc ${label.replace('M', '')}`}
+                    />
+                    <Legend 
+                      formatter={(value) => 
+                        value === 'revenue' ? 'Příjmy' : value === 'costs' ? 'Náklady' : 'Zisk'
+                      }
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="costs" 
+                      stroke="hsl(var(--destructive))" 
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="profit" 
+                      stroke="hsl(var(--success))" 
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+            
+            {/* AI Analysis */}
+            <Card className="card-apple p-6">
+              <div className="flex items-center mb-4">
+                <Brain className="w-6 h-6 mr-2 text-primary" />
+                <h2 className="text-xl font-semibold text-foreground">AI Analýza projektu</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  {analysis.isViable ? (
+                    <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
+                  ) : (
+                    <AlertTriangle className="w-6 h-6 text-orange-500 mt-1 flex-shrink-0" />
+                  )}
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      {analysis.isViable ? "✅ Projekt je ekonomicky viabilní" : "⚠️ Projekt potřebuje optimalizaci"}
+                    </h3>
+                    <p className="text-muted-foreground">{analysis.reasoning}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">Doporučení:</h3>
+                  <ul className="space-y-1">
+                    {analysis.recommendations.map((recommendation, index) => (
+                      <li key={index} className="text-sm text-muted-foreground">
+                        • {recommendation}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </Card>
+            
+            {/* Completion */}
+            <Card className="card-apple p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+              <div className="text-center space-y-4">
+                <h3 className="text-lg font-semibold text-foreground">
+                  Analýza dokončena
+                </h3>
+                <p className="text-muted-foreground">
+                  {analysis.isViable 
+                    ? "Projekt má dobré finanční základy. Můžete pokračovat k implementaci."
+                    : "Projekt vyžaduje optimalizaci před pokračováním. Prostudujte si doporučení výše."
+                  }
+                </p>
+                <Button 
+                  onClick={onComplete}
+                  className="btn-apple px-8"
+                  disabled={progressPercentage < 80}
+                >
+                  {analysis.isViable ? "Pokračovat na implementaci" : "Dokončit analýzu"}
+                </Button>
+                {progressPercentage < 80 && (
+                  <p className="text-xs text-muted-foreground">
+                    Vyplňte alespoň 80% polí pro pokračování
+                  </p>
+                )}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
