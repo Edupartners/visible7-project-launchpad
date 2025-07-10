@@ -225,8 +225,9 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
-  // Calculate seasonal adjusted revenue
-  const baseMonthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
+  // Calculate seasonal adjusted revenue using startup plan data
+  const avgOrdersFromStartupPlan = data.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12;
+  const baseMonthlyRevenue = data.revenue.productPrice * avgOrdersFromStartupPlan;
   const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
   
   // Break-even calculation with seasonal adjustments
@@ -461,6 +462,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   };
   
   const updateRevenue = (key: keyof ROICalculatorData['revenue'], value: number) => {
+    if (key === 'monthlyOrders') return; // Ignore monthlyOrders, use startupPlan data instead
     setRoiData(prev => ({
       ...prev,
       revenue: {
@@ -712,91 +714,6 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
             </Card>
             
-            {/* Revenue & Taxes */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-primary" />
-                Výnosy a daně
-              </h2>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="productPrice" className="text-sm font-medium">
-                      Cena produktu/služby
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="productPrice"
-                        type="number"
-                        value={roiData.revenue.productPrice}
-                        onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
-                        placeholder="0"
-                        className="pr-12"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        Kč
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="monthlyOrders" className="text-sm font-medium">
-                      Objednávky za měsíc
-                    </Label>
-                    <Input
-                      id="monthlyOrders"
-                      type="number"
-                      value={roiData.revenue.monthlyOrders}
-                      onChange={(e) => updateRevenue('monthlyOrders', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
-                      Daň z příjmu
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="incomeTaxRate"
-                        type="number"
-                        value={roiData.taxes.incomeTaxRate}
-                        onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
-                        placeholder="15"
-                        className="pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="growthReserveRate" className="text-sm font-medium">
-                      Rezerva na růst
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="growthReserveRate"
-                        type="number"
-                        value={roiData.taxes.growthReserveRate}
-                        onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
-                        placeholder="10"
-                        className="pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
             {/* Startup Launch Planning */}
             <Card className="card-apple p-6">
               <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
@@ -929,6 +846,91 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                     🚀 <strong>Agresivní:</strong> Rychlý růst 0→300 objednávek (vyžaduje více investic)<br/>
                     📅 <strong>Sezónní:</strong> Růst s ohledem na sezónní výkyvy v odvětví
                   </p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Revenue & Taxes */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <DollarSign className="w-5 h-5 mr-2 text-primary" />
+                Výnosy a daně
+              </h2>
+              <div className="space-y-4">
+                {/* Startup plan summary */}
+                <div className="bg-accent/10 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium mb-2">Založeno na plánu spuštění:</h4>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <div>• Průměrně {Math.round(roiData.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12)} objednávek/měsíc</div>
+                    <div>• Spuštění v {monthNames[roiData.startupPlan.launchMonth]}</div>
+                    <div>• Růst z {roiData.startupPlan.monthlyOrders[0]} na {roiData.startupPlan.monthlyOrders[11]} objednávek za rok</div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="productPrice" className="text-sm font-medium">
+                      Cena produktu/služby
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="productPrice"
+                        type="number"
+                        value={roiData.revenue.productPrice}
+                        onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
+                        placeholder="0"
+                        className="pr-12"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        Kč
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Počet objednávek se automaticky bere z plánu spuštění výše
+                    </p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
+                      Daň z příjmu
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="incomeTaxRate"
+                        type="number"
+                        value={roiData.taxes.incomeTaxRate}
+                        onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
+                        placeholder="15"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        %
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="growthReserveRate" className="text-sm font-medium">
+                      Rezerva na růst
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="growthReserveRate"
+                        type="number"
+                        value={roiData.taxes.growthReserveRate}
+                        onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
+                        placeholder="10"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        %
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
