@@ -198,6 +198,19 @@ const preFillfromLeanCanvas = (leanCanvas: LeanCanvasData): Partial<ROICalculato
 };
 
 const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
+  // Defensive programming - ensure data exists
+  if (!data?.marketingCosts || !data?.operationalCosts || !data?.revenue || !data?.taxes || !data?.seasonalAdjustments) {
+    console.warn('calculateROIMetrics: Missing required data properties, using defaults');
+    return {
+      roi: 0,
+      pno: 0,
+      breakEvenMonth: 25,
+      isViable: false,
+      reasoning: "Chybí základní data pro výpočet",
+      recommendations: ["Vyplňte všechna povinná pole"]
+    };
+  }
+
   const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, cost) => sum + cost, 0);
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
@@ -210,7 +223,7 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   let breakEvenMonth = 0;
   let cumulativeProfit = 0;
   for (let month = 1; month <= 24; month++) {
-    const seasonalMultiplier = data.seasonalAdjustments.salesMultipliers[(month - 1) % 12];
+    const seasonalMultiplier = data.seasonalAdjustments?.salesMultipliers?.[(month - 1) % 12] || 1;
     const adjustedRevenue = baseMonthlyRevenue * seasonalMultiplier;
     const netMonthlyRevenue = adjustedRevenue * (1 - taxAndReserveRate);
     const monthlyProfit = netMonthlyRevenue - totalMonthlyCosts;
@@ -224,7 +237,7 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   if (breakEvenMonth === 0) breakEvenMonth = 25; // More than 24 months
   
   // Calculate average annual metrics
-  const avgSeasonalMultiplier = data.seasonalAdjustments.salesMultipliers.reduce((sum, mult) => sum + mult, 0) / 12;
+  const avgSeasonalMultiplier = (data.seasonalAdjustments?.salesMultipliers || [1,1,1,1,1,1,1,1,1,1,1,1]).reduce((sum, mult) => sum + mult, 0) / 12;
   const avgMonthlyRevenue = baseMonthlyRevenue * avgSeasonalMultiplier;
   const avgNetMonthlyRevenue = avgMonthlyRevenue * (1 - taxAndReserveRate);
   const avgMonthlyProfit = avgNetMonthlyRevenue - totalMonthlyCosts;
@@ -275,6 +288,12 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
 };
 
 const generateChartData = (data: ROICalculatorData) => {
+  // Defensive programming - ensure data exists
+  if (!data?.marketingCosts || !data?.operationalCosts || !data?.taxes || !data?.startupPlan || !data?.seasonalAdjustments) {
+    console.warn('generateChartData: Missing required data properties');
+    return [];
+  }
+
   const monthlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, cost) => sum + cost, 0);
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
@@ -332,41 +351,48 @@ const generateChartData = (data: ROICalculatorData) => {
   return chartData;
 };
 
-// Migration function to ensure data compatibility
-const migrateROIData = (loadedData: any): ROICalculatorData => {
-  // If loaded data is missing new properties, merge with defaults
-  if (!loadedData.seasonalAdjustments || !loadedData.startupPlan) {
-    return {
-      ...defaultROIData,
-      ...loadedData,
-      seasonalAdjustments: loadedData.seasonalAdjustments || defaultROIData.seasonalAdjustments,
-      startupPlan: loadedData.startupPlan || defaultROIData.startupPlan
-    };
-  }
-  return loadedData;
+// Custom hook for migrated persisted state
+const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData) => {
+  const [state, setState] = useState<ROICalculatorData>(() => {
+    try {
+      const item = localStorage.getItem(key);
+      if (item) {
+        const parsed = JSON.parse(item);
+        // Migration logic - ensure all required properties exist
+        if (!parsed.seasonalAdjustments || !parsed.startupPlan) {
+          const migrated = {
+            ...defaultValue,
+            ...parsed,
+            seasonalAdjustments: parsed.seasonalAdjustments || defaultValue.seasonalAdjustments,
+            startupPlan: parsed.startupPlan || defaultValue.startupPlan
+          };
+          console.log('Migrated ROI data with missing properties');
+          return migrated;
+        }
+        return parsed;
+      }
+      return defaultValue;
+    } catch (error) {
+      console.warn(`Failed to load ${key} from localStorage:`, error);
+      return defaultValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(state));
+    } catch (error) {
+      console.warn(`Failed to save ${key} to localStorage:`, error);
+    }
+  }, [key, state]);
+
+  return [state, setState] as const;
 };
 
 export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPhaseProps) => {
   const [showIntro, setShowIntro] = useState(true);
   const [isPreFilled, setIsPreFilled] = useState(false);
-  
-  // Use custom migration logic
-  const [roiData, setRoiData] = usePersistedState<ROICalculatorData>("strategy_roi_data", defaultROIData);
-  
-  // Apply migration on mount
-  useEffect(() => {
-    const rawData = localStorage.getItem("strategy_roi_data");
-    if (rawData) {
-      try {
-        const parsed = JSON.parse(rawData);
-        const migrated = migrateROIData(parsed);
-        setRoiData(migrated);
-      } catch (error) {
-        console.warn("Failed to migrate ROI data, using defaults:", error);
-        setRoiData(defaultROIData);
-      }
-    }
-  }, []);
+  const [roiData, setRoiData] = useMigratedPersistedState("strategy_roi_data", defaultROIData);
   
   const analysis = calculateROIMetrics(roiData);
   const chartData = generateChartData(roiData);
