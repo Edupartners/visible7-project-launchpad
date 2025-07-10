@@ -332,10 +332,41 @@ const generateChartData = (data: ROICalculatorData) => {
   return chartData;
 };
 
+// Migration function to ensure data compatibility
+const migrateROIData = (loadedData: any): ROICalculatorData => {
+  // If loaded data is missing new properties, merge with defaults
+  if (!loadedData.seasonalAdjustments || !loadedData.startupPlan) {
+    return {
+      ...defaultROIData,
+      ...loadedData,
+      seasonalAdjustments: loadedData.seasonalAdjustments || defaultROIData.seasonalAdjustments,
+      startupPlan: loadedData.startupPlan || defaultROIData.startupPlan
+    };
+  }
+  return loadedData;
+};
+
 export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPhaseProps) => {
   const [showIntro, setShowIntro] = useState(true);
   const [isPreFilled, setIsPreFilled] = useState(false);
+  
+  // Use custom migration logic
   const [roiData, setRoiData] = usePersistedState<ROICalculatorData>("strategy_roi_data", defaultROIData);
+  
+  // Apply migration on mount
+  useEffect(() => {
+    const rawData = localStorage.getItem("strategy_roi_data");
+    if (rawData) {
+      try {
+        const parsed = JSON.parse(rawData);
+        const migrated = migrateROIData(parsed);
+        setRoiData(migrated);
+      } catch (error) {
+        console.warn("Failed to migrate ROI data, using defaults:", error);
+        setRoiData(defaultROIData);
+      }
+    }
+  }, []);
   
   const analysis = calculateROIMetrics(roiData);
   const chartData = generateChartData(roiData);
