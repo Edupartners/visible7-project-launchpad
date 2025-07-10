@@ -77,6 +77,11 @@ interface ROIAnalysis {
   roi: number;
   pno: number;
   breakEvenMonth: number;
+  totalRevenue: number;
+  totalCosts: number;
+  totalProfit: number;
+  averageMonthlyProfit: number;
+  profitMargin: number;
   isViable: boolean;
   reasoning: string;
   recommendations: string[];
@@ -205,6 +210,11 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
       roi: 0,
       pno: 0,
       breakEvenMonth: 25,
+      totalRevenue: 0,
+      totalCosts: 0,
+      totalProfit: 0,
+      averageMonthlyProfit: 0,
+      profitMargin: 0,
       isViable: false,
       reasoning: "Chybí základní data pro výpočet",
       recommendations: ["Vyplňte všechna povinná pole"]
@@ -277,10 +287,22 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
     recommendations.push("Doporučujeme zahájit MVP verzi a postupně škálovat");
   }
   
+  // Calculate absolute values
+  const totalRevenue = avgMonthlyRevenue * 12;
+  const totalCosts = annualCosts;
+  const totalProfit = annualProfit;
+  const averageMonthlyProfit = avgMonthlyProfit;
+  const profitMargin = avgMonthlyRevenue > 0 ? (avgMonthlyProfit / avgMonthlyRevenue) * 100 : 0;
+  
   return {
     roi,
     pno,
     breakEvenMonth,
+    totalRevenue,
+    totalCosts,
+    totalProfit,
+    averageMonthlyProfit,
+    profitMargin,
     isViable,
     reasoning,
     recommendations
@@ -997,26 +1019,75 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
             {/* Key Metrics */}
             <Card className="card-apple p-6">
               <h2 className="text-xl font-semibold text-foreground mb-4">Klíčové ukazatele</h2>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-primary/5 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
-                    {analysis.roi.toFixed(1)}%
+              
+              {/* Relativní ukazatele */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">Relativní ukazatele</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">
+                      {analysis.roi.toFixed(1)}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">ROI (roční)</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">ROI (roční)</div>
+                  
+                  <div className="text-center p-4 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">
+                      {analysis.pno.toFixed(1)}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">PNO</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-primary/5 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">
+                      {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Break-even (měsíc)</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Absolutní částky */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">Absolutní částky (12 měsíců)</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-green-500/5 rounded-lg border border-green-500/20">
+                    <div className="text-2xl font-bold text-green-600">
+                      {(analysis.totalProfit / 1000).toFixed(0)}k Kč
+                    </div>
+                    <div className="text-sm text-muted-foreground">Celkový zisk</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-red-500/5 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-600">
+                      {(analysis.totalCosts / 1000).toFixed(0)}k Kč
+                    </div>
+                    <div className="text-sm text-muted-foreground">Celkové náklady</div>
+                  </div>
+                  
+                  <div className="text-center p-4 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {(analysis.totalRevenue / 1000).toFixed(0)}k Kč
+                    </div>
+                    <div className="text-sm text-muted-foreground">Celkový obrat</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Dodatečné metriky */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="text-center p-3 bg-accent/10 rounded-lg">
+                  <div className="text-lg font-semibold text-foreground">
+                    {(analysis.averageMonthlyProfit / 1000).toFixed(1)}k Kč
+                  </div>
+                  <div className="text-xs text-muted-foreground">Průměrný měsíční zisk</div>
                 </div>
                 
-                <div className="text-center p-4 bg-primary/5 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
-                    {analysis.pno.toFixed(1)}%
+                <div className="text-center p-3 bg-accent/10 rounded-lg">
+                  <div className="text-lg font-semibold text-foreground">
+                    {analysis.profitMargin.toFixed(1)}%
                   </div>
-                  <div className="text-sm text-muted-foreground">PNO</div>
-                </div>
-                
-                <div className="text-center p-4 bg-primary/5 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
-                    {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Break-even (měsíc)</div>
+                  <div className="text-xs text-muted-foreground">Marže</div>
                 </div>
               </div>
               
