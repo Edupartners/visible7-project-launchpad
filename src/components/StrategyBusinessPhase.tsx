@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
+import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3 } from "lucide-react";
 
 interface ROICalculatorData {
   // Marketingové náklady (měsíčně)
@@ -43,6 +45,12 @@ interface ROICalculatorData {
     incomeTaxRate: number; // %
     growthReserveRate: number; // %
   };
+
+  // Sezónní úpravy
+  seasonalAdjustments: {
+    salesMultipliers: number[]; // 12 měsíců, 0.5-2.0
+    selectedProfile: 'standard' | 'ecommerce' | 'b2b' | 'travel' | 'custom';
+  };
 }
 
 interface StrategyBusinessPhaseProps {
@@ -63,6 +71,13 @@ interface ROIAnalysis {
   reasoning: string;
   recommendations: string[];
 }
+
+const seasonalProfiles = {
+  standard: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  ecommerce: [0.8, 0.9, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.5],
+  b2b: [1, 1, 1, 1, 1, 1, 1, 0.6, 1, 1, 1, 0.7],
+  travel: [0.8, 0.8, 1, 1.1, 1.2, 1.3, 1.3, 1.3, 1.1, 1, 0.9, 0.8]
+};
 
 const defaultROIData: ROICalculatorData = {
   marketingCosts: {
@@ -88,6 +103,10 @@ const defaultROIData: ROICalculatorData = {
   taxes: {
     incomeTaxRate: 15,
     growthReserveRate: 10
+  },
+  seasonalAdjustments: {
+    salesMultipliers: [...seasonalProfiles.standard],
+    selectedProfile: 'standard'
   }
 };
 
@@ -108,6 +127,8 @@ const operationalFields = [
   { key: 'fixedMonthlyOperations', label: 'Fixní měsíční provoz', hint: 'Kancelář, energie, pojištění, 3-10k Kč/měsíc' },
   { key: 'otherCosts', label: 'Ostatní náklady', hint: 'Neočekávané výdaje, rezervy, 2-5k Kč/měsíc' }
 ];
+
+const monthNames = ['Led', 'Úno', 'Bře', 'Dub', 'Kvě', 'Čvn', 'Čvc', 'Srp', 'Zář', 'Říj', 'Lis', 'Pro'];
 
 const loadLeanCanvasData = (): LeanCanvasData | null => {
   try {
@@ -158,31 +179,40 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
-  const monthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
+  // Calculate seasonal adjusted revenue
+  const baseMonthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
   const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
-  const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
   
-  const monthlyProfit = netMonthlyRevenue - totalMonthlyCosts;
-  
-  // ROI calculation (annual)
-  const annualProfit = monthlyProfit * 12;
-  const annualCosts = totalMonthlyCosts * 12;
-  const roi = annualCosts > 0 ? (annualProfit / annualCosts) * 100 : 0;
-  
-  // PNO calculation
-  const pno = monthlyRevenue > 0 ? (monthlyMarketingCosts / monthlyRevenue) * 100 : 0;
-  
-  // Break-even calculation
+  // Break-even calculation with seasonal adjustments
   let breakEvenMonth = 0;
   let cumulativeProfit = 0;
   for (let month = 1; month <= 24; month++) {
+    const seasonalMultiplier = data.seasonalAdjustments.salesMultipliers[(month - 1) % 12];
+    const adjustedRevenue = baseMonthlyRevenue * seasonalMultiplier;
+    const netMonthlyRevenue = adjustedRevenue * (1 - taxAndReserveRate);
+    const monthlyProfit = netMonthlyRevenue - totalMonthlyCosts;
+    
     cumulativeProfit += monthlyProfit;
-    if (cumulativeProfit > 0) {
+    if (cumulativeProfit > 0 && breakEvenMonth === 0) {
       breakEvenMonth = month;
       break;
     }
   }
   if (breakEvenMonth === 0) breakEvenMonth = 25; // More than 24 months
+  
+  // Calculate average annual metrics
+  const avgSeasonalMultiplier = data.seasonalAdjustments.salesMultipliers.reduce((sum, mult) => sum + mult, 0) / 12;
+  const avgMonthlyRevenue = baseMonthlyRevenue * avgSeasonalMultiplier;
+  const avgNetMonthlyRevenue = avgMonthlyRevenue * (1 - taxAndReserveRate);
+  const avgMonthlyProfit = avgNetMonthlyRevenue - totalMonthlyCosts;
+  
+  // ROI calculation (annual)
+  const annualProfit = avgMonthlyProfit * 12;
+  const annualCosts = totalMonthlyCosts * 12;
+  const roi = annualCosts > 0 ? (annualProfit / annualCosts) * 100 : 0;
+  
+  // PNO calculation
+  const pno = avgMonthlyRevenue > 0 ? (monthlyMarketingCosts / avgMonthlyRevenue) * 100 : 0;
   
   // Analysis
   const isViable = roi > 20 && pno < 50 && breakEvenMonth <= 12;
@@ -226,9 +256,8 @@ const generateChartData = (data: ROICalculatorData) => {
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
-  const monthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
+  const baseMonthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
   const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
-  const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
   
   const chartData = [];
   let cumulativeRevenue = 0;
@@ -236,15 +265,21 @@ const generateChartData = (data: ROICalculatorData) => {
   let cumulativeProfit = 0;
   
   for (let month = 1; month <= 12; month++) {
+    const seasonalMultiplier = data.seasonalAdjustments.salesMultipliers[month - 1];
+    const adjustedRevenue = baseMonthlyRevenue * seasonalMultiplier;
+    const netMonthlyRevenue = adjustedRevenue * (1 - taxAndReserveRate);
+    
     cumulativeRevenue += netMonthlyRevenue;
     cumulativeCosts += totalMonthlyCosts;
     cumulativeProfit = cumulativeRevenue - cumulativeCosts;
     
     chartData.push({
       month: `M${month}`,
+      monthName: monthNames[month - 1],
       revenue: Math.round(cumulativeRevenue),
       costs: Math.round(cumulativeCosts),
-      profit: Math.round(cumulativeProfit)
+      profit: Math.round(cumulativeProfit),
+      isBreakEven: cumulativeProfit > 0 && (month === 1 || chartData[month - 2]?.profit <= 0)
     });
   }
   
@@ -258,6 +293,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   
   const analysis = calculateROIMetrics(roiData);
   const chartData = generateChartData(roiData);
+  const breakEvenPoint = chartData.find(point => point.isBreakEven);
   
   // Pre-fill from Lean Canvas on mount
   useEffect(() => {
@@ -318,6 +354,30 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
       }
     }));
   };
+
+  const updateSeasonalProfile = (profile: keyof typeof seasonalProfiles) => {
+    setRoiData(prev => ({
+      ...prev,
+      seasonalAdjustments: {
+        ...prev.seasonalAdjustments,
+        selectedProfile: profile,
+        salesMultipliers: [...seasonalProfiles[profile]]
+      }
+    }));
+  };
+
+  const updateSeasonalMultiplier = (monthIndex: number, value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      seasonalAdjustments: {
+        ...prev.seasonalAdjustments,
+        selectedProfile: 'custom',
+        salesMultipliers: prev.seasonalAdjustments.salesMultipliers.map((mult, index) => 
+          index === monthIndex ? value : mult
+        )
+      }
+    }));
+  };
   
   const filledFieldsCount = [
     ...Object.values(roiData.marketingCosts),
@@ -352,7 +412,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 <h1 className="text-3xl font-bold text-foreground">Fáze 3: Strategy & Business</h1>
                 <p className="text-xl text-primary font-medium">Výpočet ROI a návratnosti</p>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Analyzujeme finanční stránku vašeho projektu. Spočítáme ROI, PNO a break-even point 
+                  Analyzujeme finanční stránku vašeho projektu včetně sezónních vlivů. Spočítáme ROI, PNO a break-even point 
                   aby zjistili, jestli se váš projekt ekonomicky vyplatí.
                 </p>
               </div>
@@ -361,8 +421,8 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 <h3 className="font-semibold text-foreground mb-2">Co vás čeká:</h3>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Zadání marketingových a provozních nákladů</li>
-                  <li>• Výpočet ROI a podílu nákladů na obratu (PNO)</li>
-                  <li>• Graf vývoje návratnosti v čase</li>
+                  <li>• Sezónní úpravy prodejů (vánoce, léto, atd.)</li>
+                  <li>• Graf s bodem zvratu a vývojem návratnosti</li>
                   <li>• AI doporučení pro optimalizaci</li>
                 </ul>
               </div>
@@ -577,6 +637,86 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 </div>
               </div>
             </Card>
+
+            {/* Seasonal Adjustments */}
+            <Card className="card-apple p-6">
+              <Accordion type="single" collapsible>
+                <AccordionItem value="seasonal">
+                  <AccordionTrigger className="text-lg font-semibold">
+                    <div className="flex items-center">
+                      <Calendar className="w-5 h-5 mr-2 text-primary" />
+                      Sezónní variace prodejů
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-4 pt-4">
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Přednastavené profily:</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant={roiData.seasonalAdjustments.selectedProfile === 'standard' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => updateSeasonalProfile('standard')}
+                        >
+                          Standardní
+                        </Button>
+                        <Button
+                          variant={roiData.seasonalAdjustments.selectedProfile === 'ecommerce' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => updateSeasonalProfile('ecommerce')}
+                        >
+                          E-commerce
+                        </Button>
+                        <Button
+                          variant={roiData.seasonalAdjustments.selectedProfile === 'b2b' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => updateSeasonalProfile('b2b')}
+                        >
+                          B2B služby
+                        </Button>
+                        <Button
+                          variant={roiData.seasonalAdjustments.selectedProfile === 'travel' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => updateSeasonalProfile('travel')}
+                        >
+                          Cestovní ruch
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Měsíční úpravy (% od základu):</Label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {monthNames.map((month, index) => (
+                          <div key={month} className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">{month}</Label>
+                            <div className="space-y-1">
+                              <Slider
+                                value={[roiData.seasonalAdjustments.salesMultipliers[index]]}
+                                onValueChange={([value]) => updateSeasonalMultiplier(index, value)}
+                                min={0.5}
+                                max={2.0}
+                                step={0.1}
+                                className="w-full"
+                              />
+                              <div className="text-xs text-center text-muted-foreground">
+                                {Math.round(roiData.seasonalAdjustments.salesMultipliers[index] * 100)}%
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-accent/10 p-3 rounded-lg">
+                      <p className="text-xs text-muted-foreground">
+                        💡 Tip: E-commerce má obvykle vyšší prodeje v listopadu-prosinci (vánoce), 
+                        B2B služby mají nižší prodeje v srpnu a prosinci.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </Card>
           </div>
           
           {/* Right Column - Results & Analysis */}
@@ -621,15 +761,18 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
             </Card>
             
-            {/* Chart */}
+            {/* Chart with Break-even */}
             <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Vývoj návratnosti (12 měsíců)</h2>
-              <div className="h-64">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+                Vývoj návratnosti s bodem zvratu
+              </h2>
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis 
-                      dataKey="month" 
+                      dataKey="monthName" 
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={12}
                     />
@@ -638,18 +781,72 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                       fontSize={12}
                       tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
                     />
+                    
+                    {/* Zero line */}
+                    <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="2 2" />
+                    
+                    {/* Break-even line */}
+                    {breakEvenPoint && (
+                      <ReferenceLine 
+                        x={breakEvenPoint.monthName} 
+                        stroke="hsl(var(--success))" 
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                        label={{ 
+                          value: `Break-even: ${breakEvenPoint.monthName}`, 
+                          position: "top",
+                          style: { fontSize: '12px', fill: 'hsl(var(--success))' }
+                        }}
+                      />
+                    )}
+
+                    {/* Profit zones */}
+                    <ReferenceArea 
+                      y1={0} 
+                      y2={Math.max(...chartData.map(d => d.profit))} 
+                      fill="hsl(var(--success))" 
+                      fillOpacity={0.1} 
+                    />
+                    <ReferenceArea 
+                      y1={Math.min(...chartData.map(d => d.profit))} 
+                      y2={0} 
+                      fill="hsl(var(--destructive))" 
+                      fillOpacity={0.1} 
+                    />
+                    
                     <Tooltip 
-                      formatter={(value: number, name: string) => [
-                        `${value.toLocaleString()} Kč`,
-                        name === 'revenue' ? 'Příjmy' : name === 'costs' ? 'Náklady' : 'Zisk'
-                      ]}
-                      labelFormatter={(label) => `Měsíc ${label.replace('M', '')}`}
+                      formatter={(value: number, name: string, props: any) => {
+                        const labels = {
+                          revenue: 'Příjmy',
+                          costs: 'Náklady', 
+                          profit: 'Zisk'
+                        };
+                        const formattedValue = `${value.toLocaleString()} Kč`;
+                        
+                        if (name === 'profit' && props.payload.isBreakEven) {
+                          return [`${formattedValue} (Break-even!)`, labels[name as keyof typeof labels]];
+                        }
+                        
+                        return [formattedValue, labels[name as keyof typeof labels]];
+                      }}
+                      labelFormatter={(label) => `Měsíc: ${label}`}
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
                     />
                     <Legend 
-                      formatter={(value) => 
-                        value === 'revenue' ? 'Příjmy' : value === 'costs' ? 'Náklady' : 'Zisk'
-                      }
+                      formatter={(value) => {
+                        const labels = {
+                          revenue: 'Příjmy',
+                          costs: 'Náklady', 
+                          profit: 'Zisk'
+                        };
+                        return labels[value as keyof typeof labels] || value;
+                      }}
                     />
+                    
                     <Line 
                       type="monotone" 
                       dataKey="revenue" 
@@ -668,8 +865,22 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                       type="monotone" 
                       dataKey="profit" 
                       stroke="hsl(var(--success))" 
-                      strokeWidth={2}
-                      dot={false}
+                      strokeWidth={3}
+                      dot={(props) => {
+                        if (props.payload?.isBreakEven) {
+                          return (
+                            <circle
+                              cx={props.cx}
+                              cy={props.cy}
+                              r={6}
+                              fill="hsl(var(--success))"
+                              stroke="hsl(var(--background))"
+                              strokeWidth={2}
+                            />
+                          );
+                        }
+                        return null;
+                      }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -708,6 +919,15 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                     ))}
                   </ul>
                 </div>
+
+                {breakEvenPoint && (
+                  <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
+                    <p className="text-sm text-muted-foreground">
+                      🎯 <strong>Break-even dosažen v měsíci {breakEvenPoint.monthName}</strong> - 
+                      od tohoto okamžiku začne projekt generovat zisk.
+                    </p>
+                  </div>
+                )}
               </div>
             </Card>
             
@@ -719,7 +939,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 </h3>
                 <p className="text-muted-foreground">
                   {analysis.isViable 
-                    ? "Projekt má dobré finanční základy. Můžete pokračovat k implementaci."
+                    ? "Projekt má dobré finanční základy včetně sezónních vlivů. Můžete pokračovat k implementaci."
                     : "Projekt vyžaduje optimalizaci před pokračováním. Prostudujte si doporučení výše."
                   }
                 </p>
