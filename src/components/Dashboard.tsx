@@ -19,7 +19,7 @@ const phases = [{
   id: 2,
   title: "Ideation",
   subtitle: "Lean Canvas",
-  description: "Vytvořte business model pro váš projekt",
+  description: "Popište si váš byznys model pro váš projekt",
   icon: Lightbulb,
   isFree: false,
   estimatedTime: "25 min"
