@@ -11,7 +11,14 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
-import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3 } from "lucide-react";
+import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown } from "lucide-react";
+
+interface StartupPlan {
+  launchMonth: number; // 0-11 (Jan-Dec)
+  preLaunchMonths: number; // How many months before launch to start investing
+  monthlyOrders: number[]; // 12 months of absolute order numbers
+  selectedScenario: 'slow-start' | 'aggressive' | 'seasonal' | 'custom';
+}
 
 interface ROICalculatorData {
   // Marketingové náklady (měsíčně)
@@ -37,7 +44,7 @@ interface ROICalculatorData {
   // Výnosy
   revenue: {
     productPrice: number;
-    monthlyOrders: number;
+    monthlyOrders: number; // This becomes the base for growth scenarios
   };
   
   // Daně a rezervy
@@ -51,6 +58,9 @@ interface ROICalculatorData {
     salesMultipliers: number[]; // 12 měsíců, 0.5-2.0
     selectedProfile: 'standard' | 'ecommerce' | 'b2b' | 'travel' | 'custom';
   };
+
+  // Startup launch plan
+  startupPlan: StartupPlan;
 }
 
 interface StrategyBusinessPhaseProps {
@@ -77,6 +87,13 @@ const seasonalProfiles = {
   ecommerce: [0.8, 0.9, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.5],
   b2b: [1, 1, 1, 1, 1, 1, 1, 0.6, 1, 1, 1, 0.7],
   travel: [0.8, 0.8, 1, 1.1, 1.2, 1.3, 1.3, 1.3, 1.1, 1, 0.9, 0.8]
+};
+
+// Growth scenarios for startup launches
+const growthScenarios = {
+  'slow-start': [0, 0, 5, 8, 12, 18, 25, 30, 35, 42, 50, 60],
+  'aggressive': [0, 0, 10, 25, 45, 70, 100, 130, 160, 200, 250, 300],
+  'seasonal': [0, 0, 10, 15, 20, 30, 35, 25, 30, 45, 60, 80]
 };
 
 const defaultROIData: ROICalculatorData = {
@@ -107,6 +124,12 @@ const defaultROIData: ROICalculatorData = {
   seasonalAdjustments: {
     salesMultipliers: [...seasonalProfiles.standard],
     selectedProfile: 'standard'
+  },
+  startupPlan: {
+    launchMonth: 2, // March (0-based)
+    preLaunchMonths: 2, // Start investing 2 months before launch
+    monthlyOrders: [...growthScenarios['slow-start']],
+    selectedScenario: 'slow-start'
   }
 };
 
@@ -256,7 +279,6 @@ const generateChartData = (data: ROICalculatorData) => {
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
-  const baseMonthlyRevenue = data.revenue.productPrice * data.revenue.monthlyOrders;
   const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
   
   const chartData = [];
@@ -264,22 +286,46 @@ const generateChartData = (data: ROICalculatorData) => {
   let cumulativeCosts = 0;
   let cumulativeProfit = 0;
   
+  const { launchMonth, preLaunchMonths, monthlyOrders } = data.startupPlan;
+  const startMonth = launchMonth - preLaunchMonths;
+  
   for (let month = 1; month <= 12; month++) {
-    const seasonalMultiplier = data.seasonalAdjustments.salesMultipliers[month - 1];
-    const adjustedRevenue = baseMonthlyRevenue * seasonalMultiplier;
-    const netMonthlyRevenue = adjustedRevenue * (1 - taxAndReserveRate);
+    const currentMonthIndex = (startMonth + month - 1 + 12) % 12;
+    const monthsSinceStart = month - 1;
+    const monthsSinceLaunch = monthsSinceStart - preLaunchMonths;
+    
+    // Determine if this is pre-launch, launch, or post-launch
+    const isPreLaunch = monthsSinceLaunch < 0;
+    const isLaunchMonth = monthsSinceLaunch === 0;
+    
+    // Calculate revenue based on startup plan
+    let monthlyRevenue = 0;
+    if (!isPreLaunch) {
+      const orderIndex = Math.max(0, Math.min(11, monthsSinceLaunch));
+      const ordersThisMonth = monthlyOrders[orderIndex] || 0;
+      const seasonalMultiplier = data.seasonalAdjustments.salesMultipliers[currentMonthIndex];
+      monthlyRevenue = data.revenue.productPrice * ordersThisMonth * seasonalMultiplier;
+    }
+    
+    const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
     
     cumulativeRevenue += netMonthlyRevenue;
     cumulativeCosts += totalMonthlyCosts;
     cumulativeProfit = cumulativeRevenue - cumulativeCosts;
     
+    const phaseColor = isPreLaunch ? 'investment' : (isLaunchMonth ? 'launch' : 'growth');
+    
     chartData.push({
       month: `M${month}`,
-      monthName: monthNames[month - 1],
+      monthName: monthNames[currentMonthIndex],
       revenue: Math.round(cumulativeRevenue),
       costs: Math.round(cumulativeCosts),
       profit: Math.round(cumulativeProfit),
-      isBreakEven: cumulativeProfit > 0 && (month === 1 || chartData[month - 2]?.profit <= 0)
+      phase: phaseColor,
+      ordersThisMonth: isPreLaunch ? 0 : monthlyOrders[Math.max(0, Math.min(11, monthsSinceLaunch))] || 0,
+      isBreakEven: cumulativeProfit > 0 && (month === 1 || chartData[month - 2]?.profit <= 0),
+      isPreLaunch,
+      isLaunchMonth
     });
   }
   
@@ -351,6 +397,40 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
       taxes: {
         ...prev.taxes,
         [key]: value
+      }
+    }));
+  };
+
+  const updateStartupPlan = (key: keyof StartupPlan, value: any) => {
+    setRoiData(prev => ({
+      ...prev,
+      startupPlan: {
+        ...prev.startupPlan,
+        [key]: value
+      }
+    }));
+  };
+
+  const updateGrowthScenario = (scenario: keyof typeof growthScenarios) => {
+    setRoiData(prev => ({
+      ...prev,
+      startupPlan: {
+        ...prev.startupPlan,
+        selectedScenario: scenario,
+        monthlyOrders: [...growthScenarios[scenario]]
+      }
+    }));
+  };
+
+  const updateMonthlyOrder = (monthIndex: number, value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      startupPlan: {
+        ...prev.startupPlan,
+        selectedScenario: 'custom',
+        monthlyOrders: prev.startupPlan.monthlyOrders.map((orders, index) => 
+          index === monthIndex ? value : orders
+        )
       }
     }));
   };
@@ -634,6 +714,142 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                       </span>
                     </div>
                   </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Startup Launch Planning */}
+            <Card className="card-apple p-6">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <Rocket className="w-5 h-5 mr-2 text-primary" />
+                Plánování spuštění startupu
+              </h2>
+              
+              <div className="space-y-6">
+                {/* Launch settings */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Měsíc spuštění produktu</Label>
+                    <select 
+                      className="w-full p-2 border rounded-md bg-background"
+                      value={roiData.startupPlan.launchMonth}
+                      onChange={(e) => updateStartupPlan('launchMonth', parseInt(e.target.value))}
+                    >
+                      {monthNames.map((month, index) => (
+                        <option key={index} value={index}>{month}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Měsíce před spuštěním (investice)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="6"
+                      value={roiData.startupPlan.preLaunchMonths}
+                      onChange={(e) => updateStartupPlan('preLaunchMonths', parseInt(e.target.value) || 0)}
+                    />
+                  </div>
+                </div>
+
+                {/* Growth scenario buttons */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">Scénář růstu objednávek:</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <Button
+                      variant={roiData.startupPlan.selectedScenario === 'slow-start' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => updateGrowthScenario('slow-start')}
+                      className="flex items-center space-x-2"
+                    >
+                      <TrendingUp className="w-4 h-4" />
+                      <span>Pozvolný start</span>
+                    </Button>
+                    <Button
+                      variant={roiData.startupPlan.selectedScenario === 'aggressive' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => updateGrowthScenario('aggressive')}
+                      className="flex items-center space-x-2"
+                    >
+                      <Rocket className="w-4 h-4" />
+                      <span>Agresivní růst</span>
+                    </Button>
+                    <Button
+                      variant={roiData.startupPlan.selectedScenario === 'seasonal' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => updateGrowthScenario('seasonal')}
+                      className="flex items-center space-x-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      <span>Sezónní byznys</span>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Monthly orders table */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Měsíční objednávky po spuštění:</Label>
+                    {roiData.startupPlan.selectedScenario === 'custom' && (
+                      <Badge variant="secondary">Vlastní scénář</Badge>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-4 gap-3">
+                    {roiData.startupPlan.monthlyOrders.map((orders, index) => {
+                      const monthsSinceLaunch = index;
+                      const isPreLaunch = monthsSinceLaunch < 0;
+                      
+                      return (
+                        <div key={index} className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">
+                            {monthsSinceLaunch === 0 ? 'Launch' : `M${monthsSinceLaunch + 1}`}
+                          </Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={orders}
+                            onChange={(e) => updateMonthlyOrder(index, parseInt(e.target.value) || 0)}
+                            className={`text-center ${
+                              orders === 0 ? 'bg-muted/50' : 
+                              orders > 50 ? 'bg-green-50 border-green-200' : 
+                              'bg-blue-50 border-blue-200'
+                            }`}
+                            disabled={isPreLaunch}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Preview timeline */}
+                <div className="bg-accent/10 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium mb-3">Předpokládaná timeline:</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span>Investiční fáze: {roiData.startupPlan.preLaunchMonths} měsíců před {monthNames[roiData.startupPlan.launchMonth]}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                      <span>Spuštění: {monthNames[roiData.startupPlan.launchMonth]} s {roiData.startupPlan.monthlyOrders[0]} objednávkami</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>Rok po spuštění: {roiData.startupPlan.monthlyOrders[11]} objednávek/měsíc</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scenario descriptions */}
+                <div className="bg-accent/10 p-3 rounded-lg">
+                  <p className="text-xs text-muted-foreground">
+                    💡 <strong>Pozvolný start:</strong> Konzervativní růst 0→60 objednávek za rok<br/>
+                    🚀 <strong>Agresivní:</strong> Rychlý růst 0→300 objednávek (vyžaduje více investic)<br/>
+                    📅 <strong>Sezónní:</strong> Růst s ohledem na sezónní výkyvy v odvětví
+                  </p>
                 </div>
               </div>
             </Card>
