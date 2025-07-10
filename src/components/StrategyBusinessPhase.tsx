@@ -258,11 +258,12 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   const annualCosts = totalMonthlyCosts * 12;
   const roi = annualCosts > 0 ? (annualProfit / annualCosts) * 100 : 0;
   
-  // PNO calculation
-  const pno = avgMonthlyRevenue > 0 ? (monthlyMarketingCosts / avgMonthlyRevenue) * 100 : 0;
+  // PNO calculation (marketing costs as % of profit margin)
+  const monthlyProfit = avgNetMonthlyRevenue - totalMonthlyCosts;
+  const pno = monthlyProfit > 0 ? (monthlyMarketingCosts / monthlyProfit) * 100 : 0;
   
-  // Analysis
-  const isViable = roi > 20 && pno < 50 && breakEvenMonth <= 12;
+  // Analysis (updated PNO threshold for margin-based calculation)
+  const isViable = roi > 20 && pno < 80 && breakEvenMonth <= 12;
   
   let reasoning = "";
   const recommendations: string[] = [];
@@ -272,8 +273,8 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
     recommendations.push("Zvažte optimalizaci nákladů nebo zvýšení ceny produktu");
   }
   
-  if (pno > 50) {
-    reasoning += "Vysoké marketingové náklady vůči obratu. ";
+  if (pno > 80) {
+    reasoning += "Vysoké marketingové náklady vůči marži. ";
     recommendations.push("Optimalizujte marketingové kanály a zaměřte se na nejefektivnější");
   }
   
@@ -1094,15 +1095,15 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
               
               <div className="mt-4 p-3 rounded-lg border">
-                <div className="text-sm text-muted-foreground mb-1">Doporučená PNO pro e-shopy</div>
+                <div className="text-sm text-muted-foreground mb-1">Doporučená PNO (marketing vs. marže)</div>
                 <div className="flex items-center space-x-2">
                   <div className="w-full bg-muted rounded-full h-2">
                     <div 
                       className="bg-green-500 h-2 rounded-full" 
-                      style={{ width: '30%' }}
+                      style={{ width: '60%' }}
                     ></div>
                   </div>
-                  <span className="text-sm text-muted-foreground">20-30%</span>
+                  <span className="text-sm text-muted-foreground">40-60%</span>
                 </div>
               </div>
             </Card>
