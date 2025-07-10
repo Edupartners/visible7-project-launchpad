@@ -3,10 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCircle, Play, User, LogOut } from "lucide-react";
+import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCircle, Play, User, LogOut, FileText, Crown } from "lucide-react";
 import { VisionPhase } from "./VisionPhase";
 import { IdeationPhase } from "./IdeationPhase";
 import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
+import { InvestorPitch } from "./InvestorPitch";
 import { PaymentModal } from "./PaymentModal";
 const phases = [{
   id: 1,
@@ -77,8 +78,12 @@ export const Dashboard = ({
   const [currentPhase, setCurrentPhase] = useState<number | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
+  const [showInvestorPitch, setShowInvestorPitch] = useState(false);
   const completedCount = completedPhases.length;
   const progressPercentage = completedCount / phases.length * 100;
+  const corePhases = phases.slice(0, 3); // First 3 phases: Vision, Ideation, Strategy
+  const coreCompletedCount = completedPhases.filter(id => id <= 3).length;
+  const allCoreCompleted = coreCompletedCount === 3;
   const handlePhaseClick = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree || hasAccess) {
@@ -113,6 +118,10 @@ export const Dashboard = ({
   
   if (currentPhase === 3) {
     return <StrategyBusinessPhase onComplete={() => handlePhaseComplete(3)} onBack={() => setCurrentPhase(null)} />;
+  }
+
+  if (showInvestorPitch) {
+    return <InvestorPitch onBack={() => setShowInvestorPitch(false)} />;
   }
   return <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
       {/* Header */}
@@ -202,6 +211,38 @@ export const Dashboard = ({
               </Card>;
         })}
         </div>
+
+        {/* Investor Pitch CTA */}
+        {allCoreCompleted && (
+          <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-emerald-500/10 rounded-xl">
+                  <FileText className="w-8 h-8 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <h3 className="text-xl font-semibold text-foreground">Investor Pitch Deck</h3>
+                    <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                      <Crown className="w-3 h-3 mr-1" />
+                      Připraveno
+                    </Badge>
+                  </div>
+                  <p className="text-apple-body">
+                    Všechny 3 fáze dokončeny! Vygenerujte profesionální investor pitch na základě vašich dat.
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => setShowInvestorPitch(true)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Vygenerovat Pitch
+              </Button>
+            </div>
+          </Card>
+        )}
 
         {/* CTA pro odemknutí */}
         {!hasAccess && <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
