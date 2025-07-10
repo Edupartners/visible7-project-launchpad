@@ -12,7 +12,8 @@ import { Slider } from "@/components/ui/slider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown } from "lucide-react";
+import { generatePredictiveData } from "@/lib/predictiveMapping";
+import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown, Wand2 } from "lucide-react";
 
 interface StartupPlan {
   launchMonth: number; // 0-11 (Jan-Dec)
@@ -443,7 +444,10 @@ const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData)
 export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPhaseProps) => {
   const [showIntro, setShowIntro] = useState(true);
   const [isPreFilled, setIsPreFilled] = useState(false);
+  const [showPredictions, setShowPredictions] = useState(false);
   const [roiData, setRoiData] = useMigratedPersistedState("strategy_roi_data", defaultROIData);
+  const [predictiveData, setPredictiveData] = useState<any>(null);
+  const [hasAppliedPredictions, setHasAppliedPredictions] = useState(false);
   
   const analysis = calculateROIMetrics(roiData);
   const chartData = generateChartData(roiData);
@@ -520,6 +524,43 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
         [key]: value
       }
     }));
+  };
+
+  // Apply predictive data to form
+  const applyPredictiveData = () => {
+    if (predictiveData) {
+      // Convert predictive revenue items to ROI data format
+      const totalMonthlyRevenue = predictiveData.totalMonthlyRevenue.reduce((a: number, b: number) => a + b, 0) / 12;
+      const averagePrice = totalMonthlyRevenue / Math.max(1, roiData.revenue.monthlyOrders || 45);
+      
+      // Convert marketing costs to ROI data format  
+      const convertedMarketingCosts = {
+        ppc: predictiveData.marketingCosts.ppc || Array(12).fill(8000),
+        facebookAds: predictiveData.marketingCosts.socialMedia || Array(12).fill(5000),
+        bannerAds: Array(12).fill(2000),
+        influencerMarketing: Array(12).fill(3000),
+        emailMarketing: Array(12).fill(1500),
+        seoContent: predictiveData.marketingCosts.contentMarketing || Array(12).fill(4000)
+      };
+
+      setRoiData(prev => ({
+        ...prev,
+        revenue: {
+          ...prev.revenue,
+          productPrice: Math.round(averagePrice)
+        },
+        marketingCosts: convertedMarketingCosts,
+        operationalCosts: {
+          ...prev.operationalCosts,
+          workforce: Math.round(predictiveData.operationalCosts[0] * 0.6),
+          webDevelopment: Math.round(predictiveData.operationalCosts[0] * 0.3),
+          warehouseLogistics: Math.round(predictiveData.operationalCosts[0] * 0.1)
+        }
+      }));
+
+      setHasAppliedPredictions(true);
+      setShowPredictions(false);
+    }
   };
 
   const updateStartupPlan = (key: keyof StartupPlan, value: any) => {
@@ -628,11 +669,91 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 </ul>
               </div>
               
-              {isPreFilled && (
+              {/* Predictive AI Section */}
+              {showPredictions && predictiveData && (
+                <div className="p-6 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border border-primary/20 text-left">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                      <Brain className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold mb-2 flex items-center">
+                        AI Inteligentní předvyplnění
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          {Math.round(predictiveData.confidence * 100)}% přesnost
+                        </Badge>
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Na základě vaší Vision a Ideation fáze jsme připravili inteligentní návrh finančního plánu 
+                        pro {predictiveData.industry === 'saas' ? 'SaaS business' : 
+                             predictiveData.industry === 'ecommerce' ? 'e-commerce' :
+                             predictiveData.industry === 'services' ? 'služby' :
+                             predictiveData.industry === 'marketplace' ? 'marketplace' : 'váš business'}.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 text-sm">
+                        <div className="bg-background/60 rounded-lg p-3">
+                          <div className="font-medium">Roční příjmy</div>
+                          <div className="text-lg font-bold text-primary">
+                            {predictiveData.totalYearlyRevenue.toLocaleString()} Kč
+                          </div>
+                        </div>
+                        <div className="bg-background/60 rounded-lg p-3">
+                          <div className="font-medium">Doporučený PNO</div>
+                          <div className="text-lg font-bold text-green-600">
+                            {predictiveData.recommendedPNO.toLocaleString()} Kč
+                          </div>
+                        </div>
+                        <div className="bg-background/60 rounded-lg p-3">
+                          <div className="font-medium">Typ businessu</div>
+                          <div className="text-lg font-bold text-blue-600 capitalize">
+                            {predictiveData.industry}
+                          </div>
+                        </div>
+                      </div>
+
+                      {predictiveData.suggestions && predictiveData.suggestions.length > 0 && (
+                        <div className="mb-4">
+                          <div className="font-medium mb-2 text-sm">💡 AI doporučení:</div>
+                          <ul className="text-xs text-muted-foreground space-y-1">
+                            {predictiveData.suggestions.slice(0, 2).map((suggestion: string, i: number) => (
+                              <li key={i} className="flex items-start">
+                                <span className="w-1 h-1 bg-primary rounded-full mr-2 mt-2"></span>
+                                {suggestion}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      <div className="flex gap-3">
+                        <Button onClick={applyPredictiveData} size="sm" className="flex items-center">
+                          <Wand2 className="w-4 h-4 mr-2" />
+                          Použít AI návrh
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setShowPredictions(false)}>
+                          Vyplnit ručně
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isPreFilled && !hasAppliedPredictions && (
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription>
                     Některá pole byla předvyplněna z vašeho Lean Canvas. Můžete je upravit podle potřeby.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {hasAppliedPredictions && (
+                <Alert>
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Data byla úspěšně předvyplněna AI analýzou. Můžete je dále upravovat podle potřeby.
                   </AlertDescription>
                 </Alert>
               )}
