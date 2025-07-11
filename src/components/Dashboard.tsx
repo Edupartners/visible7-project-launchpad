@@ -13,6 +13,7 @@ import { ImplementationPhase } from "./ImplementationPhase";
 import { BusinessTypeRoadmap } from "./BusinessTypeRoadmap";
 import { BenchmarkingTestingPhase } from "./BenchmarkingTestingPhase";
 import { LaunchPhase } from "./LaunchPhase";
+import { ExpansionPhase } from "./ExpansionPhase";
 import { MarketingChannelDetail } from "./MarketingChannelDetail";
 import { InvestorPitch } from "./InvestorPitch";
 import { PaymentModal } from "./PaymentModal";
@@ -186,6 +187,15 @@ export const Dashboard = ({
       <LaunchPhase 
         onBack={handleBackToPhases}
         onComplete={() => handlePhaseComplete(6)}
+      />
+    );
+  }
+
+  if (currentPhase === 7) {
+    return (
+      <ExpansionPhase 
+        onBack={handleBackToPhases}
+        onComplete={() => handlePhaseComplete(7)}
       />
     );
   }
