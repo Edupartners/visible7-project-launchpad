@@ -7,6 +7,8 @@ import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCir
 import { VisionPhase } from "./VisionPhase";
 import { IdeationPhase } from "./IdeationPhase";
 import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
+import { ImplementationPhase } from "./ImplementationPhase";
+import { BusinessTypeRoadmap } from "./BusinessTypeRoadmap";
 import { InvestorPitch } from "./InvestorPitch";
 import { PaymentModal } from "./PaymentModal";
 const phases = [{
@@ -79,6 +81,7 @@ export const Dashboard = ({
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
   const [showInvestorPitch, setShowInvestorPitch] = useState(false);
+  const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
   const completedCount = completedPhases.length;
   const progressPercentage = completedCount / phases.length * 100;
   const corePhases = phases.slice(0, 3); // First 3 phases: Vision, Ideation, Strategy
@@ -118,6 +121,24 @@ export const Dashboard = ({
   
   if (currentPhase === 3) {
     return <StrategyBusinessPhase onComplete={() => handlePhaseComplete(3)} onBack={() => setCurrentPhase(null)} />;
+  }
+  
+  if (currentPhase === 4) {
+    if (selectedBusinessType) {
+      return (
+        <BusinessTypeRoadmap 
+          businessTypeId={selectedBusinessType} 
+          onBack={() => setSelectedBusinessType(null)} 
+        />
+      );
+    }
+    return (
+      <ImplementationPhase 
+        onComplete={() => handlePhaseComplete(4)} 
+        onBack={() => setCurrentPhase(null)}
+        onSelectBusinessType={setSelectedBusinessType}
+      />
+    );
   }
 
   if (showInvestorPitch) {
