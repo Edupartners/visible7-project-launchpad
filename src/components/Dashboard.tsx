@@ -3,7 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCircle, Play, User, LogOut, FileText, Crown } from "lucide-react";
+import { usePersistedState } from "@/hooks/usePersistedState";
+import { getPromoCodeAccess } from "@/lib/promoCodes";
+import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCircle, Play, User, LogOut, FileText, Crown, Gift } from "lucide-react";
 import { VisionPhase } from "./VisionPhase";
 import { IdeationPhase } from "./IdeationPhase";
 import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
@@ -78,13 +80,14 @@ export const Dashboard = ({
   userEmail,
   onLogout
 }: DashboardProps) => {
-  const [completedPhases, setCompletedPhases] = useState<number[]>([]);
+  const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completedPhases", []);
   const [currentPhase, setCurrentPhase] = useState<number | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [hasAccess, setHasAccess] = useState(false);
+  const [hasAccess, setHasAccess] = usePersistedState<boolean>("hasAccess", false);
   const [showInvestorPitch, setShowInvestorPitch] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
   const [selectedMarketingChannel, setSelectedMarketingChannel] = useState<string | null>(null);
+  const promoCodeAccess = !!getPromoCodeAccess();
   const completedCount = completedPhases.length;
   const progressPercentage = completedCount / phases.length * 100;
   const corePhases = phases.slice(0, 3); // First 3 phases: Vision, Ideation, Strategy
@@ -92,7 +95,7 @@ export const Dashboard = ({
   const allCoreCompleted = coreCompletedCount === 3;
   const handlePhaseClick = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
-    if (phase?.isFree || hasAccess) {
+    if (phase?.isFree || hasAccess || promoCodeAccess) {
       setCurrentPhase(phaseId);
       setSelectedBusinessType(null);
       setSelectedMarketingChannel(null);
@@ -127,7 +130,7 @@ export const Dashboard = ({
   const canAccessPhase = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
-    if (hasAccess) return true;
+    if (hasAccess || promoCodeAccess) return true;
     return false;
   };
   if (currentPhase === 1) {
@@ -190,6 +193,18 @@ export const Dashboard = ({
                 <span className="text-sm font-bold text-primary-foreground">V7</span>
               </div>
               <h1 className="text-xl font-semibold text-foreground">VISIBLE7 MICEK&trade; </h1>
+              {promoCodeAccess && (
+                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                  <Gift className="w-3 h-3 mr-1" />
+                  Promo přístup
+                </Badge>
+              )}
+              {hasAccess && !promoCodeAccess && (
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                  <Crown className="w-3 h-3 mr-1" />
+                  Pro přístup
+                </Badge>
+              )}
             </div>
             
             <div className="flex items-center space-x-4">
@@ -302,7 +317,7 @@ export const Dashboard = ({
         )}
 
         {/* CTA pro odemknutí */}
-        {!hasAccess && <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+        {!hasAccess && !promoCodeAccess && <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Odemkněte celou metodiku VISIBLE7

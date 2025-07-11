@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Mail, Eye, EyeOff } from "lucide-react";
+import { PromoCodeInput } from "@/components/PromoCodeInput";
+import { getPromoCodeAccess } from "@/lib/promoCodes";
 
 interface LoginPageProps {
-  onLogin: (email: string) => void;
+  onLogin: (email: string, hasPromoAccess?: boolean) => void;
 }
 
 export const LoginPage = ({ onLogin }: LoginPageProps) => {
@@ -13,17 +15,26 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [showPromoInput, setShowPromoInput] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      onLogin(email);
+      const hasPromoAccess = !!getPromoCodeAccess();
+      onLogin(email, hasPromoAccess);
     }
   };
 
   const handleGoogleLogin = () => {
     // Simulace Google přihlášení
-    onLogin("user@gmail.com");
+    const hasPromoAccess = !!getPromoCodeAccess();
+    onLogin("user@gmail.com", hasPromoAccess);
+  };
+
+  const handlePromoSuccess = () => {
+    setShowPromoInput(false);
+    // Auto-login after successful promo code
+    onLogin("promo-user@visible7.cz", true);
   };
 
   return (
@@ -144,6 +155,23 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
             </Button>
           </form>
         </Card>
+
+        {/* Promokód sekce */}
+        <div className="mt-6">
+          {!showPromoInput ? (
+            <div className="text-center">
+              <Button
+                variant="outline"
+                onClick={() => setShowPromoInput(true)}
+                className="text-sm h-10 border-border/50 hover:border-primary"
+              >
+                Mám promokód z kurzu
+              </Button>
+            </div>
+          ) : (
+            <PromoCodeInput onSuccess={handlePromoSuccess} />
+          )}
+        </div>
 
         {/* Footer */}
         <div className="text-center mt-8 text-apple-body">

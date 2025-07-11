@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { 
   X, 
   CreditCard, 
@@ -13,8 +14,11 @@ import {
   Download,
   Users,
   Clock,
-  Shield
+  Shield,
+  Gift
 } from "lucide-react";
+import { validatePromoCode, savePromoCodeAccess } from "@/lib/promoCodes";
+import { useToast } from "@/hooks/use-toast";
 
 interface PaymentModalProps {
   onClose: () => void;
@@ -26,6 +30,9 @@ interface PaymentModalProps {
 export const PaymentModal = ({ onClose, onSuccess, completedPhases, totalPhases }: PaymentModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+  const { toast } = useToast();
 
   const progressPercentage = (completedPhases / totalPhases) * 100;
   const daysLeft = 7 - Math.floor(Math.random() * 3); // Simulace časově omezené nabídky
@@ -42,6 +49,36 @@ export const PaymentModal = ({ onClose, onSuccess, completedPhases, totalPhases 
     setTimeout(() => {
       onSuccess();
     }, 1500);
+  };
+
+  const handlePromoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCode.trim()) return;
+
+    setIsValidatingPromo(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const isValid = validatePromoCode(promoCode.trim());
+
+    if (isValid) {
+      savePromoCodeAccess(promoCode.trim());
+      toast({
+        title: "Promokód úspěšně aktivován!",
+        description: "Získáváte přístup ke všem fázím zdarma.",
+      });
+      setShowSuccess(true);
+      setTimeout(() => {
+        onSuccess();
+      }, 1500);
+    } else {
+      toast({
+        title: "Neplatný promokód",
+        description: "Zkontrolujte prosím správnost zadaného kódu.",
+        variant: "destructive",
+      });
+    }
+
+    setIsValidatingPromo(false);
   };
 
   const features = [
@@ -212,6 +249,57 @@ export const PaymentModal = ({ onClose, onSuccess, completedPhases, totalPhases 
                   </>
                 )}
               </Button>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border/50" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-background px-4 text-muted-foreground">nebo</span>
+                </div>
+              </div>
+
+              {/* Promo kód sekce */}
+              <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <Gift className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">
+                    Máte promokód z kurzu?
+                  </span>
+                </div>
+                
+                <form onSubmit={handlePromoSubmit} className="space-y-3">
+                  <Input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    placeholder="Zadejte promokód"
+                    className="h-10 border-green-300 focus:border-green-500"
+                    disabled={isValidatingPromo}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!promoCode.trim() || isValidatingPromo}
+                    className="w-full h-10 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {isValidatingPromo ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full" />
+                        Ověřuji...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="mr-2 w-4 h-4" />
+                        Uplatnit promokód
+                      </>
+                    )}
+                  </Button>
+                </form>
+                
+                <p className="text-xs text-green-700 mt-2">
+                  Promokód získáte po absolvování našeho kurzu
+                </p>
+              </Card>
 
               <p className="text-xs text-muted-foreground mt-4">
                 Bezpečná platba • SSL šifrování • 30 dní záruka vrácení peněz
