@@ -9,6 +9,8 @@ import { IdeationPhase } from "./IdeationPhase";
 import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
 import { ImplementationPhase } from "./ImplementationPhase";
 import { BusinessTypeRoadmap } from "./BusinessTypeRoadmap";
+import { BenchmarkingTestingPhase } from "./BenchmarkingTestingPhase";
+import { MarketingChannelDetail } from "./MarketingChannelDetail";
 import { InvestorPitch } from "./InvestorPitch";
 import { PaymentModal } from "./PaymentModal";
 const phases = [{
@@ -82,6 +84,7 @@ export const Dashboard = ({
   const [hasAccess, setHasAccess] = useState(false);
   const [showInvestorPitch, setShowInvestorPitch] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
+  const [selectedMarketingChannel, setSelectedMarketingChannel] = useState<string | null>(null);
   const completedCount = completedPhases.length;
   const progressPercentage = completedCount / phases.length * 100;
   const corePhases = phases.slice(0, 3); // First 3 phases: Vision, Ideation, Strategy
@@ -91,6 +94,8 @@ export const Dashboard = ({
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree || hasAccess) {
       setCurrentPhase(phaseId);
+      setSelectedBusinessType(null);
+      setSelectedMarketingChannel(null);
     } else {
       setShowPaymentModal(true);
     }
@@ -104,6 +109,20 @@ export const Dashboard = ({
   const handlePaymentSuccess = () => {
     setHasAccess(true);
     setShowPaymentModal(false);
+  };
+
+  const handleMarketingChannelSelect = (channelId: string) => {
+    setSelectedMarketingChannel(channelId);
+  };
+
+  const handleBackToMarketingChannels = () => {
+    setSelectedMarketingChannel(null);
+  };
+
+  const handleBackToPhases = () => {
+    setCurrentPhase(null);
+    setSelectedBusinessType(null);
+    setSelectedMarketingChannel(null);
   };
   const canAccessPhase = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
@@ -135,8 +154,25 @@ export const Dashboard = ({
     return (
       <ImplementationPhase 
         onComplete={() => handlePhaseComplete(4)} 
-        onBack={() => setCurrentPhase(null)}
+        onBack={handleBackToPhases}
         onSelectBusinessType={setSelectedBusinessType}
+      />
+    );
+  }
+
+  if (currentPhase === 5) {
+    if (selectedMarketingChannel) {
+      return (
+        <MarketingChannelDetail
+          channelId={selectedMarketingChannel}
+          onBack={handleBackToMarketingChannels}
+        />
+      );
+    }
+    return (
+      <BenchmarkingTestingPhase
+        onChannelSelect={handleMarketingChannelSelect}
+        onBack={handleBackToPhases}
       />
     );
   }
