@@ -5,10 +5,13 @@ import { Dashboard } from "@/components/Dashboard";
 const Index = () => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
-  const handleLogin = (email: string, hasPromoAccess?: boolean) => {
+  const handleLogin = (email: string, hasPromoAccess?: boolean, name?: string) => {
     setCurrentUser(email);
     if (hasPromoAccess) {
       localStorage.setItem('hasPromoAccess', 'true');
+    }
+    if (name) {
+      localStorage.setItem('userName', name);
     }
   };
 
