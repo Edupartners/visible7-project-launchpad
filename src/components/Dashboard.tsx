@@ -12,6 +12,7 @@ import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
 import { ImplementationPhase } from "./ImplementationPhase";
 import { BusinessTypeRoadmap } from "./BusinessTypeRoadmap";
 import { BenchmarkingTestingPhase } from "./BenchmarkingTestingPhase";
+import { LaunchPhase } from "./LaunchPhase";
 import { MarketingChannelDetail } from "./MarketingChannelDetail";
 import { InvestorPitch } from "./InvestorPitch";
 import { PaymentModal } from "./PaymentModal";
@@ -176,6 +177,15 @@ export const Dashboard = ({
       <BenchmarkingTestingPhase
         onChannelSelect={handleMarketingChannelSelect}
         onBack={handleBackToPhases}
+      />
+    );
+  }
+
+  if (currentPhase === 6) {
+    return (
+      <LaunchPhase 
+        onBack={handleBackToPhases}
+        onComplete={() => handlePhaseComplete(6)}
       />
     );
   }
