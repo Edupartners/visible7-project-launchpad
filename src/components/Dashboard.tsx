@@ -16,7 +16,7 @@ import { LaunchPhase } from "./LaunchPhase";
 import { ExpansionPhase } from "./ExpansionPhase";
 import { MarketingChannelDetail } from "./MarketingChannelDetail";
 import { InvestorPitch } from "./InvestorPitch";
-import { PaymentModal } from "./PaymentModal";
+import { PricingModal } from "./PricingModal";
 const phases = [{
   id: 1,
   title: "Vision",
@@ -84,7 +84,7 @@ export const Dashboard = ({
 }: DashboardProps) => {
   const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completedPhases", []);
   const [currentPhase, setCurrentPhase] = useState<number | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
   const [hasAccess, setHasAccess] = usePersistedState<boolean>("hasAccess", false);
   const [showInvestorPitch, setShowInvestorPitch] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
@@ -102,7 +102,7 @@ export const Dashboard = ({
       setSelectedBusinessType(null);
       setSelectedMarketingChannel(null);
     } else {
-      setShowPaymentModal(true);
+      setShowPricingModal(true);
     }
   };
   const handlePhaseComplete = (phaseId: number) => {
@@ -113,7 +113,7 @@ export const Dashboard = ({
   };
   const handlePaymentSuccess = () => {
     setHasAccess(true);
-    setShowPaymentModal(false);
+    setShowPricingModal(false);
   };
 
   const handleMarketingChannelSelect = (channelId: string) => {
@@ -347,8 +347,8 @@ export const Dashboard = ({
               </p>
               <div className="space-y-4">
                 <div className="text-3xl font-bold text-primary">990 Kč</div>
-                <Button onClick={() => setShowPaymentModal(true)} className="btn-apple text-base px-8">
-                  Odemknout přístup
+                <Button onClick={() => setShowPricingModal(true)} className="btn-apple text-base px-8">
+                  Zobrazit plány
                 </Button>
                 <p className="text-xs text-muted-foreground">
                   Jednorázová platba • Přístup navždy • 30 dní záruka vrácení peněz
@@ -358,7 +358,7 @@ export const Dashboard = ({
           </Card>}
       </div>
 
-      {/* Payment Modal */}
-      {showPaymentModal && <PaymentModal onClose={() => setShowPaymentModal(false)} onSuccess={handlePaymentSuccess} completedPhases={completedCount} totalPhases={phases.length} />}
+      {/* Pricing Modal */}
+      {showPricingModal && <PricingModal onClose={() => setShowPricingModal(false)} onSuccess={handlePaymentSuccess} completedPhases={completedCount} totalPhases={phases.length} />}
     </div>;
 };
