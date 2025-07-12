@@ -178,10 +178,14 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
     return errcAttributes;
   };
 
-  // Update value curve when ERRC data changes
-  React.useEffect(() => {
+  // Generate ERRC attributes and update value curve
+  const generateERRCAttributes = () => {
+    console.log("🎯 Manual ERRC attribute generation triggered");
     const errcAttributes = generateValueCurveFromERRC();
+    console.log("🔍 Generated ERRC attributes:", errcAttributes);
+    
     if (errcAttributes.length > 0) {
+      console.log("✅ Updating value curve with ERRC attributes");
       setValueCurve(prev => {
         // Always preserve "Cena" as first attribute
         const cenaAttribute = prev.find(attr => attr.name === "Cena") || {
@@ -201,9 +205,20 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
         });
         
         // Return array with Cena first, followed by ERRC attributes
-        return [cenaAttribute, ...updatedERRCAttributes];
+        const newValueCurve = [cenaAttribute, ...updatedERRCAttributes];
+        console.log("📊 New value curve:", newValueCurve);
+        return newValueCurve;
       });
+    } else {
+      console.log("⚠️ No ERRC attributes generated - ERRC data might be empty");
     }
+  };
+
+  // Update value curve when ERRC data changes
+  React.useEffect(() => {
+    console.log("🔄 ERRC data changed, updating value curve...");
+    console.log("📝 Current ERRC data:", errcData);
+    generateERRCAttributes();
   }, [errcData]);
 
   const updateValueCurve = (attributeIndex: number, type: 'lowCost' | 'premium' | 'myProject', value: number) => {
@@ -681,21 +696,31 @@ ${analysis}`;
             <h2 className="text-xl font-semibold">Hodnotová křivka</h2>
             <p className="text-sm text-muted-foreground">Atributy generované z ERRC matice s barevným kódováním</p>
           </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="w-4 h-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <div className="space-y-1 text-xs">
-                  <div className="flex items-center"><div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>Odstranit</div>
-                  <div className="flex items-center"><div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>Omezit</div>
-                  <div className="flex items-center"><div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>Pozvednout</div>
-                  <div className="flex items-center"><div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>Vytvořit</div>
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={generateERRCAttributes}
+              variant="outline"
+              size="sm"
+              className="text-xs"
+            >
+              🔄 Regenerovat z ERRC
+            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-4 h-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center"><div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>Odstranit</div>
+                    <div className="flex items-center"><div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>Omezit</div>
+                    <div className="flex items-center"><div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>Pozvednout</div>
+                    <div className="flex items-center"><div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>Vytvořit</div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
         
         {valueCurve.length > 0 ? (
