@@ -142,7 +142,9 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <Button 
                   onClick={() => {
+                    console.log('Začít zdarma clicked');
                     const registerSection = document.getElementById('register');
+                    console.log('Register section found:', registerSection);
                     registerSection?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="btn-apple px-8 py-3 text-base"
@@ -151,7 +153,10 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
                 <Button 
-                  onClick={() => setShowPricing(true)}
+                  onClick={() => {
+                    console.log('Zobrazit plány clicked');
+                    setShowPricing(true);
+                  }}
                   variant="outline"
                   className="px-8 py-3 text-base border-border/50 hover:border-primary"
                 >
