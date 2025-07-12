@@ -14,16 +14,27 @@ const HomePage = () => {
     const launcherEnabled = isLauncherEnabled();
     const betaAccess = getBetaAccess();
     
+    // Debug logs for launcher state
+    console.log("🚀 HomePage - Launcher Check:");
+    console.log("  launcherEnabled:", launcherEnabled);
+    console.log("  betaAccess:", betaAccess);
+    console.log("  isAuthenticated:", isAuthenticated);
+    console.log("  localStorage.launcherDisabled:", localStorage.getItem('launcherDisabled'));
+    console.log("  localStorage.betaAccessGranted:", localStorage.getItem('betaAccessGranted'));
+    
     if (launcherEnabled && !betaAccess) {
+      console.log("🔄 Redirecting to launcher page");
       navigate('/launcher');
       return;
     }
 
     if (!isAuthenticated) {
+      console.log("🔄 Redirecting to login page");
       navigate('/login');
       return;
     }
     
+    console.log("✅ Staying on home page");
     setIsLoading(false);
   }, [isAuthenticated, navigate]);
 

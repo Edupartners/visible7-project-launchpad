@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PricingModal } from "./PricingModal";
 import { usePersistedState } from "@/hooks/usePersistedState";
-import { getPromoCodeAccess } from "@/lib/promoCodes";
+import { getPromoCodeAccess, enableLauncher, disableLauncher, isLauncherEnabled, clearBetaAccess } from "@/lib/promoCodes";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { User, LogOut, CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, Trophy, FileText, Crown, Gift } from "lucide-react";
+import { User, LogOut, CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, Trophy, FileText, Crown, Gift, Settings, RefreshCw } from "lucide-react";
 
 const phases = [
   {
@@ -121,6 +121,25 @@ export const Dashboard = ({
     navigate('/investor-pitch');
   };
 
+  const handleResetToLauncher = () => {
+    console.log("🔄 Resetting to launcher mode");
+    clearBetaAccess();
+    enableLauncher();
+    window.location.reload();
+  };
+
+  const handleToggleLauncher = () => {
+    const currentState = isLauncherEnabled();
+    if (currentState) {
+      disableLauncher();
+      console.log("❌ Launcher disabled");
+    } else {
+      enableLauncher();
+      console.log("✅ Launcher enabled");
+    }
+    window.location.reload();
+  };
+
   const canAccessPhase = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
@@ -158,6 +177,29 @@ export const Dashboard = ({
                 <User className="w-4 h-4" />
                 <span>{userEmail}</span>
               </div>
+              
+              {/* Admin Controls */}
+              <div className="flex items-center space-x-2">
+                <Button 
+                  onClick={handleResetToLauncher} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-muted-foreground hover:text-foreground"
+                  title="Reset do launcher režimu"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+                <Button 
+                  onClick={handleToggleLauncher} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-muted-foreground hover:text-foreground"
+                  title={`${isLauncherEnabled() ? 'Zakázat' : 'Povolit'} launcher`}
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
+              
               <Button onClick={onLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 <LogOut className="w-4 h-4" />
               </Button>
