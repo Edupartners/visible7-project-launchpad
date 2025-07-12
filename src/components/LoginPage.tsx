@@ -218,7 +218,16 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                   <li className="flex items-center text-muted-foreground"><Shield className="w-4 h-4 mr-2" />ERRC matice</li>
                 </ul>
                 
-                <Button variant="outline" className="w-full">Začít zdarma</Button>
+                <Button 
+                  onClick={() => {
+                    const registerSection = document.getElementById('register');
+                    registerSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Začít zdarma
+                </Button>
               </div>
             </Card>
 

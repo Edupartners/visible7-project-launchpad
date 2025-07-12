@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   X, 
   Check, 
@@ -18,7 +19,9 @@ import {
   MessageCircle,
   Calendar,
   Video,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { validatePromoCode, savePromoCodeAccess } from "@/lib/promoCodes";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +31,7 @@ interface PricingModalProps {
   onSuccess: () => void;
   completedPhases: number;
   totalPhases: number;
+  preselectedPlan?: string;
 }
 
 interface PricingPlan {
@@ -43,12 +47,13 @@ interface PricingPlan {
   type: 'one-time' | 'monthly' | 'consultation';
 }
 
-export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases }: PricingModalProps) => {
-  const [selectedPlan, setSelectedPlan] = useState<string>('premium');
+export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases, preselectedPlan }: PricingModalProps) => {
+  const [selectedPlan, setSelectedPlan] = useState<string>(preselectedPlan || 'premium');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const plans: PricingPlan[] = [
@@ -192,6 +197,16 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases 
     }, 1500);
   };
 
+  const toggleCardExpansion = (planId: string) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(planId)) {
+      newExpanded.delete(planId);
+    } else {
+      newExpanded.add(planId);
+    }
+    setExpandedCards(newExpanded);
+  };
+
   const handlePromoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promoCode.trim()) return;
@@ -317,10 +332,31 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases 
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}
+                    
                     {plan.features.length > 4 && (
-                      <p className="text-xs text-primary">
-                        +{plan.features.length - 4} dalších výhod
-                      </p>
+                      <Collapsible 
+                        open={expandedCards.has(plan.id)} 
+                        onOpenChange={() => toggleCardExpansion(plan.id)}
+                      >
+                        <CollapsibleTrigger asChild>
+                          <button className="flex items-center text-xs text-primary hover:text-primary/80 transition-colors">
+                            <span>+{plan.features.length - 4} dalších výhod</span>
+                            {expandedCards.has(plan.id) ? (
+                              <ChevronUp className="w-3 h-3 ml-1" />
+                            ) : (
+                              <ChevronDown className="w-3 h-3 ml-1" />
+                            )}
+                          </button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-2 mt-2">
+                          {plan.features.slice(4).map((feature, index) => (
+                            <div key={index + 4} className="flex items-start text-xs">
+                              <Check className="w-3 h-3 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                              <span className="text-muted-foreground">{feature}</span>
+                            </div>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
                     )}
                   </div>
                 </Card>
