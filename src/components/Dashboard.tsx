@@ -1,209 +1,135 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { PricingModal } from "./PricingModal";
+import { usePersistedState } from "@/hooks/usePersistedState";
+import { getPromoCodeAccess } from "@/lib/promoCodes";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { usePersistedState } from "@/hooks/usePersistedState";
-import { getPromoCodeAccess } from "@/lib/promoCodes";
-import { Eye, Lightbulb, Target, Wrench, TrendingUp, Rocket, Zap, Lock, CheckCircle, Play, User, LogOut, FileText, Crown, Gift } from "lucide-react";
-import { VisionPhase } from "./VisionPhase";
-import { IdeationPhase } from "./IdeationPhase";
-import { StrategyBusinessPhase } from "./StrategyBusinessPhase";
-import { ImplementationPhase } from "./ImplementationPhase";
-import { BusinessTypeRoadmap } from "./BusinessTypeRoadmap";
-import { BenchmarkingTestingPhase } from "./BenchmarkingTestingPhase";
-import { LaunchPhase } from "./LaunchPhase";
-import { ExpansionPhase } from "./ExpansionPhase";
-import { MarketingChannelDetail } from "./MarketingChannelDetail";
-import { InvestorPitch } from "./InvestorPitch";
-import { PricingModal } from "./PricingModal";
-const phases = [{
-  id: 1,
-  title: "Vision",
-  subtitle: "Strategie modrého oceánu",
-  description: "Objevte svou jedinečnou hodnotu na trhu",
-  icon: Eye,
-  isFree: true,
-  estimatedTime: "15 min"
-}, {
-  id: 2,
-  title: "Ideation",
-  subtitle: "Lean Canvas",
-  description: "Popište si váš byznys model pro váš projekt",
-  icon: Lightbulb,
-  isFree: false,
-  estimatedTime: "25 min"
-}, {
-  id: 3,
-  title: "Strategy & Business",
-  subtitle: "Výpočet ROI",
-  description: "Analyzujte návratnost vaší investice",
-  icon: Target,
-  isFree: false,
-  estimatedTime: "20 min"
-}, {
-  id: 4,
-  title: "Implementation",
-  subtitle: "Výběr typu byznysu",
-  description: "12 typů online byznysů + WordPress šablony",
-  icon: Wrench,
-  isFree: false,
-  estimatedTime: "30 min"
-}, {
-  id: 5,
-  title: "Benchmarking & Testing",
-  subtitle: "Marketing a PPC",
-  description: "Připravte si marketing a spusťte PPC kampaně",
-  icon: TrendingUp,
-  isFree: false,
-  estimatedTime: "35 min"
-}, {
-  id: 6,
-  title: "Launch",
-  subtitle: "MVP a KPI",
-  description: "Definujte MVP a ověřte pomocí KPI",
-  icon: Rocket,
-  isFree: false,
-  estimatedTime: "25 min"
-}, {
-  id: 7,
-  title: "Expansion",
-  subtitle: "Automatizace růstu",
-  description: "Nástroje pro škálování vašeho projektu",
-  icon: Zap,
-  isFree: false,
-  estimatedTime: "40 min"
-}];
+import { User, LogOut, CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, Trophy, FileText, Crown, Gift } from "lucide-react";
+
+const phases = [
+  {
+    id: 1,
+    title: "Vision",
+    subtitle: "Strategie modrého oceánu",
+    description: "Definujte svou vizi pomocí Blue Ocean Strategy a ERRC matice",
+    icon: Target,
+    estimatedTime: "45 min",
+    isFree: true,
+    route: "/vision"
+  },
+  {
+    id: 2,
+    title: "Ideation",
+    subtitle: "Lean Canvas",
+    description: "Vytvořte business model s validovanými předpoklady",
+    icon: Lightbulb,
+    estimatedTime: "30 min",
+    isFree: true,
+    route: "/ideation"
+  },
+  {
+    id: 3,
+    title: "Strategy & Business",
+    subtitle: "ROI kalkulačka",
+    description: "Propočítejte návratnost investice a finanční plán",
+    icon: TrendingUp,
+    estimatedTime: "60 min",
+    isFree: true,
+    route: "/strategy"
+  },
+  {
+    id: 4,
+    title: "Implementation",
+    subtitle: "Roadmapa podle business typu",
+    description: "Získejte konkrétní kroky založené na vašem typu podnikání",
+    icon: Wrench,
+    estimatedTime: "20 min",
+    isFree: false,
+    route: "/implementation"
+  },
+  {
+    id: 5,
+    title: "Benchmarking & Testing",
+    subtitle: "Marketingové kanály",
+    description: "Identifikujte nejefektivnější kanály pro váš segment",
+    icon: BarChart3,
+    estimatedTime: "35 min",
+    isFree: false,
+    route: "/benchmarking"
+  },
+  {
+    id: 6,
+    title: "Launch",
+    subtitle: "Go-to-market strategie",
+    description: "Připravte si detailní plán uvedení produktu na trh",
+    icon: Rocket,
+    estimatedTime: "40 min",
+    isFree: false,
+    route: "/launch"
+  },
+  {
+    id: 7,
+    title: "Expansion",
+    subtitle: "Škálování a růst",
+    description: "Strategie pro rozšiřování a zvyšování tržního podílu",
+    icon: Layers,
+    estimatedTime: "50 min",
+    isFree: false,
+    route: "/expansion"
+  }
+];
+
 interface DashboardProps {
   userEmail: string;
   onLogout: () => void;
 }
+
 export const Dashboard = ({
   userEmail,
   onLogout
 }: DashboardProps) => {
-  const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completedPhases", []);
-  const [currentPhase, setCurrentPhase] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completed_phases", []);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [hasAccess, setHasAccess] = usePersistedState<boolean>("hasAccess", false);
   const [showInvestorPitch, setShowInvestorPitch] = useState(false);
-  const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
-  const [selectedMarketingChannel, setSelectedMarketingChannel] = useState<string | null>(null);
   const promoCodeAccess = !!getPromoCodeAccess();
   const completedCount = completedPhases.length;
   const progressPercentage = completedCount / phases.length * 100;
   const corePhases = phases.slice(0, 3); // First 3 phases: Vision, Ideation, Strategy
   const coreCompletedCount = completedPhases.filter(id => id <= 3).length;
   const allCoreCompleted = coreCompletedCount === 3;
+  
   const handlePhaseClick = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree || hasAccess || promoCodeAccess) {
-      setCurrentPhase(phaseId);
-      setSelectedBusinessType(null);
-      setSelectedMarketingChannel(null);
+      navigate(phase?.route || '/');
     } else {
       setShowPricingModal(true);
     }
   };
-  const handlePhaseComplete = (phaseId: number) => {
-    if (!completedPhases.includes(phaseId)) {
-      setCompletedPhases([...completedPhases, phaseId]);
-    }
-    setCurrentPhase(null);
-  };
+
   const handlePaymentSuccess = () => {
     setHasAccess(true);
     setShowPricingModal(false);
   };
 
-  const handleMarketingChannelSelect = (channelId: string) => {
-    setSelectedMarketingChannel(channelId);
+  const handleInvestorPitchClick = () => {
+    navigate('/investor-pitch');
   };
 
-  const handleBackToMarketingChannels = () => {
-    setSelectedMarketingChannel(null);
-  };
-
-  const handleBackToPhases = () => {
-    setCurrentPhase(null);
-    setSelectedBusinessType(null);
-    setSelectedMarketingChannel(null);
-  };
   const canAccessPhase = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
     if (hasAccess || promoCodeAccess) return true;
     return false;
   };
-  if (currentPhase === 1) {
-    return <VisionPhase onComplete={() => handlePhaseComplete(1)} onBack={() => setCurrentPhase(null)} />;
-  }
-  
-  if (currentPhase === 2) {
-    return <IdeationPhase onComplete={() => handlePhaseComplete(2)} onBack={() => setCurrentPhase(null)} />;
-  }
-  
-  if (currentPhase === 3) {
-    return <StrategyBusinessPhase onComplete={() => handlePhaseComplete(3)} onBack={() => setCurrentPhase(null)} />;
-  }
-  
-  if (currentPhase === 4) {
-    if (selectedBusinessType) {
-      return (
-        <BusinessTypeRoadmap 
-          businessTypeId={selectedBusinessType} 
-          onBack={() => setSelectedBusinessType(null)} 
-        />
-      );
-    }
-    return (
-      <ImplementationPhase 
-        onComplete={() => handlePhaseComplete(4)} 
-        onBack={handleBackToPhases}
-        onSelectBusinessType={setSelectedBusinessType}
-      />
-    );
-  }
 
-  if (currentPhase === 5) {
-    if (selectedMarketingChannel) {
-      return (
-        <MarketingChannelDetail
-          channelId={selectedMarketingChannel}
-          onBack={handleBackToMarketingChannels}
-        />
-      );
-    }
-    return (
-      <BenchmarkingTestingPhase
-        onChannelSelect={handleMarketingChannelSelect}
-        onBack={handleBackToPhases}
-      />
-    );
-  }
-
-  if (currentPhase === 6) {
-    return (
-      <LaunchPhase 
-        onBack={handleBackToPhases}
-        onComplete={() => handlePhaseComplete(6)}
-      />
-    );
-  }
-
-  if (currentPhase === 7) {
-    return (
-      <ExpansionPhase 
-        onBack={handleBackToPhases}
-        onComplete={() => handlePhaseComplete(7)}
-      />
-    );
-  }
-
-  if (showInvestorPitch) {
-    return <InvestorPitch onBack={() => setShowInvestorPitch(false)} />;
-  }
-  return <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -265,23 +191,47 @@ export const Dashboard = ({
         {/* Fáze */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {phases.map(phase => {
-          const isCompleted = completedPhases.includes(phase.id);
-          const isAccessible = canAccessPhase(phase.id);
-          const IconComponent = phase.icon;
-          return <Card key={phase.id} className={`card-apple-hover p-6 cursor-pointer transition-all duration-200 ${isCompleted ? 'ring-2 ring-primary/20 bg-primary/5' : ''} ${!isAccessible ? 'opacity-60' : ''}`} onClick={() => handlePhaseClick(phase.id)}>
+            const isCompleted = completedPhases.includes(phase.id);
+            const isAccessible = canAccessPhase(phase.id);
+            const IconComponent = phase.icon;
+            
+            return (
+              <Card 
+                key={phase.id} 
+                className={`card-apple-hover p-6 cursor-pointer transition-all duration-200 ${
+                  isCompleted ? 'ring-2 ring-primary/20 bg-primary/5' : ''
+                } ${!isAccessible ? 'opacity-60' : ''}`} 
+                onClick={() => handlePhaseClick(phase.id)}
+              >
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-3 rounded-xl ${isCompleted ? 'bg-primary text-primary-foreground' : isAccessible ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                    {isCompleted ? <CheckCircle className="w-6 h-6" /> : !isAccessible ? <Lock className="w-6 h-6" /> : <IconComponent className="w-6 h-6" />}
+                  <div className={`p-3 rounded-xl ${
+                    isCompleted 
+                      ? 'bg-primary text-primary-foreground' 
+                      : isAccessible 
+                        ? 'bg-primary/10 text-primary' 
+                        : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {isCompleted ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : !isAccessible ? (
+                      <Lock className="w-6 h-6" />
+                    ) : (
+                      <IconComponent className="w-6 h-6" />
+                    )}
                   </div>
                   
                   <div className="flex flex-col items-end space-y-2">
-                    {phase.isFree && <Badge variant="secondary" className="text-xs">
+                    {phase.isFree && (
+                      <Badge variant="secondary" className="text-xs">
                         ZDARMA
-                      </Badge>}
-                    {isCompleted && <Badge className="bg-primary/10 text-primary border-primary/20">
+                      </Badge>
+                    )}
+                    {isCompleted && (
+                      <Badge className="bg-primary/10 text-primary border-primary/20">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         Hotovo
-                      </Badge>}
+                      </Badge>
+                    )}
                   </div>
                 </div>
 
@@ -294,14 +244,17 @@ export const Dashboard = ({
                     <span className="text-xs text-muted-foreground">
                       ⏱ {phase.estimatedTime}
                     </span>
-                    {isAccessible && <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
+                    {isAccessible && (
+                      <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
                         <Play className="w-3 h-3 mr-1" />
                         {isCompleted ? 'Znovu' : 'Začít'}
-                      </Button>}
+                      </Button>
+                    )}
                   </div>
                 </div>
-              </Card>;
-        })}
+              </Card>
+            );
+          })}
         </div>
 
         {/* Investor Pitch CTA */}
@@ -326,7 +279,7 @@ export const Dashboard = ({
                 </div>
               </div>
               <Button 
-                onClick={() => setShowInvestorPitch(true)}
+                onClick={handleInvestorPitchClick}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
               >
                 <FileText className="w-4 h-4 mr-2" />
@@ -337,7 +290,8 @@ export const Dashboard = ({
         )}
 
         {/* CTA pro odemknutí */}
-        {!hasAccess && !promoCodeAccess && <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+        {!hasAccess && !promoCodeAccess && (
+          <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Odemkněte celou metodiku VISIBLE7
@@ -355,10 +309,19 @@ export const Dashboard = ({
                 </p>
               </div>
             </div>
-          </Card>}
+          </Card>
+        )}
       </div>
 
       {/* Pricing Modal */}
-      {showPricingModal && <PricingModal onClose={() => setShowPricingModal(false)} onSuccess={handlePaymentSuccess} completedPhases={completedCount} totalPhases={phases.length} />}
-    </div>;
+      {showPricingModal && (
+        <PricingModal 
+          onClose={() => setShowPricingModal(false)} 
+          onSuccess={handlePaymentSuccess} 
+          completedPhases={completedCount} 
+          totalPhases={phases.length} 
+        />
+      )}
+    </div>
+  );
 };
