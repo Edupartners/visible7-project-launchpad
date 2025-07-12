@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,15 @@ const errcTemplate = {
 };
 
 export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
+  // Debug cache busting - Vision v2.1 with color coding
+  const VISION_VERSION = "VisionPhase_v2.1_ColorCoding_" + Date.now();
+  
+  useEffect(() => {
+    console.log("🎯 VisionPhase Loading - Version:", VISION_VERSION);
+    console.log("🎨 Color coding for ERRC attributes is ACTIVE");
+    console.log("📊 Value curve with colored attributes enabled");
+  }, []);
+
   const [showIntro, setShowIntro] = useState(true);
   
   // Form data - persisted in localStorage
@@ -118,6 +127,7 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
 
   // ERRC to Value Curve conversion
   const generateValueCurveFromERRC = () => {
+    console.log("🔄 Generating value curve with ERRC color coding");
     const errcAttributes = [];
     
     // Add attributes from ERRC matrix in order: Eliminate → Reduce → Raise → Create
