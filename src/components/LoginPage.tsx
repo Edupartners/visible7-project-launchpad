@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Mail, Eye, EyeOff, User, CheckCircle, Users, Star, TrendingUp, Shield, Clock, Award, Gift } from "lucide-react";
+import { ArrowRight, Mail, Eye, EyeOff, User, CheckCircle, Users, Star, TrendingUp, Shield, Clock, Award, Gift, Check, Zap, Briefcase } from "lucide-react";
 import { PromoCodeInput } from "@/components/PromoCodeInput";
+import { PricingModal } from "@/components/PricingModal";
 import { getPromoCodeAccess } from "@/lib/promoCodes";
 
 interface LoginPageProps {
@@ -19,6 +20,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState(1); // 1 = registration, 2 = promo code
   const [showPromoInput, setShowPromoInput] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,6 +137,27 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Projděte si ověřenou metodiku VISIBLE7, kterou využilo už <strong>500+ podnikatelů</strong> k vybudování prosperujícího online byznysu
               </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Button 
+                  onClick={() => {
+                    const registerSection = document.getElementById('register');
+                    registerSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="btn-apple px-8 py-3 text-base"
+                >
+                  Začít zdarma
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+                <Button 
+                  onClick={() => setShowPricing(true)}
+                  variant="outline"
+                  className="px-8 py-3 text-base border-border/50 hover:border-primary"
+                >
+                  Zobrazit plány
+                </Button>
+              </div>
               
               {/* Benefits */}
               <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -173,8 +196,102 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
         </div>
       </div>
 
+      {/* Pricing Section */}
+      <div className="container mx-auto px-4 py-16" id="pricing">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-foreground mb-4">Vyberte si plán</h2>
+            <p className="text-muted-foreground">Začněte zdarma nebo si vyberte plán pro kompletní metodiku</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {/* Freemium Plan */}
+            <Card className="p-6 relative">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-2">Freemium</h3>
+                <div className="text-3xl font-bold text-primary mb-4">0 Kč</div>
+                <p className="text-sm text-muted-foreground mb-6">Pro začátečníky</p>
+                
+                <ul className="text-sm space-y-3 mb-6 text-left">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Fáze 1: Vision</li>
+                  <li className="flex items-center text-muted-foreground"><Shield className="w-4 h-4 mr-2" />Blue Ocean Strategy</li>
+                  <li className="flex items-center text-muted-foreground"><Shield className="w-4 h-4 mr-2" />ERRC matice</li>
+                </ul>
+                
+                <Button variant="outline" className="w-full">Začít zdarma</Button>
+              </div>
+            </Card>
+
+            {/* Basic Plan */}
+            <Card className="p-6 relative">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-2">Basic</h3>
+                <div className="text-3xl font-bold text-primary mb-4">490 Kč</div>
+                <p className="text-sm text-muted-foreground mb-6">Jednorázová platba</p>
+                
+                <ul className="text-sm space-y-3 mb-6 text-left">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Fáze 1-3</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Vision + Ideation + Strategy</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />ROI kalkulačka</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />PDF exporty</li>
+                </ul>
+                
+                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat Basic</Button>
+              </div>
+            </Card>
+
+            {/* Premium Plan */}
+            <Card className="p-6 relative border-primary">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">Nejoblíbenější</span>
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-2">Premium</h3>
+                <div className="text-3xl font-bold text-primary mb-4">990 Kč</div>
+                <p className="text-sm text-muted-foreground mb-6">Kompletní metodika</p>
+                
+                <ul className="text-sm space-y-3 mb-6 text-left">
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Všech 7 fází</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Implementation roadmap</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Launch strategie</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Expansion plány</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Investor pitch</li>
+                </ul>
+                
+                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat Premium</Button>
+              </div>
+            </Card>
+          </div>
+
+          {/* Future Plans Preview */}
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-4">🚀 Připravujeme pro vás</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Card className="p-4 bg-muted/30">
+                <div className="flex items-center space-x-3">
+                  <Zap className="w-6 h-6 text-primary" />
+                  <div className="text-left">
+                    <h4 className="font-semibold">Premium+ (99 Kč/měsíc)</h4>
+                    <p className="text-xs text-muted-foreground">Měsíční updates + expertní konzultace</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 bg-muted/30">
+                <div className="flex items-center space-x-3">
+                  <Briefcase className="w-6 h-6 text-primary" />
+                  <div className="text-left">
+                    <h4 className="font-semibold">Business (199 Kč/měsíc)</h4>
+                    <p className="text-xs text-muted-foreground">Team access + networking events</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Registration Form */}
-      <div className="flex items-center justify-center p-4">
+      <div className="flex items-center justify-center p-4" id="register">
         <div className="w-full max-w-md animate-fade-in">
           {/* Progress indicator */}
           <div className="flex items-center justify-center mb-8">
@@ -390,6 +507,19 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
           </div>
         </div>
       </div>
+
+      {/* Pricing Modal */}
+      {showPricing && (
+        <PricingModal 
+          onClose={() => setShowPricing(false)}
+          onSuccess={() => {
+            setShowPricing(false);
+            onLogin(email || "user@example.com", true, `${firstName} ${lastName}`.trim());
+          }}
+          completedPhases={0}
+          totalPhases={7}
+        />
+      )}
     </div>
   );
 };
