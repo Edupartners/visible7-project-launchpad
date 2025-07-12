@@ -141,24 +141,34 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <Button 
-                  onClick={() => {
-                    console.log('Začít zdarma clicked');
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Začít zdarma clicked - event triggered');
                     const registerSection = document.getElementById('register');
                     console.log('Register section found:', registerSection);
                     registerSection?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="btn-apple px-8 py-3 text-base"
+                  onMouseEnter={() => console.log('Začít zdarma mouse enter')}
+                  onMouseLeave={() => console.log('Začít zdarma mouse leave')}
+                  className="btn-apple px-8 py-3 text-base relative z-50"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   Začít zdarma
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
                 <Button 
-                  onClick={() => {
-                    console.log('Zobrazit plány clicked');
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Zobrazit plány clicked - event triggered');
                     setShowPricing(true);
                   }}
+                  onMouseEnter={() => console.log('Zobrazit plány mouse enter')}
+                  onMouseLeave={() => console.log('Zobrazit plány mouse leave')}
                   variant="outline"
-                  className="px-8 py-3 text-base border-border/50 hover:border-primary"
+                  className="px-8 py-3 text-base border-border/50 hover:border-primary relative z-50"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   Zobrazit plány
                 </Button>
