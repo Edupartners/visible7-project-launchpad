@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Bar, BarChart } from "recharts";
+import { BackButton } from "@/components/ui/back-button";
 import { 
-  ArrowLeft, 
   Download, 
   FileText, 
   TrendingUp, 
@@ -342,14 +342,9 @@ ${new Date().toLocaleDateString()}
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
       <div className="max-w-6xl mx-auto">
-        <Button 
-          onClick={onBack}
-          variant="ghost" 
-          className="mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Zpět na dashboard
-        </Button>
+        <div className="mb-6">
+          <BackButton onBack={onBack} />
+        </div>
 
         <div className="space-y-6">
           {/* Header */}
@@ -508,7 +503,6 @@ ${new Date().toLocaleDateString()}
                     onClick={() => setCurrentSection(Math.max(0, currentSection - 1))}
                     disabled={currentSection === 0}
                   >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
                     Předchozí
                   </Button>
                   <Button 
@@ -516,7 +510,6 @@ ${new Date().toLocaleDateString()}
                     disabled={currentSection === sections.length - 1}
                   >
                     Další
-                    <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
                   </Button>
                 </div>
               </Card>

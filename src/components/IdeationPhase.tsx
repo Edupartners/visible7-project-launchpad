@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap, Info, RefreshCw, Eye } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap, Info, RefreshCw, Eye } from "lucide-react";
 
 interface LeanCanvasData {
   problem: string;
@@ -278,14 +279,9 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
         <div className="max-w-4xl mx-auto">
-          <Button 
-            onClick={onBack}
-            variant="ghost" 
-            className="mb-6 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět na dashboard
-          </Button>
+          <div className="mb-6">
+            <BackButton onBack={onBack} />
+          </div>
           
           <Card className="card-apple p-8">
             <div className="text-center space-y-6">
@@ -329,14 +325,9 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
         <div className="max-w-6xl mx-auto">
-          <Button 
-            onClick={() => setShowVisualization(false)}
-            variant="ghost" 
-            className="mb-6 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět k editaci
-          </Button>
+          <div className="mb-6">
+            <BackButton onBack={() => setShowVisualization(false)} />
+          </div>
           
           <div className="space-y-6">
             {/* Lean Canvas Visualization */}
@@ -488,14 +479,9 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
       <div className="max-w-4xl mx-auto">
-        <Button 
-          onClick={onBack}
-          variant="ghost" 
-          className="mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Zpět na dashboard
-        </Button>
+        <div className="mb-6">
+          <BackButton onBack={onBack} />
+        </div>
         
         {/* Progress */}
         <Card className="card-apple p-6 mb-6">

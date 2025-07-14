@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign } from "lucide-react";
 import { businessTypes, type RoadmapStep } from "@/types/implementation";
 import { usePersistedState } from "@/hooks/usePersistedState";
 
@@ -64,14 +65,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Button 
-              onClick={onBack}
-              variant="ghost" 
-              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Zpět na výběr typu</span>
-            </Button>
+            <BackButton onBack={onBack} />
             
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">

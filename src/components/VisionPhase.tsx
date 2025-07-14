@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
+import { BackButton } from "@/components/ui/back-button";
 import { 
-  ArrowLeft, 
   ArrowRight, 
   Eye, 
   Lightbulb, 
@@ -523,7 +523,6 @@ ${analysis}`;
                   variant="ghost"
                   className="w-full"
                 >
-                  <ArrowLeft className="mr-2 w-4 h-4" />
                   Zpět na dashboard
                 </Button>
               </div>
@@ -965,9 +964,7 @@ ${analysis}`;
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
-              <Button onClick={onBack} variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
+              <BackButton onBack={onBack} />
               <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
                 <Eye className="w-5 h-5" />
               </div>

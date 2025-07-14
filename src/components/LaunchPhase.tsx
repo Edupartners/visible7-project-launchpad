@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ArrowLeft, Target, TrendingUp, BarChart3, Plus, Trash2, Download, PlayCircle } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { Target, TrendingUp, BarChart3, Plus, Trash2, Download, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -176,10 +177,7 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={onBack} className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Zpět
-            </Button>
+            <BackButton onBack={onBack} />
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 LAUNCH – Spusť svůj projekt do světa

@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BackButton } from "@/components/ui/back-button";
 import { CheckCircle, AlertTriangle, TrendingUp, Calculator, DollarSign, Clock, BarChart3, Users, Target, Lightbulb } from "lucide-react";
 import { ExpansionData, defaultExpansionData } from "@/types/expansion";
 import { usePersistedState } from "@/hooks/usePersistedState";

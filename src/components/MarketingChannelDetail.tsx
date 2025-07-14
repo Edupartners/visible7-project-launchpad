@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { marketingChannels, type MarketingChannel, type MarketingStep } from "@/types/marketing";
-import { Clock, DollarSign, Target, CheckCircle2, ArrowLeft } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { Clock, DollarSign, Target, CheckCircle2 } from "lucide-react";
 
 interface MarketingChannelDetailProps {
   channelId: string;
@@ -76,14 +77,9 @@ export function MarketingChannelDetail({ channelId, onBack }: MarketingChannelDe
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={onBack}
-            className="mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět na kanály
-          </Button>
+          <div className="mb-6">
+            <BackButton onBack={onBack} />
+          </div>
           
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>

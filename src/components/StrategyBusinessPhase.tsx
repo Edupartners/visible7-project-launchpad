@@ -13,7 +13,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { generatePredictiveData } from "@/lib/predictiveMapping";
-import { ArrowLeft, Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown, Wand2 } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown, Wand2 } from "lucide-react";
 
 interface StartupPlan {
   launchMonth: number; // 0-11 (Jan-Dec)
@@ -635,14 +636,9 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
         <div className="max-w-4xl mx-auto">
-          <Button 
-            onClick={onBack}
-            variant="ghost" 
-            className="mb-6 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Zpět na dashboard
-          </Button>
+          <div className="mb-6">
+            <BackButton onBack={onBack} />
+          </div>
           
           <Card className="card-apple p-8">
             <div className="text-center space-y-6">
@@ -774,14 +770,9 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
       <div className="max-w-7xl mx-auto">
-        <Button 
-          onClick={onBack}
-          variant="ghost" 
-          className="mb-6 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Zpět na dashboard
-        </Button>
+        <div className="mb-6">
+          <BackButton onBack={onBack} />
+        </div>
         
         {/* Progress Header */}
         <Card className="card-apple p-6 mb-6">
