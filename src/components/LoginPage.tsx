@@ -88,7 +88,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                   </div>
                   <h3 className="text-lg font-semibold mb-2">Speciální nabídka</h3>
                   <p className="text-muted-foreground text-sm mb-6">
-                    S promokódem získáte přístup ke všem 7 fázím VISIBLE7 zdarma
+                    S promokódem získáte přístup ke všem 7 fázím VISIBLE7 během 15denního trialu
                   </p>
                 </div>
                 
@@ -219,70 +219,57 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
             <p className="text-muted-foreground">Začněte zdarma nebo si vyberte plán pro kompletní metodiku</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {/* Freemium Plan */}
-            <Card className="p-6 relative">
-              <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">Freemium</h3>
-                <div className="text-3xl font-bold text-primary mb-4">0 Kč</div>
-                <p className="text-sm text-muted-foreground mb-6">Pro začátečníky</p>
-                
-                <ul className="text-sm space-y-3 mb-6 text-left">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Fáze 1: Vision</li>
-                  <li className="flex items-center text-muted-foreground"><Shield className="w-4 h-4 mr-2" />Blue Ocean Strategy</li>
-                  <li className="flex items-center text-muted-foreground"><Shield className="w-4 h-4 mr-2" />ERRC matice</li>
-                </ul>
-                
-                <Button 
-                  onClick={() => {
-                    const registerSection = document.getElementById('register');
-                    registerSection?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  variant="outline" 
-                  className="w-full"
-                >
-                  Začít zdarma
-                </Button>
+          <div className="grid md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
+            {/* Trial Notice */}
+            <div className="md:col-span-2 text-center mb-8 p-6 bg-primary/5 rounded-xl border border-primary/20">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Gift className="w-5 h-5 text-primary" />
+                <span className="text-lg font-semibold text-primary">15denní zkušební verze zdarma</span>
               </div>
-            </Card>
+              <p className="text-muted-foreground">
+                Vyzkoušejte celou metodiku VISIBLE7 úplně zdarma. Po skončení trialu si můžete vybrat plán podle svých potřeb.
+              </p>
+            </div>
 
-            {/* Basic Plan */}
+            {/* STARTER Plan */}
             <Card className="p-6 relative">
               <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">Basic</h3>
-                <div className="text-3xl font-bold text-primary mb-4">490 Kč</div>
+                <h3 className="text-xl font-semibold mb-2">STARTER</h3>
+                <div className="text-3xl font-bold text-primary mb-1">299 Kč</div>
                 <p className="text-sm text-muted-foreground mb-6">Jednorázová platba</p>
                 
                 <ul className="text-sm space-y-3 mb-6 text-left">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Fáze 1-3</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Vision + Ideation + Strategy</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Fáze 1-4: Vision až Strategy</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Blue Ocean Strategy</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Business Model Canvas</li>
                   <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />ROI kalkulačka</li>
                   <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />PDF exporty</li>
                 </ul>
                 
-                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat Basic</Button>
+                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat STARTER</Button>
               </div>
             </Card>
 
-            {/* Premium Plan */}
+            {/* BUSINESS Plan */}
             <Card className="p-6 relative border-primary">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">Nejoblíbenější</span>
               </div>
               <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">Premium</h3>
-                <div className="text-3xl font-bold text-primary mb-4">990 Kč</div>
+                <h3 className="text-xl font-semibold mb-2">BUSINESS</h3>
+                <div className="text-3xl font-bold text-primary mb-1">990 Kč</div>
                 <p className="text-sm text-muted-foreground mb-6">Kompletní metodika</p>
                 
                 <ul className="text-sm space-y-3 mb-6 text-left">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Všech 7 fází</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Všech 7 fází VISIBLE7</li>
                   <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Implementation roadmap</li>
                   <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Launch strategie</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Expansion plány</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Investor pitch</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Growth & Expansion plány</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Investor pitch deck</li>
+                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Benchmarking nástroje</li>
                 </ul>
                 
-                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat Premium</Button>
+                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat BUSINESS</Button>
               </div>
             </Card>
           </div>
