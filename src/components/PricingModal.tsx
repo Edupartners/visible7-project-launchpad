@@ -71,10 +71,10 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
     {
       id: 'starter',
       name: 'STARTER',
-      price: 490,
-      subtitle: '1 projekt',
-      description: 'Perfektní pro začátek',
-      type: 'one-time',
+      price: 299,
+      subtitle: '1 projekt · MVP cena',
+      description: 'Testujte svůj nápad',
+      type: 'monthly',
       features: [
         '1 projekt současně',
         'Všech 7 fází metodiky VISIBLE7',
@@ -82,17 +82,17 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
         'Lean Canvas + Business Model',
         'ROI kalkulačka',
         'PDF export výsledků',
-        '30 dní záruka'
+        '30 dní záruka',
+        'Později 499 Kč/měsíc'
       ]
     },
     {
       id: 'business',
       name: 'BUSINESS',
       price: 990,
-      originalPrice: 1490,
-      subtitle: '5 projektů',
+      subtitle: '5 projektů · Pouze 100 Kč/projekt',
       description: 'Nejpopulárnější volba',
-      type: 'one-time',
+      type: 'monthly',
       recommended: true,
       features: [
         '5 projektů současně',
@@ -106,85 +106,12 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
         'PDF + Word exporty',
         '30 dní záruka'
       ]
-    },
-    {
-      id: 'agency',
-      name: 'AGENCY',
-      price: 1990,
-      subtitle: 'Neomezené projekty',
-      description: 'Pro týmy a agentury',
-      type: 'one-time',
-      features: [
-        'Neomezený počet projektů',
-        'Všech 7 fází metodiky VISIBLE7',
-        'AI analýzy s prioritou',
-        'Týmové workspace',
-        'Multi-uživatelský přístup',
-        'White-label možnosti',
-        'Prioritní podpora',
-        'Pokročilé analytics',
-        'Všechny exporty a šablony',
-        'Dedicated account manager',
-        '60 dní záruka'
-      ]
     }
   ];
 
-  const consultations: ConsultationOption[] = [
-    {
-      id: 'mentor-call',
-      name: 'MENTOR CALL',
-      price: 2990,
-      subtitle: '60 min konzultace',
-      description: '1:1 strategická konzultace',
-      type: 'consultation' as const,
-      features: [
-        '60 minut s expertem',
-        'Personalizovaná strategie',
-        'Analýza vašeho projektu',
-        'Akční plán na další kroky',
-        'Nahrávka hovoru',
-        'Follow-up email'
-      ]
-    },
-    {
-      id: 'business-audit',
-      name: 'BUSINESS AUDIT',
-      price: 4990,
-      subtitle: 'Kompletní analýza',
-      description: 'Detailní rozbor projektu',
-      type: 'consultation' as const,
-      features: [
-        '90 min detailní audit',
-        'Analýza konkurence',
-        'Market research',
-        'Doporučení pro růst',
-        'Písemná zpráva (10+ stran)',
-        '30 dní follow-up podpora'
-      ]
-    },
-    {
-      id: 'launch-package',
-      name: 'LAUNCH PACKAGE',
-      price: 9990,
-      subtitle: 'Kompletní launch',
-      description: 'Od nápadu po spuštění',
-      type: 'consultation' as const,
-      features: [
-        '3x 90 min konzultace',
-        'Kompletní business plán',
-        'Marketing strategie',
-        'Launch timeline',
-        'Technická podpora',
-        '60 dní ongoing podpora'
-      ]
-    }
-  ];
+  // Consultation services removed for MVP simplicity
 
-  const selectedPlanData = [...plans, ...consultations].find(p => p.id === selectedPlan);
-  const isPricingPlan = (item: PricingPlan | ConsultationOption): item is PricingPlan => {
-    return item.type !== 'consultation';
-  };
+  const selectedPlanData = plans.find(p => p.id === selectedPlan);
 
   const handleStartTrial = () => {
     startFreeTrial();
@@ -253,13 +180,10 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
             <Check className="w-8 h-8" />
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">
-            {selectedPlanData?.type === 'consultation' ? 'Objednávka úspěšná!' : 'Platba úspěšná!'}
+            Platba úspěšná!
           </h3>
           <p className="text-muted-foreground mb-4">
-            {selectedPlanData?.type === 'consultation' 
-              ? 'Brzy vás kontaktujeme pro domluvení termínu'
-              : 'Máte nyní přístup k VISIBLE7'
-            }
+            Máte nyní přístup k VISIBLE7
           </p>
           <div className="animate-pulse text-primary text-sm">
             Přesměrováváme vás...
@@ -310,129 +234,54 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
         </div>
 
         <div className="p-6">
-          {/* Hlavní plány */}
+          {/* MVP Pricing - Simplified */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Vyberte podle počtu projektů</h3>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-foreground mb-2">Jednoduché ceny pro začátek</h3>
+              <p className="text-muted-foreground">Vyberte si podle počtu projektů · Pouze 100 Kč za projekt</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {plans.map((plan) => (
                 <Card 
                   key={plan.id}
-                  className={`card-apple p-4 cursor-pointer transition-all relative ${
+                  className={`card-apple p-6 cursor-pointer transition-all relative ${
                     selectedPlan === plan.id ? 'ring-2 ring-primary border-primary' : ''
-                   } ${isPricingPlan(plan) && plan.comingSoon ? 'opacity-60' : ''}`}
-                  onClick={() => !(isPricingPlan(plan) && plan.comingSoon) && setSelectedPlan(plan.id)}
+                   }`}
+                  onClick={() => setSelectedPlan(plan.id)}
                 >
-                  {isPricingPlan(plan) && plan.recommended && (
+                  {plan.recommended && (
                     <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
                       <Star className="w-3 h-3 mr-1" />
                       Doporučeno
                     </Badge>
                   )}
-                  
-                  {isPricingPlan(plan) && plan.comingSoon && (
-                    <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white">
-                      <Clock className="w-3 h-3 mr-1" />
-                      Brzy
-                    </Badge>
-                  )}
 
-                  <div className="text-center mb-4">
-                    <h4 className="font-semibold text-foreground text-sm">{plan.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-2">{plan.subtitle}</p>
+                  <div className="text-center mb-6">
+                    <h4 className="font-bold text-foreground text-lg">{plan.name}</h4>
+                    <p className="text-sm text-muted-foreground mb-3">{plan.subtitle}</p>
                     
                     <div className="mb-2">
-                      <span className="text-2xl font-bold text-primary">{plan.price} Kč</span>
-                      {isPricingPlan(plan) && plan.originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through ml-2">
-                          {plan.originalPrice} Kč
-                        </span>
-                      )}
-                      {plan.type === 'monthly' && (
-                        <span className="text-xs text-muted-foreground">/měsíc</span>
-                      )}
+                      <span className="text-3xl font-bold text-primary">{plan.price} Kč</span>
+                      <span className="text-sm text-muted-foreground">/měsíc</span>
                     </div>
                     
-                    <p className="text-xs text-muted-foreground">{plan.description}</p>
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
                   </div>
 
-                  <div className="space-y-2">
-                    {plan.features.slice(0, 4).map((feature, index) => (
-                      <div key={index} className="flex items-start text-xs">
-                        <Check className="w-3 h-3 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{feature}</span>
-                      </div>
-                    ))}
-                    
-                    {plan.features.length > 4 && (
-                      <Collapsible 
-                        open={expandedCards.has(plan.id)} 
-                        onOpenChange={() => toggleCardExpansion(plan.id)}
-                      >
-                        <CollapsibleTrigger asChild>
-                          <button className="flex items-center text-xs text-primary hover:text-primary/80 transition-colors">
-                            <span>+{plan.features.length - 4} dalších výhod</span>
-                            {expandedCards.has(plan.id) ? (
-                              <ChevronUp className="w-3 h-3 ml-1" />
-                            ) : (
-                              <ChevronDown className="w-3 h-3 ml-1" />
-                            )}
-                          </button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="space-y-2 mt-2">
-                          {plan.features.slice(4).map((feature, index) => (
-                            <div key={index + 4} className="flex items-start text-xs">
-                              <Check className="w-3 h-3 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                              <span className="text-muted-foreground">{feature}</span>
-                            </div>
-                          ))}
-                        </CollapsibleContent>
-                      </Collapsible>
-                    )}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Konzultační služby */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Konzultační služby
-            </h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              {consultations.map((consultation) => (
-                <Card 
-                  key={consultation.id}
-                  className="card-apple p-4 cursor-pointer hover:border-primary/50 transition-all"
-                  onClick={() => setSelectedPlan(consultation.id)}
-                >
-                  <div className="text-center mb-4">
-                    <h4 className="font-semibold text-foreground text-sm">{consultation.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-2">{consultation.subtitle}</p>
-                    
-                    <div className="mb-2">
-                      <span className="text-xl font-bold text-primary">{consultation.price.toLocaleString()} Kč</span>
-                    </div>
-                    
-                    <p className="text-xs text-muted-foreground">{consultation.description}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    {consultation.features.map((feature, index) => (
-                      <div key={index} className="flex items-start text-xs">
-                        <Check className="w-3 h-3 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <div className="space-y-3">
+                    {plan.features.map((feature, index) => (
+                      <div key={index} className="flex items-start text-sm">
+                        <Check className="w-4 h-4 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
                         <span className="text-muted-foreground">{feature}</span>
                       </div>
                     ))}
                   </div>
 
                   <Button 
-                    className="w-full mt-4 text-xs h-8"
-                    variant="outline"
+                    className={`w-full mt-6 ${selectedPlan === plan.id ? 'bg-primary' : ''}`}
+                    variant={selectedPlan === plan.id ? 'default' : 'outline'}
                   >
-                    <Calendar className="w-3 h-3 mr-1" />
-                    Objednat konzultaci
+                    {selectedPlan === plan.id ? 'Vybráno' : 'Vybrat plán'}
                   </Button>
                 </Card>
               ))}
@@ -480,20 +329,13 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
               <Card className="card-apple p-6">
                 <Button
                   onClick={handlePayment}
-                  disabled={isProcessing || (isPricingPlan(selectedPlanData) && selectedPlanData.comingSoon)}
+                  disabled={isProcessing}
                   className="w-full h-12 text-base mb-6"
                 >
                   {isProcessing ? (
                     <>
                       <div className="animate-spin w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full" />
                       Zpracováváme...
-                    </>
-                  ) : isPricingPlan(selectedPlanData) && selectedPlanData.comingSoon ? (
-                    'Brzy k dispozici'
-                  ) : selectedPlanData.type === 'consultation' ? (
-                    <>
-                      <Calendar className="mr-2 w-4 h-4" />
-                      Objednat konzultaci
                     </>
                   ) : (
                     <>

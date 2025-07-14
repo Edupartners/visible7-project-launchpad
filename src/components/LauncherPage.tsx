@@ -45,7 +45,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Začněte hned teď!
             </CardTitle>
             <CardDescription className="text-base">
-              Vyzkoušejte VISIBLE7 zcela zdarma po dobu 15 dní. Bez závazků, bez kreditní karty.
+              Začněte za pouhých 299 Kč/měsíc. Nejdříve 15 dní zdarma, bez závazků.
             </CardDescription>
           </CardHeader>
           
@@ -76,7 +76,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </Button>
             
             <p className="text-xs text-center text-muted-foreground">
-              Bez kreditní karty • Zrušte kdykoliv • Okamžitý přístup
+              Poté jen 299 Kč/měsíc • Bez kreditní karty • Zrušte kdykoliv
             </p>
           </CardContent>
         </Card>
