@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PricingModal } from "./PricingModal";
 import { usePersistedState } from "@/hooks/usePersistedState";
-import { getPromoCodeAccess, enableLauncher, disableLauncher, isLauncherEnabled, clearBetaAccess } from "@/lib/promoCodes";
+import { getPromoCodeAccess, enableLauncher, disableLauncher, isLauncherEnabled, clearBetaAccess, getTrialStatus } from "@/lib/promoCodes";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { User, LogOut, CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, Trophy, FileText, Crown, Gift, Settings, RefreshCw } from "lucide-react";
+import { User, LogOut, CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, Trophy, FileText, Crown, Gift, Settings, RefreshCw, Clock } from "lucide-react";
 
 const phases = [
   {
@@ -97,6 +97,7 @@ export const Dashboard = ({
   const [hasAccess, setHasAccess] = usePersistedState<boolean>("hasAccess", false);
   const [showInvestorPitch, setShowInvestorPitch] = useState(false);
   const promoCodeAccess = !!getPromoCodeAccess();
+  const trialStatus = getTrialStatus();
   const completedCount = completedPhases.length;
   const progressPercentage = completedCount / phases.length * 100;
   const corePhases = phases.slice(0, 3); // First 3 phases: Vision, Ideation, Strategy
@@ -105,7 +106,7 @@ export const Dashboard = ({
   
   const handlePhaseClick = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
-    if (phase?.isFree || hasAccess || promoCodeAccess) {
+    if (phase?.isFree || hasAccess || promoCodeAccess || trialStatus.isActive) {
       navigate(phase?.route || '/');
     } else {
       setShowPricingModal(true);
@@ -143,7 +144,7 @@ export const Dashboard = ({
   const canAccessPhase = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
-    if (hasAccess || promoCodeAccess) return true;
+    if (hasAccess || promoCodeAccess || trialStatus.isActive) return true;
     return false;
   };
 
@@ -158,13 +159,19 @@ export const Dashboard = ({
                 <span className="text-sm font-bold text-primary-foreground">V7</span>
               </div>
               <h1 className="text-xl font-semibold text-foreground">VISIBLE7 MICEK&trade; </h1>
+              {trialStatus.isActive && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Trial: {trialStatus.daysRemaining} dní
+                </Badge>
+              )}
               {promoCodeAccess && (
                 <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
                   <Gift className="w-3 h-3 mr-1" />
                   Promo přístup
                 </Badge>
               )}
-              {hasAccess && !promoCodeAccess && (
+              {hasAccess && !promoCodeAccess && !trialStatus.isActive && (
                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                   <Crown className="w-3 h-3 mr-1" />
                   Pro přístup
@@ -331,8 +338,25 @@ export const Dashboard = ({
           </Card>
         )}
 
+        {/* Trial expiration warning */}
+        {trialStatus.isActive && trialStatus.daysRemaining <= 3 && (
+          <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-orange-500/5 via-orange-500/10 to-orange-500/5 border-orange-500/20">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Váš trial brzy vyprší!
+              </h3>
+              <p className="text-apple-body mb-4">
+                Zbývají vám pouze {trialStatus.daysRemaining} dny. Pokračujte s některým z našich plánů.
+              </p>
+              <Button onClick={() => setShowPricingModal(true)} className="btn-apple">
+                Vybrat plán
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* CTA pro odemknutí */}
-        {!hasAccess && !promoCodeAccess && (
+        {!hasAccess && !promoCodeAccess && !trialStatus.isActive && (
           <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">

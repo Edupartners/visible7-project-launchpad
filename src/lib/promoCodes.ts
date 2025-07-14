@@ -166,6 +166,42 @@ export const clearBetaAccess = (): void => {
   localStorage.removeItem('betaAccessTimestamp');
 };
 
+// Trial management functions
+export const startFreeTrial = (): void => {
+  const now = new Date();
+  const endDate = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000); // 15 days
+  
+  localStorage.setItem('trial_start', now.toISOString());
+  localStorage.setItem('trial_end', endDate.toISOString());
+  localStorage.setItem('trial_active', 'true');
+};
+
+export const getTrialStatus = (): { isActive: boolean; daysRemaining: number; endDate: string | null } => {
+  const trialActive = localStorage.getItem('trial_active') === 'true';
+  const trialEnd = localStorage.getItem('trial_end');
+  
+  if (!trialActive || !trialEnd) {
+    return { isActive: false, daysRemaining: 0, endDate: null };
+  }
+  
+  const now = new Date();
+  const endDate = new Date(trialEnd);
+  
+  if (now > endDate) {
+    localStorage.setItem('trial_active', 'false');
+    return { isActive: false, daysRemaining: 0, endDate: trialEnd };
+  }
+  
+  const timeRemaining = endDate.getTime() - now.getTime();
+  const daysRemaining = Math.ceil(timeRemaining / (24 * 60 * 60 * 1000));
+  
+  return { isActive: true, daysRemaining, endDate: trialEnd };
+};
+
+export const endTrial = (): void => {
+  localStorage.setItem('trial_active', 'false');
+};
+
 export const isLauncherEnabled = (): boolean => {
   // Check if launcher mode is disabled (for development or admin)
   const launcherDisabled = localStorage.getItem('launcherDisabled') === 'true';

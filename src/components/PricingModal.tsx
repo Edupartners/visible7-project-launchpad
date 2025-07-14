@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { startFreeTrial } from "@/lib/promoCodes";
 import { 
   X, 
   Check, 
@@ -183,6 +184,11 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
 
   const selectedPlanData = plans.find(p => p.id === selectedPlan);
 
+  const handleStartTrial = () => {
+    startFreeTrial();
+    onSuccess();
+  };
+
   const handlePayment = async () => {
     setIsProcessing(true);
     
@@ -277,6 +283,28 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
           <Button onClick={onClose} variant="ghost" size="sm">
             <X className="w-4 h-4" />
           </Button>
+        </div>
+
+        {/* Trial Banner */}
+        <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Gift className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-green-800">Vyzkoušejte zdarma 15 dní!</h3>
+                <p className="text-sm text-green-600">Získejte přístup ke všem funkcím bez omezení</p>
+              </div>
+            </div>
+            <Button 
+              onClick={handleStartTrial}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Gift className="w-4 h-4 mr-2" />
+              Začít trial
+            </Button>
+          </div>
         </div>
 
         <div className="p-6">
