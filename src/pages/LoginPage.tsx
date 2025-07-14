@@ -9,13 +9,13 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/home');
     }
   }, [isAuthenticated, navigate]);
 
   const handleLogin = (email: string, hasPromoAccess?: boolean, name?: string) => {
     login(email, hasPromoAccess, name);
-    navigate('/');
+      navigate('/home');
   };
 
   return (

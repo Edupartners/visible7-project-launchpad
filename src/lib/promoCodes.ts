@@ -216,6 +216,23 @@ export const enableLauncher = (): void => {
   localStorage.removeItem('launcherDisabled');
 };
 
+// Access gate management functions
+export const saveAccessGrant = (code: string): void => {
+  localStorage.setItem('accessGranted', 'true');
+  localStorage.setItem('accessCode', code);
+  localStorage.setItem('accessTimestamp', new Date().toISOString());
+};
+
+export const hasValidAccess = (): boolean => {
+  return localStorage.getItem('accessGranted') === 'true';
+};
+
+export const clearAccessGrant = (): void => {
+  localStorage.removeItem('accessGranted');
+  localStorage.removeItem('accessCode');
+  localStorage.removeItem('accessTimestamp');
+};
+
 // Cleanup old beta access keys for migration to trial system
 export const cleanupOldBetaAccess = (): void => {
   clearBetaAccess();

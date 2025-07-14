@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import LauncherPage from "./pages/LauncherPage";
+import AccessGatePage from "./pages/AccessGatePage";
 import VisionPage from "./pages/VisionPage";
 import IdeationPage from "./pages/IdeationPage";
 import StrategyPage from "./pages/StrategyPage";
@@ -30,13 +31,15 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/access-gate" element={<AccessGatePage />} />
             <Route path="/launcher" element={<LauncherPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={
+            <Route path="/home" element={
               <ProtectedRoute>
                 <HomePage />
               </ProtectedRoute>
             } />
+            <Route path="/" element={<AccessGatePage />} />
             <Route path="/vision" element={
               <ProtectedRoute>
                 <VisionPage />
