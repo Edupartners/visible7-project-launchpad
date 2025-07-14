@@ -1,51 +1,18 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, Lock, Users, Timer } from "lucide-react";
-import { validateBetaCode } from "@/lib/promoCodes";
-import { useToast } from "@/hooks/use-toast";
+import { Rocket, Gift, Zap } from "lucide-react";
+import { startFreeTrial } from "@/lib/promoCodes";
 
 interface LauncherPageProps {
   onAccessGranted: () => void;
 }
 
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
-  const [code, setCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simple rate limiting
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (validateBetaCode(code)) {
-      localStorage.setItem('betaAccessGranted', 'true');
-      localStorage.setItem('betaAccessCode', code);
-      localStorage.setItem('betaAccessTimestamp', new Date().toISOString());
-      
-      toast({
-        title: "Přístup povolen!",
-        description: "Vítejte v beta verzi VISIBLE7",
-      });
-      
-      onAccessGranted();
-    } else {
-      toast({
-        title: "Neplatný kód",
-        description: "Zadaný přístupový kód není platný. Zkuste to prosím znovu.",
-        variant: "destructive",
-      });
-    }
-    
-    setIsLoading(false);
+  const handleStartTrial = () => {
+    startFreeTrial();
+    onAccessGranted();
   };
-
-  const isAdminCode = code.toLowerCase() === "admin2024";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
@@ -65,58 +32,52 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </p>
         </div>
 
-        {/* Coming Soon Card */}
-        <Card className="border-2 border-primary/20">
+        {/* Free Trial Card */}
+        <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-2">
-              <Badge variant="secondary" className="gap-1">
-                <Timer className="h-3 w-3" />
-                Beta Testing
+              <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 hover:bg-green-100">
+                <Gift className="h-3 w-3" />
+                15 dní zdarma
               </Badge>
             </div>
-            <CardTitle className="text-2xl">Už brzy spouštíme!</CardTitle>
+            <CardTitle className="text-2xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Začněte hned teď!
+            </CardTitle>
             <CardDescription className="text-base">
-              Připravujeme pro vás něco úžasného. Zadejte přístupový kód pro beta testování.
+              Vyzkoušejte VISIBLE7 zcela zdarma po dobu 15 dní. Bez závazků, bez kreditní karty.
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="access-code" className="text-sm font-medium">
-                  Přístupový kód
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="access-code"
-                    type="text"
-                    placeholder="Zadejte váš kód..."
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className="pl-10"
-                    disabled={isLoading}
-                  />
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Zap className="w-4 h-4 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-green-800">Co získáte zdarma:</h4>
                 </div>
               </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={!code || isLoading}
-              >
-                {isLoading ? "Ověřuji..." : "Získat přístup"}
-              </Button>
-            </form>
-
-            {isAdminCode && (
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  Admin panel bude dostupný po přihlášení
-                </div>
-              </div>
-            )}
+              <ul className="space-y-1 text-sm text-green-700">
+                <li>✓ Přístup ke všem 7 fázím metodiky</li>
+                <li>✓ 1 projekt v plné verzi</li>
+                <li>✓ AI analýzy a doporučení</li>
+                <li>✓ Export do PDF</li>
+              </ul>
+            </div>
+            
+            <Button 
+              onClick={handleStartTrial}
+              className="w-full h-12 text-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            >
+              <Gift className="mr-2 h-5 w-5" />
+              Začít 15denní trial zdarma
+            </Button>
+            
+            <p className="text-xs text-center text-muted-foreground">
+              Bez kreditní karty • Zrušte kdykoliv • Okamžitý přístup
+            </p>
           </CardContent>
         </Card>
 
@@ -137,8 +98,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
         {/* Contact */}
         <div className="text-center text-sm text-muted-foreground">
-          <p>Potřebujete přístupový kód?</p>
-          <p>Kontaktujte nás pro beta testování.</p>
+          <p>Máte otázky? Jsme tu pro vás!</p>
+          <p>Kontaktujte nás pro více informací.</p>
         </div>
       </div>
     </div>

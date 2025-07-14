@@ -45,11 +45,21 @@ interface PricingPlan {
   features: string[];
   recommended?: boolean;
   comingSoon?: boolean;
-  type: 'one-time' | 'monthly' | 'consultation';
+  type: 'one-time' | 'monthly';
+}
+
+interface ConsultationOption {
+  id: string;
+  name: string;
+  price: number;
+  subtitle: string;
+  description: string;
+  type: 'consultation';
+  features: string[];
 }
 
 export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases, preselectedPlan }: PricingModalProps) => {
-  const [selectedPlan, setSelectedPlan] = useState<string>(preselectedPlan || 'premium');
+  const [selectedPlan, setSelectedPlan] = useState<string>(preselectedPlan || 'business');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -59,79 +69,68 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
 
   const plans: PricingPlan[] = [
     {
-      id: 'basic',
-      name: 'BASIC',
+      id: 'starter',
+      name: 'STARTER',
       price: 490,
-      subtitle: 'Základní start',
+      subtitle: '1 projekt',
       description: 'Perfektní pro začátek',
       type: 'one-time',
       features: [
-        'Fáze 1-3: Vision, Ideation, Strategy',
-        'Lean Canvas metodika',
+        '1 projekt současně',
+        'Všech 7 fází metodiky VISIBLE7',
+        'AI analýzy a doporučení',
+        'Lean Canvas + Business Model',
         'ROI kalkulačka',
-        'Základní AI analýzy',
         'PDF export výsledků',
         '30 dní záruka'
       ]
     },
     {
-      id: 'premium',
-      name: 'PREMIUM',
+      id: 'business',
+      name: 'BUSINESS',
       price: 990,
       originalPrice: 1490,
-      subtitle: 'Kompletní metodika',
+      subtitle: '5 projektů',
       description: 'Nejpopulárnější volba',
       type: 'one-time',
       recommended: true,
       features: [
+        '5 projektů současně',
         'Všech 7 fází metodiky VISIBLE7',
-        'AI analýzy a zpětná vazba',
-        'Export do PDF',
+        'Pokročilé AI analýzy',
         '12 typů byznysů + WordPress šablony',
-        'Přístup ke komunitě Discord',
         'Marketing a PPC strategie',
         'MVP a KPI definice',
         'Nástroje pro škálování',
+        'Přístup ke komunitě Discord',
+        'PDF + Word exporty',
         '30 dní záruka'
       ]
     },
     {
-      id: 'premium-plus',
-      name: 'PREMIUM+',
-      price: 99,
-      subtitle: 'Měsíční updates',
-      description: 'Vždy aktuální obsah',
-      type: 'monthly',
-      comingSoon: true,
+      id: 'agency',
+      name: 'AGENCY',
+      price: 1990,
+      subtitle: 'Neomezené projekty',
+      description: 'Pro týmy a agentury',
+      type: 'one-time',
       features: [
-        'Vše z PREMIUM',
-        'Měsíční nové case studies',
-        'Aktualizované šablony',
-        'Živé Q&A sessions',
-        'Prioritní podpora',
-        'Early access k novinkám'
-      ]
-    },
-    {
-      id: 'business',
-      name: 'BUSINESS',
-      price: 199,
-      subtitle: 'Pro týmy a agentury',
-      description: 'Rozšířené možnosti',
-      type: 'monthly',
-      comingSoon: true,
-      features: [
-        'Vše z PREMIUM+',
-        'Multi-uživatelský přístup',
+        'Neomezený počet projektů',
+        'Všech 7 fází metodiky VISIBLE7',
+        'AI analýzy s prioritou',
         'Týmové workspace',
-        'Pokročilé analytics',
+        'Multi-uživatelský přístup',
         'White-label možnosti',
-        'Dedicated account manager'
+        'Prioritní podpora',
+        'Pokročilé analytics',
+        'Všechny exporty a šablony',
+        'Dedicated account manager',
+        '60 dní záruka'
       ]
     }
   ];
 
-  const consultations = [
+  const consultations: ConsultationOption[] = [
     {
       id: 'mentor-call',
       name: 'MENTOR CALL',
@@ -182,7 +181,10 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
     }
   ];
 
-  const selectedPlanData = plans.find(p => p.id === selectedPlan);
+  const selectedPlanData = [...plans, ...consultations].find(p => p.id === selectedPlan);
+  const isPricingPlan = (item: PricingPlan | ConsultationOption): item is PricingPlan => {
+    return item.type !== 'consultation';
+  };
 
   const handleStartTrial = () => {
     startFreeTrial();
@@ -310,24 +312,24 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
         <div className="p-6">
           {/* Hlavní plány */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Hlavní plány</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Vyberte podle počtu projektů</h3>
+            <div className="grid md:grid-cols-3 gap-6">
               {plans.map((plan) => (
                 <Card 
                   key={plan.id}
                   className={`card-apple p-4 cursor-pointer transition-all relative ${
                     selectedPlan === plan.id ? 'ring-2 ring-primary border-primary' : ''
-                  } ${plan.comingSoon ? 'opacity-60' : ''}`}
-                  onClick={() => !plan.comingSoon && setSelectedPlan(plan.id)}
+                   } ${isPricingPlan(plan) && plan.comingSoon ? 'opacity-60' : ''}`}
+                  onClick={() => !(isPricingPlan(plan) && plan.comingSoon) && setSelectedPlan(plan.id)}
                 >
-                  {plan.recommended && (
+                  {isPricingPlan(plan) && plan.recommended && (
                     <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground">
                       <Star className="w-3 h-3 mr-1" />
                       Doporučeno
                     </Badge>
                   )}
                   
-                  {plan.comingSoon && (
+                  {isPricingPlan(plan) && plan.comingSoon && (
                     <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white">
                       <Clock className="w-3 h-3 mr-1" />
                       Brzy
@@ -340,7 +342,7 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
                     
                     <div className="mb-2">
                       <span className="text-2xl font-bold text-primary">{plan.price} Kč</span>
-                      {plan.originalPrice && (
+                      {isPricingPlan(plan) && plan.originalPrice && (
                         <span className="text-sm text-muted-foreground line-through ml-2">
                           {plan.originalPrice} Kč
                         </span>
@@ -478,7 +480,7 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
               <Card className="card-apple p-6">
                 <Button
                   onClick={handlePayment}
-                  disabled={isProcessing || selectedPlanData.comingSoon}
+                  disabled={isProcessing || (isPricingPlan(selectedPlanData) && selectedPlanData.comingSoon)}
                   className="w-full h-12 text-base mb-6"
                 >
                   {isProcessing ? (
@@ -486,7 +488,7 @@ export const PricingModal = ({ onClose, onSuccess, completedPhases, totalPhases,
                       <div className="animate-spin w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full" />
                       Zpracováváme...
                     </>
-                  ) : selectedPlanData.comingSoon ? (
+                  ) : isPricingPlan(selectedPlanData) && selectedPlanData.comingSoon ? (
                     'Brzy k dispozici'
                   ) : selectedPlanData.type === 'consultation' ? (
                     <>
