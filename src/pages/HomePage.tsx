@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dashboard } from "@/components/Dashboard";
 import { useAuth } from "@/contexts/AuthContext";
-import { getBetaAccess, isLauncherEnabled } from "@/lib/promoCodes";
+import { getTrialStatus, cleanupOldBetaAccess } from "@/lib/promoCodes";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -10,31 +10,24 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if launcher should be shown
-    const launcherEnabled = isLauncherEnabled();
-    const betaAccess = getBetaAccess();
+    // Clean up old beta access keys and migrate to trial system
+    cleanupOldBetaAccess();
     
-    // Debug logs for launcher state
-    console.log("🚀 HomePage - Launcher Check:");
-    console.log("  launcherEnabled:", launcherEnabled);
-    console.log("  betaAccess:", betaAccess);
+    const trialStatus = getTrialStatus();
+    
+    // Debug logs for current state
+    console.log("🚀 HomePage - State Check:");
     console.log("  isAuthenticated:", isAuthenticated);
-    console.log("  localStorage.launcherDisabled:", localStorage.getItem('launcherDisabled'));
-    console.log("  localStorage.betaAccessGranted:", localStorage.getItem('betaAccessGranted'));
+    console.log("  trialStatus:", trialStatus);
     
-    if (launcherEnabled && !betaAccess) {
+    // If user is not authenticated, redirect to launcher (landing page)
+    if (!isAuthenticated) {
       console.log("🔄 Redirecting to launcher page");
       navigate('/launcher');
       return;
     }
-
-    if (!isAuthenticated) {
-      console.log("🔄 Redirecting to login page");
-      navigate('/login');
-      return;
-    }
     
-    console.log("✅ Staying on home page");
+    console.log("✅ User authenticated, staying on home page");
     setIsLoading(false);
   }, [isAuthenticated, navigate]);
 

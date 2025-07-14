@@ -215,3 +215,9 @@ export const disableLauncher = (): void => {
 export const enableLauncher = (): void => {
   localStorage.removeItem('launcherDisabled');
 };
+
+// Cleanup old beta access keys for migration to trial system
+export const cleanupOldBetaAccess = (): void => {
+  clearBetaAccess();
+  localStorage.removeItem('launcherDisabled');
+};
