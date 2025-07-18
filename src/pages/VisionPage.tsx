@@ -26,11 +26,11 @@ const VisionPage = () => {
       }
       return prev;
     });
-    navigate('/');
+    navigate('/home');
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const handleStart = () => {

@@ -14,7 +14,7 @@ const InvestorPitchPage = () => {
   }
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   return (

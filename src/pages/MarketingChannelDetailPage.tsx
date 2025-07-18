@@ -13,7 +13,7 @@ const MarketingChannelDetailPage = () => {
   }
 
   const handleBack = () => {
-    navigate('/benchmarking');
+    navigate('/home');
   };
 
   return (

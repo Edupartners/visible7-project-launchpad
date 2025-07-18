@@ -13,7 +13,7 @@ const BusinessTypeDetailPage = () => {
   }
 
   const handleBack = () => {
-    navigate('/implementation');
+    navigate('/home');
   };
 
   return (

@@ -26,11 +26,11 @@ const BenchmarkingPage = () => {
       }
       return prev;
     });
-    navigate('/');
+    navigate('/home');
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const handleChannelSelect = (channelId: string) => {

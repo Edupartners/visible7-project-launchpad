@@ -21,11 +21,11 @@ const ImplementationPage = () => {
       }
       return prev;
     });
-    navigate('/');
+    navigate('/home');
   };
 
   const handleBack = () => {
-    navigate('/');
+    navigate('/home');
   };
 
   const handleSelectBusinessType = (businessTypeId: string) => {
