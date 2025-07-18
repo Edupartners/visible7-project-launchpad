@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dashboard } from "@/components/Dashboard";
 import { useAuth } from "@/contexts/AuthContext";
-import { getTrialStatus, cleanupOldBetaAccess, hasValidAccess } from "@/lib/promoCodes";
+import { getTrialStatus, cleanupOldBetaAccess } from "@/lib/promoCodes";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -10,17 +10,6 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check access gate first
-    const validAccess = hasValidAccess();
-    console.log("🔑 Access check result:", validAccess);
-    console.log("🔑 localStorage accessGranted:", localStorage.getItem('accessGranted'));
-    
-    if (!validAccess) {
-      console.log("🔄 Redirecting to access gate");
-      navigate('/access-gate');
-      return;
-    }
-
     // Clean up old beta access keys and migrate to trial system
     cleanupOldBetaAccess();
     
