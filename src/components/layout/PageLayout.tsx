@@ -2,6 +2,7 @@
 import React from "react";
 import { UnifiedHeader } from "./UnifiedHeader";
 import { BackButton } from "@/components/ui/back-button";
+import { Footer } from "./Footer";
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ export const PageLayout = ({
   showBackButton = true 
 }: PageLayoutProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 flex flex-col">
       <UnifiedHeader showTrialInfo={showTrialInfo} />
       
       {showBackButton && onBack && (
@@ -26,9 +27,11 @@ export const PageLayout = ({
         </div>
       )}
       
-      <main className="pb-8">
+      <main className="flex-1 pb-8">
         {children}
       </main>
+      
+      <Footer />
     </div>
   );
 };
