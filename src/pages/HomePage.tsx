@@ -11,7 +11,11 @@ const HomePage = () => {
 
   useEffect(() => {
     // Check access gate first
-    if (!hasValidAccess()) {
+    const validAccess = hasValidAccess();
+    console.log("🔑 Access check result:", validAccess);
+    console.log("🔑 localStorage accessGranted:", localStorage.getItem('accessGranted'));
+    
+    if (!validAccess) {
       console.log("🔄 Redirecting to access gate");
       navigate('/access-gate');
       return;
