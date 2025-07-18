@@ -359,6 +359,386 @@ ${analysis}`;
     link.click();
   };
 
+  // Render Methods
+  const renderBasicInfo = () => (
+    <Card className="card-apple p-6 mb-6">
+      <div className="flex items-center mb-4">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-blue-600 flex items-center justify-center mr-3">
+          <FileText className="w-4 h-4" />
+        </div>
+        <h3 className="text-lg font-semibold">Základní informace o projektu</h3>
+      </div>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Název projektu *</label>
+          <Input
+            value={projectData.name}
+            onChange={(e) => setProjectData(prev => ({ ...prev, name: e.target.value }))}
+            placeholder="Zadejte název vašeho projektu..."
+            className="input-apple"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium mb-2">Slogan / tagline</label>
+          <Input
+            value={projectData.slogan}
+            onChange={(e) => setProjectData(prev => ({ ...prev, slogan: e.target.value }))}
+            placeholder="Stručně popište hodnotu vašeho produktu..."
+            className="input-apple"
+          />
+        </div>
+      </div>
+    </Card>
+  );
+
+  const renderERRCMatrix = () => (
+    <Card className="card-apple p-6 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-purple-600 flex items-center justify-center mr-3">
+            <Target className="w-4 h-4" />
+          </div>
+          <h3 className="text-lg font-semibold">ERRC Matice</h3>
+        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info className="w-4 h-4 text-muted-foreground" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">Definujte co eliminovat, redukovat, pozvýšit a vytvořit oproti konkurenci</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Eliminate */}
+        <div className="space-y-3">
+          <h4 className="font-medium text-red-600 flex items-center">
+            <Minus className="w-4 h-4 mr-2" />
+            Eliminovat
+          </h4>
+          {errcData.eliminate.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <Input
+                value={item}
+                onChange={(e) => updateERRCItem('eliminate', index, e.target.value)}
+                placeholder="Co odstranit z trhu..."
+                className="input-apple flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeERRCItem('eliminate', index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addERRCItem('eliminate')}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Přidat
+          </Button>
+        </div>
+
+        {/* Reduce */}
+        <div className="space-y-3">
+          <h4 className="font-medium text-orange-600 flex items-center">
+            <Minus className="w-4 h-4 mr-2" />
+            Redukovat
+          </h4>
+          {errcData.reduce.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <Input
+                value={item}
+                onChange={(e) => updateERRCItem('reduce', index, e.target.value)}
+                placeholder="Co snížit pod standard..."
+                className="input-apple flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeERRCItem('reduce', index)}
+                className="text-orange-500 hover:text-orange-700"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addERRCItem('reduce')}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Přidat
+          </Button>
+        </div>
+
+        {/* Raise */}
+        <div className="space-y-3">
+          <h4 className="font-medium text-blue-600 flex items-center">
+            <Plus className="w-4 h-4 mr-2" />
+            Pozvýšit
+          </h4>
+          {errcData.raise.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <Input
+                value={item}
+                onChange={(e) => updateERRCItem('raise', index, e.target.value)}
+                placeholder="Co zlepšit nad standard..."
+                className="input-apple flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeERRCItem('raise', index)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addERRCItem('raise')}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Přidat
+          </Button>
+        </div>
+
+        {/* Create */}
+        <div className="space-y-3">
+          <h4 className="font-medium text-green-600 flex items-center">
+            <Plus className="w-4 h-4 mr-2" />
+            Vytvořit
+          </h4>
+          {errcData.create.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <Input
+                value={item}
+                onChange={(e) => updateERRCItem('create', index, e.target.value)}
+                placeholder="Co nového přinést..."
+                className="input-apple flex-1"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeERRCItem('create', index)}
+                className="text-green-500 hover:text-green-700"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addERRCItem('create')}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Přidat
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+
+  const renderValueCurve = () => (
+    <Card className="card-apple p-6 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 flex items-center justify-center mr-3">
+            <TrendingUp className="w-4 h-4" />
+          </div>
+          <h3 className="text-lg font-semibold">Hodnotová křivka</h3>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addCustomAttribute}
+          disabled={valueCurve.length >= 10}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Přidat atribut
+        </Button>
+      </div>
+      
+      <div className="mb-6">
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={valueCurve} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="name" 
+              tick={{ fontSize: 12 }}
+              angle={-45}
+              textAnchor="end"
+              height={80}
+            />
+            <YAxis domain={[0, 100]} />
+            <Legend />
+            <Line type="monotone" dataKey="lowCost" stroke="#8884d8" strokeWidth={2} name="Low-cost konkurence" />
+            <Line type="monotone" dataKey="premium" stroke="#82ca9d" strokeWidth={2} name="Premium konkurence" />
+            <Line type="monotone" dataKey="myProject" stroke="#ff7300" strokeWidth={3} name="Můj projekt" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      
+      <div className="space-y-4">
+        {valueCurve.map((attribute, index) => (
+          <div key={index} className="p-4 border rounded-lg bg-muted/50">
+            <div className="flex items-center justify-between mb-3">
+              <Input
+                value={attribute.name}
+                onChange={(e) => updateAttributeName(index, e.target.value)}
+                className="font-medium bg-transparent border-none p-0 text-base"
+                style={{ color: attribute.color }}
+              />
+              {index > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeCustomAttribute(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Minus className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-medium mb-1">Low-cost</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={attribute.lowCost}
+                  onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <span className="text-xs text-muted-foreground">{attribute.lowCost}</span>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-medium mb-1">Premium</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={attribute.premium}
+                  onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <span className="text-xs text-muted-foreground">{attribute.premium}</span>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-medium mb-1">Můj projekt</label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={attribute.myProject}
+                  onChange={(e) => updateValueCurve(index, 'myProject', parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <span className="text-xs text-muted-foreground">{attribute.myProject}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+
+  const renderVisionStatement = () => (
+    <Card className="card-apple p-6 mb-6">
+      <div className="flex items-center mb-4">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-600 flex items-center justify-center mr-3">
+          <Eye className="w-4 h-4" />
+        </div>
+        <h3 className="text-lg font-semibold">Vision Statement</h3>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">
+          Popište svou vizi (min. 50 znaků) *
+        </label>
+        <Textarea
+          value={visionStatement}
+          onChange={(e) => setVisionStatement(e.target.value)}
+          placeholder="Naše vize je vytvořit..."
+          className="textarea-apple min-h-[120px]"
+        />
+        <div className="text-xs text-muted-foreground mt-1">
+          {visionStatement.length}/50 znaků minimum
+        </div>
+      </div>
+    </Card>
+  );
+
+  const renderAIAnalysis = () => (
+    <Card className="card-apple p-6 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 text-violet-600 flex items-center justify-center mr-3">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <h3 className="text-lg font-semibold">AI Validace</h3>
+        </div>
+        
+        <Button
+          onClick={generateAnalysis}
+          disabled={!canGenerateAnalysis() || isGeneratingAnalysis}
+          className="btn-apple bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600"
+        >
+          {isGeneratingAnalysis ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Analyzuji...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Spustit AI analýzu
+            </>
+          )}
+        </Button>
+      </div>
+      
+      {!canGenerateAnalysis() && (
+        <div className="text-sm text-muted-foreground mb-4">
+          💡 Dokončete všechny předchozí sekce pro spuštění AI analýzy
+        </div>
+      )}
+      
+      {analysis && (
+        <div className="bg-muted/50 rounded-lg p-4">
+          <div className="prose prose-sm max-w-none">
+            {analysis.split('\n').map((line, index) => (
+              <p key={index} className="mb-2 whitespace-pre-wrap">{line}</p>
+            ))}
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}

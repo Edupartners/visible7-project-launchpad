@@ -13,8 +13,8 @@ interface UnifiedHeaderProps {
 }
 
 export const UnifiedHeader = ({ showTrialInfo = true }: UnifiedHeaderProps) => {
-  const { user, logout } = useAuth();
-  const { remainingDays, isTrialActive } = useTrial();
+  const { currentUser, logout } = useAuth();
+  const { daysRemaining, isActive } = useTrial();
 
   const handleLogout = () => {
     logout();
@@ -39,9 +39,9 @@ export const UnifiedHeader = ({ showTrialInfo = true }: UnifiedHeaderProps) => {
               </span>
             </div>
             
-            {showTrialInfo && isTrialActive && (
+            {showTrialInfo && isActive && (
               <Badge variant="secondary" className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 border-blue-200">
-                🎯 {remainingDays} dní trial verze
+                🎯 {daysRemaining} dní trial verze
               </Badge>
             )}
           </div>
@@ -49,7 +49,7 @@ export const UnifiedHeader = ({ showTrialInfo = true }: UnifiedHeaderProps) => {
           {/* Right side - User Info and Settings */}
           <div className="flex items-center space-x-3">
             <span className="text-sm text-muted-foreground hidden sm:block">
-              {user?.email}
+              {currentUser}
             </span>
             
             <DropdownMenu>
@@ -57,16 +57,16 @@ export const UnifiedHeader = ({ showTrialInfo = true }: UnifiedHeaderProps) => {
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-medium">
-                      {user?.email ? getUserInitials(user.email) : 'U'}
+                      {currentUser ? getUserInitials(currentUser) : 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium leading-none">{user?.email}</p>
+                  <p className="text-sm font-medium leading-none">{currentUser}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    {isTrialActive ? `${remainingDays} dní do konce trial verze` : 'Trial verze ukončena'}
+                    {isActive ? `${daysRemaining} dní do konce trial verze` : 'Trial verze ukončena'}
                   </p>
                 </div>
                 <DropdownMenuSeparator />
