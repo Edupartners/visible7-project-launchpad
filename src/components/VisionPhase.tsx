@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
-import { BackButton } from "@/components/ui/back-button";
 import { 
   ArrowRight, 
   Eye, 
@@ -15,7 +14,6 @@ import {
   FileText, 
   Sparkles,
   Download,
-  Play,
   Info,
   Plus,
   Minus,
@@ -361,705 +359,106 @@ ${analysis}`;
     link.click();
   };
 
-  if (showIntro) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full">
-          <Card className="card-apple p-8">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary mx-auto mb-6 flex items-center justify-center">
-                <Eye className="w-8 h-8" />
-              </div>
-              
-              <h1 className="text-apple-title mb-4">Fáze 1: Vision</h1>
-              <h2 className="text-xl text-primary font-medium mb-6">Strategie modrého oceánu</h2>
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-primary flex items-center justify-center">
+              <Eye className="w-5 h-5" />
             </div>
-
-            {/* Video Section */}
-            <div className="mb-8">
-              <div className="relative bg-muted/50 rounded-xl p-8 mb-6">
-                <div className="flex flex-col lg:flex-row items-center gap-6">
-                  <div className="w-full lg:w-1/2">
-                    <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/20">
-                      <div className="text-center">
-                        <VideoIcon className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">2minutové představení Vision fáze</p>
-                        <p className="text-xs text-muted-foreground mt-1">(Video bude přidáno později)</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-1/2 space-y-4 text-left">
-                    <h3 className="text-lg font-semibold">Co se v této fázi naučíte?</h3>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
-                        Blue Ocean Strategy - jak najít volný prostor na trhu
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
-                        ERRC matice - eliminace, redukce, pozvýšení a vytvoření hodnot
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
-                        Hodnotová křivka - positioning vůči konkurenci
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2"></span>
-                        AI validace - ověření životaschopnosti vize
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold">Vision</h1>
+              <p className="text-sm text-muted-foreground">Blue Ocean Strategy</p>
             </div>
-
-            {/* Explanatory Text */}
-            <div className="mb-8 text-left">
-              <h3 className="text-lg font-semibold mb-4">Proč je Vision fáze klíčová?</h3>
-              <div className="prose prose-sm max-w-none text-muted-foreground space-y-4">
-                <p>
-                  <strong className="text-foreground">Blue Ocean Strategy</strong> vám pomůže najít neobsazený prostor na trhu, 
-                  kde můžete vytvořit novou poptávku místo konkurování v přeplněném "červeném oceánu". 
-                  Tato metodika byla úspěšně použita společnostmi jako Cirque du Soleil, Netflix nebo Southwest Airlines.
-                </p>
-                
-                <p>
-                  <strong className="text-foreground">ERRC matice</strong> (Eliminate-Reduce-Raise-Create) je srdcem této strategie. 
-                  Pomůže vám identifikovat co odstranit z trhu, co zlevnit, co vylepšit a co úplně nového vytvořit. 
-                  Výsledkem je jedinečná hodnotová propozice, která vás odliší od konkurence.
-                </p>
-                
-                <p>
-                  <strong className="text-foreground">Hodnotová křivka</strong> graficky zobrazuje, jak se váš projekt liší od 
-                  low-cost a premium konkurence napříč klíčovými atributy. Ideální křivka má jiný tvar než konkurence - 
-                  to znamená, že nabízíte jinou kombinaci hodnot.
-                </p>
-                
-                <p>
-                  <strong className="text-foreground">AI validace</strong> na konci vyhodnotí kvalitu vaší vize a poskytne 
-                  konkrétní doporučení pro zlepšení. Teprve s validovanou vizí můžete pokračovat do fáze Ideation.
-                </p>
-              </div>
-            </div>
-
-            {/* Supporting Materials */}
-            <div className="mb-8 p-6 bg-muted/30 rounded-xl">
-              <div className="flex items-center mb-4">
-                <BookOpen className="w-5 h-5 text-primary mr-2" />
-                <h3 className="text-lg font-semibold">Podpůrné materiály</h3>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Stáhněte si pracovní šablony a metodické materiály pro lepší přípravu na Vision fázi.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
-                  <FileText className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium text-sm">Blue Ocean Strategy - Přehled</div>
-                    <div className="text-xs text-muted-foreground">Základy metodiky a příklady</div>
-                  </div>
-                </Button>
-                
-                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
-                  <FileText className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium text-sm">ERRC Matice - Worksheet</div>
-                    <div className="text-xs text-muted-foreground">Prázdná šablona pro offline práci</div>
-                  </div>
-                </Button>
-                
-                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
-                  <FileText className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium text-sm">Hodnotová křivka - Template</div>
-                    <div className="text-xs text-muted-foreground">Graf a návod k analýze</div>
-                  </div>
-                </Button>
-                
-                <Button variant="outline" size="sm" className="justify-start h-auto p-3" disabled>
-                  <FileText className="w-4 h-4 mr-2" />
-                  <div className="text-left">
-                    <div className="font-medium text-sm">Vision Statement - Šablona</div>
-                    <div className="text-xs text-muted-foreground">Framework a inspirace</div>
-                  </div>
-                </Button>
-              </div>
-              
-              <p className="text-xs text-muted-foreground mt-3 italic">
-                💡 PDF materiály budou přidány později
-              </p>
-            </div>
-
-            {/* Stats and CTA */}
-            <div className="text-center">
-              <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground mb-8">
-                <div className="flex items-center">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  5 kroků
-                </div>
-                <div className="flex items-center">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  ~25 minut
-                </div>
-                <div className="flex items-center">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  AI validace
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Button 
-                  onClick={() => setShowIntro(false)}
-                  className="btn-apple w-full h-12 text-base"
-                >
-                  <Play className="mr-2 w-4 h-4" />
-                  Začít s Vision
-                </Button>
-                
-                <Button 
-                  onClick={onBack}
-                  variant="ghost"
-                  className="w-full"
-                >
-                  Zpět na dashboard
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  const renderBasicInfo = () => (
-    <Card className="card-apple p-8 mb-8">
-      <div className="flex items-center mb-6">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
-          <FileText className="w-4 h-4" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Základní informace o projektu</h2>
-          <p className="text-sm text-muted-foreground">Definujte název a slogan vašeho projektu</p>
-        </div>
-      </div>
-      
-      <div className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Pracovní název projektu *
-          </label>
-          <Input
-            value={projectData.name}
-            onChange={(e) => setProjectData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="např. BioDoggies"
-            className="h-12 rounded-xl"
-          />
+          </div>
+          <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+            {Math.round(getCompletionProgress())}% hotovo
+          </Badge>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Slogan *
-          </label>
-          <Input
-            value={projectData.slogan}
-            onChange={(e) => setProjectData(prev => ({ ...prev, slogan: e.target.value }))}
-            placeholder="např. Zdravé pamlsky pro psy bez chemie"
-            className="h-12 rounded-xl"
-          />
-        </div>
-      </div>
-    </Card>
-  );
-
-  const renderERRCMatrix = () => (
-    <Card className="card-apple p-8 mb-8">
-      <div className="flex items-center mb-6">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
-          <Target className="w-4 h-4" />
-        </div>
-        <div className="flex-1">
-          <h2 className="text-xl font-semibold">ERRC Matice</h2>
-          <p className="text-sm text-muted-foreground">Definujte čtyři klíčové oblasti vaší strategie</p>
-        </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="w-4 h-4 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Eliminate-Reduce-Raise-Create matice pro Blue Ocean Strategy</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {Object.entries({
-          eliminate: { title: "Odstranit", color: "bg-red-50 border-red-200", desc: "Co odstraníte oproti trhu?" },
-          reduce: { title: "Omezit", color: "bg-orange-50 border-orange-200", desc: "Co zlevníte nebo zjednodušíte?" },
-          raise: { title: "Pozvednout", color: "bg-blue-50 border-blue-200", desc: "Co nabídnete víc než konkurence?" },
-          create: { title: "Vytvořit", color: "bg-green-50 border-green-200", desc: "Co vytvoříte úplně nového?" }
-        }).map(([key, config]) => (
-          <div key={key} className={`p-4 rounded-xl border ${config.color}`}>
-            <h3 className="font-semibold mb-1">{config.title}</h3>
-            <p className="text-sm text-muted-foreground mb-3">{config.desc}</p>
-            
-            <div className="space-y-2">
-              {errcData[key as keyof ERRCData].map((item, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={item}
-                    onChange={(e) => updateERRCItem(key as keyof ERRCData, index, e.target.value)}
-                    placeholder={`${config.title} ${index + 1}...`}
-                    className="h-10 text-sm"
-                  />
-                  {errcData[key as keyof ERRCData].length > 2 && (
-                    <Button
-                      onClick={() => removeERRCItem(key as keyof ERRCData, index)}
-                      variant="ghost"
-                      size="sm"
-                      className="px-2"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
+        {/* Horizontal Progress Bar */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            {sections.map((section, index) => {
+              const Icon = section.icon;
+              const isCompleted = section.completed();
+              
+              return (
+                <div key={section.id} className="flex items-center">
+                  <div 
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium ${
+                      isCompleted 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="ml-2 hidden lg:block">
+                    <div className={`text-sm font-medium ${isCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
+                      {section.title}
+                    </div>
+                  </div>
+                  {index < sections.length - 1 && (
+                    <div 
+                      className={`h-1 w-16 xl:w-24 mx-4 rounded-full ${
+                        isCompleted ? 'bg-green-500' : 'bg-muted'
+                      }`} 
+                    />
                   )}
                 </div>
-              ))}
-              {errcData[key as keyof ERRCData].length < 3 && (
-                <Button
-                  onClick={() => addERRCItem(key as keyof ERRCData)}
-                  variant="ghost"
-                  size="sm"
-                  className="w-full h-8 text-xs"
-                >
-                  <Plus className="w-3 h-3 mr-1" />
-                  Přidat
-                </Button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </Card>
-  );
-
-  const renderValueCurve = () => {
-    const chartData = valueCurve.map(attr => ({
-      name: attr.name,
-      "Low-cost": attr.lowCost === 0 ? null : attr.lowCost,
-      "Premium": attr.premium === 0 ? null : attr.premium,
-      "Můj projekt": attr.myProject === 0 ? null : attr.myProject,
-      type: attr.type,
-      color: attr.color
-    }));
-
-    const CustomXAxisTick = (props: any) => {
-      const { x, y, payload } = props;
-      const item = chartData.find(d => d.name === payload.value);
-      const color = item?.color || '#64748b';
-      
-      return (
-        <g transform={`translate(${x},${y})`}>
-          <text 
-            x={0} 
-            y={0} 
-            dy={16} 
-            textAnchor="middle" 
-            fill={color}
-            fontSize="12"
-            fontWeight="500"
-          >
-            {payload.value}
-          </text>
-          {item?.type && (
-            <circle 
-              cx={0} 
-              cy={-10} 
-              r={3} 
-              fill={color}
-            />
-          )}
-        </g>
-      );
-    };
-
-    return (
-      <Card className="card-apple p-8 mb-8">
-        <div className="flex items-center mb-6">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
-            <TrendingUp className="w-4 h-4" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold">Hodnotová křivka</h2>
-            <p className="text-sm text-muted-foreground">Atributy generované z ERRC matice s barevným kódováním</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={generateERRCAttributes}
-              variant="outline"
-              size="sm"
-              className="text-xs"
-            >
-              🔄 Regenerovat z ERRC
-            </Button>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-muted-foreground" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center"><div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>Odstranit</div>
-                    <div className="flex items-center"><div className="w-3 h-3 bg-orange-500 rounded-full mr-2"></div>Omezit</div>
-                    <div className="flex items-center"><div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>Pozvednout</div>
-                    <div className="flex items-center"><div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>Vytvořit</div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-        
-        {valueCurve.length > 0 ? (
-          <>
-            <div className="mb-8">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    tick={<CustomXAxisTick />}
-                    height={60}
-                  />
-                  <YAxis domain={[0, 100]} />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="Low-cost" 
-                    stroke="hsl(var(--destructive))" 
-                    strokeWidth={2}
-                    dot={{ fill: "hsl(var(--destructive))" }}
-                    connectNulls={false}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="Premium" 
-                    stroke="#f97316" 
-                    strokeWidth={2}
-                    dot={{ fill: "#f97316" }}
-                    connectNulls={false}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="Můj projekt" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    dot={{ fill: "hsl(var(--primary))" }}
-                    connectNulls={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="grid gap-4">
-              {valueCurve.map((attr, index) => (
-                <div 
-                  key={index} 
-                  className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center p-4 rounded-lg border-l-4"
-                  style={{ 
-                    borderLeftColor: attr.color || '#64748b',
-                    backgroundColor: attr.color ? `${attr.color}10` : undefined
-                  }}
-                >
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
-                        style={{ backgroundColor: attr.color || '#64748b' }}
-                      ></div>
-                      Atribut
-                      {attr.type && (
-                        <Badge 
-                          variant="outline" 
-                          className="ml-2 text-xs px-1 py-0"
-                          style={{ 
-                            borderColor: attr.color,
-                            color: attr.color 
-                          }}
-                        >
-                          {attr.type === 'eliminate' ? 'Odstranit' : 
-                           attr.type === 'reduce' ? 'Omezit' :
-                           attr.type === 'raise' ? 'Pozvednout' : 'Vytvořit'}
-                        </Badge>
-                      )}
-                    </label>
-                    <div className="h-8 px-3 py-2 bg-muted/50 rounded-md text-sm font-medium flex items-center">
-                      {attr.name}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Low-cost</label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={attr.lowCost}
-                      onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value) || 0)}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Premium</label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={attr.premium}
-                      onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value) || 0)}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Můj projekt</label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={attr.myProject}
-                      onChange={(e) => updateValueCurve(index, 'myProject', parseInt(e.target.value) || 0)}
-                      className="h-8 text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-muted-foreground">Info</label>
-                    <div className="h-8 flex items-center text-xs text-muted-foreground">
-                      Z ERRC matice
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-medium mb-2">Zatím žádné atributy</h3>
-            <p className="text-sm">Vyplňte ERRC matici pro generování hodnotové křivky</p>
-          </div>
-        )}
-      </Card>
-    );
-  };
-
-  const renderVisionStatement = () => (
-    <Card className="card-apple p-8 mb-8">
-      <div className="flex items-center mb-6">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
-          <Eye className="w-4 h-4" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Vision Statement</h2>
-          <p className="text-sm text-muted-foreground">Shrňte svou vizi do jednoho odstavce (max 500 znaků)</p>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <Textarea
-          value={visionStatement}
-          onChange={(e) => setVisionStatement(e.target.value)}
-          placeholder="Např. Chci vytvořit e-shop s přírodními produkty pro psy, který kombinuje individuální doporučení s recepty na míru. Naše řešení eliminuje chemické přísady, snižuje náklady díky přímému prodeji a vytváří komunitu pejskařů..."
-          className="min-h-32 rounded-xl resize-none"
-          maxLength={500}
-        />
-        <div className="text-right text-sm text-muted-foreground">
-          {visionStatement.length}/500 znaků
-        </div>
-      </div>
-    </Card>
-  );
-
-  const renderAIAnalysis = () => (
-    <Card className="card-apple p-8 mb-8">
-      <div className="flex items-center mb-6">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mr-3">
-          <Sparkles className="w-4 h-4" />
-        </div>
-        <div className="flex-1">
-          <h2 className="text-xl font-semibold">AI Validace</h2>
-          <p className="text-sm text-muted-foreground">Nechte AI vyhodnotit kvalitu vaší vize</p>
-        </div>
-      </div>
-
-      {isGeneratingAnalysis ? (
-        <div className="text-center py-8">
-          <Sparkles className="w-12 h-12 text-primary mx-auto mb-4 animate-spin" />
-          <h3 className="text-lg font-semibold mb-2">Generuji AI analýzu...</h3>
-          <p className="text-muted-foreground">Vyhodnocuji vaši vizi podle Blue Ocean Strategy</p>
-        </div>
-      ) : analysis ? (
-        <div className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-1">
-              <div className="p-6 bg-muted/30 rounded-xl">
-                <h3 className="font-semibold mb-4 flex items-center">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Shrnutí projektu
-                </h3>
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <div className="font-medium">Název:</div>
-                    <div className="text-muted-foreground">{projectData.name}</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">Slogan:</div>
-                    <div className="text-muted-foreground">{projectData.slogan}</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">Vision Score:</div>
-                    <div className="text-primary font-semibold">{getVisionScore()}/10</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-2">
-              <div className="p-6 bg-muted/30 rounded-xl">
-                <h3 className="font-semibold mb-4 flex items-center">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  AI Analýza
-                </h3>
-                <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-line text-sm text-muted-foreground">{analysis}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="text-center py-8">
-          <Button 
-            onClick={generateAnalysis} 
-            disabled={!canGenerateAnalysis()}
-            className="btn-apple"
-          >
-            <Sparkles className="mr-2 w-4 h-4" />
-            Validovat vizi pomocí AI
-          </Button>
-          {!canGenerateAnalysis() && (
-            <p className="text-sm text-muted-foreground mt-2">
-              Vyplňte všechny předchozí sekce pro spuštění AI validace
-            </p>
-          )}
-        </div>
-      )}
-    </Card>
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
-      <div className="max-w-6xl mx-auto py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <BackButton onBack={onBack} />
-              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
-                <Eye className="w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">Vision</h1>
-                <p className="text-sm text-muted-foreground">Blue Ocean Strategy</p>
-              </div>
-            </div>
-            <Badge variant="secondary" className="px-3 py-1">
-              {Math.round(getCompletionProgress())}% hotovo
-            </Badge>
+              );
+            })}
           </div>
           
-          {/* Horizontal Progress Bar */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              {sections.map((section, index) => {
-                const Icon = section.icon;
-                const isCompleted = section.completed();
-                
-                return (
-                  <div key={section.id} className="flex items-center">
-                    <div 
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium ${
-                        isCompleted 
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-muted text-muted-foreground'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="ml-2 hidden lg:block">
-                      <div className={`text-sm font-medium ${isCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
-                        {section.title}
-                      </div>
-                    </div>
-                    {index < sections.length - 1 && (
-                      <div 
-                        className={`h-1 w-16 xl:w-24 mx-4 rounded-full ${
-                          isCompleted ? 'bg-green-500' : 'bg-muted'
-                        }`} 
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            
-            <div className="w-full bg-muted rounded-full h-2">
-              <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getCompletionProgress()}%` }}
-              />
-            </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div 
+              className="bg-primary h-2 rounded-full transition-all duration-300"
+              style={{ width: `${getCompletionProgress()}%` }}
+            />
           </div>
         </div>
-
-        {/* All Sections */}
-        <div className="space-y-0">
-          {renderBasicInfo()}
-          {renderERRCMatrix()}
-          {renderValueCurve()}
-          {renderVisionStatement()}
-          {renderAIAnalysis()}
-        </div>
-
-        {/* Final Actions */}
-        {allDataComplete() && (
-          <Card className="card-apple p-6 text-center">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-green-600">Vision fáze dokončena!</h3>
-                <p className="text-sm text-muted-foreground">Vaše vize je validována a připravena k implementaci</p>
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={exportToPDF} className="btn-apple-secondary">
-                <Download className="mr-2 w-4 h-4" />
-                Stáhnout výsledky (PDF)
-              </Button>
-              
-              {canProceed && (
-                <Button onClick={onComplete} className="btn-apple">
-                  Pokračovat do fáze 2 - Ideation
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              )}
-            </div>
-          </Card>
-        )}
       </div>
+
+      {/* All Sections */}
+      <div className="space-y-0">
+        {renderBasicInfo()}
+        {renderERRCMatrix()}
+        {renderValueCurve()}
+        {renderVisionStatement()}
+        {renderAIAnalysis()}
+      </div>
+
+      {/* Final Actions */}
+      {allDataComplete() && (
+        <Card className="card-apple p-6 text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 text-emerald-600 flex items-center justify-center mr-3">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-emerald-600">Vision fáze dokončena!</h3>
+              <p className="text-sm text-muted-foreground">Vaše vize je validována a připravena k implementaci</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button onClick={exportToPDF} className="btn-apple-secondary">
+              <Download className="mr-2 w-4 h-4" />
+              Stáhnout výsledky (PDF)
+            </Button>
+            
+            {canProceed && (
+              <Button onClick={onComplete} className="btn-apple bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
+                Pokračovat do fáze 2 - Ideation
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
