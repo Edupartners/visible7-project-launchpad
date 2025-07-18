@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { Card } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
 import { 
   ArrowRight, 
@@ -21,7 +23,8 @@ import {
   Target,
   VideoIcon,
   BookOpen,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from "lucide-react";
 
 interface VisionPhaseProps {
@@ -67,13 +70,13 @@ const errcTemplate = {
 };
 
 export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
-  // Debug cache busting - Vision v2.1 with color coding
-  const VISION_VERSION = "VisionPhase_v2.1_ColorCoding_" + Date.now();
+  // Debug cache busting - Vision v2.2 with create attributes fix
+  const VISION_VERSION = "VisionPhase_v2.2_CreateAttributesFix_" + Date.now();
   
   useEffect(() => {
     console.log("🎯 VisionPhase Loading - Version:", VISION_VERSION);
-    console.log("🎨 Color coding for ERRC attributes is ACTIVE");
-    console.log("📊 Value curve with colored attributes enabled");
+    console.log("🎨 Create attributes will show only myProject values");
+    console.log("📊 Value curve filtered for create attributes");
   }, []);
 
   const [showIntro, setShowIntro] = useState(true);
@@ -93,6 +96,22 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const [analysis, setAnalysis] = usePersistedState<string | null>("vision_analysis", null);
   const [canProceed, setCanProceed] = useState(false);
+
+  // Reset all data function
+  const resetAllData = () => {
+    console.log("🔄 Resetting all Vision phase data");
+    setProjectData({ name: "", slogan: "" });
+    setERRCData({
+      eliminate: ["", ""],
+      reduce: ["", ""],
+      raise: ["", ""],
+      create: ["", ""]
+    });
+    setValueCurve(defaultAttributes);
+    setVisionStatement("");
+    setAnalysis(null);
+    setCanProceed(false);
+  };
 
   const sections = [
     { id: "basic", title: "Základní informace", icon: FileText, completed: () => projectData.name.trim() && projectData.slogan.trim() },
@@ -125,7 +144,7 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
 
   // ERRC to Value Curve conversion
   const generateValueCurveFromERRC = () => {
-    console.log("🔄 Generating value curve with ERRC color coding");
+    console.log("🔄 Generating value curve with ERRC - Create attributes will have lowCost=0, premium=0");
     const errcAttributes = [];
     
     // Add attributes from ERRC matrix in order: Eliminate → Reduce → Raise → Create
@@ -165,8 +184,8 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
     errcData.create.filter(item => item.trim()).forEach(item => {
       errcAttributes.push({
         name: item,
-        lowCost: 50,
-        premium: 50,
+        lowCost: 0,  // Always 0 for create attributes
+        premium: 0,  // Always 0 for create attributes
         myProject: 50,
         type: 'create',
         color: '#10b981' // green
@@ -357,6 +376,17 @@ ${analysis}`;
     link.href = url;
     link.download = `VISIBLE7-Vision-${projectData.name || 'Project'}.txt`;
     link.click();
+  };
+
+  // Prepare chart data - filter out create attributes with zero values
+  const prepareChartData = () => {
+    return valueCurve.map(attr => ({
+      name: attr.name,
+      lowCost: attr.type === 'create' ? null : attr.lowCost, // Hide create attributes from chart
+      premium: attr.type === 'create' ? null : attr.premium, // Hide create attributes from chart
+      myProject: attr.myProject,
+      type: attr.type
+    }));
   };
 
   // Render Methods
@@ -580,7 +610,7 @@ ${analysis}`;
       
       <div className="mb-6">
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={valueCurve} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={prepareChartData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="name" 
@@ -591,9 +621,29 @@ ${analysis}`;
             />
             <YAxis domain={[0, 100]} />
             <Legend />
-            <Line type="monotone" dataKey="lowCost" stroke="#8884d8" strokeWidth={2} name="Low-cost konkurence" />
-            <Line type="monotone" dataKey="premium" stroke="#82ca9d" strokeWidth={2} name="Premium konkurence" />
-            <Line type="monotone" dataKey="myProject" stroke="#ff7300" strokeWidth={3} name="Můj projekt" />
+            <Line 
+              type="monotone" 
+              dataKey="lowCost" 
+              stroke="#8884d8" 
+              strokeWidth={2} 
+              name="Low-cost konkurence"
+              connectNulls={false}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="premium" 
+              stroke="#82ca9d" 
+              strokeWidth={2} 
+              name="Premium konkurence"
+              connectNulls={false}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="myProject" 
+              stroke="#ff7300" 
+              strokeWidth={3} 
+              name="Můj projekt"
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -602,12 +652,28 @@ ${analysis}`;
         {valueCurve.map((attribute, index) => (
           <div key={index} className="p-4 border rounded-lg bg-muted/50">
             <div className="flex items-center justify-between mb-3">
-              <Input
-                value={attribute.name}
-                onChange={(e) => updateAttributeName(index, e.target.value)}
-                className="font-medium bg-transparent border-none p-0 text-base"
-                style={{ color: attribute.color }}
-              />
+              <div className="flex items-center">
+                <Input
+                  value={attribute.name}
+                  onChange={(e) => updateAttributeName(index, e.target.value)}
+                  className="font-medium bg-transparent border-none p-0 text-base"
+                  style={{ color: attribute.color }}
+                />
+                {attribute.type === 'create' && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Badge variant="outline" className="ml-2 text-xs bg-green-50 text-green-700 border-green-200">
+                          Vytvoření
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">U "Vytvoření" se zobrazuje pouze hodnota vašeho projektu, protože konkurence tyto funkce nemá.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
               {index > 0 && (
                 <Button
                   variant="ghost"
@@ -621,34 +687,46 @@ ${analysis}`;
             </div>
             
             <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-medium mb-1">Low-cost</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={attribute.lowCost}
-                  onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value))}
-                  className="w-full"
-                />
-                <span className="text-xs text-muted-foreground">{attribute.lowCost}</span>
-              </div>
+              {/* Low Cost - Hidden for create attributes */}
+              {attribute.type !== 'create' && (
+                <div>
+                  <label className="block text-xs font-medium mb-1">Low-cost</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={attribute.lowCost}
+                    onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-muted-foreground">{attribute.lowCost}</span>
+                </div>
+              )}
               
-              <div>
-                <label className="block text-xs font-medium mb-1">Premium</label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={attribute.premium}
-                  onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value))}
-                  className="w-full"
-                />
-                <span className="text-xs text-muted-foreground">{attribute.premium}</span>
-              </div>
+              {/* Premium - Hidden for create attributes */}
+              {attribute.type !== 'create' && (
+                <div>
+                  <label className="block text-xs font-medium mb-1">Premium</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={attribute.premium}
+                    onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-muted-foreground">{attribute.premium}</span>
+                </div>
+              )}
               
-              <div>
-                <label className="block text-xs font-medium mb-1">Můj projekt</label>
+              {/* My Project - Always visible */}
+              <div className={attribute.type === 'create' ? 'col-span-3' : ''}>
+                <label className="block text-xs font-medium mb-1">
+                  Můj projekt
+                  {attribute.type === 'create' && (
+                    <span className="text-green-600 ml-1">(Unikátní funkce)</span>
+                  )}
+                </label>
                 <input
                   type="range"
                   min="0"
@@ -660,6 +738,13 @@ ${analysis}`;
                 <span className="text-xs text-muted-foreground">{attribute.myProject}</span>
               </div>
             </div>
+            
+            {/* Explanation for create attributes */}
+            {attribute.type === 'create' && (
+              <div className="mt-2 p-2 bg-green-50 rounded text-xs text-green-700">
+                💡 Tato funkce neexistuje u konkurence, proto se zobrazuje pouze hodnota vašeho projektu.
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -753,9 +838,33 @@ ${analysis}`;
               <p className="text-sm text-muted-foreground">Blue Ocean Strategy</p>
             </div>
           </div>
-          <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
-            {Math.round(getCompletionProgress())}% hotovo
-          </Badge>
+          <div className="flex items-center space-x-3">
+            <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+              {Math.round(getCompletionProgress())}% hotovo
+            </Badge>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Reset All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Resetovat všechna data?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tato akce vymaže všechna vyplněná data ve Vision fázi. Tuto akci nelze vrátit zpět.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Zrušit</AlertDialogCancel>
+                  <AlertDialogAction onClick={resetAllData} className="bg-red-600 hover:bg-red-700">
+                    Resetovat vše
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
         
         {/* Horizontal Progress Bar */}
