@@ -33,11 +33,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         <div className="text-center space-y-8 mb-16">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
-              <Rocket className="h-10 w-10 text-primary-foreground" />
+              <span className="text-2xl font-bold text-primary-foreground">V7</span>
             </div>
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            VISIBLE7 MICEK
+            VISIBLE7 MICEK™
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Revoluce v business plánování - Metodika 7 kroků k úspěšnému online podnikání

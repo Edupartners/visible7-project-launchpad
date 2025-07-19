@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PricingModal } from "./PricingModal";
+import { UnifiedHeader } from "./layout/UnifiedHeader";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { getPromoCodeAccess, enableLauncher, disableLauncher, isLauncherEnabled, clearBetaAccess, getTrialStatus } from "@/lib/promoCodes";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { User, LogOut, CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, Trophy, FileText, Crown, Gift, Settings, RefreshCw, Clock } from "lucide-react";
+import { CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, FileText, Crown, Gift, Settings, RefreshCw } from "lucide-react";
 
 const phases = [
   {
@@ -150,21 +151,14 @@ export const Dashboard = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
+      {/* Unified Header */}
+      <UnifiedHeader showTrialInfo={true} />
+      
+      {/* Admin Controls Bar */}
+      <div className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">V7</span>
-              </div>
-              <h1 className="text-xl font-semibold text-foreground">VISIBLE7 MICEK&trade; </h1>
-              {trialStatus.isActive && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
-                  <Clock className="w-3 h-3 mr-1" />
-                  Trial: {trialStatus.daysRemaining} dní
-                </Badge>
-              )}
+          <div className="flex items-center justify-between h-12">
+            <div className="flex items-center space-x-2">
               {promoCodeAccess && (
                 <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
                   <Gift className="w-3 h-3 mr-1" />
@@ -179,41 +173,30 @@ export const Dashboard = ({
               )}
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <User className="w-4 h-4" />
-                <span>{userEmail}</span>
-              </div>
-              
-              {/* Admin Controls */}
-              <div className="flex items-center space-x-2">
-                <Button 
-                  onClick={handleResetToLauncher} 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground"
-                  title="Reset do launcher režimu"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-                <Button 
-                  onClick={handleToggleLauncher} 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground"
-                  title={`${isLauncherEnabled() ? 'Zakázat' : 'Povolit'} launcher`}
-                >
-                  <Settings className="w-4 h-4" />
-                </Button>
-              </div>
-              
-              <Button onClick={onLogout} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                <LogOut className="w-4 h-4" />
+            {/* Admin Controls */}
+            <div className="flex items-center space-x-2">
+              <Button 
+                onClick={handleResetToLauncher} 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground"
+                title="Reset do launcher režimu"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+              <Button 
+                onClick={handleToggleLauncher} 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground"
+                title={`${isLauncherEnabled() ? 'Zakázat' : 'Povolit'} launcher`}
+              >
+                <Settings className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Progress Overview */}
