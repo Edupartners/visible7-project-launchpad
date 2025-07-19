@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BackButton } from "@/components/ui/back-button";
 import { CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap, Info, RefreshCw, Eye } from "lucide-react";
 
 interface LeanCanvasData {
@@ -280,7 +279,6 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <BackButton onBack={onBack} />
           </div>
           
           <Card className="card-apple p-8">
@@ -326,7 +324,6 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
       <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-6">
-            <BackButton onBack={() => setShowVisualization(false)} />
           </div>
           
           <div className="space-y-6">
@@ -480,7 +477,6 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <BackButton onBack={onBack} />
         </div>
         
         {/* Progress */}
