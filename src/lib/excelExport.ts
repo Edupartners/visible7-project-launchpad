@@ -1,153 +1,263 @@
-
+import * as XLSX from 'xlsx';
 import { generatePredictiveData } from './predictiveMapping';
 
-interface ExcelData {
-  revenueItems: Array<{
-    name: string;
-    type: string;
-    monthlyRevenue: number[];
+interface ROICalculatorData {
+  marketingCosts: Array<{
+    channel: string;
+    costs: number[];
   }>;
-  marketingCosts: {
-    socialMedia: number[];
-    ppc: number[];
-    contentMarketing: number[];
-    events: number[];
-    partnerships: number[];
-    other: number[];
+  operationalCosts: Array<{
+    item: string;
+    monthlyCost: number;
+  }>;
+  revenue: {
+    productPrice: number;
+    ordersPerMonth: number;
   };
-  operationalCosts: number[];
-  totalMonthlyRevenue: number[];
-  industry: string;
-  recommendedPNO: number;
-  suggestions: string[];
+  taxes: {
+    incomeTaxRate: number;
+    socialInsuranceRate: number;
+    reserveRate: number;
+  };
+  seasonalAdjustments: number[];
+  startupPlan: {
+    launchMonth: number;
+    growthScenario: string;
+  };
 }
 
-export const generateExcelData = (): ExcelData | null => {
-  const predictiveData = generatePredictiveData();
-  
-  if (!predictiveData) return null;
-  
-  return {
-    revenueItems: predictiveData.revenueItems,
-    marketingCosts: predictiveData.marketingCosts,
-    operationalCosts: predictiveData.operationalCosts,
-    totalMonthlyRevenue: predictiveData.totalMonthlyRevenue,
-    industry: predictiveData.industry,
-    recommendedPNO: predictiveData.recommendedPNO,
-    suggestions: predictiveData.suggestions
-  };
+const getROIDataFromStorage = (): ROICalculatorData | null => {
+  try {
+    const stored = localStorage.getItem('roi-calculator-data');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
 };
 
-export const createExcelBlob = (data: ExcelData): Blob => {
-  const months = ['Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 
-                  'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
+const getDefaultROIData = (): ROICalculatorData => ({
+  marketingCosts: [
+    { channel: 'Google Ads', costs: Array(12).fill(10000) },
+    { channel: 'Facebook Ads', costs: Array(12).fill(8000) },
+    { channel: 'SEO', costs: Array(12).fill(5000) },
+    { channel: 'Email Marketing', costs: Array(12).fill(2000) },
+    { channel: 'Content Marketing', costs: Array(12).fill(3000) }
+  ],
+  operationalCosts: [
+    { item: 'Nájem', monthlyCost: 15000 },
+    { item: 'Mzdy', monthlyCost: 80000 },
+    { item: 'Pojištění', monthlyCost: 3000 },
+    { item: 'Software', monthlyCost: 5000 },
+    { item: 'Ostatní', monthlyCost: 7000 }
+  ],
+  revenue: {
+    productPrice: 500,
+    ordersPerMonth: 100
+  },
+  taxes: {
+    incomeTaxRate: 19,
+    socialInsuranceRate: 13.5,
+    reserveRate: 10
+  },
+  seasonalAdjustments: [0.9, 0.85, 1.0, 1.1, 1.2, 1.3, 1.1, 0.9, 1.0, 1.1, 1.2, 1.4],
+  startupPlan: {
+    launchMonth: 1,
+    growthScenario: 'Moderate'
+  }
+});
+
+const createInteractiveExcelFile = (data: ROICalculatorData): ArrayBuffer => {
+  const workbook = XLSX.utils.book_new();
   
-  // Create CSV content that can be opened in Excel
-  let csvContent = '';
-  
-  // Header
-  csvContent += 'V7 VISIBLE7 MICEK™ - ROI Business Kalkulátor\n\n';
-  csvContent += `Odvětví: ${data.industry}\n`;
-  csvContent += `Doporučené PNO: ${data.recommendedPNO.toLocaleString('cs-CZ')} Kč\n\n`;
-  
-  // Revenue section
-  csvContent += 'PŘÍJMY (Kč)\n';
-  csvContent += 'Zdroj příjmů,Typ,' + months.join(',') + ',Celkem\n';
-  
-  data.revenueItems.forEach(item => {
-    const total = item.monthlyRevenue.reduce((a, b) => a + b, 0);
-    csvContent += `"${item.name}","${item.type}",` + 
-                  item.monthlyRevenue.map(val => val.toLocaleString('cs-CZ')).join(',') + 
-                  `,${total.toLocaleString('cs-CZ')}\n`;
-  });
-  
-  const totalRevenue = data.totalMonthlyRevenue.reduce((a, b) => a + b, 0);
-  csvContent += 'CELKEM PŘÍJMY,,' + 
-                data.totalMonthlyRevenue.map(val => val.toLocaleString('cs-CZ')).join(',') + 
-                `,${totalRevenue.toLocaleString('cs-CZ')}\n\n`;
-  
-  // Marketing costs section
-  csvContent += 'MARKETINGOVÉ NÁKLADY (Kč)\n';
-  csvContent += 'Kanál,' + months.join(',') + ',Celkem\n';
-  
-  const marketingChannels = [
-    { name: 'Social Media', values: data.marketingCosts.socialMedia },
-    { name: 'PPC Reklama', values: data.marketingCosts.ppc },
-    { name: 'Content Marketing', values: data.marketingCosts.contentMarketing },
-    { name: 'Eventy', values: data.marketingCosts.events },
-    { name: 'Partnerství', values: data.marketingCosts.partnerships },
-    { name: 'Ostatní', values: data.marketingCosts.other }
+  // Sheet 1: Vstupní data (Inputs)
+  const inputData = [
+    ['ROI BUSINESS KALKULÁTOR', '', '', '', '', '', '', '', '', '', '', '', ''],
+    ['Interaktivní Excel verze', '', '', '', '', '', '', '', '', '', '', '', ''],
+    [''],
+    ['=== MARKETINGOVÉ NÁKLADY ==='],
+    ['Kanál', 'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'],
+    ...data.marketingCosts.map(cost => [cost.channel, ...cost.costs]),
+    [''],
+    ['=== PROVOZNÍ NÁKLADY ==='],
+    ['Položka', 'Měsíční náklady (Kč)'],
+    ...data.operationalCosts.map(cost => [cost.item, cost.monthlyCost]),
+    [''],
+    ['=== PŘÍJMY ==='],
+    ['Cena produktu (Kč)', data.revenue.productPrice],
+    ['Objednávky za měsíc', data.revenue.ordersPerMonth],
+    [''],
+    ['=== DANĚ A REZERVY ==='],
+    ['Daň z příjmu (%)', data.taxes.incomeTaxRate],
+    ['Sociální pojištění (%)', data.taxes.socialInsuranceRate],
+    ['Rezervy (%)', data.taxes.reserveRate],
+    [''],
+    ['=== SEZÓNNÍ MULTIPLIKÁTORY ==='],
+    ['Měsíc', 'Multiplikátor'],
+    ...data.seasonalAdjustments.map((adj, i) => [`${i + 1}. měsíc`, adj]),
+    [''],
+    ['=== STARTUP PLÁN ==='],
+    ['Měsíc spuštění', data.startupPlan.launchMonth],
+    ['Růstový scénář', data.startupPlan.growthScenario]
   ];
   
-  let totalMarketingCosts = Array(12).fill(0);
-  marketingChannels.forEach(channel => {
-    const total = channel.values.reduce((a, b) => a + b, 0);
-    csvContent += `"${channel.name}",` + 
-                  channel.values.map(val => val.toLocaleString('cs-CZ')).join(',') + 
-                  `,${total.toLocaleString('cs-CZ')}\n`;
-    
-    channel.values.forEach((val, i) => totalMarketingCosts[i] += val);
-  });
+  const inputSheet = XLSX.utils.aoa_to_sheet(inputData);
+  XLSX.utils.book_append_sheet(workbook, inputSheet, 'Vstupní data');
+
+  // Sheet 2: Kalkulace (Calculations)
+  const calcData = [
+    ['=== AUTOMATICKÉ VÝPOČTY ==='],
+    [''],
+    ['MĚSÍČNÍ ANALÝZA'],
+    ['Měsíc', 'Hrubý příjem', 'Marketing náklady', 'Provozní náklady', 'Celkové náklady', 'Hrubý zisk', 'Zisk po daních'],
+    ...Array(12).fill(0).map((_, i) => [
+      `${i + 1}`,
+      { f: `'Vstupní data'!M13*'Vstupní data'!N13*INDEX('Vstupní data'!B22:B33,${i + 1})` },
+      { f: `SUM('Vstupní data'!B${6 + i}:M${6 + i})` },
+      { f: `SUM('Vstupní data'!B10:B14)` },
+      { f: `C${5 + i}+D${5 + i}` },
+      { f: `B${5 + i}-E${5 + i}` },
+      { f: `F${5 + i}*(1-('Vstupní data'!B17+'Vstupní data'!B18+'Vstupní data'!B19)/100)` }
+    ]),
+    [''],
+    ['ROČNÍ SOUHRNY'],
+    ['Celkový roční příjem', { f: 'SUM(B5:B16)' }],
+    ['Celkové roční náklady', { f: 'SUM(E5:E16)' }],
+    ['Roční zisk před zdaněním', { f: 'SUM(F5:F16)' }],
+    ['Roční zisk po zdanění', { f: 'SUM(G5:G16)' }],
+    [''],
+    ['KPI METRIKY'],
+    ['ROI (%)', { f: '(B21/B20)*100' }],
+    ['Marže (%)', { f: '(B21/B19)*100' }],
+    ['PNO (%)', { f: '(SUM(C5:C16)/B21)*100' }],
+    ['Break-even měsíc', { f: 'MATCH(TRUE,F5:F16>0,0)' }]
+  ];
   
-  const totalMarketingYear = totalMarketingCosts.reduce((a, b) => a + b, 0);
-  csvContent += 'CELKEM MARKETING,' + 
-                totalMarketingCosts.map(val => val.toLocaleString('cs-CZ')).join(',') + 
-                `,${totalMarketingYear.toLocaleString('cs-CZ')}\n\n`;
+  const calcSheet = XLSX.utils.aoa_to_sheet(calcData);
+  XLSX.utils.book_append_sheet(workbook, calcSheet, 'Kalkulace');
+
+  // Sheet 3: Dashboard (Results)
+  const dashboardData = [
+    ['ROI BUSINESS KALKULÁTOR - DASHBOARD'],
+    [''],
+    ['=== KLÍČOVÉ METRIKY ==='],
+    ['Metrika', 'Hodnota', 'Status'],
+    ['ROI', { f: "Kalkulace!B25&'%'" }, { f: 'IF(Kalkulace!B25>20,"✓ Výborné",IF(Kalkulace!B25>10,"⚠ Dobré","✗ Pozor"))' }],
+    ['Marže', { f: "Kalkulace!B26&'%'" }, { f: 'IF(Kalkulace!B26>30,"✓ Výborné",IF(Kalkulace!B26>15,"⚠ Dobré","✗ Pozor"))' }],
+    ['PNO', { f: "Kalkulace!B27&'%'" }, { f: 'IF(Kalkulace!B27<50,"✓ Výborné",IF(Kalkulace!B27<80,"⚠ Dobré","✗ Pozor"))' }],
+    ['Break-even', { f: "Kalkulace!B28&'. měsíc'" }, { f: 'IF(Kalkulace!B28<=6,"✓ Rychle",IF(Kalkulace!B28<=12,"⚠ Střední","✗ Pomalé"))' }],
+    [''],
+    ['=== FINANČNÍ PŘEHLED ==='],
+    ['Roční příjem', { f: 'Kalkulace!B19' }],
+    ['Roční náklady', { f: 'Kalkulace!B20' }],
+    ['Roční zisk', { f: 'Kalkulace!B22' }],
+    [''],
+    ['=== DOPORUČENÍ ==='],
+    ['• Sledujte PNO - mělo by být pod 50%'],
+    ['• ROI nad 20% je vynikající výsledek'],
+    ['• Break-even do 6 měsíců je ideální'],
+    ['• Pravidelně optimalizujte marketingové kanály']
+  ];
   
-  // Operational costs section
-  csvContent += 'PROVOZNÍ NÁKLADY (Kč)\n';
-  csvContent += 'Měsíc,' + months.join(',') + ',Celkem\n';
-  const totalOperational = data.operationalCosts.reduce((a, b) => a + b, 0);
-  csvContent += 'Provozní náklady,' + 
-                data.operationalCosts.map(val => val.toLocaleString('cs-CZ')).join(',') + 
-                `,${totalOperational.toLocaleString('cs-CZ')}\n\n`;
+  const dashboardSheet = XLSX.utils.aoa_to_sheet(dashboardData);
+  XLSX.utils.book_append_sheet(workbook, dashboardSheet, 'Dashboard');
+
+  // Sheet 4: Scénáře (Scenarios)
+  const scenariosData = [
+    ['SROVNÁNÍ SCÉNÁŘŮ'],
+    [''],
+    ['Scénář', 'Konzervativní (-20%)', 'Aktuální', 'Optimistický (+30%)'],
+    ['Roční příjem', 
+      { f: 'Kalkulace!B19*0.8' }, 
+      { f: 'Kalkulace!B19' }, 
+      { f: 'Kalkulace!B19*1.3' }
+    ],
+    ['Roční zisk', 
+      { f: 'Kalkulace!B22*0.8' }, 
+      { f: 'Kalkulace!B22' }, 
+      { f: 'Kalkulace!B22*1.3' }
+    ],
+    ['ROI (%)', 
+      { f: 'Kalkulace!B25*0.8' }, 
+      { f: 'Kalkulace!B25' }, 
+      { f: 'Kalkulace!B25*1.3' }
+    ],
+    [''],
+    ['=== SENSITIVITY ANALÝZA ==='],
+    ['Změna ceny produktu o:', '-20%', '-10%', '0%', '+10%', '+20%'],
+    ['Dopad na roční zisk:', 
+      { f: 'Kalkulace!B22*0.8' },
+      { f: 'Kalkulace!B22*0.9' },
+      { f: 'Kalkulace!B22' },
+      { f: 'Kalkulace!B22*1.1' },
+      { f: 'Kalkulace!B22*1.2' }
+    ]
+  ];
   
-  // Summary section
-  csvContent += 'SHRNUTÍ\n';
-  csvContent += 'Ukazatel,Hodnota\n';
+  const scenariosSheet = XLSX.utils.aoa_to_sheet(scenariosData);
+  XLSX.utils.book_append_sheet(workbook, scenariosSheet, 'Scénáře');
+
+  // Sheet 5: Instrukce
+  const instructionsData = [
+    ['NÁVOD K POUŽITÍ ROI KALKULÁTORU'],
+    [''],
+    ['=== JAK POUŽÍVAT ==='],
+    ['1. Přejděte na list "Vstupní data"'],
+    ['2. Upravte modré buňky podle vašich hodnot'],
+    ['3. Výsledky se automaticky přepočítají'],
+    ['4. Zkontrolujte "Dashboard" pro přehled'],
+    ['5. Porovnejte scénáře na listu "Scénáře"'],
+    [''],
+    ['=== BAREVNÉ KÓDOVÁNÍ ==='],
+    ['🔵 Modré buňky = Editovatelné hodnoty'],
+    ['⚪ Bílé buňky = Vypočítané hodnoty'],
+    ['🟢 Zelené = Dobré výsledky'],
+    ['🟡 Žluté = Pozor, lze zlepšit'],
+    ['🔴 Červené = Problém, nutná optimalizace'],
+    [''],
+    ['=== KLÍČOVÉ METRIKY ==='],
+    ['ROI = Return on Investment (návratnost investice)'],
+    ['PNO = Poměr nákladů na obrat'],
+    ['Marže = Zisková marže v %'],
+    ['Break-even = Měsíc dosažení zisku'],
+    [''],
+    ['=== TIPY PRO OPTIMALIZACI ==='],
+    ['• Sledujte nejefektivnější marketingové kanály'],
+    ['• Optimalizujte sezónní multiplikátory'],
+    ['• Testujte různé cenové strategie'],
+    ['• Kontrolujte provozní náklady'],
+    [''],
+    ['Vytvořeno: ' + new Date().toLocaleDateString('cs-CZ')]
+  ];
   
-  const totalCosts = totalMarketingYear + totalOperational;
-  const profit = totalRevenue - totalCosts;
-  const profitMargin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
-  const roi = totalCosts > 0 ? (profit / totalCosts) * 100 : 0;
-  
-  csvContent += `"Celkové příjmy","${totalRevenue.toLocaleString('cs-CZ')} Kč"\n`;
-  csvContent += `"Celkové náklady","${totalCosts.toLocaleString('cs-CZ')} Kč"\n`;
-  csvContent += `"Zisk","${profit.toLocaleString('cs-CZ')} Kč"\n`;
-  csvContent += `"Zisková marže","${profitMargin.toFixed(1)}%"\n`;
-  csvContent += `"ROI","${roi.toFixed(1)}%"\n`;
-  csvContent += `"Doporučené PNO","${data.recommendedPNO.toLocaleString('cs-CZ')} Kč"\n\n`;
-  
-  // Suggestions section
-  if (data.suggestions.length > 0) {
-    csvContent += 'DOPORUČENÍ\n';
-    data.suggestions.forEach((suggestion, index) => {
-      csvContent += `"${index + 1}. ${suggestion}"\n`;
-    });
-  }
-  
-  // Convert to blob with proper encoding for Excel
-  const blob = new Blob(['\ufeff' + csvContent], { 
-    type: 'text/csv;charset=utf-8;' 
-  });
-  
-  return blob;
+  const instructionsSheet = XLSX.utils.aoa_to_sheet(instructionsData);
+  XLSX.utils.book_append_sheet(workbook, instructionsSheet, 'Instrukce');
+
+  return XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 };
 
-export const downloadExcelFile = () => {
-  const data = generateExcelData();
+const downloadExcelFile = (): void => {
+  const roiData = getROIDataFromStorage() || getDefaultROIData();
   
-  if (!data) {
-    throw new Error('Nejsou k dispozici data pro export. Dokončete nejprve předchozí fáze.');
+  try {
+    const arrayBuffer = createInteractiveExcelFile(roiData);
+    const blob = new Blob([arrayBuffer], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.href = url;
+    link.download = `roi-kalkulator-interaktivni-${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Chyba při vytváření Excel souboru:', error);
+    throw new Error("Nepodařilo se vytvořit Excel soubor. Zkuste to prosím znovu.");
   }
-  
-  const blob = createExcelBlob(data);
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  
-  link.href = url;
-  link.download = `V7_ROI_Kalkulator_${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
-  
-  window.URL.revokeObjectURL(url);
 };
+
+export { downloadExcelFile };

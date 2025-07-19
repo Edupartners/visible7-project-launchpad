@@ -26,7 +26,7 @@ export const ExcelExportButton = ({ className, variant = "outline" }: ExcelExpor
       className={className}
     >
       <FileSpreadsheet className="w-4 h-4 mr-2" />
-      Stáhnout Excel kalkulátor
+      Stáhnout interaktivní Excel
       <Download className="w-4 h-4 ml-2" />
     </Button>
   );
