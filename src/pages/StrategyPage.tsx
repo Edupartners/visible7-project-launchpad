@@ -2,6 +2,7 @@
 import { StrategyBusinessPhase } from "@/components/StrategyBusinessPhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
+import { ExcelExportButton } from "@/components/ExcelExportButton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePersistedState } from "@/hooks/usePersistedState";
@@ -67,7 +68,13 @@ const StrategyPage = () => {
 
   return (
     <PageLayout onBack={handleBack}>
-      <StrategyBusinessPhase onComplete={handleComplete} onBack={handleBack} />
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Strategy & Business</h1>
+          <ExcelExportButton variant="outline" />
+        </div>
+        <StrategyBusinessPhase onComplete={handleComplete} onBack={handleBack} />
+      </div>
     </PageLayout>
   );
 };
