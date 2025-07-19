@@ -20,10 +20,10 @@ const HomePage = () => {
     console.log("  isAuthenticated:", isAuthenticated);
     console.log("  trialStatus:", trialStatus);
     
-    // If user is not authenticated, redirect to login page
+    // If user is not authenticated, redirect to landing page
     if (!isAuthenticated) {
-      console.log("🔄 Redirecting to login page");
-      navigate('/login');
+      console.log("🔄 Redirecting to landing page");
+      navigate('/');
       return;
     }
     
