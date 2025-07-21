@@ -37,11 +37,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<LauncherPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/home" element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            } />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/vision" element={
               <ProtectedRoute>
                 <VisionPage />
