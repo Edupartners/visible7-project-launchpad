@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,16 +13,17 @@ import { TemplatePaymentModal } from "./TemplatePaymentModal";
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
   onBack: () => void;
+  hasAccess: boolean;
+  onPaymentSuccess: () => void;
 }
 
-export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoadmapProps) => {
+export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPaymentSuccess }: BusinessTypeRoadmapProps) => {
   const businessType = businessTypes.find(bt => bt.id === businessTypeId);
   const [steps, setSteps] = usePersistedState<RoadmapStep[]>(
     `roadmap-${businessTypeId}`, 
     businessType?.steps || []
   );
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [hasTemplateAccess, setHasTemplateAccess] = usePersistedState<boolean>("hasTemplateAccess", false);
 
   useEffect(() => {
     if (businessType && steps.length === 0) {
@@ -55,17 +55,22 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
   };
 
   const handleTemplateDownload = () => {
-    if (hasTemplateAccess) {
+    if (hasAccess) {
       window.open(businessType?.templateUrl || '#', '_blank');
     } else {
       setShowPaymentModal(true);
     }
   };
 
-  const handlePaymentSuccess = () => {
-    setHasTemplateAccess(true);
+  const handlePaymentSuccessInternal = () => {
+    console.log("💳 Template payment modal success - calling parent handler");
+    onPaymentSuccess();
     setShowPaymentModal(false);
-    window.open(businessType?.templateUrl || '#', '_blank');
+    
+    // Small delay to ensure state is updated before opening template
+    setTimeout(() => {
+      window.open(businessType?.templateUrl || '#', '_blank');
+    }, 200);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -90,6 +95,11 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                 <span className="text-sm font-bold text-primary-foreground">V7</span>
               </div>
               <h1 className="text-xl font-semibold text-foreground">{businessType.name}</h1>
+              
+              {/* Debug badge */}
+              <Badge variant="outline" className="text-xs bg-muted">
+                Access: {hasAccess.toString()}
+              </Badge>
             </div>
           </div>
         </div>
@@ -97,7 +107,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Payment Box - Prominently displayed if no access */}
-        {!hasTemplateAccess && (
+        {!hasAccess && (
           <Card className="card-apple mb-8 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
             <CardContent className="p-8">
               <div className="text-center">
@@ -152,7 +162,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
         )}
 
         {/* Success Box - Show if user has access */}
-        {hasTemplateAccess && (
+        {hasAccess && (
           <Card className="card-apple mb-8 border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -249,7 +259,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                   Použijte All in One Migration plugin pro rychlý import.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  {hasTemplateAccess ? (
+                  {hasAccess ? (
                     <Button 
                       onClick={handleTemplateDownload}
                       className="btn-apple flex-1"
@@ -283,7 +293,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
         <Card className="card-apple">
           <CardHeader>
             <CardTitle>Roadmapa - Gamifikované kroky</CardTitle>
-            {!hasTemplateAccess && (
+            {!hasAccess && (
               <p className="text-sm text-muted-foreground">
                 Kroky jsou dostupné po zakoupení plného přístupu
               </p>
@@ -307,13 +317,13 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                       key={step.id} 
                       className={`border-b border-border/30 transition-colors ${
                         step.completed ? 'bg-emerald-500/5' : 'hover:bg-muted/50'
-                      } ${!hasTemplateAccess ? 'opacity-60' : ''}`}
+                      } ${!hasAccess ? 'opacity-60' : ''}`}
                     >
                       <td className="py-4 px-2">
                         <Checkbox
                           checked={step.completed}
-                          onCheckedChange={() => hasTemplateAccess && handleStepToggle(step.id)}
-                          disabled={!hasTemplateAccess}
+                          onCheckedChange={() => hasAccess && handleStepToggle(step.id)}
+                          disabled={!hasAccess}
                           className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                         />
                       </td>
@@ -371,7 +381,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
       <TemplatePaymentModal
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
-        onSuccess={handlePaymentSuccess}
+        onSuccess={handlePaymentSuccessInternal}
         templateName={businessType?.name || 'WordPress šablonu'}
       />
     </div>
