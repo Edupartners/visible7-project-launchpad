@@ -66,7 +66,6 @@ const BenchmarkingPage = () => {
     <PageLayout onBack={handleBack}>
       <BenchmarkingTestingPhase 
         onChannelSelect={handleChannelSelect} 
-        onBack={handleBack} 
       />
     </PageLayout>
   );

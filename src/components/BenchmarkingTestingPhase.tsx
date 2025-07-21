@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,6 @@ import { TrendingUp, Target, Clock, DollarSign, BarChart3, Search, Share2, Mail,
 
 interface BenchmarkingTestingPhaseProps {
   onChannelSelect: (channelId: string) => void;
-  onBack: () => void;
 }
 
 const getChannelIcon = (channelId: string) => {
@@ -26,7 +26,7 @@ const getChannelIcon = (channelId: string) => {
   return icons[channelId as keyof typeof icons] || Target;
 };
 
-export function BenchmarkingTestingPhase({ onChannelSelect, onBack }: BenchmarkingTestingPhaseProps) {
+export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestingPhaseProps) {
   const [selectedAdType, setSelectedAdType] = useState<string>("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedTime, setSelectedTime] = useState<string>("all");
@@ -66,14 +66,6 @@ export function BenchmarkingTestingPhase({ onChannelSelect, onBack }: Benchmarki
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <Button 
-            variant="ghost" 
-            onClick={onBack}
-            className="mb-6"
-          >
-            ← Zpět na přehled
-          </Button>
-          
           <h1 className="text-4xl font-bold text-primary mb-4">
             Benchmarking & Testing
           </h1>
