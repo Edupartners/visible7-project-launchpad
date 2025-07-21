@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Lock, Crown, CheckCircle, Search, BarChart3, Target, TrendingUp, Share2, Mail, MessageSquare, Users, PenTool } from "lucide-react";
 import { useState } from "react";
 import { PricingModal } from "./PricingModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PhasePreviewProps {
   phaseId: number;
@@ -82,6 +83,7 @@ export const PhasePreview = ({
   estimatedTime 
 }: PhasePreviewProps) => {
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const { hasPromoAccess } = useAuth();
 
   const handlePaymentSuccess = () => {
     setShowPricingModal(false);
@@ -184,51 +186,53 @@ export const PhasePreview = ({
           })}
         </div>
 
-        {/* Unlock CTA */}
-        <Card className="card-apple p-8 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
-          <div className="text-center">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Crown className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="text-2xl font-semibold text-foreground mb-2">
-              Odemkněte pokročilé fáze
-            </h3>
-            <p className="text-apple-body mb-6 max-w-2xl mx-auto">
-              Získejte přístup k plné verzi fází 5-7 s interaktivními nástroji, 
-              podrobnými analýzami a exporty dat. Pokračujte ve svém podnikatelském růstu!
-            </p>
-            
-            <div className="space-y-4">
-              <div className="text-3xl font-bold text-primary">990 Kč</div>
-              <Button 
-                onClick={() => setShowPricingModal(true)}
-                className="btn-apple text-base px-8"
-                size="lg"
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                Odemknout pokročilé fáze
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Jednorázová platba • Přístup navždy • 30 dní záruka vrácení peněz
+        {/* Unlock CTA - only show if user doesn't have promo access */}
+        {!hasPromoAccess && (
+          <Card className="card-apple p-8 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Crown className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-2xl font-semibold text-foreground mb-2">
+                Odemkněte pokročilé fáze
+              </h3>
+              <p className="text-apple-body mb-6 max-w-2xl mx-auto">
+                Získejte přístup k plné verzi fází 5-7 s interaktivními nástroji, 
+                podrobnými analýzami a exporty dat. Pokračujte ve svém podnikatelském růstu!
               </p>
-            </div>
+              
+              <div className="space-y-4">
+                <div className="text-3xl font-bold text-primary">990 Kč</div>
+                <Button 
+                  onClick={() => setShowPricingModal(true)}
+                  className="btn-apple text-base px-8"
+                  size="lg"
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Odemknout pokročilé fáze
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Jednorázová platba • Přístup navždy • 30 dní záruka vrácení peněz
+                </p>
+              </div>
 
-            <div className="mt-8 grid md:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Interaktivní nástroje</span>
-              </div>
-              <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Detailní analýzy</span>
-              </div>
-              <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                <span>Exporty dat</span>
+              <div className="mt-8 grid md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center justify-center space-x-2 text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>Interaktivní nástroje</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>Detailní analýzy</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>Exporty dat</span>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        )}
       </div>
 
       {/* Pricing Modal */}
