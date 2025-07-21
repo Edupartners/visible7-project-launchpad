@@ -27,6 +27,12 @@ const BusinessTypeDetailPage = () => {
       hasAccess: true, 
       localStorage: localStorage.getItem('hasAccess') 
     });
+
+    // Navigate back to home to force Dashboard to reload with new access state
+    setTimeout(() => {
+      console.log("🔄 Navigating back to home to sync access state");
+      navigate('/home');
+    }, 1000);
   };
 
   return (
