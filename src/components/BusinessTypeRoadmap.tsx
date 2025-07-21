@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,11 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BackButton } from "@/components/ui/back-button";
-import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Lock } from "lucide-react";
+import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Lock, Crown, Shield, FileText, Zap } from "lucide-react";
 import { businessTypes, type RoadmapStep } from "@/types/implementation";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { TemplatePaymentModal } from "./TemplatePaymentModal";
-import { getPromoCodeAccess } from "@/lib/promoCodes";
 
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
@@ -24,16 +24,6 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
   );
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [hasTemplateAccess, setHasTemplateAccess] = usePersistedState<boolean>("hasTemplateAccess", false);
-  
-  // Check for promo access
-  const promoCodeAccess = !!getPromoCodeAccess();
-
-  // Debug log pro stav přístupu
-  console.log("🔍 DEBUG - Template access state:", { 
-    hasTemplateAccess, 
-    promoCodeAccess, 
-    showPaymentModal 
-  });
 
   useEffect(() => {
     if (businessType && steps.length === 0) {
@@ -65,25 +55,16 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
   };
 
   const handleTemplateDownload = () => {
-    console.log("🔍 DEBUG - handleTemplateDownload called");
-    console.log("🔍 DEBUG - Current state:", { hasTemplateAccess, promoCodeAccess });
-    
-    if (hasTemplateAccess || promoCodeAccess) {
-      console.log("🔍 DEBUG - User has access, proceeding with download");
-      // User has access, proceed with download
+    if (hasTemplateAccess) {
       window.open(businessType?.templateUrl || '#', '_blank');
     } else {
-      console.log("🔍 DEBUG - User doesn't have access, showing payment modal");
-      // Show payment modal
       setShowPaymentModal(true);
     }
   };
 
   const handlePaymentSuccess = () => {
-    console.log("🔍 DEBUG - Payment successful, granting access");
     setHasTemplateAccess(true);
     setShowPaymentModal(false);
-    // Proceed with download
     window.open(businessType?.templateUrl || '#', '_blank');
   };
 
@@ -115,6 +96,78 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Payment Box - Prominently displayed if no access */}
+        {!hasTemplateAccess && (
+          <Card className="card-apple mb-8 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                  <Crown className="w-8 h-8 text-primary" />
+                </div>
+                
+                <h3 className="text-2xl font-bold mb-3">Odemkněte PLNÝ PŘÍSTUP</h3>
+                <div className="text-4xl font-bold text-primary mb-2">999 Kč</div>
+                <p className="text-muted-foreground mb-6">Jednorázová platba • Přístup navždy</p>
+                
+                <div className="grid md:grid-cols-3 gap-4 mb-8">
+                  <div className="flex items-center gap-3 p-4 bg-background/50 rounded-lg">
+                    <FileText className="w-6 h-6 text-primary flex-shrink-0" />
+                    <div className="text-left">
+                      <div className="font-semibold">WordPress šablona</div>
+                      <div className="text-sm text-muted-foreground">Připravená pro {businessType.name}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-4 bg-background/50 rounded-lg">
+                    <Zap className="w-6 h-6 text-primary flex-shrink-0" />
+                    <div className="text-left">
+                      <div className="font-semibold">Kompletní roadmapa</div>
+                      <div className="text-sm text-muted-foreground">Interaktivní kroky</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-4 bg-background/50 rounded-lg">
+                    <Shield className="w-6 h-6 text-primary flex-shrink-0" />
+                    <div className="text-left">
+                      <div className="font-semibold">Všechny fáze V7</div>
+                      <div className="text-sm text-muted-foreground">Kompletní metodika</div>
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => setShowPaymentModal(true)}
+                  className="btn-apple h-14 px-8 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                >
+                  <Crown className="w-5 h-5 mr-2" />
+                  Koupit plný přístup za 999 Kč
+                </Button>
+                
+                <p className="text-xs text-muted-foreground mt-4">
+                  Bezpečná platba • 30 dní záruka vrácení peněz • Žádné skryté poplatky
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Success Box - Show if user has access */}
+        {hasTemplateAccess && (
+          <Card className="card-apple mb-8 border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-emerald-800">Přístup aktivován!</h3>
+                  <p className="text-emerald-700">Máte plný přístup ke všem šablonám a funkcím VISIBLE7</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Business Type Header */}
         <div className="mb-8">
           <Card className="card-apple p-6">
@@ -196,36 +249,23 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                   Použijte All in One Migration plugin pro rychlý import.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  {(() => {
-                    const shouldShowPaymentButton = !hasTemplateAccess && !promoCodeAccess;
-                    console.log("🔍 DEBUG - Button render logic:", { 
-                      shouldShowPaymentButton,
-                      hasTemplateAccess,
-                      promoCodeAccess
-                    });
-                    
-                    if (shouldShowPaymentButton) {
-                      return (
-                        <Button 
-                          onClick={handleTemplateDownload}
-                          className="btn-apple flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                        >
-                          <Lock className="w-4 h-4 mr-2" />
-                          Koupit plný přístup za 999 Kč
-                        </Button>
-                      );
-                    } else {
-                      return (
-                        <Button 
-                          onClick={handleTemplateDownload}
-                          className="btn-apple flex-1"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          Stáhnout šablonu zdarma
-                        </Button>
-                      );
-                    }
-                  })()}
+                  {hasTemplateAccess ? (
+                    <Button 
+                      onClick={handleTemplateDownload}
+                      className="btn-apple flex-1"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Stáhnout šablonu zdarma
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleTemplateDownload}
+                      className="btn-apple flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                    >
+                      <Lock className="w-4 h-4 mr-2" />
+                      Po zakoupení přístupu
+                    </Button>
+                  )}
                   <Button variant="outline" className="flex-1">
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Návod na import
@@ -243,6 +283,11 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
         <Card className="card-apple">
           <CardHeader>
             <CardTitle>Roadmapa - Gamifikované kroky</CardTitle>
+            {!hasTemplateAccess && (
+              <p className="text-sm text-muted-foreground">
+                Kroky jsou dostupné po zakoupení plného přístupu
+              </p>
+            )}
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -262,12 +307,13 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                       key={step.id} 
                       className={`border-b border-border/30 transition-colors ${
                         step.completed ? 'bg-emerald-500/5' : 'hover:bg-muted/50'
-                      }`}
+                      } ${!hasTemplateAccess ? 'opacity-60' : ''}`}
                     >
                       <td className="py-4 px-2">
                         <Checkbox
                           checked={step.completed}
-                          onCheckedChange={() => handleStepToggle(step.id)}
+                          onCheckedChange={() => hasTemplateAccess && handleStepToggle(step.id)}
+                          disabled={!hasTemplateAccess}
                           className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                         />
                       </td>
@@ -322,20 +368,12 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
       </div>
 
       {/* Template Payment Modal */}
-      {(() => {
-        console.log("🔍 DEBUG - Modal render:", { showPaymentModal });
-        return (
-          <TemplatePaymentModal
-            isOpen={showPaymentModal}
-            onClose={() => {
-              console.log("🔍 DEBUG - Modal closing");
-              setShowPaymentModal(false);
-            }}
-            onSuccess={handlePaymentSuccess}
-            templateName={businessType?.name || 'WordPress šablonu'}
-          />
-        );
-      })()}
+      <TemplatePaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSuccess={handlePaymentSuccess}
+        templateName={businessType?.name || 'WordPress šablonu'}
+      />
     </div>
   );
 };
