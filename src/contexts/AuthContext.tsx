@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface AuthContextType {
   currentUser: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   hasPromoAccess: boolean;
   userName: string | null;
   login: (email: string, hasPromoAccess?: boolean, name?: string) => void;
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [hasPromoAccess, setHasPromoAccess] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     // Check if user is already logged in on app start
@@ -40,6 +42,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setHasPromoAccess(storedPromoAccess);
       setUserName(storedUserName);
     }
+    
+    setIsLoading(false);
   }, []);
 
   const login = (email: string, hasPromoAccess?: boolean, name?: string) => {
@@ -75,6 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
+    isLoading,
     hasPromoAccess,
     userName,
     login,
