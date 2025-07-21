@@ -1,7 +1,8 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Lock, Crown, CheckCircle } from "lucide-react";
+import { ArrowLeft, Lock, Crown, CheckCircle, Search, BarChart3, Target, TrendingUp, Share2, Mail, MessageSquare, Users, PenTool } from "lucide-react";
 import { useState } from "react";
 import { PricingModal } from "./PricingModal";
 
@@ -14,6 +15,62 @@ interface PhasePreviewProps {
   features: string[];
   estimatedTime: string;
 }
+
+const getChannelPreview = (feature: string) => {
+  const channelMap: Record<string, { image: string; icon: any; gradient: string }> = {
+    "Srovnávače zboží": {
+      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80",
+      icon: Search,
+      gradient: "from-blue-500/20 to-cyan-500/20"
+    },
+    "Katalogy a marketplace": {
+      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=400&q=80",
+      icon: BarChart3,
+      gradient: "from-green-500/20 to-emerald-500/20"
+    },
+    "PPC kampaně": {
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80",
+      icon: Target,
+      gradient: "from-red-500/20 to-pink-500/20"
+    },
+    "SEO optimalizace": {
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=400&q=80",
+      icon: TrendingUp,
+      gradient: "from-purple-500/20 to-violet-500/20"
+    },
+    "Sociální sítě": {
+      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80",
+      icon: Share2,
+      gradient: "from-orange-500/20 to-yellow-500/20"
+    },
+    "E-mail marketing": {
+      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=400&q=80",
+      icon: Mail,
+      gradient: "from-indigo-500/20 to-blue-500/20"
+    },
+    "SMS marketing": {
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80",
+      icon: MessageSquare,
+      gradient: "from-teal-500/20 to-cyan-500/20"
+    },
+    "PR & influenceři": {
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=400&q=80",
+      icon: Users,
+      gradient: "from-pink-500/20 to-rose-500/20"
+    },
+    "Copywriting": {
+      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80",
+      icon: PenTool,
+      gradient: "from-slate-500/20 to-gray-500/20"
+    }
+  };
+
+  return channelMap[feature] || {
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=400&q=80",
+    icon: Target,
+    gradient: "from-gray-500/20 to-slate-500/20"
+  };
+};
 
 export const PhasePreview = ({ 
   phaseId, 
@@ -81,28 +138,50 @@ export const PhasePreview = ({
 
         {/* Preview Content */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          {features.map((feature, index) => (
-            <Card key={index} className="card-apple relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-background/50 to-muted/30 rounded-lg" />
-              <div className="absolute top-4 right-4">
-                <Lock className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <CardHeader className="relative">
-                <CardTitle className="text-lg flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-2 text-primary opacity-50" />
-                  {feature}
-                </CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  Tato funkce je dostupná po odemknutí plné verze
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="relative">
-                <div className="h-20 bg-muted/50 rounded border-2 border-dashed border-muted-foreground/30 flex items-center justify-center">
-                  <span className="text-sm text-muted-foreground">Náhled obsahu</span>
+          {features.map((feature, index) => {
+            const preview = getChannelPreview(feature);
+            const IconComponent = preview.icon;
+            
+            return (
+              <Card key={index} className="card-apple relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-background/50 to-muted/30 rounded-lg" />
+                <div className="absolute top-4 right-4 z-20">
+                  <Lock className="w-5 h-5 text-muted-foreground" />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <CardHeader className="relative z-10">
+                  <CardTitle className="text-lg flex items-center">
+                    <CheckCircle className="w-5 h-5 mr-2 text-primary opacity-50" />
+                    {feature}
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    Tato funkce je dostupná po odemknutí plné verze
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="relative z-10">
+                  <div className="relative h-20 rounded border-2 border-dashed border-muted-foreground/30 overflow-hidden">
+                    {/* Background Image */}
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center opacity-30 blur-sm"
+                      style={{ backgroundImage: `url(${preview.image})` }}
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${preview.gradient}`} />
+                    
+                    {/* Icon and Text */}
+                    <div className="relative h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-1">
+                          <IconComponent className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="text-xs text-muted-foreground font-medium">Náhled kanálu</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Unlock CTA */}

@@ -6,12 +6,15 @@ const BenchmarkingPreviewPage = () => {
   const navigate = useNavigate();
 
   const features = [
-    "Analýza marketingových kanálů",
-    "ROI kalkulace pro kampaně", 
-    "A/B testování návody",
-    "Optimalizace konverzí",
-    "Měření výkonnosti",
-    "Konkurenční analýza"
+    "Srovnávače zboží",
+    "Katalogy a marketplace", 
+    "PPC kampaně",
+    "SEO optimalizace",
+    "Sociální sítě",
+    "E-mail marketing",
+    "SMS marketing",
+    "PR & influenceři",
+    "Copywriting"
   ];
 
   const handleBack = () => {
