@@ -124,13 +124,19 @@ export const Dashboard = ({
       return;
     }
     
-    // Preview phases (5-7) - show preview if no access
-    if (phase?.previewOnly && !hasAccess && !promoCodeAccess) {
-      navigate(`${phase.route}/preview`);
+    // Paid phases (5-7) - check access and navigate accordingly
+    if (phase?.previewOnly) {
+      // If user has access, go to full version
+      if (hasAccess || promoCodeAccess) {
+        navigate(phase.route || '/');
+      } else {
+        // No access - go to preview
+        navigate(`${phase.route}/preview`);
+      }
       return;
     }
     
-    // Full access or paid phases
+    // Fallback for other phases
     if (hasAccess || promoCodeAccess) {
       navigate(phase?.route || '/');
     } else {
