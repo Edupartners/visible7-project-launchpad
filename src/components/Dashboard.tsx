@@ -237,9 +237,15 @@ export const Dashboard = ({
                 <h2 className="text-2xl font-bold text-foreground mb-2">
                   Registrujte se pro přístup k VISIBLE7
                 </h2>
-                <p className="text-apple-body">
+                <p className="text-apple-body mb-6">
                   Dokončete rychlou registraci pro odemknutí fází 1-3 zdarma navždy
                 </p>
+                <Button 
+                  onClick={() => window.location.href = '/?register=true'}
+                  className="btn-apple text-base px-8"
+                >
+                  Začít registraci zdarma
+                </Button>
               </div>
             </Card>
           </div>
