@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PricingModal } from "./PricingModal";
@@ -89,11 +90,13 @@ const phases = [
 interface DashboardProps {
   userEmail: string;
   onLogout: () => void;
+  isAuthenticated?: boolean;
 }
 
 export const Dashboard = ({
   userEmail,
-  onLogout
+  onLogout,
+  isAuthenticated = true
 }: DashboardProps) => {
   const navigate = useNavigate();
   const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completed_phases", []);
@@ -109,9 +112,14 @@ export const Dashboard = ({
   const allCoreCompleted = coreCompletedCount === 3;
   
   const handlePhaseClick = (phaseId: number) => {
+    // If user is not authenticated, prevent navigation
+    if (!isAuthenticated) {
+      return;
+    }
+    
     const phase = phases.find(p => p.id === phaseId);
     
-    // Free phases (1-4) - always accessible
+    // Free phases (1-4) - always accessible for authenticated users
     if (phase?.isFree) {
       navigate(phase.route || '/');
       return;
@@ -160,6 +168,9 @@ export const Dashboard = ({
   };
 
   const canAccessPhase = (phaseId: number) => {
+    // If user is not authenticated, they can't access any phase
+    if (!isAuthenticated) return false;
+    
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
     if (phase?.previewOnly) return true; // Preview phases are always "accessible" 
@@ -170,73 +181,93 @@ export const Dashboard = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
       {/* Unified Header */}
-      <UnifiedHeader showTrialInfo={true} />
+      <UnifiedHeader showTrialInfo={isAuthenticated} />
       
-      {/* Admin Controls Bar */}
-      <div className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12">
-            <div className="flex items-center space-x-2">
-              {promoCodeAccess && (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
-                  <Gift className="w-3 h-3 mr-1" />
-                  Promo přístup
-                </Badge>
-              )}
-              {hasAccess && !promoCodeAccess && !trialStatus.isActive && (
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                  <Crown className="w-3 h-3 mr-1" />
-                  Pro přístup
-                </Badge>
-              )}
-            </div>
-            
-            {/* Admin Controls */}
-            <div className="flex items-center space-x-2">
-              <Button 
-                onClick={handleResetToLauncher} 
-                variant="ghost" 
-                size="sm" 
-                className="text-muted-foreground hover:text-foreground"
-                title="Reset do launcher režimu"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-              <Button 
-                onClick={handleToggleLauncher} 
-                variant="ghost" 
-                size="sm" 
-                className="text-muted-foreground hover:text-foreground"
-                title={`${isLauncherEnabled() ? 'Zakázat' : 'Povolit'} launcher`}
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
+      {/* Admin Controls Bar - only show for authenticated users */}
+      {isAuthenticated && (
+        <div className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-12">
+              <div className="flex items-center space-x-2">
+                {promoCodeAccess && (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                    <Gift className="w-3 h-3 mr-1" />
+                    Promo přístup
+                  </Badge>
+                )}
+                {hasAccess && !promoCodeAccess && !trialStatus.isActive && (
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Pro přístup
+                  </Badge>
+                )}
+              </div>
+              
+              {/* Admin Controls */}
+              <div className="flex items-center space-x-2">
+                <Button 
+                  onClick={handleResetToLauncher} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-muted-foreground hover:text-foreground"
+                  title="Reset do launcher režimu"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+                <Button 
+                  onClick={handleToggleLauncher} 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-muted-foreground hover:text-foreground"
+                  title={`${isLauncherEnabled() ? 'Zakázat' : 'Povolit'} launcher`}
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Progress Overview */}
-        <div className="mb-8">
-          <Card className="card-apple p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-apple-title">Váš pokrok</h2>
-                <p className="text-apple-subtitle mt-1">
-                  Dokončeno {completedCount} z {phases.length} fází
+        {/* Registration prompt for unauthenticated users */}
+        {!isAuthenticated && (
+          <div className="mb-8">
+            <Card className="card-apple p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-foreground mb-2">
+                  Registrujte se pro přístup k VISIBLE7
+                </h2>
+                <p className="text-apple-body">
+                  Dokončete rychlou registraci pro odemknutí fází 1-3 zdarma navždy
                 </p>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-primary">
-                  {Math.round(progressPercentage)}%
+            </Card>
+          </div>
+        )}
+
+        {/* Progress Overview - only show for authenticated users */}
+        {isAuthenticated && (
+          <div className="mb-8">
+            <Card className="card-apple p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-apple-title">Váš pokrok</h2>
+                  <p className="text-apple-subtitle mt-1">
+                    Dokončeno {completedCount} z {phases.length} fází
+                  </p>
                 </div>
-                <div className="text-sm text-muted-foreground">hotovo</div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">
+                    {Math.round(progressPercentage)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground">hotovo</div>
+                </div>
               </div>
-            </div>
-            <Progress value={progressPercentage} className="h-3" />
-          </Card>
-        </div>
+              <Progress value={progressPercentage} className="h-3" />
+            </Card>
+          </div>
+        )}
 
         {/* Fáze */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -248,10 +279,10 @@ export const Dashboard = ({
             return (
               <Card 
                 key={phase.id} 
-                className={`card-apple-hover p-6 cursor-pointer transition-all duration-200 ${
+                className={`card-apple-hover p-6 transition-all duration-200 ${
                   isCompleted ? 'ring-2 ring-primary/20 bg-primary/5' : ''
-                } ${!isAccessible ? 'opacity-60' : ''}`} 
-                onClick={() => handlePhaseClick(phase.id)}
+                } ${!isAccessible ? 'opacity-60' : 'cursor-pointer'}`} 
+                onClick={() => isAccessible ? handlePhaseClick(phase.id) : undefined}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className={`p-3 rounded-xl ${
@@ -312,8 +343,8 @@ export const Dashboard = ({
           })}
         </div>
 
-        {/* Investor Pitch CTA */}
-        {allCoreCompleted && (
+        {/* Investor Pitch CTA - only show for authenticated users */}
+        {isAuthenticated && allCoreCompleted && (
           <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -344,8 +375,8 @@ export const Dashboard = ({
           </Card>
         )}
 
-        {/* CTA pro odemknutí pokročilých fází */}
-        {!hasAccess && !promoCodeAccess && allCoreCompleted && (
+        {/* CTA pro odemknutí pokročilých fází - only show for authenticated users */}
+        {isAuthenticated && !hasAccess && !promoCodeAccess && allCoreCompleted && (
           <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -368,8 +399,8 @@ export const Dashboard = ({
         )}
       </div>
 
-      {/* Pricing Modal */}
-      {showPricingModal && (
+      {/* Pricing Modal - only show for authenticated users */}
+      {isAuthenticated && showPricingModal && (
         <PricingModal 
           onClose={() => setShowPricingModal(false)} 
           onSuccess={handlePaymentSuccess} 

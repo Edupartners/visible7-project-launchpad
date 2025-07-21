@@ -17,33 +17,23 @@ const HomePage = () => {
     // Clean up old beta access keys and migrate to trial system
     cleanupOldBetaAccess();
     
-    const trialStatus = getTrialStatus();
     const shouldShowRegistration = searchParams.get('register') === 'true';
     
     // Debug logs for current state
     console.log("🚀 HomePage - State Check:");
     console.log("  isAuthenticated:", isAuthenticated);
     console.log("  shouldShowRegistration:", shouldShowRegistration);
-    console.log("  trialStatus:", trialStatus);
     
-    // If user is not authenticated and no registration param, redirect to landing page
-    if (!isAuthenticated && !shouldShowRegistration) {
-      console.log("🔄 Redirecting to landing page");
-      navigate('/');
-      return;
-    }
-    
-    // If user is not authenticated but has registration param, show registration modal
-    if (!isAuthenticated && shouldShowRegistration) {
+    // If user should register, show registration modal
+    if (shouldShowRegistration && !isAuthenticated) {
       console.log("📝 Showing registration modal");
       setShowRegistrationModal(true);
       // Remove the register param from URL
       setSearchParams(new URLSearchParams());
     }
     
-    console.log("✅ User authenticated or registration modal shown");
     setIsLoading(false);
-  }, [isAuthenticated, navigate, searchParams, setSearchParams]);
+  }, [isAuthenticated, searchParams, setSearchParams]);
 
   const handleRegister = (email: string, name: string) => {
     console.log("📋 Registering user:", email, name);
@@ -64,23 +54,20 @@ const HomePage = () => {
     );
   }
 
-  // Show registration modal if user is not authenticated
-  if (!isAuthenticated) {
-    return (
+  return (
+    <>
+      <Dashboard 
+        userEmail={currentUser || "guest@example.com"} 
+        onLogout={logout} 
+        isAuthenticated={isAuthenticated}
+      />
+      
       <SimpleRegistrationModal 
         isOpen={showRegistrationModal}
         onClose={handleCloseRegistrationModal}
         onRegister={handleRegister}
       />
-    );
-  }
-
-  if (!currentUser) {
-    return null;
-  }
-
-  return (
-    <Dashboard userEmail={currentUser} onLogout={logout} />
+    </>
   );
 };
 
