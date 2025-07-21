@@ -58,7 +58,7 @@ const App = () => (
                 <ImplementationPage />
               </ProtectedRoute>
             } />
-            <Route path="/benchmarking" element={
+            <Route path="/benchmarking-phase" element={
               <ProtectedRoute>
                 <BenchmarkingPage />
               </ProtectedRoute>
@@ -88,7 +88,7 @@ const App = () => (
                 <InvestorPitchPage />
               </ProtectedRoute>
             } />
-            <Route path="/benchmarking/preview" element={
+            <Route path="/benchmarking-phase/preview" element={
               <ProtectedRoute>
                 <BenchmarkingPreviewPage />
               </ProtectedRoute>

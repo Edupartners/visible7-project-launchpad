@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PricingModal } from "./PricingModal";
@@ -61,7 +60,7 @@ const phases = [
     estimatedTime: "35 min",
     isFree: false,
     previewOnly: true, // New property for preview mode
-    route: "/benchmarking"
+    route: "/benchmarking-phase"
   },
   {
     id: 6,
