@@ -28,6 +28,13 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
   // Check for promo access
   const promoCodeAccess = !!getPromoCodeAccess();
 
+  // Debug log pro stav přístupu
+  console.log("🔍 DEBUG - Template access state:", { 
+    hasTemplateAccess, 
+    promoCodeAccess, 
+    showPaymentModal 
+  });
+
   useEffect(() => {
     if (businessType && steps.length === 0) {
       setSteps(businessType.steps);
@@ -58,16 +65,22 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
   };
 
   const handleTemplateDownload = () => {
+    console.log("🔍 DEBUG - handleTemplateDownload called");
+    console.log("🔍 DEBUG - Current state:", { hasTemplateAccess, promoCodeAccess });
+    
     if (hasTemplateAccess || promoCodeAccess) {
+      console.log("🔍 DEBUG - User has access, proceeding with download");
       // User has access, proceed with download
       window.open(businessType?.templateUrl || '#', '_blank');
     } else {
+      console.log("🔍 DEBUG - User doesn't have access, showing payment modal");
       // Show payment modal
       setShowPaymentModal(true);
     }
   };
 
   const handlePaymentSuccess = () => {
+    console.log("🔍 DEBUG - Payment successful, granting access");
     setHasTemplateAccess(true);
     setShowPaymentModal(false);
     // Proceed with download
@@ -183,23 +196,36 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                   Použijte All in One Migration plugin pro rychlý import.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  {!hasTemplateAccess && !promoCodeAccess ? (
-                    <Button 
-                      onClick={handleTemplateDownload}
-                      className="btn-apple flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                    >
-                      <Lock className="w-4 h-4 mr-2" />
-                      Koupit plný přístup za 999 Kč
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={handleTemplateDownload}
-                      className="btn-apple flex-1"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Stáhnout šablonu zdarma
-                    </Button>
-                  )}
+                  {(() => {
+                    const shouldShowPaymentButton = !hasTemplateAccess && !promoCodeAccess;
+                    console.log("🔍 DEBUG - Button render logic:", { 
+                      shouldShowPaymentButton,
+                      hasTemplateAccess,
+                      promoCodeAccess
+                    });
+                    
+                    if (shouldShowPaymentButton) {
+                      return (
+                        <Button 
+                          onClick={handleTemplateDownload}
+                          className="btn-apple flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                        >
+                          <Lock className="w-4 h-4 mr-2" />
+                          Koupit plný přístup za 999 Kč
+                        </Button>
+                      );
+                    } else {
+                      return (
+                        <Button 
+                          onClick={handleTemplateDownload}
+                          className="btn-apple flex-1"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Stáhnout šablonu zdarma
+                        </Button>
+                      );
+                    }
+                  })()}
                   <Button variant="outline" className="flex-1">
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Návod na import
@@ -296,12 +322,20 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
       </div>
 
       {/* Template Payment Modal */}
-      <TemplatePaymentModal
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        onSuccess={handlePaymentSuccess}
-        templateName={businessType?.name || 'WordPress šablonu'}
-      />
+      {(() => {
+        console.log("🔍 DEBUG - Modal render:", { showPaymentModal });
+        return (
+          <TemplatePaymentModal
+            isOpen={showPaymentModal}
+            onClose={() => {
+              console.log("🔍 DEBUG - Modal closing");
+              setShowPaymentModal(false);
+            }}
+            onSuccess={handlePaymentSuccess}
+            templateName={businessType?.name || 'WordPress šablonu'}
+          />
+        );
+      })()}
     </div>
   );
 };
