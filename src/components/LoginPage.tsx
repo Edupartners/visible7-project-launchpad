@@ -18,28 +18,15 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [step, setStep] = useState(1); // 1 = registration, 2 = promo code
-  const [showPromoInput, setShowPromoInput] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && (!isLogin || password)) {
-      if (!isLogin) {
-        // For registration, go to step 2 (promo code)
-        setStep(2);
-      } else {
-        // For login, proceed directly
-        const hasPromoAccess = !!getPromoCodeAccess();
-        onLogin(email, hasPromoAccess, `${firstName} ${lastName}`.trim());
-      }
+      const fullName = `${firstName} ${lastName}`.trim();
+      const hasPromoAccess = !!getPromoCodeAccess();
+      onLogin(email, hasPromoAccess, fullName);
     }
-  };
-
-  const handleSkipPromo = () => {
-    const fullName = `${firstName} ${lastName}`.trim();
-    localStorage.setItem('userName', fullName);
-    onLogin(email, false, fullName);
   };
 
   const handleGoogleLogin = () => {
@@ -47,77 +34,6 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
     const hasPromoAccess = !!getPromoCodeAccess();
     onLogin("user@gmail.com", hasPromoAccess, "Google User");
   };
-
-  const handlePromoSuccess = () => {
-    setShowPromoInput(false);
-    const fullName = `${firstName} ${lastName}`.trim();
-    localStorage.setItem('userName', fullName);
-    onLogin(email, true, fullName);
-  };
-
-  if (step === 2) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-accent/10 to-primary/5 flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-in">
-          {/* Progress indicator */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <CheckCircle className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <div className="w-8 h-0.5 bg-primary"></div>
-              <div className="w-8 h-8 rounded-full bg-primary border-2 border-primary flex items-center justify-center">
-                <span className="text-xs font-bold text-primary-foreground">2</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mb-8">
-            <h1 className="text-apple-title mb-2">Skvělé, {firstName}! 🎉</h1>
-            <p className="text-apple-subtitle">
-              Máte promokód? Získejte přístup zdarma!
-            </p>
-          </div>
-
-          <Card className="card-apple p-8">
-            {!showPromoInput ? (
-              <div className="space-y-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Gift className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Speciální nabídka</h3>
-                  <p className="text-muted-foreground text-sm mb-6">
-                    S promokódem získáte přístup ke všem 7 fázím VISIBLE7 během 15denního trialu
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  <Button
-                    onClick={() => setShowPromoInput(true)}
-                    className="btn-apple w-full h-12"
-                  >
-                    <Gift className="mr-2 w-4 h-4" />
-                    Mám promokód
-                  </Button>
-                  
-                  <Button
-                    onClick={handleSkipPromo}
-                    variant="outline"
-                    className="w-full h-12 border-border/50 hover:border-primary"
-                  >
-                    Pokračovat bez promokódu
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <PromoCodeInput onSuccess={handlePromoSuccess} />
-            )}
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/10 to-primary/5">
@@ -144,15 +60,10 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Začít zdarma clicked - event triggered');
                     const registerSection = document.getElementById('register');
-                    console.log('Register section found:', registerSection);
                     registerSection?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  onMouseEnter={() => console.log('Začít zdarma mouse enter')}
-                  onMouseLeave={() => console.log('Začít zdarma mouse leave')}
                   className="btn-apple px-8 py-3 text-base relative z-50"
-                  style={{ pointerEvents: 'auto' }}
                 >
                   Začít zdarma
                   <ArrowRight className="ml-2 w-4 h-4" />
@@ -161,14 +72,10 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Zobrazit plány clicked - event triggered');
                     setShowPricing(true);
                   }}
-                  onMouseEnter={() => console.log('Zobrazit plány mouse enter')}
-                  onMouseLeave={() => console.log('Zobrazit plány mouse leave')}
                   variant="outline"
                   className="px-8 py-3 text-base border-border/50 hover:border-primary relative z-50"
-                  style={{ pointerEvents: 'auto' }}
                 >
                   Zobrazit plány
                 </Button>
@@ -301,21 +208,9 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
         </div>
       </div>
 
-      {/* Registration Form */}
+        {/* Registration Form */}
       <div className="flex items-center justify-center p-4" id="register">
         <div className="w-full max-w-md animate-fade-in">
-          {/* Progress indicator */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary border-2 border-primary flex items-center justify-center">
-                <span className="text-xs font-bold text-primary-foreground">1</span>
-              </div>
-              <div className="w-8 h-0.5 bg-border"></div>
-              <div className="w-8 h-8 rounded-full bg-muted border-2 border-border flex items-center justify-center">
-                <span className="text-xs font-bold text-muted-foreground">2</span>
-              </div>
-            </div>
-          </div>
 
           {/* Hlavní karta */}
           <Card className="card-apple p-8">
@@ -324,7 +219,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 {isLogin ? "Přihlaste se" : "Začněte svou cestu"}
               </h2>
               <p className="text-muted-foreground">
-                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Registrace je zdarma a trvá jen minutu"}
+                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Zaregistrujte se zdarma a získejte okamžitý přístup k základním fázím"}
               </p>
             </div>
 

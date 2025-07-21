@@ -5,9 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BackButton } from "@/components/ui/back-button";
-import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign } from "lucide-react";
+import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Lock } from "lucide-react";
 import { businessTypes, type RoadmapStep } from "@/types/implementation";
 import { usePersistedState } from "@/hooks/usePersistedState";
+import { TemplatePaymentModal } from "./TemplatePaymentModal";
+import { getPromoCodeAccess } from "@/lib/promoCodes";
 
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
@@ -20,6 +22,11 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
     `roadmap-${businessTypeId}`, 
     businessType?.steps || []
   );
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [hasTemplateAccess, setHasTemplateAccess] = usePersistedState<boolean>("hasTemplateAccess", false);
+  
+  // Check for promo access
+  const promoCodeAccess = !!getPromoCodeAccess();
 
   useEffect(() => {
     if (businessType && steps.length === 0) {
@@ -48,6 +55,23 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
           : step
       )
     );
+  };
+
+  const handleTemplateDownload = () => {
+    if (hasTemplateAccess || promoCodeAccess) {
+      // User has access, proceed with download
+      window.open(businessType?.templateUrl || '#', '_blank');
+    } else {
+      // Show payment modal
+      setShowPaymentModal(true);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setHasTemplateAccess(true);
+    setShowPaymentModal(false);
+    // Proceed with download
+    window.open(businessType?.templateUrl || '#', '_blank');
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -159,9 +183,23 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                   Použijte All in One Migration plugin pro rychlý import.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <Button className="btn-apple flex-1">
-                    <Download className="w-4 h-4 mr-2" />
-                    Stáhnout šablonu
+                  <Button 
+                    onClick={handleTemplateDownload}
+                    className={`btn-apple flex-1 ${
+                      !hasTemplateAccess && !promoCodeAccess ? 'relative' : ''
+                    }`}
+                  >
+                    {!hasTemplateAccess && !promoCodeAccess ? (
+                      <>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Odemknout šablonu
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        Stáhnout šablonu
+                      </>
+                    )}
                   </Button>
                   <Button variant="outline" className="flex-1">
                     <ExternalLink className="w-4 h-4 mr-2" />
@@ -257,6 +295,14 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
           </CardContent>
         </Card>
       </div>
+
+      {/* Template Payment Modal */}
+      <TemplatePaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSuccess={handlePaymentSuccess}
+        templateName={businessType?.name || 'WordPress šablonu'}
+      />
     </div>
   );
 };

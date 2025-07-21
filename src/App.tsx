@@ -20,6 +20,9 @@ import ExpansionPage from "./pages/ExpansionPage";
 import BusinessTypeDetailPage from "./pages/BusinessTypeDetailPage";
 import MarketingChannelDetailPage from "./pages/MarketingChannelDetailPage";
 import InvestorPitchPage from "./pages/InvestorPitchPage";
+import BenchmarkingPreviewPage from "./pages/BenchmarkingPreviewPage";
+import LaunchPreviewPage from "./pages/LaunchPreviewPage";
+import ExpansionPreviewPage from "./pages/ExpansionPreviewPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -87,6 +90,21 @@ const App = () => (
             <Route path="/investor-pitch" element={
               <ProtectedRoute>
                 <InvestorPitchPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/benchmarking/preview" element={
+              <ProtectedRoute>
+                <BenchmarkingPreviewPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/launch/preview" element={
+              <ProtectedRoute>
+                <LaunchPreviewPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/expansion/preview" element={
+              <ProtectedRoute>
+                <ExpansionPreviewPage />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

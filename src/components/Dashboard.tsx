@@ -45,10 +45,10 @@ const phases = [
     id: 4,
     title: "Implementation",
     subtitle: "Roadmapa podle business typu",
-    description: "Získejte konkrétní kroky založené na vašem typu podnikání",
+    description: "Prohlédněte si typy podnikání a získejte šablony",
     icon: Wrench,
     estimatedTime: "20 min",
-    isFree: false,
+    isFree: true, // Changed to true - browsing is free
     route: "/implementation"
   },
   {
@@ -59,6 +59,7 @@ const phases = [
     icon: BarChart3,
     estimatedTime: "35 min",
     isFree: false,
+    previewOnly: true, // New property for preview mode
     route: "/benchmarking"
   },
   {
@@ -69,6 +70,7 @@ const phases = [
     icon: Rocket,
     estimatedTime: "40 min",
     isFree: false,
+    previewOnly: true, // New property for preview mode
     route: "/launch"
   },
   {
@@ -79,6 +81,7 @@ const phases = [
     icon: Layers,
     estimatedTime: "50 min",
     isFree: false,
+    previewOnly: true, // New property for preview mode
     route: "/expansion"
   }
 ];
@@ -107,7 +110,21 @@ export const Dashboard = ({
   
   const handlePhaseClick = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
-    if (phase?.isFree || hasAccess || promoCodeAccess || trialStatus.isActive) {
+    
+    // Free phases (1-4) - always accessible
+    if (phase?.isFree) {
+      navigate(phase.route || '/');
+      return;
+    }
+    
+    // Preview phases (5-7) - show preview if no access
+    if (phase?.previewOnly && !hasAccess && !promoCodeAccess) {
+      navigate(`${phase.route}/preview`);
+      return;
+    }
+    
+    // Full access or paid phases
+    if (hasAccess || promoCodeAccess) {
       navigate(phase?.route || '/');
     } else {
       setShowPricingModal(true);
@@ -145,7 +162,8 @@ export const Dashboard = ({
   const canAccessPhase = (phaseId: number) => {
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
-    if (hasAccess || promoCodeAccess || trialStatus.isActive) return true;
+    if (phase?.previewOnly) return true; // Preview phases are always "accessible" 
+    if (hasAccess || promoCodeAccess) return true;
     return false;
   };
 
@@ -258,6 +276,11 @@ export const Dashboard = ({
                         ZDARMA
                       </Badge>
                     )}
+                    {phase.previewOnly && !hasAccess && !promoCodeAccess && (
+                      <Badge variant="outline" className="text-xs">
+                        NÁHLED
+                      </Badge>
+                    )}
                     {isCompleted && (
                       <Badge className="bg-primary/10 text-primary border-primary/20">
                         <CheckCircle className="w-3 h-3 mr-1" />
@@ -279,7 +302,7 @@ export const Dashboard = ({
                     {isAccessible && (
                       <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
                         <Play className="w-3 h-3 mr-1" />
-                        {isCompleted ? 'Znovu' : 'Začít'}
+                        {phase.previewOnly && !hasAccess && !promoCodeAccess ? 'Náhled' : isCompleted ? 'Znovu' : 'Začít'}
                       </Button>
                     )}
                   </div>
@@ -321,37 +344,20 @@ export const Dashboard = ({
           </Card>
         )}
 
-        {/* Trial expiration warning */}
-        {trialStatus.isActive && trialStatus.daysRemaining <= 3 && (
-          <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-orange-500/5 via-orange-500/10 to-orange-500/5 border-orange-500/20">
-            <div className="text-center">
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                Váš trial brzy vyprší!
-              </h3>
-              <p className="text-apple-body mb-4">
-                Zbývají vám pouze {trialStatus.daysRemaining} dny. Pokračujte s některým z našich plánů.
-              </p>
-              <Button onClick={() => setShowPricingModal(true)} className="btn-apple">
-                Vybrat plán
-              </Button>
-            </div>
-          </Card>
-        )}
-
-        {/* CTA pro odemknutí */}
-        {!hasAccess && !promoCodeAccess && !trialStatus.isActive && (
+        {/* CTA pro odemknutí pokročilých fází */}
+        {!hasAccess && !promoCodeAccess && allCoreCompleted && (
           <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                Odemkněte celou metodiku VISIBLE7
+                Odemkněte pokročilé fáze VISIBLE7
               </h3>
               <p className="text-apple-body mb-6">
-                Získejte přístup ke všem 7 fázím, AI analýzám, exportům a exkluzivním šablonám
+                Získejte přístup k pokročilým fázím 5-7: Benchmarking, Launch a Expansion s kompletními nástroji a analýzami
               </p>
               <div className="space-y-4">
                 <div className="text-3xl font-bold text-primary">990 Kč</div>
                 <Button onClick={() => setShowPricingModal(true)} className="btn-apple text-base px-8">
-                  Zobrazit plány
+                  Odemknout pokročilé fáze
                 </Button>
                 <p className="text-xs text-muted-foreground">
                   Jednorázová platba • Přístup navždy • 30 dní záruka vrácení peněz
