@@ -183,24 +183,23 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoad
                   Použijte All in One Migration plugin pro rychlý import.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <Button 
-                    onClick={handleTemplateDownload}
-                    className={`btn-apple flex-1 ${
-                      !hasTemplateAccess && !promoCodeAccess ? 'relative' : ''
-                    }`}
-                  >
-                    {!hasTemplateAccess && !promoCodeAccess ? (
-                      <>
-                        <Lock className="w-4 h-4 mr-2" />
-                        Odemknout šablonu
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-4 h-4 mr-2" />
-                        Stáhnout šablonu
-                      </>
-                    )}
-                  </Button>
+                  {!hasTemplateAccess && !promoCodeAccess ? (
+                    <Button 
+                      onClick={handleTemplateDownload}
+                      className="btn-apple flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                    >
+                      <Lock className="w-4 h-4 mr-2" />
+                      Koupit plný přístup za 999 Kč
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={handleTemplateDownload}
+                      className="btn-apple flex-1"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Stáhnout šablonu zdarma
+                    </Button>
+                  )}
                   <Button variant="outline" className="flex-1">
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Návod na import
