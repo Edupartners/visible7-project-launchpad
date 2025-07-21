@@ -111,25 +111,40 @@ export const Dashboard = ({
   const allCoreCompleted = coreCompletedCount === 3;
   
   const handlePhaseClick = (phaseId: number) => {
+    console.log("🖱️ Phase click:", { phaseId, hasAccess, promoCodeAccess, isAuthenticated });
+    
     // If user is not authenticated, prevent navigation
     if (!isAuthenticated) {
+      console.log("❌ User not authenticated, blocking navigation");
       return;
     }
     
     const phase = phases.find(p => p.id === phaseId);
+    console.log("📋 Phase details:", { phase: phase?.title, isFree: phase?.isFree, previewOnly: phase?.previewOnly });
     
     // Free phases (1-4) - always accessible for authenticated users
     if (phase?.isFree) {
+      console.log("✅ Free phase, navigating to:", phase.route);
       navigate(phase.route || '/');
       return;
     }
     
     // Paid phases (5-7) - check access and navigate accordingly
     if (phase?.previewOnly) {
+      const userHasAccess = hasAccess || promoCodeAccess;
+      console.log("💰 Paid phase access check:", { 
+        userHasAccess, 
+        hasAccess, 
+        promoCodeAccess,
+        targetRoute: userHasAccess ? phase.route : `${phase.route}/preview`
+      });
+      
       // If user has access, go to full version
-      if (hasAccess || promoCodeAccess) {
+      if (userHasAccess) {
+        console.log("✅ User has access, navigating to full version:", phase.route);
         navigate(phase.route || '/');
       } else {
+        console.log("⚠️ User has no access, navigating to preview:", `${phase.route}/preview`);
         // No access - go to preview
         navigate(`${phase.route}/preview`);
       }
@@ -138,15 +153,34 @@ export const Dashboard = ({
     
     // Fallback for other phases
     if (hasAccess || promoCodeAccess) {
+      console.log("✅ Access granted, navigating to:", phase?.route);
       navigate(phase?.route || '/');
     } else {
+      console.log("💳 No access, showing pricing modal");
       setShowPricingModal(true);
     }
   };
 
   const handlePaymentSuccess = () => {
+    console.log("💳 Payment successful, granting access");
+    
+    // Set access and ensure it's persisted
     setHasAccess(true);
+    
+    // Force localStorage update to ensure persistence
+    localStorage.setItem('hasAccess', 'true');
+    
+    console.log("✅ Access granted:", { 
+      hasAccess: true, 
+      localStorage: localStorage.getItem('hasAccess') 
+    });
+    
     setShowPricingModal(false);
+    
+    // Small delay to ensure state is properly updated before any potential navigation
+    setTimeout(() => {
+      console.log("🔄 Payment success completed, state should be updated");
+    }, 100);
   };
 
   const handleInvestorPitchClick = () => {
@@ -206,6 +240,11 @@ export const Dashboard = ({
                     Pro přístup
                   </Badge>
                 )}
+                
+                {/* Debug info */}
+                <Badge variant="outline" className="text-xs bg-muted">
+                  Debug: hasAccess={hasAccess.toString()}, promo={promoCodeAccess.toString()}
+                </Badge>
               </div>
               
               {/* Admin Controls */}
