@@ -2,8 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, Gift, Zap, Eye, Lightbulb, Target, Hammer, BarChart3, TrendingUp, CheckCircle } from "lucide-react";
-import { startFreeTrial } from "@/lib/promoCodes";
+import { Rocket, Eye, Lightbulb, Target, Hammer, BarChart3, TrendingUp, CheckCircle } from "lucide-react";
 
 interface LauncherPageProps {
   onAccessGranted: () => void;
@@ -20,9 +19,8 @@ const METHODOLOGY_STEPS = [
 ];
 
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
-  const handleSelectPlan = (planType: 'basic' | 'business') => {
-    startFreeTrial();
-    console.log(`Selected plan: ${planType}`);
+  const handleStartFree = () => {
+    console.log('Starting free registration');
     onAccessGranted();
   };
 
@@ -40,7 +38,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             VISIBLE7 MICEK™
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Revoluce v business plánování - Metodika 7 kroků k úspěšnému online podnikání
+            Revoluce v business plánování - Analyzujte svůj byznys zdarma, plaťte jen za šablony
           </p>
         </div>
 
@@ -67,117 +65,68 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </div>
 
-        {/* Pricing Plans */}
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Vyberte si svůj plán</h2>
-          <p className="text-center text-muted-foreground mb-12">Začněte s 15denním zkušebním obdobím zdarma</p>
+        {/* Value Proposition */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">Jak to funguje</h2>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Basic Plan */}
-            <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent relative">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-2">
-                  <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 hover:bg-green-100">
-                    <Gift className="h-3 w-3" />
-                    15 dní zdarma
-                  </Badge>
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <Card className="text-center border-2 border-green-200 bg-green-50">
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <CheckCircle className="h-6 w-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl">Základní plán</CardTitle>
-                <div className="text-3xl font-bold text-primary">299 Kč<span className="text-base font-normal text-muted-foreground">/měsíc</span></div>
-                <CardDescription>Ideální pro začátečníky a malé projekty</CardDescription>
+                <CardTitle className="text-lg text-green-800">Fáze 1-3 ZDARMA</CardTitle>
               </CardHeader>
-              
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Přístup ke všem 7 fázím metodiky</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">1 aktivní projekt</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Základní AI analýzy</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Export do PDF</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  onClick={() => handleSelectPlan('basic')}
-                  className="w-full h-12 text-lg"
-                >
-                  <Gift className="mr-2 h-5 w-5" />
-                  Začít základní plán
-                </Button>
+              <CardContent>
+                <p className="text-sm text-green-700">Vize • Ideace • Strategie</p>
+                <p className="text-xs text-green-600 mt-2">Kompletní analýza vašeho byznysu bez poplatků</p>
               </CardContent>
             </Card>
 
-            {/* Business Plan */}
-            <Card className="border-2 border-primary bg-gradient-to-br from-primary/10 to-primary/5 relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-4">
-                  Nejoblíbenější
-                </Badge>
-              </div>
-              <CardHeader className="text-center pt-8">
-                <div className="flex justify-center mb-2">
-                  <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 hover:bg-green-100">
-                    <Gift className="h-3 w-3" />
-                    15 dní zdarma
-                  </Badge>
+            <Card className="text-center border-2 border-blue-200 bg-blue-50">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Hammer className="h-6 w-6 text-white" />
                 </div>
-                <CardTitle className="text-2xl">Business plán</CardTitle>
-                <div className="text-3xl font-bold text-primary">990 Kč<span className="text-base font-normal text-muted-foreground">/měsíc</span></div>
-                <CardDescription>Pro firmy a pokročilé podnikatele</CardDescription>
+                <CardTitle className="text-lg text-blue-800">Fáze 4 - Šablony</CardTitle>
               </CardHeader>
-              
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Vše ze základního plánu</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Neomezený počet projektů</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Pokročilé AI analýzy a doporučení</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Přístup k expertním zdrojům</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Prioritní podpora</span>
-                  </div>
+              <CardContent>
+                <p className="text-sm text-blue-700">Implementace</p>
+                <p className="text-xs text-blue-600 mt-2">Šablony pro různé typy podnikání za 490 Kč</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 border-purple-200 bg-purple-50">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Rocket className="h-6 w-6 text-white" />
                 </div>
-                
-                <Button 
-                  onClick={() => handleSelectPlan('business')}
-                  className="w-full h-12 text-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                >
-                  <Zap className="mr-2 h-5 w-5" />
-                  Začít business plán
-                </Button>
+                <CardTitle className="text-lg text-purple-800">Fáze 5-7 Premium</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-purple-700">Benchmarking • Launch • Expanze</p>
+                <p className="text-xs text-purple-600 mt-2">Kompletní přístup za 990 Kč</p>
               </CardContent>
             </Card>
           </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-8">
-            Bez kreditní karty • Zrušte kdykoliv • Bezpečné platby
-          </p>
+          {/* Main CTA */}
+          <div className="text-center">
+            <Button 
+              onClick={handleStartFree}
+              className="h-14 px-12 text-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            >
+              <CheckCircle className="mr-2 h-6 w-6" />
+              Začít zdarma
+            </Button>
+            <p className="text-sm text-muted-foreground mt-4">
+              Žádné poplatky za registraci • Okamžitý přístup • Plaťte jen za to, co potřebujete
+            </p>
+          </div>
         </div>
 
         {/* Contact */}
-        <div className="text-center text-sm text-muted-foreground mt-16">
+        <div className="text-center text-sm text-muted-foreground">
           <p>Máte otázky? Jsme tu pro vás!</p>
           <p>Kontaktujte nás pro více informací.</p>
         </div>
