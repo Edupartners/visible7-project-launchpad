@@ -6,7 +6,7 @@ const LauncherPage = () => {
   const navigate = useNavigate();
 
   const handleAccessGranted = () => {
-    navigate('/login');
+    navigate('/home?register=true');
   };
 
   return (

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthContextType {
@@ -42,12 +43,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const login = (email: string, hasPromoAccess?: boolean, name?: string) => {
+    console.log("🔐 AuthContext - Login:", { email, hasPromoAccess, name });
+    
     setCurrentUser(email);
     localStorage.setItem('currentUser', email);
     
     if (hasPromoAccess) {
       setHasPromoAccess(true);
       localStorage.setItem('hasPromoAccess', 'true');
+    } else {
+      setHasPromoAccess(false);
+      localStorage.removeItem('hasPromoAccess');
     }
     
     if (name) {
@@ -57,6 +63,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = () => {
+    console.log("🚪 AuthContext - Logout");
     setCurrentUser(null);
     setHasPromoAccess(false);
     setUserName(null);
