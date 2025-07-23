@@ -60,9 +60,7 @@ export const LauncherPage = ({
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             VISIBLE7 MICEK™
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-2xl">
-            Měníme vaše nápady v úspěšné online projekty
-          </p>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-2xl">Měníme vaše nápady v úspěšné online projekty - Najděte a analyzujte svůj byznys zdarma, plaťte jen za šablony</p>
         </div>
 
         {/* 7 Steps Methodology */}
