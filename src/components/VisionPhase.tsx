@@ -644,6 +644,16 @@ ${analysis}`;
             <TrendingUp className="w-4 h-4" />
           </div>
           <h3 className="text-lg font-semibold">Hodnotová křivka</h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="w-4 h-4 text-emerald-600 ml-2" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">Vizualizace pozice vašeho projektu vůči konkurenci na různých atributech. Pomáhá identifikovat Blue Ocean příležitosti.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <Button
           variant="outline"
@@ -654,6 +664,65 @@ ${analysis}`;
           <Plus className="w-4 h-4 mr-2" />
           Přidat atribut
         </Button>
+      </div>
+      
+      {/* Info box explaining values and competition modeling */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg border border-blue-200">
+        <div className="flex items-start space-x-3">
+          <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Info className="w-3 h-3" />
+          </div>
+          <div className="space-y-3 text-sm">
+            <div>
+              <h4 className="font-semibold text-blue-900 mb-2">Jak nastavit hodnoty (0-100%):</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-blue-800">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span><strong>0%</strong> = Minimum/Nejhorší</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <span><strong>50%</strong> = Standardní tržní úroveň</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span><strong>100%</strong> = Maximum/Nejlepší</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold text-blue-900 mb-2">Jak modelovat konkurenci:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-blue-800">
+                <div>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <div className="w-3 h-1 bg-blue-500 rounded-full"></div>
+                    <span className="font-medium">Low-cost konkurence</span>
+                  </div>
+                  <p className="text-xs">Nižší kvalita/služby, vyšší dostupnost</p>
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <div className="w-3 h-1 bg-green-500 rounded-full"></div>
+                    <span className="font-medium">Premium konkurence</span>
+                  </div>
+                  <p className="text-xs">Vyšší kvalita/služby, nižší dostupnost</p>
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <div className="w-3 h-1 bg-orange-500 rounded-full"></div>
+                    <span className="font-medium">Váš projekt</span>
+                  </div>
+                  <p className="text-xs">Vaše Blue Ocean strategie</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-xs text-blue-700 bg-blue-100 rounded p-2">
+              <strong>💡 Příklad:</strong> U atributu "Cena" znamená 100% = nejlevnější možná cena, 0% = nejdražší možná cena na trhu.
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="mb-6">
@@ -721,6 +790,48 @@ ${analysis}`;
                     </Tooltip>
                   </TooltipProvider>
                 )}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="w-4 h-4 text-muted-foreground ml-2" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="max-w-xs space-y-1">
+                        <p className="font-medium">Příklady pro "{attribute.name}":</p>
+                        {attribute.name.toLowerCase().includes('cena') && (
+                          <>
+                            <p><strong>0%</strong> - Nejdražší možná cena</p>
+                            <p><strong>50%</strong> - Průměrná tržní cena</p>
+                            <p><strong>100%</strong> - Nejlevnější možná cena</p>
+                          </>
+                        )}
+                        {attribute.name.toLowerCase().includes('kvalita') && (
+                          <>
+                            <p><strong>0%</strong> - Základní kvalita</p>
+                            <p><strong>50%</strong> - Standardní kvalita</p>
+                            <p><strong>100%</strong> - Prémiová kvalita</p>
+                          </>
+                        )}
+                        {attribute.name.toLowerCase().includes('dostupnost') && (
+                          <>
+                            <p><strong>0%</strong> - Velmi omezená dostupnost</p>
+                            <p><strong>50%</strong> - Běžná dostupnost</p>
+                            <p><strong>100%</strong> - Všude dostupné</p>
+                          </>
+                        )}
+                        {!attribute.name.toLowerCase().includes('cena') && 
+                         !attribute.name.toLowerCase().includes('kvalita') && 
+                         !attribute.name.toLowerCase().includes('dostupnost') && (
+                          <>
+                            <p><strong>0%</strong> - Minimum/Nejhorší</p>
+                            <p><strong>50%</strong> - Průměrná úroveň</p>
+                            <p><strong>100%</strong> - Maximum/Nejlepší</p>
+                          </>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               {index > 0 && (
                 <Button
@@ -747,7 +858,7 @@ ${analysis}`;
                     onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value))}
                     className="w-full"
                   />
-                  <span className="text-xs text-muted-foreground">{attribute.lowCost}</span>
+                  <span className="text-xs text-muted-foreground">{attribute.lowCost}%</span>
                 </div>
               )}
               
@@ -763,7 +874,7 @@ ${analysis}`;
                     onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value))}
                     className="w-full"
                   />
-                  <span className="text-xs text-muted-foreground">{attribute.premium}</span>
+                  <span className="text-xs text-muted-foreground">{attribute.premium}%</span>
                 </div>
               )}
               
@@ -783,7 +894,7 @@ ${analysis}`;
                   onChange={(e) => updateValueCurve(index, 'myProject', parseInt(e.target.value))}
                   className="w-full"
                 />
-                <span className="text-xs text-muted-foreground">{attribute.myProject}</span>
+                <span className="text-xs text-muted-foreground">{attribute.myProject}%</span>
               </div>
             </div>
             
