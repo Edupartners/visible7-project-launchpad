@@ -447,10 +447,22 @@ ${analysis}`;
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Eliminate */}
         <div className="space-y-3">
-          <h4 className="font-medium text-red-600 flex items-center">
-            <Minus className="w-4 h-4 mr-2" />
-            Eliminovat
-          </h4>
+          <div className="flex items-center">
+            <h4 className="font-medium text-red-600 flex items-center">
+              <Minus className="w-4 h-4 mr-2" />
+              Eliminovat
+            </h4>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-4 h-4 text-red-600 ml-2" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Co můžete úplně odstranit z trhu? Zamyslete se nad zbytečnými funkcemi, službami nebo procesy, které konkurence nabízí, ale zákazníci je nepotřebují nebo je považují za obtěžující.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           {errcData.eliminate.map((item, index) => (
             <div key={index} className="flex items-center space-x-2">
               <Input
@@ -482,10 +494,22 @@ ${analysis}`;
 
         {/* Reduce */}
         <div className="space-y-3">
-          <h4 className="font-medium text-orange-600 flex items-center">
-            <Minus className="w-4 h-4 mr-2" />
-            Redukovat
-          </h4>
+          <div className="flex items-center">
+            <h4 className="font-medium text-orange-600 flex items-center">
+              <Minus className="w-4 h-4 mr-2" />
+              Redukovat
+            </h4>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-4 h-4 text-orange-600 ml-2" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Co můžete výrazně snížit pod standardní úroveň? Identifikujte oblasti, kde lze ušetřit náklady nebo zjednodušit bez ztráty hodnoty pro zákazníka.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           {errcData.reduce.map((item, index) => (
             <div key={index} className="flex items-center space-x-2">
               <Input
@@ -517,10 +541,22 @@ ${analysis}`;
 
         {/* Raise */}
         <div className="space-y-3">
-          <h4 className="font-medium text-blue-600 flex items-center">
-            <Plus className="w-4 h-4 mr-2" />
-            Pozvýšit
-          </h4>
+          <div className="flex items-center">
+            <h4 className="font-medium text-blue-600 flex items-center">
+              <Plus className="w-4 h-4 mr-2" />
+              Pozvýšit
+            </h4>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-4 h-4 text-blue-600 ml-2" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Co můžete zvýšit nad standardní úroveň konkurence? Určete faktory, které jsou pro zákazníky důležité a kde můžete předčit očekávání.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           {errcData.raise.map((item, index) => (
             <div key={index} className="flex items-center space-x-2">
               <Input
@@ -552,10 +588,22 @@ ${analysis}`;
 
         {/* Create */}
         <div className="space-y-3">
-          <h4 className="font-medium text-green-600 flex items-center">
-            <Plus className="w-4 h-4 mr-2" />
-            Vytvořit
-          </h4>
+          <div className="flex items-center">
+            <h4 className="font-medium text-green-600 flex items-center">
+              <Plus className="w-4 h-4 mr-2" />
+              Vytvořit
+            </h4>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-4 h-4 text-green-600 ml-2" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">Co můžete vytvořit úplně nového? Definujte inovativní prvky, služby nebo hodnoty, které na trhu ještě neexistují a které vytvoří novou poptávku.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           {errcData.create.map((item, index) => (
             <div key={index} className="flex items-center space-x-2">
               <Input
