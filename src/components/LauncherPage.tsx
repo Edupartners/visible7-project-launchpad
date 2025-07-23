@@ -1,31 +1,54 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Rocket, Eye, Lightbulb, Target, Hammer, BarChart3, TrendingUp, CheckCircle } from "lucide-react";
-
 interface LauncherPageProps {
   onAccessGranted: () => void;
 }
-
-const METHODOLOGY_STEPS = [
-  { id: 1, title: "Vize", icon: Eye, description: "Definování vize a cílů" },
-  { id: 2, title: "Ideace", icon: Lightbulb, description: "Generování a hodnocení nápadů" },
-  { id: 3, title: "Strategie", icon: Target, description: "Vytvoření obchodní strategie" },
-  { id: 4, title: "Implementace", icon: Hammer, description: "Realizace a spuštění" },
-  { id: 5, title: "Benchmarking", icon: BarChart3, description: "Měření a analýza výkonu" },
-  { id: 6, title: "Launch", icon: Rocket, description: "Oficiální uvedení na trh" },
-  { id: 7, title: "Expanze", icon: TrendingUp, description: "Růst a škálování" },
-];
-
-export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
+const METHODOLOGY_STEPS = [{
+  id: 1,
+  title: "Vize",
+  icon: Eye,
+  description: "Definování vize a cílů"
+}, {
+  id: 2,
+  title: "Ideace",
+  icon: Lightbulb,
+  description: "Generování a hodnocení nápadů"
+}, {
+  id: 3,
+  title: "Strategie",
+  icon: Target,
+  description: "Vytvoření obchodní strategie"
+}, {
+  id: 4,
+  title: "Implementace",
+  icon: Hammer,
+  description: "Realizace a spuštění"
+}, {
+  id: 5,
+  title: "Benchmarking",
+  icon: BarChart3,
+  description: "Měření a analýza výkonu"
+}, {
+  id: 6,
+  title: "Launch",
+  icon: Rocket,
+  description: "Oficiální uvedení na trh"
+}, {
+  id: 7,
+  title: "Expanze",
+  icon: TrendingUp,
+  description: "Růst a škálování"
+}];
+export const LauncherPage = ({
+  onAccessGranted
+}: LauncherPageProps) => {
   const handleStartFree = () => {
     console.log('Starting free registration');
     onAccessGranted();
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8 mb-16">
@@ -37,7 +60,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             VISIBLE7 MICEK™
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-2xl">
             Měníme vaše nápady v úspěšné online projekty
           </p>
         </div>
@@ -46,8 +69,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-center mb-12">7 kroků k úspěšnému podnikání</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {METHODOLOGY_STEPS.map((step, index) => (
-              <Card key={step.id} className="relative hover:shadow-lg transition-shadow">
+            {METHODOLOGY_STEPS.map((step, index) => <Card key={step.id} className="relative hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center pb-2">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
                     <step.icon className="h-6 w-6 text-primary" />
@@ -60,8 +82,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <CardContent className="pt-0">
                   <p className="text-sm text-muted-foreground text-center">{step.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
 
@@ -112,10 +133,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
           {/* Main CTA */}
           <div className="text-center">
-            <Button 
-              onClick={handleStartFree}
-              className="h-14 px-12 text-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-            >
+            <Button onClick={handleStartFree} className="h-14 px-12 text-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
               <CheckCircle className="mr-2 h-6 w-6" />
               Začít zdarma
             </Button>
@@ -131,6 +149,5 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <p>Kontaktujte nás pro více informací.</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
