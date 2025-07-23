@@ -11,14 +11,12 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { User, Mail, Building, Phone, Globe, Calendar, Clock } from "lucide-react";
-import { useTrial } from "@/hooks/useTrial";
+import { User, Mail, Building, Phone, Globe, Calendar, Clock, Crown } from "lucide-react";
 import { MotivationalBox } from "@/components/profile/MotivationalBox";
 
 const UserProfilePage = () => {
-  const { userProfile, updateProfile } = useAuth();
+  const { userProfile, updateProfile, hasPromoAccess } = useAuth();
   const { toast } = useToast();
-  const { daysRemaining, isActive } = useTrial();
   
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -73,6 +71,27 @@ const UserProfilePage = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
+  // New function to determine user's version
+  const getUserVersionInfo = () => {
+    if (hasPromoAccess) {
+      return {
+        label: "Full verze",
+        variant: "default",
+        icon: <Crown className="w-3.5 h-3.5 mr-1" />,
+        className: "bg-primary/90 text-primary-foreground"
+      };
+    } else {
+      return {
+        label: "Bezplatná verze",
+        variant: "secondary",
+        icon: null,
+        className: "bg-secondary text-secondary-foreground"
+      };
+    }
+  };
+
+  const versionInfo = getUserVersionInfo();
+
   if (!userProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10">
@@ -119,8 +138,11 @@ const UserProfilePage = () => {
                 <p className="text-sm text-muted-foreground">{userProfile.email}</p>
                 
                 <div className="flex justify-center mt-4">
-                  <Badge variant={isActive ? "default" : "destructive"}>
-                    {isActive ? `Trial: ${daysRemaining} dní` : 'Trial ukončen'}
+                  <Badge variant={versionInfo.variant} className={versionInfo.className}>
+                    <span className="flex items-center">
+                      {versionInfo.icon}
+                      {versionInfo.label}
+                    </span>
                   </Badge>
                 </div>
               </CardHeader>
