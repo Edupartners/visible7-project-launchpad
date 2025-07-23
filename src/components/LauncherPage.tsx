@@ -113,7 +113,7 @@ export const LauncherPage = ({
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-blue-700">Implementace</p>
-                <p className="text-xs text-blue-600 mt-2">Šablony pro různé typy podnikání za 490 Kč</p>
+                <p className="text-xs text-blue-600 mt-2">Šablony pro 12 různých typů online podnikání za 490 Kč</p>
               </CardContent>
             </Card>
 
