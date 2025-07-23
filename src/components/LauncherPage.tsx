@@ -38,7 +38,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             VISIBLE7 MICEK™
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Revoluce v business plánování - Analyzujte svůj byznys zdarma, plaťte jen za šablony
+            Měníme vaše nápady v úspěšné online projekty
           </p>
         </div>
 
