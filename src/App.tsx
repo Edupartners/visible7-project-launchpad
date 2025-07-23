@@ -9,6 +9,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import LauncherPage from "./pages/LauncherPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 
 import VisionPage from "./pages/VisionPage";
 import IdeationPage from "./pages/IdeationPage";
@@ -38,6 +40,16 @@ const App = () => (
             <Route path="/" element={<LauncherPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <UserProfilePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            } />
             <Route path="/vision" element={
               <ProtectedRoute>
                 <VisionPage />

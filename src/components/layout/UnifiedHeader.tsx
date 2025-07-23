@@ -20,12 +20,21 @@ export const UnifiedHeader = ({ showTrialInfo = true }: UnifiedHeaderProps) => {
 
   const handleLogout = () => {
     logout();
+    navigate('/');
   };
 
   const handleLogoClick = () => {
     if (isAuthenticated) {
       navigate('/home');
     }
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
+  const handleSettingsClick = () => {
+    navigate('/settings');
   };
 
   const getUserInitials = (email: string) => {
@@ -83,11 +92,11 @@ export const UnifiedHeader = ({ showTrialInfo = true }: UnifiedHeaderProps) => {
                     </p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Nastavení</span>
                   </DropdownMenuItem>
