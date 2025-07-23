@@ -60,7 +60,7 @@ export const LauncherPage = ({
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             VISIBLE7 MICEK™
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-2xl">Měníme vaše nápady v úspěšné online projekty - Najděte a analyzujte svůj byznys zdarma, plaťte jen za šablony</p>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-2xl">Vymyslete a analyzujte svůj byznys zdarma – plaťte až ve chvíli, kdy se rozhodnete projekt vytvořit a spustit.</p>
         </div>
 
         {/* 7 Steps Methodology */}
@@ -144,7 +144,7 @@ export const LauncherPage = ({
         {/* Contact */}
         <div className="text-center text-sm text-muted-foreground">
           <p>Máte otázky? Jsme tu pro vás!</p>
-          <p>Kontaktujte nás pro více informací: michal.micek@edu-partners.cz</p>
+          <p>Kontaktujte nás pro více informací.</p>
         </div>
       </div>
     </div>;
