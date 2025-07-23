@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile, UserSettings, defaultUserSettings } from '@/types/user';
 
@@ -53,7 +52,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (storedProfile) {
         try {
-          setUserProfile(JSON.parse(storedProfile));
+          const parsedProfile = JSON.parse(storedProfile);
+          // Migrate old name field to firstName/lastName if needed
+          if (parsedProfile.name && !parsedProfile.firstName && !parsedProfile.lastName) {
+            const nameParts = parsedProfile.name.split(' ');
+            parsedProfile.firstName = nameParts[0] || '';
+            parsedProfile.lastName = nameParts.slice(1).join(' ') || '';
+          }
+          setUserProfile(parsedProfile);
         } catch (error) {
           console.warn('Failed to parse stored profile:', error);
         }
@@ -92,10 +98,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // Create default profile if none exists
     if (!userProfile) {
+      const defaultName = name || email.split('@')[0];
+      const nameParts = defaultName.split(' ');
       const defaultProfile: UserProfile = {
         id: crypto.randomUUID(),
         email,
-        name: name || email.split('@')[0],
+        name: defaultName,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
       };
@@ -122,13 +132,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (!userProfile) return;
     
     const updatedProfile = { ...userProfile, ...profileUpdates };
+    
+    // Update the name field if firstName or lastName changed
+    if (profileUpdates.firstName || profileUpdates.lastName) {
+      const firstName = profileUpdates.firstName || userProfile.firstName || '';
+      const lastName = profileUpdates.lastName || userProfile.lastName || '';
+      updatedProfile.name = `${firstName} ${lastName}`.trim();
+    }
+    
     setUserProfile(updatedProfile);
     localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
     
     // Update userName if name was changed
-    if (profileUpdates.name) {
-      setUserName(profileUpdates.name);
-      localStorage.setItem('userName', profileUpdates.name);
+    if (updatedProfile.name) {
+      setUserName(updatedProfile.name);
+      localStorage.setItem('userName', updatedProfile.name);
     }
   };
 

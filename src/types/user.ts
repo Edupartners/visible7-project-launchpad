@@ -2,7 +2,9 @@
 export interface UserProfile {
   id: string;
   email: string;
-  name: string;
+  name: string; // Keep for backward compatibility
+  firstName?: string;
+  lastName?: string;
   company?: string;
   position?: string;
   phone?: string;
