@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { UnifiedHeader } from "@/components/layout/UnifiedHeader";
@@ -76,14 +75,14 @@ const UserProfilePage = () => {
     if (hasPromoAccess) {
       return {
         label: "Full verze",
-        variant: "default",
+        variant: "default" as const,
         icon: <Crown className="w-3.5 h-3.5 mr-1" />,
         className: "bg-primary/90 text-primary-foreground"
       };
     } else {
       return {
         label: "Bezplatná verze",
-        variant: "secondary",
+        variant: "secondary" as const,
         icon: null,
         className: "bg-secondary text-secondary-foreground"
       };

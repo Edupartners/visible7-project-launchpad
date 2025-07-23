@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, FileText, Crown, Gift, Settings, RefreshCw } from "lucide-react";
+import { CheckCircle, Lock, Play, Target, Lightbulb, TrendingUp, Wrench, BarChart3, Rocket, Layers, FileText, Crown, Gift, RefreshCw, ToggleRight } from "lucide-react";
 
 const phases = [
   {
@@ -265,7 +265,7 @@ export const Dashboard = ({
                   className="text-muted-foreground hover:text-foreground"
                   title={`${isLauncherEnabled() ? 'Zakázat' : 'Povolit'} launcher`}
                 >
-                  <Settings className="w-4 h-4" />
+                  <ToggleRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
