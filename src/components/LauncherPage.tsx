@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Rocket, Eye, Lightbulb, Target, Hammer, BarChart3, TrendingUp, CheckCircle } from "lucide-react";
+import { Rocket, Eye, Lightbulb, Target, Hammer, BarChart3, TrendingUp, CheckCircle, Users, Lightbulb as BulbIcon, Building } from "lucide-react";
+
 interface LauncherPageProps {
   onAccessGranted: () => void;
 }
+
 const METHODOLOGY_STEPS = [{
   id: 1,
   title: "Vize",
@@ -41,6 +43,7 @@ const METHODOLOGY_STEPS = [{
   icon: TrendingUp,
   description: "Růst a škálování"
 }];
+
 export const LauncherPage = ({
   onAccessGranted
 }: LauncherPageProps) => {
@@ -48,6 +51,7 @@ export const LauncherPage = ({
     console.log('Starting free registration');
     onAccessGranted();
   };
+
   return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
@@ -61,6 +65,60 @@ export const LauncherPage = ({
             VISIBLE7 MICEK™
           </h1>
           <p className="max-w-2xl mx-auto text-slate-950 font-medium text-4xl">VYMYSLI - VYTVOŘ - VYDĚLÁVEJ</p>
+        </div>
+
+        {/* What is V7 Methodology */}
+        <div className="max-w-4xl mx-auto mb-20">
+          <h2 className="text-3xl font-bold text-center mb-8">Co je metodika VISIBLE7?</h2>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <Card className="text-center">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <BulbIcon className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Máte nápad?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Nevíte, jak ho přeměnit v úspěšný byznys? Naše metodika vám poskytne jasný postup.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Začínáte podnikat?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Strukturovaný přístup vám ušetří čas, peníze a pomůže vyhnout se častým chybám.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Building className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Už podnikáte?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Optimalizujte své procesy, najděte nové příležitosti a systematicky růstěte.</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center space-y-4">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              <strong>VISIBLE7</strong> je ověřená metodika, která vás provede celým procesem od nápadu až po úspěšné podnikání. 
+              Každý krok má svůj účel a navazuje na předchozí - nic není náhodné.
+            </p>
+            <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+              Tisíce podnikatelů již využilo naši metodiku k vytvoření udržitelného a ziskového byznysu. 
+              Nyní je řada na vás.
+            </p>
+          </div>
         </div>
 
         {/* 7 Steps Methodology */}
