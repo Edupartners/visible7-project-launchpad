@@ -16,71 +16,33 @@ export interface UserProfile {
 }
 
 export interface UserSettings {
-  general: {
+  privacy: {
+    dataProcessingConsent: boolean;
+    marketingConsent: boolean;
+    analyticsConsent: boolean;
+  };
+  basic: {
     language: string;
-    timezone: string;
-    dateFormat: string;
-    currency: string;
-  };
-  notifications: {
-    email: boolean;
-    push: boolean;
-    marketing: boolean;
-    updates: boolean;
-  };
-  display: {
     theme: 'light' | 'dark' | 'system';
-    density: 'compact' | 'comfortable' | 'spacious';
-    sidebarCollapsed: boolean;
   };
-  data: {
-    autoSave: boolean;
-    backupFrequency: 'daily' | 'weekly' | 'monthly';
-    exportFormat: 'json' | 'csv' | 'excel';
-  };
-  security: {
-    twoFactorEnabled: boolean;
-    sessionTimeout: number;
-    loginAlerts: boolean;
-  };
-  account: {
-    publicProfile: boolean;
-    allowAnalytics: boolean;
-    subscribeNewsletter: boolean;
+  communication: {
+    emailNotifications: boolean;
+    newsletter: boolean;
   };
 }
 
 export const defaultUserSettings: UserSettings = {
-  general: {
+  privacy: {
+    dataProcessingConsent: true,
+    marketingConsent: false,
+    analyticsConsent: true,
+  },
+  basic: {
     language: 'cs',
-    timezone: 'Europe/Prague',
-    dateFormat: 'DD.MM.YYYY',
-    currency: 'CZK',
-  },
-  notifications: {
-    email: true,
-    push: true,
-    marketing: false,
-    updates: true,
-  },
-  display: {
     theme: 'system',
-    density: 'comfortable',
-    sidebarCollapsed: false,
   },
-  data: {
-    autoSave: true,
-    backupFrequency: 'weekly',
-    exportFormat: 'json',
-  },
-  security: {
-    twoFactorEnabled: false,
-    sessionTimeout: 30,
-    loginAlerts: true,
-  },
-  account: {
-    publicProfile: false,
-    allowAnalytics: true,
-    subscribeNewsletter: false,
+  communication: {
+    emailNotifications: true,
+    newsletter: false,
   },
 };

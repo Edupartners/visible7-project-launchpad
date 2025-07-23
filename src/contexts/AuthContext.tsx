@@ -67,9 +67,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (storedSettings) {
         try {
-          setUserSettings({ ...defaultUserSettings, ...JSON.parse(storedSettings) });
+          const parsedSettings = JSON.parse(storedSettings);
+          // Migrate old settings structure to new simplified one
+          const migratedSettings = {
+            privacy: {
+              dataProcessingConsent: parsedSettings.account?.allowAnalytics ?? defaultUserSettings.privacy.dataProcessingConsent,
+              marketingConsent: parsedSettings.notifications?.marketing ?? defaultUserSettings.privacy.marketingConsent,
+              analyticsConsent: parsedSettings.account?.allowAnalytics ?? defaultUserSettings.privacy.analyticsConsent,
+            },
+            basic: {
+              language: parsedSettings.general?.language ?? defaultUserSettings.basic.language,
+              theme: parsedSettings.display?.theme ?? defaultUserSettings.basic.theme,
+            },
+            communication: {
+              emailNotifications: parsedSettings.notifications?.email ?? defaultUserSettings.communication.emailNotifications,
+              newsletter: parsedSettings.account?.subscribeNewsletter ?? defaultUserSettings.communication.newsletter,
+            }
+          };
+          setUserSettings(migratedSettings);
         } catch (error) {
           console.warn('Failed to parse stored settings:', error);
+          setUserSettings(defaultUserSettings);
         }
       }
     }
