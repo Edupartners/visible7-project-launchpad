@@ -144,7 +144,7 @@ export const LauncherPage = ({
         {/* Contact */}
         <div className="text-center text-sm text-muted-foreground">
           <p>Máte otázky? Jsme tu pro vás!</p>
-          <p>Kontaktujte nás pro více informací.</p>
+          <p>Kontaktujte nás pro více informací: michal.micek@edu-partners.cz</p>
         </div>
       </div>
     </div>;
