@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -56,12 +55,6 @@ interface ROICalculatorData {
     growthReserveRate: number; // %
   };
 
-  // Sezónní úpravy
-  seasonalAdjustments: {
-    salesMultipliers: number[]; // 12 měsíců, 0.5-2.0
-    selectedProfile: 'standard' | 'ecommerce' | 'b2b' | 'travel' | 'custom';
-  };
-
   // Startup launch plan
   startupPlan: StartupPlan;
 }
@@ -89,13 +82,6 @@ interface ROIAnalysis {
   reasoning: string;
   recommendations: string[];
 }
-
-const seasonalProfiles = {
-  standard: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  ecommerce: [0.8, 0.9, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.2, 1.5],
-  b2b: [1, 1, 1, 1, 1, 1, 1, 0.6, 1, 1, 1, 0.7],
-  travel: [0.8, 0.8, 1, 1.1, 1.2, 1.3, 1.3, 1.3, 1.1, 1, 0.9, 0.8]
-};
 
 // Growth scenarios for startup launches
 const growthScenarios = {
@@ -128,10 +114,6 @@ const defaultROIData: ROICalculatorData = {
   taxes: {
     incomeTaxRate: 15,
     growthReserveRate: 10
-  },
-  seasonalAdjustments: {
-    salesMultipliers: [...seasonalProfiles.standard],
-    selectedProfile: 'standard'
   },
   startupPlan: {
     launchMonth: 2, // March (0-based)
@@ -207,7 +189,7 @@ const preFillfromLeanCanvas = (leanCanvas: LeanCanvasData): Partial<ROICalculato
 
 const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   // Defensive programming - ensure data exists
-  if (!data?.marketingCosts || !data?.operationalCosts || !data?.revenue || !data?.taxes || !data?.seasonalAdjustments) {
+  if (!data?.marketingCosts || !data?.operationalCosts || !data?.revenue || !data?.taxes || !data?.startupPlan) {
     console.warn('calculateROIMetrics: Missing required data properties, using defaults');
     return {
       roi: 0,
@@ -231,17 +213,16 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
-  // Calculate seasonal adjusted revenue using startup plan data
+  // Calculate revenue using startup plan data without seasonal adjustments
   const avgOrdersFromStartupPlan = data.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12;
   const baseMonthlyRevenue = data.revenue.productPrice * avgOrdersFromStartupPlan;
   const taxAndReserveRate = (data.taxes.incomeTaxRate + data.taxes.growthReserveRate) / 100;
   
-  // Break-even calculation with seasonal adjustments
+  // Break-even calculation without seasonal adjustments
   let breakEvenMonth = 0;
   let cumulativeProfit = 0;
   for (let month = 1; month <= 24; month++) {
-    const seasonalMultiplier = data.seasonalAdjustments?.salesMultipliers?.[(month - 1) % 12] || 1;
-    const adjustedRevenue = baseMonthlyRevenue * seasonalMultiplier;
+    const adjustedRevenue = baseMonthlyRevenue; // No seasonal multiplier
     const netMonthlyRevenue = adjustedRevenue * (1 - taxAndReserveRate);
     const monthlyProfit = netMonthlyRevenue - totalMonthlyCosts;
     
@@ -253,9 +234,8 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   }
   if (breakEvenMonth === 0) breakEvenMonth = 25; // More than 24 months
   
-  // Calculate average annual metrics
-  const avgSeasonalMultiplier = (data.seasonalAdjustments?.salesMultipliers || [1,1,1,1,1,1,1,1,1,1,1,1]).reduce((sum, mult) => sum + mult, 0) / 12;
-  const avgMonthlyRevenue = baseMonthlyRevenue * avgSeasonalMultiplier;
+  // Calculate average annual metrics without seasonal adjustments
+  const avgMonthlyRevenue = baseMonthlyRevenue;
   const avgNetMonthlyRevenue = avgMonthlyRevenue * (1 - taxAndReserveRate);
   const avgMonthlyProfit = avgNetMonthlyRevenue - totalMonthlyCosts;
   
@@ -319,7 +299,7 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
 
 const generateChartData = (data: ROICalculatorData) => {
   // Defensive programming - ensure data exists
-  if (!data?.marketingCosts || !data?.operationalCosts || !data?.taxes || !data?.startupPlan || !data?.seasonalAdjustments) {
+  if (!data?.marketingCosts || !data?.operationalCosts || !data?.taxes || !data?.startupPlan) {
     console.warn('generateChartData: Missing required data properties');
     return [];
   }
@@ -352,13 +332,12 @@ const generateChartData = (data: ROICalculatorData) => {
     const isPreLaunch = monthsSinceLaunch < 0;
     const isLaunchMonth = monthsSinceLaunch === 0;
     
-    // Calculate revenue based on startup plan
+    // Calculate revenue based on startup plan without seasonal adjustments
     let monthlyRevenue = 0;
     if (!isPreLaunch) {
       const orderIndex = Math.max(0, Math.min(11, monthsSinceLaunch));
       const ordersThisMonth = monthlyOrders[orderIndex] || 0;
-      const seasonalMultiplier = data.seasonalAdjustments.salesMultipliers[currentMonthIndex];
-      monthlyRevenue = data.revenue.productPrice * ordersThisMonth * seasonalMultiplier;
+      monthlyRevenue = data.revenue.productPrice * ordersThisMonth; // No seasonal multiplier
     }
     
     const netMonthlyRevenue = monthlyRevenue * (1 - taxAndReserveRate);
@@ -411,12 +390,17 @@ const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData)
           console.log('Migrated marketing costs from single values to monthly arrays');
         }
         
+        // Migration logic - remove seasonal adjustments if they exist
+        if (parsed.seasonalAdjustments) {
+          delete parsed.seasonalAdjustments;
+          console.log('Removed seasonal adjustments from stored data');
+        }
+        
         // Migration logic - ensure all required properties exist
-        if (!parsed.seasonalAdjustments || !parsed.startupPlan) {
+        if (!parsed.startupPlan) {
           const migrated = {
             ...defaultValue,
             ...parsed,
-            seasonalAdjustments: parsed.seasonalAdjustments || defaultValue.seasonalAdjustments,
             startupPlan: parsed.startupPlan || defaultValue.startupPlan
           };
           console.log('Migrated ROI data with missing properties');
@@ -593,30 +577,6 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
         selectedScenario: 'custom',
         monthlyOrders: prev.startupPlan.monthlyOrders.map((orders, index) => 
           index === monthIndex ? value : orders
-        )
-      }
-    }));
-  };
-
-  const updateSeasonalProfile = (profile: keyof typeof seasonalProfiles) => {
-    setRoiData(prev => ({
-      ...prev,
-      seasonalAdjustments: {
-        ...prev.seasonalAdjustments,
-        selectedProfile: profile,
-        salesMultipliers: [...seasonalProfiles[profile]]
-      }
-    }));
-  };
-
-  const updateSeasonalMultiplier = (monthIndex: number, value: number) => {
-    setRoiData(prev => ({
-      ...prev,
-      seasonalAdjustments: {
-        ...prev.seasonalAdjustments,
-        selectedProfile: 'custom',
-        salesMultipliers: prev.seasonalAdjustments.salesMultipliers.map((mult, index) => 
-          index === monthIndex ? value : mult
         )
       }
     }));
@@ -1154,86 +1114,6 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                   </div>
                 </div>
               </div>
-            </Card>
-
-            {/* Seasonal Adjustments */}
-            <Card className="card-apple p-6">
-              <Accordion type="single" collapsible>
-                <AccordionItem value="seasonal">
-                  <AccordionTrigger className="text-lg font-semibold">
-                    <div className="flex items-center">
-                      <Calendar className="w-5 h-5 mr-2 text-primary" />
-                      Sezónní variace prodejů
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-4 pt-4">
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium">Přednastavené profily:</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          variant={roiData.seasonalAdjustments.selectedProfile === 'standard' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => updateSeasonalProfile('standard')}
-                        >
-                          Standardní
-                        </Button>
-                        <Button
-                          variant={roiData.seasonalAdjustments.selectedProfile === 'ecommerce' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => updateSeasonalProfile('ecommerce')}
-                        >
-                          E-commerce
-                        </Button>
-                        <Button
-                          variant={roiData.seasonalAdjustments.selectedProfile === 'b2b' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => updateSeasonalProfile('b2b')}
-                        >
-                          B2B služby
-                        </Button>
-                        <Button
-                          variant={roiData.seasonalAdjustments.selectedProfile === 'travel' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => updateSeasonalProfile('travel')}
-                        >
-                          Cestovní ruch
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium">Měsíční úpravy (% od základu):</Label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {monthNames.map((month, index) => (
-                          <div key={month} className="space-y-2">
-                            <Label className="text-xs text-muted-foreground">{month}</Label>
-                            <div className="space-y-1">
-                              <Slider
-                                value={[roiData.seasonalAdjustments.salesMultipliers[index]]}
-                                onValueChange={([value]) => updateSeasonalMultiplier(index, value)}
-                                min={0.5}
-                                max={2.0}
-                                step={0.1}
-                                className="w-full"
-                              />
-                              <div className="text-xs text-center text-muted-foreground">
-                                {Math.round(roiData.seasonalAdjustments.salesMultipliers[index] * 100)}%
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-accent/10 p-3 rounded-lg">
-                      <p className="text-xs text-muted-foreground">
-                        💡 Tip: E-commerce má obvykle vyšší prodeje v listopadu-prosinci (vánoce), 
-                        B2B služby mají nižší prodeje v srpnu a prosinci.
-                      </p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
             </Card>
           </div>
           
