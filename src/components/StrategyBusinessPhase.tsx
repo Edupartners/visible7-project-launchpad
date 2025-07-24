@@ -33,14 +33,14 @@ interface ROICalculatorData {
     seoContent: number[];
   };
   
-  // Provozní náklady (měsíčně)
+  // Provozní náklady (měsíčně - pole 12 hodnot)
   operationalCosts: {
-    webDevelopment: number;
-    hostingSoftware: number;
-    workforce: number;
-    warehouseLogistics: number;
-    fixedMonthlyOperations: number;
-    otherCosts: number;
+    webDevelopment: number[];
+    hostingSoftware: number[];
+    workforce: number[];
+    warehouseLogistics: number[];
+    fixedMonthlyOperations: number[];
+    otherCosts: number[];
   };
   
   // Výnosy
@@ -78,6 +78,7 @@ interface ROIAnalysis {
   totalProfit: number;
   averageMonthlyProfit: number;
   profitMargin: number;
+  costPerOrder: number;
   isViable: boolean;
   reasoning: string;
   recommendations: string[];
@@ -100,12 +101,12 @@ const defaultROIData: ROICalculatorData = {
     seoContent: Array(12).fill(4000)
   },
   operationalCosts: {
-    webDevelopment: 15000,
-    hostingSoftware: 2000,
-    workforce: 25000,
-    warehouseLogistics: 8000,
-    fixedMonthlyOperations: 5000,
-    otherCosts: 3000
+    webDevelopment: Array(12).fill(15000),
+    hostingSoftware: Array(12).fill(2000),
+    workforce: Array(12).fill(25000),
+    warehouseLogistics: Array(12).fill(8000),
+    fixedMonthlyOperations: Array(12).fill(5000),
+    otherCosts: Array(12).fill(3000)
   },
   revenue: {
     productPrice: 850,
@@ -167,9 +168,9 @@ const preFillfromLeanCanvas = (leanCanvas: LeanCanvasData): Partial<ROICalculato
   // Pre-fill costs if we have numbers
   if (costNumbers.length >= 3) {
     preFilledData.operationalCosts = {
-      webDevelopment: costNumbers[0] || defaultROIData.operationalCosts.webDevelopment,
-      workforce: costNumbers[1] || defaultROIData.operationalCosts.workforce,
-      hostingSoftware: costNumbers[2] || defaultROIData.operationalCosts.hostingSoftware,
+      webDevelopment: Array(12).fill(costNumbers[0] || defaultROIData.operationalCosts.webDevelopment[0]),
+      workforce: Array(12).fill(costNumbers[1] || defaultROIData.operationalCosts.workforce[0]),
+      hostingSoftware: Array(12).fill(costNumbers[2] || defaultROIData.operationalCosts.hostingSoftware[0]),
       warehouseLogistics: defaultROIData.operationalCosts.warehouseLogistics,
       fixedMonthlyOperations: defaultROIData.operationalCosts.fixedMonthlyOperations,
       otherCosts: defaultROIData.operationalCosts.otherCosts
@@ -200,6 +201,7 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
       totalProfit: 0,
       averageMonthlyProfit: 0,
       profitMargin: 0,
+      costPerOrder: 0,
       isViable: false,
       reasoning: "Chybí základní data pro výpočet",
       recommendations: ["Vyplňte všechna povinná pole"]
@@ -210,7 +212,10 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
     const averageCost = costArray.reduce((a, b) => a + b, 0) / costArray.length;
     return sum + averageCost;
   }, 0);
-  const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
+  const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, costArray) => {
+    const averageCost = costArray.reduce((a, b) => a + b, 0) / costArray.length;
+    return sum + averageCost;
+  }, 0);
   const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
   
   // Calculate revenue using startup plan data without seasonal adjustments
@@ -247,6 +252,13 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   // PNO calculation (marketing costs as % of profit margin)
   const monthlyProfit = avgNetMonthlyRevenue - totalMonthlyCosts;
   const pno = monthlyProfit > 0 ? (monthlyMarketingCosts / monthlyProfit) * 100 : 0;
+  
+  // Cost per order calculation
+  const totalYearlyOrders = data.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0);
+  const totalYearlyMarketingCosts = Object.values(data.marketingCosts).reduce((sum, costArray) => {
+    return sum + costArray.reduce((a, b) => a + b, 0);
+  }, 0);
+  const costPerOrder = totalYearlyOrders > 0 ? totalYearlyMarketingCosts / totalYearlyOrders : 0;
   
   // Analysis (updated PNO threshold for margin-based calculation)
   const isViable = roi > 20 && pno < 80 && breakEvenMonth <= 12;
@@ -291,6 +303,7 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
     totalProfit,
     averageMonthlyProfit,
     profitMargin,
+    costPerOrder,
     isViable,
     reasoning,
     recommendations
@@ -304,7 +317,12 @@ const generateChartData = (data: ROICalculatorData, viewMode: 'monthly' | 'cumul
     return [];
   }
 
-  const monthlyOperationalCosts = Object.values(data.operationalCosts).reduce((sum, cost) => sum + cost, 0);
+  // Function to calculate operational costs for a specific month
+  const getMonthlyOperationalCosts = (monthIndex: number) => {
+    return Object.values(data.operationalCosts).reduce((sum, costArray) => {
+      return sum + (costArray[monthIndex] || 0);
+    }, 0);
+  };
   
   // Function to calculate marketing costs for a specific month
   const getMonthlyMarketingCosts = (monthIndex: number) => {
@@ -344,6 +362,7 @@ const generateChartData = (data: ROICalculatorData, viewMode: 'monthly' | 'cumul
     
     // Calculate costs for this specific month
     const monthlyMarketingCosts = getMonthlyMarketingCosts(currentMonthIndex);
+    const monthlyOperationalCosts = getMonthlyOperationalCosts(currentMonthIndex);
     const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
     
     // Calculate monthly profit/loss
@@ -395,6 +414,19 @@ const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData)
           });
           parsed.marketingCosts = migratedMarketingCosts;
           console.log('Migrated marketing costs from single values to monthly arrays');
+        }
+        
+        // Migration logic for operational costs (number -> number[])
+        const needsOperationalMigration = parsed.operationalCosts && 
+          Object.values(parsed.operationalCosts).some((value: any) => typeof value === 'number');
+        
+        if (needsOperationalMigration) {
+          const migratedOperationalCosts: any = {};
+          Object.entries(parsed.operationalCosts).forEach(([key, value]: [string, any]) => {
+            migratedOperationalCosts[key] = typeof value === 'number' ? Array(12).fill(value) : value;
+          });
+          parsed.operationalCosts = migratedOperationalCosts;
+          console.log('Migrated operational costs from single values to monthly arrays');
         }
         
         // Migration logic - remove seasonal adjustments if they exist
@@ -488,12 +520,24 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
     }));
   };
   
-  const updateOperationalCost = (key: keyof ROICalculatorData['operationalCosts'], value: number) => {
+  const updateOperationalCost = (key: keyof ROICalculatorData['operationalCosts'], monthIndex: number, value: number) => {
     setRoiData(prev => ({
       ...prev,
       operationalCosts: {
         ...prev.operationalCosts,
-        [key]: value
+        [key]: prev.operationalCosts[key].map((cost, index) => 
+          index === monthIndex ? value : cost
+        )
+      }
+    }));
+  };
+
+  const setAllMonthsOperationalCost = (key: keyof ROICalculatorData['operationalCosts'], value: number) => {
+    setRoiData(prev => ({
+      ...prev,
+      operationalCosts: {
+        ...prev.operationalCosts,
+        [key]: Array(12).fill(value)
       }
     }));
   };
@@ -545,9 +589,9 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
         marketingCosts: convertedMarketingCosts,
         operationalCosts: {
           ...prev.operationalCosts,
-          workforce: Math.round(predictiveData.operationalCosts[0] * 0.6),
-          webDevelopment: Math.round(predictiveData.operationalCosts[0] * 0.3),
-          warehouseLogistics: Math.round(predictiveData.operationalCosts[0] * 0.1)
+          workforce: Array(12).fill(Math.round(predictiveData.operationalCosts[0] * 0.6)),
+          webDevelopment: Array(12).fill(Math.round(predictiveData.operationalCosts[0] * 0.3)),
+          warehouseLogistics: Array(12).fill(Math.round(predictiveData.operationalCosts[0] * 0.1))
         }
       }));
 
@@ -592,7 +636,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   
   const filledFieldsCount = [
     ...Object.values(roiData.marketingCosts).map(arr => arr.reduce((a, b) => a + b, 0)),
-    ...Object.values(roiData.operationalCosts),
+    ...Object.values(roiData.operationalCosts).map(arr => arr.reduce((a, b) => a + b, 0)),
     ...Object.values(roiData.revenue),
     ...Object.values(roiData.taxes)
   ].filter(value => value > 0).length;
@@ -763,6 +807,204 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
           <Progress value={progressPercentage} className="h-3" />
         </Card>
         
+        {/* Chart at the top */}
+        <Card className="card-apple p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-foreground flex items-center">
+              <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+              {chartViewMode === 'monthly' ? 'Měsíční cash flow' : 'Kumulativní vývoj návratnosti'}
+            </h2>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm text-muted-foreground">Zobrazení:</label>
+              <select 
+                value={chartViewMode} 
+                onChange={(e) => setChartViewMode(e.target.value as 'monthly' | 'cumulative')}
+                className="px-3 py-1 bg-background border border-border rounded-md text-sm"
+              >
+                <option value="monthly">Měsíčně</option>
+                <option value="cumulative">Kumulativně</option>
+              </select>
+            </div>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="monthName" 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                />
+                
+                {/* Zero line */}
+                <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="2 2" />
+                
+                {/* Break-even highlight */}
+                {breakEvenPoint && chartViewMode === 'cumulative' && (
+                  <ReferenceArea
+                    x1={breakEvenPoint.month}
+                    x2={breakEvenPoint.month}
+                    fill="hsl(var(--primary))"
+                    fillOpacity={0.1}
+                  />
+                )}
+                
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--background))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    color: 'hsl(var(--foreground))'
+                  }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  formatter={(value, name) => [
+                    `${Number(value).toLocaleString()} Kč`,
+                    name === 'revenue' ? 'Výnosy' : 
+                    name === 'costs' ? 'Náklady' : 
+                    name === 'profit' ? 'Zisk' : name
+                  ]}
+                />
+                
+                <Legend 
+                  formatter={(value) => 
+                    value === 'revenue' ? 'Výnosy' : 
+                    value === 'costs' ? 'Náklady' : 
+                    value === 'profit' ? 'Zisk' : value
+                  }
+                />
+                
+                <Line 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                />
+                
+                <Line 
+                  type="monotone" 
+                  dataKey="costs" 
+                  stroke="hsl(var(--destructive))" 
+                  strokeWidth={2}
+                  dot={{ fill: 'hsl(var(--destructive))', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: 'hsl(var(--destructive))', strokeWidth: 2 }}
+                />
+                
+                <Line 
+                  type="monotone" 
+                  dataKey="profit" 
+                  stroke="hsl(var(--chart-2))" 
+                  strokeWidth={3}
+                  dot={{ fill: 'hsl(var(--chart-2))', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: 'hsl(var(--chart-2))', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* Key Metrics below the chart */}
+        <Card className="card-apple p-6 mb-6">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Klíčové ukazatele</h2>
+          
+          {/* Relativní ukazatele */}
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">Relativní ukazatele</h3>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-primary/5 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {analysis.roi.toFixed(1)}%
+                </div>
+                <div className="text-sm text-muted-foreground">ROI (roční)</div>
+              </div>
+              
+              <div className="text-center p-4 bg-primary/5 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {analysis.pno.toFixed(1)}%
+                </div>
+                <div className="text-sm text-muted-foreground">PNO</div>
+              </div>
+              
+              <div className="text-center p-4 bg-primary/5 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
+                </div>
+                <div className="text-sm text-muted-foreground">Break-even (měsíc)</div>
+              </div>
+              
+              <div className="text-center p-4 bg-orange-500/5 rounded-lg border border-orange-500/20">
+                <div className="text-2xl font-bold text-orange-600">
+                  {analysis.costPerOrder.toFixed(0)} Kč
+                </div>
+                <div className="text-sm text-muted-foreground">Náklad na objednávku</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Absolutní částky */}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">Absolutní částky (12 měsíců)</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-green-500/5 rounded-lg border border-green-500/20">
+                <div className="text-2xl font-bold text-green-600">
+                  {(analysis.totalProfit / 1000).toFixed(0)}k Kč
+                </div>
+                <div className="text-sm text-muted-foreground">Celkový zisk</div>
+              </div>
+              
+              <div className="text-center p-4 bg-red-500/5 rounded-lg border border-red-500/20">
+                <div className="text-2xl font-bold text-red-600">
+                  {(analysis.totalCosts / 1000).toFixed(0)}k Kč
+                </div>
+                <div className="text-sm text-muted-foreground">Celkové náklady</div>
+              </div>
+              
+              <div className="text-center p-4 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                <div className="text-2xl font-bold text-blue-600">
+                  {(analysis.totalRevenue / 1000).toFixed(0)}k Kč
+                </div>
+                <div className="text-sm text-muted-foreground">Celkový obrat</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Dodatečné metriky */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="text-center p-3 bg-accent/10 rounded-lg">
+              <div className="text-lg font-semibold text-foreground">
+                {(analysis.averageMonthlyProfit / 1000).toFixed(1)}k Kč
+              </div>
+              <div className="text-xs text-muted-foreground">Průměrný měsíční zisk</div>
+            </div>
+            
+            <div className="text-center p-3 bg-accent/10 rounded-lg">
+              <div className="text-lg font-semibold text-foreground">
+                {analysis.profitMargin.toFixed(1)}%
+              </div>
+              <div className="text-xs text-muted-foreground">Marže</div>
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 rounded-lg border">
+            <div className="text-sm text-muted-foreground mb-1">Doporučená PNO (marketing vs. marže)</div>
+            <div className="flex items-center space-x-2">
+              <div className="w-full bg-muted rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full" 
+                  style={{ width: '60%' }}
+                ></div>
+              </div>
+              <span className="text-sm text-muted-foreground">40-60%</span>
+            </div>
+          </div>
+        </Card>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Input Forms */}
           <div className="space-y-6">
@@ -875,31 +1117,100 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                 <Calculator className="w-5 h-5 mr-2 text-primary" />
                 Provozní náklady (měsíčně)
               </h2>
-              <div className="space-y-4">
+              
+              <div className="space-y-6">
                 {operationalFields.map((field) => (
-                  <div key={field.key} className="space-y-2">
-                    <Label htmlFor={field.key} className="text-sm font-medium">
-                      {field.label}
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id={field.key}
-                        type="number"
-                        value={roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts]}
-                        onChange={(e) => updateOperationalCost(
-                          field.key as keyof ROICalculatorData['operationalCosts'], 
-                          parseInt(e.target.value) || 0
-                        )}
-                        placeholder="0"
-                        className="pr-12"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        Kč
-                      </span>
+                  <div key={field.key} className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label className="text-sm font-medium">{field.label}</Label>
+                        <p className="text-xs text-muted-foreground">{field.hint}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="number"
+                          placeholder="Konstantní hodnota"
+                          className="w-32"
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 0;
+                            if (value > 0) {
+                              setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], value);
+                            }
+                          }}
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], 0)}
+                        >
+                          Reset
+                        </Button>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">{field.hint}</p>
+                    
+                    <div className="grid grid-cols-4 gap-2">
+                      {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].map((cost, monthIndex) => (
+                        <div key={monthIndex} className="space-y-1">
+                          <Label className="text-xs text-muted-foreground text-center block">
+                            {monthNames[monthIndex]}
+                          </Label>
+                          <Input
+                            type="number"
+                            value={cost}
+                            onChange={(e) => updateOperationalCost(
+                              field.key as keyof ROICalculatorData['operationalCosts'],
+                              monthIndex,
+                              parseInt(e.target.value) || 0
+                            )}
+                            className="text-center text-sm"
+                            min="0"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="text-xs text-muted-foreground text-center">
+                      Celkem za rok: {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].reduce((sum, cost) => sum + cost, 0).toLocaleString()} Kč
+                    </div>
                   </div>
                 ))}
+                
+                <div className="bg-accent/10 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium mb-2">💡 Rychlé akce:</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        operationalFields.forEach(field => {
+                          const constantValue = roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts][0];
+                          setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], constantValue);
+                        });
+                      }}
+                    >
+                      Konstantní hodnoty
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        operationalFields.forEach(field => {
+                          const baseValue = roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts][0];
+                          const newValues = Array.from({length: 12}, (_, i) => Math.round(baseValue * (1 + i * 0.05)));
+                          setRoiData(prev => ({
+                            ...prev,
+                            operationalCosts: {
+                              ...prev.operationalCosts,
+                              [field.key]: newValues
+                            }
+                          }));
+                        });
+                      }}
+                    >
+                      Postupný nárůst
+                    </Button>
+                  </div>
+                </div>
               </div>
             </Card>
             
@@ -1216,149 +1527,94 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
             </Card>
             
-            {/* Chart with Break-even */}
+            {/* Revenue & Taxes */}
             <Card className="card-apple p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-foreground flex items-center">
-                  <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-                  {chartViewMode === 'monthly' ? 'Měsíční cash flow' : 'Kumulativní vývoj návratnosti'}
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <label className="text-sm text-muted-foreground">Zobrazení:</label>
-                  <select 
-                    value={chartViewMode} 
-                    onChange={(e) => setChartViewMode(e.target.value as 'monthly' | 'cumulative')}
-                    className="px-3 py-1 bg-background border border-border rounded-md text-sm"
-                  >
-                    <option value="monthly">Měsíčně</option>
-                    <option value="cumulative">Kumulativně</option>
-                  </select>
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
+                <DollarSign className="w-5 h-5 mr-2 text-primary" />
+                Výnosy a daně
+              </h2>
+              <div className="space-y-4">
+                {/* Startup plan summary */}
+                <div className="bg-accent/10 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium mb-2">Založeno na plánu spuštění:</h4>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <div>• Průměrně {Math.round(roiData.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12)} objednávek/měsíc</div>
+                    <div>• Spuštění v {monthNames[roiData.startupPlan.launchMonth]}</div>
+                    <div>• Růst z {roiData.startupPlan.monthlyOrders[0]} na {roiData.startupPlan.monthlyOrders[11]} objednávek za rok</div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="productPrice" className="text-sm font-medium">
+                      Cena produktu/služby
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="productPrice"
+                        type="number"
+                        value={roiData.revenue.productPrice}
+                        onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
+                        placeholder="0"
+                        className="pr-12"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        Kč
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Počet objednávek se automaticky bere z plánu spuštění výše
+                    </p>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
+                      Daň z příjmu
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="incomeTaxRate"
+                        type="number"
+                        value={roiData.taxes.incomeTaxRate}
+                        onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
+                        placeholder="15"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        %
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="growthReserveRate" className="text-sm font-medium">
+                      Rezerva na růst
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="growthReserveRate"
+                        type="number"
+                        value={roiData.taxes.growthReserveRate}
+                        onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
+                        placeholder="10"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                        %
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis 
-                      dataKey="monthName" 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
-                    />
-                    
-                    {/* Zero line */}
-                    <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="2 2" />
-                    
-                    {/* Break-even line - only show for cumulative view */}
-                    {breakEvenPoint && chartViewMode === 'cumulative' && (
-                      <ReferenceLine 
-                        x={breakEvenPoint.monthName} 
-                        stroke="hsl(var(--success))" 
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                        label={{ 
-                          value: `Break-even: ${breakEvenPoint.monthName}`, 
-                          position: "top",
-                          style: { fontSize: '12px', fill: 'hsl(var(--success))' }
-                        }}
-                      />
-                    )}
-
-                    {/* Profit zones - only show for cumulative view */}
-                    {chartViewMode === 'cumulative' && (
-                      <>
-                        <ReferenceArea 
-                          y1={0} 
-                          y2={Math.max(...chartData.map(d => d.profit))} 
-                          fill="hsl(var(--success))" 
-                          fillOpacity={0.1} 
-                        />
-                        <ReferenceArea 
-                          y1={Math.min(...chartData.map(d => d.profit))} 
-                          y2={0} 
-                          fill="hsl(var(--destructive))" 
-                          fillOpacity={0.1} 
-                        />
-                      </>
-                    )}
-                    
-                    <Tooltip 
-                      formatter={(value: number, name: string, props: any) => {
-                        const labels = {
-                          revenue: chartViewMode === 'monthly' ? 'Měsíční příjmy' : 'Kumulativní příjmy',
-                          costs: chartViewMode === 'monthly' ? 'Měsíční náklady' : 'Kumulativní náklady', 
-                          profit: chartViewMode === 'monthly' ? 'Měsíční zisk' : 'Kumulativní zisk'
-                        };
-                        const formattedValue = `${value.toLocaleString()} Kč`;
-                        
-                        if (name === 'profit' && props.payload.isBreakEven && chartViewMode === 'cumulative') {
-                          return [`${formattedValue} (Break-even!)`, labels[name as keyof typeof labels]];
-                        }
-                        
-                        return [formattedValue, labels[name as keyof typeof labels]];
-                      }}
-                      labelFormatter={(label) => `Měsíc: ${label}`}
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px'
-                      }}
-                    />
-                    <Legend 
-                      formatter={(value) => {
-                        const labels = {
-                          revenue: chartViewMode === 'monthly' ? 'Měsíční příjmy' : 'Kumulativní příjmy',
-                          costs: chartViewMode === 'monthly' ? 'Měsíční náklady' : 'Kumulativní náklady', 
-                          profit: chartViewMode === 'monthly' ? 'Měsíční zisk' : 'Kumulativní zisk'
-                        };
-                        return labels[value as keyof typeof labels] || value;
-                      }}
-                    />
-                    
-                    <Line 
-                      type="monotone" 
-                      dataKey="revenue" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="costs" 
-                      stroke="hsl(var(--destructive))" 
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="profit" 
-                      stroke="hsl(var(--success))" 
-                      strokeWidth={3}
-                      dot={(props) => {
-                        if (props.payload?.isBreakEven) {
-                          return (
-                            <circle
-                              cx={props.cx}
-                              cy={props.cy}
-                              r={6}
-                              fill="hsl(var(--success))"
-                              stroke="hsl(var(--background))"
-                              strokeWidth={2}
-                            />
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
             </Card>
-            
+          </div>
+          
+          {/* Right Column - AI Analysis */}
+          <div className="space-y-6">
             {/* AI Analysis */}
             <Card className="card-apple p-6">
               <div className="flex items-center mb-4">
