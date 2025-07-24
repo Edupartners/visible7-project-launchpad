@@ -20,8 +20,14 @@ export interface LaunchKPI {
 export interface ProductPerformance {
   id: string;
   name: string;
-  sales: number;
+  unitsSold: number;
+  pricePerUnit: number;
   revenue: number;
+  directCosts: number;
+  indirectCosts: number;
+  profit: number;
+  profitMargin: number;
+  sales: number; // Keep for backward compatibility
   conversionRate: number;
 }
 

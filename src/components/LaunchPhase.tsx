@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BackButton } from "@/components/ui/back-button";
-import { Target, TrendingUp, BarChart3, Plus, Trash2, Download, PlayCircle } from "lucide-react";
+import { Target, TrendingUp, BarChart3, Plus, Trash2, Download, PlayCircle, PieChart } from "lucide-react";
+import { PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend, Pie as RechartsPie } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,14 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
     paretoAnalysis: { topProducts: [], recommendation: "" }
   });
 
-  const [newProduct, setNewProduct] = useState({ name: "", sales: 0, revenue: 0, conversionRate: 0 });
+  const [newProduct, setNewProduct] = useState({ 
+    name: "", 
+    unitsSold: 0, 
+    pricePerUnit: 0, 
+    directCosts: 0, 
+    indirectCosts: 0, 
+    conversionRate: 0 
+  });
   const [newChannel, setNewChannel] = useState({ channel: "", cost: 0, revenue: 0, customers: 0 });
 
   const updateKPI = (type: 'target' | 'actual', field: string, value: number) => {
@@ -48,11 +56,20 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
   };
 
   const addProduct = () => {
-    if (!newProduct.name) return;
+    if (!newProduct.name || newProduct.unitsSold <= 0 || newProduct.pricePerUnit <= 0) return;
+    
+    const revenue = newProduct.unitsSold * newProduct.pricePerUnit;
+    const totalCosts = newProduct.directCosts + newProduct.indirectCosts;
+    const profit = revenue - totalCosts;
+    const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
     
     const product: ProductPerformance = {
       id: Date.now().toString(),
-      ...newProduct
+      ...newProduct,
+      revenue,
+      profit,
+      profitMargin,
+      sales: newProduct.unitsSold // Keep for backward compatibility
     };
     
     setLaunchData(prev => ({
@@ -60,7 +77,14 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
       products: [...prev.products, product]
     }));
     
-    setNewProduct({ name: "", sales: 0, revenue: 0, conversionRate: 0 });
+    setNewProduct({ 
+      name: "", 
+      unitsSold: 0, 
+      pricePerUnit: 0, 
+      directCosts: 0, 
+      indirectCosts: 0, 
+      conversionRate: 0 
+    });
     performParetoAnalysis([...launchData.products, product]);
   };
 
@@ -101,28 +125,28 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
   const performParetoAnalysis = (products: ProductPerformance[]) => {
     if (products.length === 0) return;
 
-    const sortedProducts = products.sort((a, b) => b.revenue - a.revenue);
-    const totalRevenue = sortedProducts.reduce((sum, p) => sum + p.revenue, 0);
+    const sortedByProfit = products.sort((a, b) => b.profit - a.profit);
+    const totalProfit = sortedByProfit.reduce((sum, p) => sum + p.profit, 0);
     
-    let cumulativeRevenue = 0;
+    let cumulativeProfit = 0;
     const topProducts: string[] = [];
     
-    for (const product of sortedProducts) {
-      cumulativeRevenue += product.revenue;
+    for (const product of sortedByProfit) {
+      cumulativeProfit += product.profit;
       topProducts.push(product.name);
       
-      if (cumulativeRevenue >= totalRevenue * 0.8) break;
+      if (cumulativeProfit >= totalProfit * 0.8) break;
     }
     
     const topProductsPercentage = (topProducts.length / products.length) * 100;
     let recommendation = "";
     
     if (topProductsPercentage <= 30) {
-      recommendation = "✅ Vynikající! Jen několik produktů generuje většinu příjmů. Zaměřte se na jejich škálování.";
+      recommendation = "✅ Vynikající! Jen několik produktů generuje většinu zisku. Zaměřte se na jejich škálování.";
     } else if (topProductsPercentage <= 50) {
-      recommendation = "⚠️ Dobrý výsledek, ale můžete optimalizovat. Zvažte redukci méně výkonných produktů.";
+      recommendation = "⚠️ Dobrý výsledek podle zisku, ale můžete optimalizovat náklady u méně ziskových produktů.";
     } else {
-      recommendation = "🔄 Příjmy jsou příliš rozptýlené. Doporučujeme se zaměřit na nejlepší produkty a ostatní upravit nebo vyřadit.";
+      recommendation = "🔄 Zisk je příliš rozptýlený. Doporučujeme se zaměřit na nejziskovější produkty a zvýšit marže u ostatních.";
     }
     
     setLaunchData(prev => ({
@@ -206,8 +230,8 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
               KPI Tracking
             </TabsTrigger>
             <TabsTrigger value="pareto" className="gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Paretova analýza
+              <PieChart className="w-4 h-4" />
+              Analýza produktů
             </TabsTrigger>
             <TabsTrigger value="channels" className="gap-2">
               <BarChart3 className="w-4 h-4" />
@@ -252,15 +276,16 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
                         onChange={(e) => updateKPI('target', 'visitors', Number(e.target.value))}
                       />
                     </div>
-                    <div>
-                      <Label>Konverzní poměr (%)</Label>
-                      <Input 
-                        type="number" 
-                        step="0.1"
-                        value={launchData.kpis.target.conversionRate}
-                        onChange={(e) => updateKPI('target', 'conversionRate', Number(e.target.value))}
-                      />
-                    </div>
+                     <div>
+                       <Label>Konverzní poměr (%) - objednávky/návštěvníci</Label>
+                       <Input 
+                         type="number" 
+                         step="0.01"
+                         value={launchData.kpis.target.conversionRate}
+                         onChange={(e) => updateKPI('target', 'conversionRate', Number(e.target.value))}
+                         placeholder="Např. 2.5 pro 2.5%"
+                       />
+                     </div>
                     <div>
                       <Label>CPC (Kč)</Label>
                       <Input 
@@ -314,15 +339,16 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
                         onChange={(e) => updateKPI('actual', 'visitors', Number(e.target.value))}
                       />
                     </div>
-                    <div>
-                      <Label>Konverzní poměr (%)</Label>
-                      <Input 
-                        type="number" 
-                        step="0.1"
-                        value={launchData.kpis.actual.conversionRate}
-                        onChange={(e) => updateKPI('actual', 'conversionRate', Number(e.target.value))}
-                      />
-                    </div>
+                     <div>
+                       <Label>Konverzní poměr (%) - skutečný</Label>
+                       <Input 
+                         type="number" 
+                         step="0.01"
+                         value={launchData.kpis.actual.conversionRate}
+                         onChange={(e) => updateKPI('actual', 'conversionRate', Number(e.target.value))}
+                         placeholder="Vypočítá se automaticky: objednávky/návštěvníci"
+                       />
+                     </div>
                     <div>
                       <Label>CPC (Kč)</Label>
                       <Input 
@@ -386,10 +412,11 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
           </TabsContent>
 
           <TabsContent value="pareto" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Přidat produkt/službu</CardTitle>
+                  <CardDescription>Zadejte detailní informace o produktu včetně nákladů</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -400,24 +427,65 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
                       placeholder="Např. Základní balíček"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Počet prodejů</Label>
-                      <Input 
-                        type="number"
-                        value={newProduct.sales}
-                        onChange={(e) => setNewProduct(prev => ({ ...prev, sales: Number(e.target.value) }))}
-                      />
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">Prodeje</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Počet prodaných kusů</Label>
+                        <Input 
+                          type="number"
+                          value={newProduct.unitsSold}
+                          onChange={(e) => setNewProduct(prev => ({ ...prev, unitsSold: Number(e.target.value) }))}
+                        />
+                      </div>
+                      <div>
+                        <Label>Cena za kus (Kč)</Label>
+                        <Input 
+                          type="number"
+                          value={newProduct.pricePerUnit}
+                          onChange={(e) => setNewProduct(prev => ({ ...prev, pricePerUnit: Number(e.target.value) }))}
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label>Tržby (Kč)</Label>
-                      <Input 
-                        type="number"
-                        value={newProduct.revenue}
-                        onChange={(e) => setNewProduct(prev => ({ ...prev, revenue: Number(e.target.value) }))}
-                      />
+                    <div className="p-2 bg-muted rounded text-sm">
+                      <strong>Tržby: {(newProduct.unitsSold * newProduct.pricePerUnit).toLocaleString()} Kč</strong>
                     </div>
                   </div>
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">Náklady</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Přímé náklady (Kč)</Label>
+                        <Input 
+                          type="number"
+                          value={newProduct.directCosts}
+                          onChange={(e) => setNewProduct(prev => ({ ...prev, directCosts: Number(e.target.value) }))}
+                          placeholder="Materiál, výroba..."
+                        />
+                      </div>
+                      <div>
+                        <Label>Nepřímé náklady (Kč)</Label>
+                        <Input 
+                          type="number"
+                          value={newProduct.indirectCosts}
+                          onChange={(e) => setNewProduct(prev => ({ ...prev, indirectCosts: Number(e.target.value) }))}
+                          placeholder="Marketing, režie..."
+                        />
+                      </div>
+                    </div>
+                    <div className="p-2 bg-muted rounded text-sm space-y-1">
+                      <div><strong>Celkové náklady: {(newProduct.directCosts + newProduct.indirectCosts).toLocaleString()} Kč</strong></div>
+                      <div className="text-primary"><strong>Zisk: {((newProduct.unitsSold * newProduct.pricePerUnit) - (newProduct.directCosts + newProduct.indirectCosts)).toLocaleString()} Kč</strong></div>
+                      <div className="text-xs text-muted-foreground">
+                        Marže: {newProduct.unitsSold * newProduct.pricePerUnit > 0 ? 
+                          (((newProduct.unitsSold * newProduct.pricePerUnit - newProduct.directCosts - newProduct.indirectCosts) / (newProduct.unitsSold * newProduct.pricePerUnit)) * 100).toFixed(1)
+                          : 0}%
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <Label>Konverzní poměr (%)</Label>
                     <Input 
@@ -425,9 +493,15 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
                       step="0.1"
                       value={newProduct.conversionRate}
                       onChange={(e) => setNewProduct(prev => ({ ...prev, conversionRate: Number(e.target.value) }))}
+                      placeholder="Volitelné"
                     />
                   </div>
-                  <Button onClick={addProduct} className="w-full gap-2">
+                  
+                  <Button 
+                    onClick={addProduct} 
+                    className="w-full gap-2"
+                    disabled={!newProduct.name || newProduct.unitsSold <= 0 || newProduct.pricePerUnit <= 0}
+                  >
                     <Plus className="w-4 h-4" />
                     Přidat produkt
                   </Button>
@@ -437,7 +511,7 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
               <Card>
                 <CardHeader>
                   <CardTitle>Paretova analýza</CardTitle>
-                  <CardDescription>Které produkty generují 80% vašich příjmů?</CardDescription>
+                  <CardDescription>Které produkty generují 80% zisku?</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {launchData.products.length > 0 ? (
@@ -446,7 +520,7 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
                         <p className="text-sm">{launchData.paretoAnalysis.recommendation}</p>
                       </div>
                       <div>
-                        <h4 className="font-medium mb-2">Top produkty (generující 80% příjmů):</h4>
+                        <h4 className="font-medium mb-2">Top produkty (generující 80% zisku):</h4>
                         <div className="flex flex-wrap gap-2">
                           {launchData.paretoAnalysis.topProducts.map((product, index) => (
                             <Badge key={index} variant="default">
@@ -463,44 +537,135 @@ export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
                   )}
                 </CardContent>
               </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Vizualizace výkonu</CardTitle>
+                  <CardDescription>Podíl produktů na celkových výsledcích</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {launchData.products.length > 0 ? (
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="font-medium mb-3">Podíl na tržbách</h4>
+                        <div className="h-64">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPieChart>
+                              <RechartsPie
+                                data={launchData.products.map(p => ({
+                                  name: p.name,
+                                  value: p.revenue,
+                                  color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+                                }))}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={80}
+                                dataKey="value"
+                                label={(entry) => `${entry.name}: ${((entry.value / launchData.products.reduce((sum, p) => sum + p.revenue, 0)) * 100).toFixed(1)}%`}
+                              >
+                                {launchData.products.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={`hsl(${(index * 137.5) % 360}, 70%, 50%)`} />
+                                ))}
+                              </RechartsPie>
+                              <Tooltip formatter={(value: number) => [`${value.toLocaleString()} Kč`, 'Tržby']} />
+                            </RechartsPieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium mb-3">Podíl na zisku</h4>
+                        <div className="h-64">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPieChart>
+                              <RechartsPie
+                                data={launchData.products.map(p => ({
+                                  name: p.name,
+                                  value: p.profit,
+                                  color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+                                }))}
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={80}
+                                dataKey="value"
+                                label={(entry) => `${entry.name}: ${((entry.value / launchData.products.reduce((sum, p) => sum + p.profit, 0)) * 100).toFixed(1)}%`}
+                              >
+                                {launchData.products.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={`hsl(${(index * 137.5 + 60) % 360}, 70%, 50%)`} />
+                                ))}
+                              </RechartsPie>
+                              <Tooltip formatter={(value: number) => [`${value.toLocaleString()} Kč`, 'Zisk']} />
+                            </RechartsPieChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-center py-8">
+                      Přidejte produkty pro vizualizaci
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
             <Card>
               <CardHeader>
-                <CardTitle>Přehled výkonu produktů</CardTitle>
+                <CardTitle>Detailní přehled produktů</CardTitle>
+                <CardDescription>Kompletní finanční analýza všech produktů</CardDescription>
               </CardHeader>
               <CardContent>
                 {launchData.products.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Produkt/služba</TableHead>
-                        <TableHead>Počet prodejů</TableHead>
-                        <TableHead>Tržby (Kč)</TableHead>
-                        <TableHead>Konverzní poměr (%)</TableHead>
-                        <TableHead></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {launchData.products.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium">{product.name}</TableCell>
-                          <TableCell>{product.sales}</TableCell>
-                          <TableCell>{product.revenue.toLocaleString()} Kč</TableCell>
-                          <TableCell>{product.conversionRate}%</TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => removeProduct(product.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Produkt</TableHead>
+                          <TableHead>Kusy</TableHead>
+                          <TableHead>Cena/kus</TableHead>
+                          <TableHead>Tržby</TableHead>
+                          <TableHead>Náklady</TableHead>
+                          <TableHead>Zisk</TableHead>
+                          <TableHead>Marže</TableHead>
+                          <TableHead>Konverze</TableHead>
+                          <TableHead></TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {[...launchData.products].sort((a, b) => b.profit - a.profit).map((product) => (
+                          <TableRow key={product.id}>
+                            <TableCell className="font-medium">{product.name}</TableCell>
+                            <TableCell>{product.unitsSold}</TableCell>
+                            <TableCell>{product.pricePerUnit?.toLocaleString() || 0} Kč</TableCell>
+                            <TableCell>{product.revenue.toLocaleString()} Kč</TableCell>
+                            <TableCell>{((product.directCosts || 0) + (product.indirectCosts || 0)).toLocaleString()} Kč</TableCell>
+                            <TableCell className={product.profit > 0 ? "text-green-600" : "text-red-600"}>
+                              {product.profit?.toLocaleString() || 0} Kč
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={
+                                (product.profitMargin || 0) > 30 ? "default" : 
+                                (product.profitMargin || 0) > 15 ? "secondary" : 
+                                "destructive"
+                              }>
+                                {product.profitMargin?.toFixed(1) || 0}%
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{product.conversionRate || 0}%</TableCell>
+                            <TableCell>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => removeProduct(product.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">
                     Zatím nejsou přidány žádné produkty
