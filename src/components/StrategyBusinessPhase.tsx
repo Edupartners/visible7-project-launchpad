@@ -297,7 +297,7 @@ const calculateROIMetrics = (data: ROICalculatorData): ROIAnalysis => {
   };
 };
 
-const generateChartData = (data: ROICalculatorData) => {
+const generateChartData = (data: ROICalculatorData, viewMode: 'monthly' | 'cumulative' = 'monthly') => {
   // Defensive programming - ensure data exists
   if (!data?.marketingCosts || !data?.operationalCosts || !data?.taxes || !data?.startupPlan) {
     console.warn('generateChartData: Missing required data properties');
@@ -346,6 +346,10 @@ const generateChartData = (data: ROICalculatorData) => {
     const monthlyMarketingCosts = getMonthlyMarketingCosts(currentMonthIndex);
     const totalMonthlyCosts = monthlyMarketingCosts + monthlyOperationalCosts;
     
+    // Calculate monthly profit/loss
+    const monthlyProfit = netMonthlyRevenue - totalMonthlyCosts;
+    
+    // Update cumulative values
     cumulativeRevenue += netMonthlyRevenue;
     cumulativeCosts += totalMonthlyCosts;
     cumulativeProfit = cumulativeRevenue - cumulativeCosts;
@@ -355,12 +359,15 @@ const generateChartData = (data: ROICalculatorData) => {
     chartData.push({
       month: `M${month}`,
       monthName: monthNames[currentMonthIndex],
-      revenue: Math.round(cumulativeRevenue),
-      costs: Math.round(cumulativeCosts),
-      profit: Math.round(cumulativeProfit),
+      // Show either monthly or cumulative values based on viewMode
+      revenue: viewMode === 'monthly' ? Math.round(netMonthlyRevenue) : Math.round(cumulativeRevenue),
+      costs: viewMode === 'monthly' ? Math.round(totalMonthlyCosts) : Math.round(cumulativeCosts),
+      profit: viewMode === 'monthly' ? Math.round(monthlyProfit) : Math.round(cumulativeProfit),
+      // Always keep cumulative profit for break-even calculation
+      cumulativeProfit: Math.round(cumulativeProfit),
       phase: phaseColor,
       ordersThisMonth: isPreLaunch ? 0 : monthlyOrders[Math.max(0, Math.min(11, monthsSinceLaunch))] || 0,
-      isBreakEven: cumulativeProfit > 0 && (month === 1 || chartData[month - 2]?.profit <= 0),
+      isBreakEven: cumulativeProfit > 0 && (month === 1 || chartData[month - 2]?.cumulativeProfit <= 0),
       isPreLaunch,
       isLaunchMonth
     });
@@ -430,12 +437,13 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   const [showIntro, setShowIntro] = useState(true);
   const [isPreFilled, setIsPreFilled] = useState(false);
   const [showPredictions, setShowPredictions] = useState(false);
+  const [chartViewMode, setChartViewMode] = useState<'monthly' | 'cumulative'>('monthly');
   const [roiData, setRoiData] = useMigratedPersistedState("strategy_roi_data", defaultROIData);
   const [predictiveData, setPredictiveData] = useState<any>(null);
   const [hasAppliedPredictions, setHasAppliedPredictions] = useState(false);
   
   const analysis = calculateROIMetrics(roiData);
-  const chartData = generateChartData(roiData);
+  const chartData = generateChartData(roiData, chartViewMode);
   const breakEvenPoint = chartData.find(point => point.isBreakEven);
   
   // Pre-fill from Lean Canvas on mount
@@ -1210,10 +1218,23 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
             
             {/* Chart with Break-even */}
             <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <BarChart3 className="w-5 h-5 mr-2 text-primary" />
-                Vývoj návratnosti s bodem zvratu
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-foreground flex items-center">
+                  <BarChart3 className="w-5 h-5 mr-2 text-primary" />
+                  {chartViewMode === 'monthly' ? 'Měsíční cash flow' : 'Kumulativní vývoj návratnosti'}
+                </h2>
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm text-muted-foreground">Zobrazení:</label>
+                  <select 
+                    value={chartViewMode} 
+                    onChange={(e) => setChartViewMode(e.target.value as 'monthly' | 'cumulative')}
+                    className="px-3 py-1 bg-background border border-border rounded-md text-sm"
+                  >
+                    <option value="monthly">Měsíčně</option>
+                    <option value="cumulative">Kumulativně</option>
+                  </select>
+                </div>
+              </div>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
@@ -1232,8 +1253,8 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                     {/* Zero line */}
                     <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="2 2" />
                     
-                    {/* Break-even line */}
-                    {breakEvenPoint && (
+                    {/* Break-even line - only show for cumulative view */}
+                    {breakEvenPoint && chartViewMode === 'cumulative' && (
                       <ReferenceLine 
                         x={breakEvenPoint.monthName} 
                         stroke="hsl(var(--success))" 
@@ -1247,30 +1268,34 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                       />
                     )}
 
-                    {/* Profit zones */}
-                    <ReferenceArea 
-                      y1={0} 
-                      y2={Math.max(...chartData.map(d => d.profit))} 
-                      fill="hsl(var(--success))" 
-                      fillOpacity={0.1} 
-                    />
-                    <ReferenceArea 
-                      y1={Math.min(...chartData.map(d => d.profit))} 
-                      y2={0} 
-                      fill="hsl(var(--destructive))" 
-                      fillOpacity={0.1} 
-                    />
+                    {/* Profit zones - only show for cumulative view */}
+                    {chartViewMode === 'cumulative' && (
+                      <>
+                        <ReferenceArea 
+                          y1={0} 
+                          y2={Math.max(...chartData.map(d => d.profit))} 
+                          fill="hsl(var(--success))" 
+                          fillOpacity={0.1} 
+                        />
+                        <ReferenceArea 
+                          y1={Math.min(...chartData.map(d => d.profit))} 
+                          y2={0} 
+                          fill="hsl(var(--destructive))" 
+                          fillOpacity={0.1} 
+                        />
+                      </>
+                    )}
                     
                     <Tooltip 
                       formatter={(value: number, name: string, props: any) => {
                         const labels = {
-                          revenue: 'Příjmy',
-                          costs: 'Náklady', 
-                          profit: 'Zisk'
+                          revenue: chartViewMode === 'monthly' ? 'Měsíční příjmy' : 'Kumulativní příjmy',
+                          costs: chartViewMode === 'monthly' ? 'Měsíční náklady' : 'Kumulativní náklady', 
+                          profit: chartViewMode === 'monthly' ? 'Měsíční zisk' : 'Kumulativní zisk'
                         };
                         const formattedValue = `${value.toLocaleString()} Kč`;
                         
-                        if (name === 'profit' && props.payload.isBreakEven) {
+                        if (name === 'profit' && props.payload.isBreakEven && chartViewMode === 'cumulative') {
                           return [`${formattedValue} (Break-even!)`, labels[name as keyof typeof labels]];
                         }
                         
@@ -1286,9 +1311,9 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                     <Legend 
                       formatter={(value) => {
                         const labels = {
-                          revenue: 'Příjmy',
-                          costs: 'Náklady', 
-                          profit: 'Zisk'
+                          revenue: chartViewMode === 'monthly' ? 'Měsíční příjmy' : 'Kumulativní příjmy',
+                          costs: chartViewMode === 'monthly' ? 'Měsíční náklady' : 'Kumulativní náklady', 
+                          profit: chartViewMode === 'monthly' ? 'Měsíční zisk' : 'Kumulativní zisk'
                         };
                         return labels[value as keyof typeof labels] || value;
                       }}
