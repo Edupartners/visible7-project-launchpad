@@ -1008,10 +1008,10 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Input Forms */}
           <div className="space-y-6">
-            {/* Marketing Costs */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+            {/* Marketing Costs - Emerald Theme */}
+            <Card className="bg-emerald-50/50 border-emerald-200 p-6">
+              <h2 className="text-xl font-semibold text-emerald-700 mb-4 flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-emerald-600" />
                 Marketingové náklady (měsíčně)
               </h2>
               
@@ -1111,10 +1111,10 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
             </Card>
             
-            {/* Operational Costs */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <Calculator className="w-5 h-5 mr-2 text-primary" />
+            {/* Operational Costs - Red Theme */}
+            <Card className="bg-red-50/50 border-red-200 p-6">
+              <h2 className="text-xl font-semibold text-red-700 mb-4 flex items-center">
+                <TrendingDown className="w-5 h-5 mr-2 text-red-600" />
                 Provozní náklady (měsíčně)
               </h2>
               
@@ -1214,10 +1214,10 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
             </Card>
             
-            {/* Startup Launch Planning */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <Rocket className="w-5 h-5 mr-2 text-primary" />
+            {/* Startup Launch Planning - Purple Theme */}
+            <Card className="bg-purple-50/50 border-purple-200 p-6">
+              <h2 className="text-xl font-semibold text-purple-700 mb-4 flex items-center">
+                <Rocket className="w-5 h-5 mr-2 text-purple-600" />
                 Plánování spuštění startupu
               </h2>
               
@@ -1350,106 +1350,17 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
               </div>
             </Card>
 
-            {/* Revenue & Taxes */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-primary" />
+            {/* Revenue & Taxes - Blue Theme */}
+            <Card className="bg-blue-50/50 border-blue-200 p-6">
+              <h2 className="text-xl font-semibold text-blue-700 mb-4 flex items-center">
+                <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
                 Výnosy a daně
               </h2>
               <div className="space-y-4">
                 {/* Startup plan summary */}
-                <div className="bg-accent/10 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-2">Založeno na plánu spuštění:</h4>
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <div>• Průměrně {Math.round(roiData.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12)} objednávek/měsíc</div>
-                    <div>• Spuštění v {monthNames[roiData.startupPlan.launchMonth]}</div>
-                    <div>• Růst z {roiData.startupPlan.monthlyOrders[0]} na {roiData.startupPlan.monthlyOrders[11]} objednávek za rok</div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="productPrice" className="text-sm font-medium">
-                      Cena produktu/služby
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="productPrice"
-                        type="number"
-                        value={roiData.revenue.productPrice}
-                        onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
-                        placeholder="0"
-                        className="pr-12"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        Kč
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Počet objednávek se automaticky bere z plánu spuštění výše
-                    </p>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
-                      Daň z příjmu
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="incomeTaxRate"
-                        type="number"
-                        value={roiData.taxes.incomeTaxRate}
-                        onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
-                        placeholder="15"
-                        className="pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="growthReserveRate" className="text-sm font-medium">
-                      Rezerva na růst
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="growthReserveRate"
-                        type="number"
-                        value={roiData.taxes.growthReserveRate}
-                        onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
-                        placeholder="10"
-                        className="pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-          
-          {/* Right Column - Results & Analysis */}
-          <div className="space-y-6">
-            
-            {/* Revenue & Taxes */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-primary" />
-                Výnosy a daně
-              </h2>
-              <div className="space-y-4">
-                {/* Startup plan summary */}
-                <div className="bg-accent/10 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-2">Založeno na plánu spuštění:</h4>
-                  <div className="text-sm text-muted-foreground space-y-1">
+                <div className="bg-blue-100/50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium mb-2 text-blue-800">Založeno na plánu spuštění:</h4>
+                  <div className="text-sm text-blue-600 space-y-1">
                     <div>• Průměrně {Math.round(roiData.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12)} objednávek/měsíc</div>
                     <div>• Spuštění v {monthNames[roiData.startupPlan.launchMonth]}</div>
                     <div>• Růst z {roiData.startupPlan.monthlyOrders[0]} na {roiData.startupPlan.monthlyOrders[11]} objednávek za rok</div>
