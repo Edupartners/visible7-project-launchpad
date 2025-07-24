@@ -1043,25 +1043,25 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-12 gap-1">
-                    {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].map((cost, monthIndex) => (
-                      <div key={monthIndex} className="space-y-1">
-                        <Label className="text-xs text-muted-foreground text-center block">
-                          {monthNames[monthIndex]}
-                        </Label>
-                         <Input
-                          type="number"
-                          value={cost}
-                          onChange={(e) => updateMarketingCost(
-                            field.key as keyof ROICalculatorData['marketingCosts'],
-                            monthIndex,
-                            parseInt(e.target.value) || 0
-                          )}
-                          className="text-center text-xs h-8"
-                          min="0"
-                        />
-                      </div>
-                    ))}
+                   <div className="grid grid-cols-12 gap-2 overflow-x-auto">
+                     {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].map((cost, monthIndex) => (
+                       <div key={monthIndex} className="space-y-1 min-w-[80px]">
+                         <Label className="text-sm text-muted-foreground text-center block">
+                           {monthNames[monthIndex]}
+                         </Label>
+                          <Input
+                           type="number"
+                           value={cost}
+                           onChange={(e) => updateMarketingCost(
+                             field.key as keyof ROICalculatorData['marketingCosts'],
+                             monthIndex,
+                             parseInt(e.target.value) || 0
+                           )}
+                           className="text-center text-sm h-10 w-full"
+                           min="0"
+                         />
+                       </div>
+                     ))}
                   </div>
                   
                   <div className="text-xs text-muted-foreground text-center">
@@ -1146,25 +1146,25 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-12 gap-1">
-                    {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].map((cost, monthIndex) => (
-                      <div key={monthIndex} className="space-y-1">
-                        <Label className="text-xs text-muted-foreground text-center block">
-                          {monthNames[monthIndex]}
-                        </Label>
-                         <Input
-                          type="number"
-                          value={cost}
-                          onChange={(e) => updateOperationalCost(
-                            field.key as keyof ROICalculatorData['operationalCosts'],
-                            monthIndex,
-                            parseInt(e.target.value) || 0
-                          )}
-                          className="text-center text-xs h-8"
-                          min="0"
-                        />
-                      </div>
-                    ))}
+                   <div className="grid grid-cols-12 gap-2 overflow-x-auto">
+                     {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].map((cost, monthIndex) => (
+                       <div key={monthIndex} className="space-y-1 min-w-[80px]">
+                         <Label className="text-sm text-muted-foreground text-center block">
+                           {monthNames[monthIndex]}
+                         </Label>
+                          <Input
+                           type="number"
+                           value={cost}
+                           onChange={(e) => updateOperationalCost(
+                             field.key as keyof ROICalculatorData['operationalCosts'],
+                             monthIndex,
+                             parseInt(e.target.value) || 0
+                           )}
+                           className="text-center text-sm h-10 w-full"
+                           min="0"
+                         />
+                       </div>
+                     ))}
                   </div>
                   
                   <div className="text-xs text-muted-foreground text-center">
