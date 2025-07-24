@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tooltip as ChartTooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { generatePredictiveData } from "@/lib/predictiveMapping";
@@ -916,35 +917,85 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
           {/* Relativní ukazatele */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-muted-foreground mb-3">Relativní ukazatele</h3>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-primary/5 rounded-lg">
-                <div className="text-2xl font-bold text-primary">
-                  {analysis.roi.toFixed(1)}%
+            <TooltipProvider>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {analysis.roi.toFixed(1)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    ROI (roční)
+                    <ChartTooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-3 h-3 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p><strong>Roční návratnost investice</strong></p>
+                        <p className="text-xs mt-1">Vzorec: (Roční zisk / Roční náklady) × 100%</p>  
+                        <p className="text-xs mt-1 text-green-600">Dobrá hodnota: nad 20%</p>
+                      </TooltipContent>
+                    </ChartTooltip>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">ROI (roční)</div>
-              </div>
-              
-              <div className="text-center p-4 bg-primary/5 rounded-lg">
-                <div className="text-2xl font-bold text-primary">
-                  {analysis.pno.toFixed(1)}%
+                
+                <div className="text-center p-4 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {analysis.pno.toFixed(1)}%
+                  </div>
+                  <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    PNO
+                    <ChartTooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-3 h-3 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p><strong>Poměr marketingových nákladů k marži</strong></p>
+                        <p className="text-xs mt-1">Vzorec: (Měsíční marketing / Měsíční zisk) × 100%</p>
+                        <p className="text-xs mt-1 text-green-600">Optimální: pod 80%</p>
+                      </TooltipContent>
+                    </ChartTooltip>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">PNO</div>
-              </div>
-              
-              <div className="text-center p-4 bg-primary/5 rounded-lg">
-                <div className="text-2xl font-bold text-primary">
-                  {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
+                
+                <div className="text-center p-4 bg-primary/5 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">
+                    {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
+                  </div>
+                  <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    Break-even (měsíc)
+                    <ChartTooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-3 h-3 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p><strong>Doba dosažení kladného cash flow</strong></p>
+                        <p className="text-xs mt-1">Počet měsíců do prvního kladného kumulativního zisku</p>
+                        <p className="text-xs mt-1 text-green-600">Cíl: do 12 měsíců</p>
+                      </TooltipContent>
+                    </ChartTooltip>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">Break-even (měsíc)</div>
-              </div>
-              
-              <div className="text-center p-4 bg-orange-500/5 rounded-lg border border-orange-500/20">
-                <div className="text-2xl font-bold text-orange-600">
-                  {analysis.costPerOrder.toFixed(0)} Kč
+                
+                <div className="text-center p-4 bg-orange-500/5 rounded-lg border border-orange-500/20">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {analysis.costPerOrder.toFixed(0)} Kč
+                  </div>
+                  <div className="text-sm text-muted-foreground flex items-center justify-center gap-1">
+                    Náklad na objednávku
+                    <ChartTooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-3 h-3 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p><strong>Průměrný marketingový náklad na objednávku</strong></p>
+                        <p className="text-xs mt-1">Vzorec: Celkové roční marketingové náklady / Celkový počet objednávek</p>
+                        <p className="text-xs mt-1 text-blue-600">Porovnejte s marží na objednávku</p>
+                      </TooltipContent>
+                    </ChartTooltip>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">Náklad na objednávku</div>
               </div>
-            </div>
+            </TooltipProvider>
           </div>
           
           {/* Absolutní částky */}
