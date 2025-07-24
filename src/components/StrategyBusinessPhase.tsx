@@ -361,7 +361,7 @@ const generateChartData = (data: ROICalculatorData, viewMode: 'monthly' | 'cumul
       monthName: monthNames[currentMonthIndex],
       // Show either monthly or cumulative values based on viewMode
       revenue: viewMode === 'monthly' ? Math.round(netMonthlyRevenue) : Math.round(cumulativeRevenue),
-      costs: viewMode === 'monthly' ? Math.round(totalMonthlyCosts) : Math.round(cumulativeCosts),
+      costs: viewMode === 'monthly' ? -Math.round(totalMonthlyCosts) : -Math.round(cumulativeCosts),
       profit: viewMode === 'monthly' ? Math.round(monthlyProfit) : Math.round(cumulativeProfit),
       // Always keep cumulative profit for break-even calculation
       cumulativeProfit: Math.round(cumulativeProfit),
