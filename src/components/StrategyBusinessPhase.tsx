@@ -1005,510 +1005,504 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - Input Forms */}
-          <div className="space-y-6">
-            {/* Marketing Costs - Emerald Theme */}
-            <Card className="bg-emerald-50/50 border-emerald-200 p-6">
-              <h2 className="text-xl font-semibold text-emerald-700 mb-4 flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-emerald-600" />
-                Marketingové náklady (měsíčně)
-              </h2>
-              
-              <div className="space-y-6">
-                {marketingFields.map((field) => (
-                  <div key={field.key} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-sm font-medium">{field.label}</Label>
-                        <p className="text-xs text-muted-foreground">{field.hint}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="number"
-                          placeholder="Konstantní hodnota"
-                          className="w-32"
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value) || 0;
-                            if (value > 0) {
-                              setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], value);
-                            }
-                          }}
-                        />
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], 0)}
-                        >
-                          Reset
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-12 gap-1">
-                      {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].map((cost, monthIndex) => (
-                        <div key={monthIndex} className="space-y-1">
-                          <Label className="text-xs text-muted-foreground text-center block">
-                            {monthNames[monthIndex]}
-                          </Label>
-                           <Input
-                            type="number"
-                            value={cost}
-                            onChange={(e) => updateMarketingCost(
-                              field.key as keyof ROICalculatorData['marketingCosts'],
-                              monthIndex,
-                              parseInt(e.target.value) || 0
-                            )}
-                            className="text-center text-xs h-8"
-                            min="0"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="text-xs text-muted-foreground text-center">
-                      Celkem za rok: {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].reduce((sum, cost) => sum + cost, 0).toLocaleString()} Kč
-                    </div>
-                  </div>
-                ))}
-                
-                <div className="bg-accent/10 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-2">💡 Rychlé akce:</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        marketingFields.forEach(field => {
-                          const constantValue = roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts][0];
-                          setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], constantValue);
-                        });
-                      }}
-                    >
-                      Konstantní hodnoty
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        marketingFields.forEach(field => {
-                          const baseValue = roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts][0];
-                          const newValues = Array.from({length: 12}, (_, i) => Math.round(baseValue * (1 + i * 0.1)));
-                          setRoiData(prev => ({
-                            ...prev,
-                            marketingCosts: {
-                              ...prev.marketingCosts,
-                              [field.key]: newValues
-                            }
-                          }));
-                        });
-                      }}
-                    >
-                      Postupný nárůst
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
+        <div className="space-y-6">
+          {/* Marketing Costs - Emerald Theme */}
+          <Card className="bg-emerald-50/50 border-emerald-200 p-6">
+            <h2 className="text-xl font-semibold text-emerald-700 mb-4 flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-emerald-600" />
+              Marketingové náklady (měsíčně)
+            </h2>
             
-            {/* Operational Costs - Red Theme */}
-            <Card className="bg-red-50/50 border-red-200 p-6">
-              <h2 className="text-xl font-semibold text-red-700 mb-4 flex items-center">
-                <TrendingDown className="w-5 h-5 mr-2 text-red-600" />
-                Provozní náklady (měsíčně)
-              </h2>
-              
-              <div className="space-y-6">
-                {operationalFields.map((field) => (
-                  <div key={field.key} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-sm font-medium">{field.label}</Label>
-                        <p className="text-xs text-muted-foreground">{field.hint}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="number"
-                          placeholder="Konstantní hodnota"
-                          className="w-32"
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value) || 0;
-                            if (value > 0) {
-                              setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], value);
-                            }
-                          }}
-                        />
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], 0)}
-                        >
-                          Reset
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-12 gap-1">
-                      {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].map((cost, monthIndex) => (
-                        <div key={monthIndex} className="space-y-1">
-                          <Label className="text-xs text-muted-foreground text-center block">
-                            {monthNames[monthIndex]}
-                          </Label>
-                           <Input
-                            type="number"
-                            value={cost}
-                            onChange={(e) => updateOperationalCost(
-                              field.key as keyof ROICalculatorData['operationalCosts'],
-                              monthIndex,
-                              parseInt(e.target.value) || 0
-                            )}
-                            className="text-center text-xs h-8"
-                            min="0"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="text-xs text-muted-foreground text-center">
-                      Celkem za rok: {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].reduce((sum, cost) => sum + cost, 0).toLocaleString()} Kč
-                    </div>
-                  </div>
-                ))}
-                
-                <div className="bg-accent/10 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-2">💡 Rychlé akce:</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        operationalFields.forEach(field => {
-                          const constantValue = roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts][0];
-                          setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], constantValue);
-                        });
-                      }}
-                    >
-                      Konstantní hodnoty
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        operationalFields.forEach(field => {
-                          const baseValue = roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts][0];
-                          const newValues = Array.from({length: 12}, (_, i) => Math.round(baseValue * (1 + i * 0.05)));
-                          setRoiData(prev => ({
-                            ...prev,
-                            operationalCosts: {
-                              ...prev.operationalCosts,
-                              [field.key]: newValues
-                            }
-                          }));
-                        });
-                      }}
-                    >
-                      Postupný nárůst
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Startup Launch Planning - Purple Theme */}
-            <Card className="bg-purple-50/50 border-purple-200 p-6">
-              <h2 className="text-xl font-semibold text-purple-700 mb-4 flex items-center">
-                <Rocket className="w-5 h-5 mr-2 text-purple-600" />
-                Plánování spuštění startupu
-              </h2>
-              
-              <div className="space-y-6">
-                {/* Launch settings */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Měsíc spuštění produktu</Label>
-                    <select 
-                      className="w-full p-2 border rounded-md bg-background"
-                      value={roiData.startupPlan.launchMonth}
-                      onChange={(e) => updateStartupPlan('launchMonth', parseInt(e.target.value))}
-                    >
-                      {monthNames.map((month, index) => (
-                        <option key={index} value={index}>{month}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Měsíce před spuštěním (investice)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="6"
-                      value={roiData.startupPlan.preLaunchMonths}
-                      onChange={(e) => updateStartupPlan('preLaunchMonths', parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                </div>
-
-                {/* Growth scenario buttons */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium">Scénář růstu objednávek:</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <Button
-                      variant={roiData.startupPlan.selectedScenario === 'slow-start' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateGrowthScenario('slow-start')}
-                      className="flex items-center space-x-2"
-                    >
-                      <TrendingUp className="w-4 h-4" />
-                      <span>Pozvolný start</span>
-                    </Button>
-                    <Button
-                      variant={roiData.startupPlan.selectedScenario === 'aggressive' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateGrowthScenario('aggressive')}
-                      className="flex items-center space-x-2"
-                    >
-                      <Rocket className="w-4 h-4" />
-                      <span>Agresivní růst</span>
-                    </Button>
-                    <Button
-                      variant={roiData.startupPlan.selectedScenario === 'seasonal' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => updateGrowthScenario('seasonal')}
-                      className="flex items-center space-x-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      <span>Sezónní byznys</span>
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Monthly orders table */}
-                <div className="space-y-3">
+            <div className="space-y-6">
+              {marketingFields.map((field) => (
+                <div key={field.key} className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">Měsíční objednávky po spuštění:</Label>
-                    {roiData.startupPlan.selectedScenario === 'custom' && (
-                      <Badge variant="secondary">Vlastní scénář</Badge>
-                    )}
+                    <div>
+                      <Label className="text-sm font-medium">{field.label}</Label>
+                      <p className="text-xs text-muted-foreground">{field.hint}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        type="number"
+                        placeholder="Konstantní hodnota"
+                        className="w-32"
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          if (value > 0) {
+                            setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], value);
+                          }
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], 0)}
+                      >
+                        Reset
+                      </Button>
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-4 gap-3">
-                    {roiData.startupPlan.monthlyOrders.map((orders, index) => {
-                      const monthsSinceLaunch = index;
-                      const isPreLaunch = monthsSinceLaunch < 0;
-                      
-                      return (
-                        <div key={index} className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">
-                            {monthsSinceLaunch === 0 ? 'Launch' : `M${monthsSinceLaunch + 1}`}
-                          </Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            value={orders}
-                            onChange={(e) => updateMonthlyOrder(index, parseInt(e.target.value) || 0)}
-                            className={`text-center ${
-                              orders === 0 ? 'bg-muted/50' : 
-                              orders > 50 ? 'bg-green-50 border-green-200' : 
-                              'bg-blue-50 border-blue-200'
-                            }`}
-                            disabled={isPreLaunch}
-                          />
-                        </div>
-                      );
-                    })}
+                  <div className="grid grid-cols-12 gap-1">
+                    {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].map((cost, monthIndex) => (
+                      <div key={monthIndex} className="space-y-1">
+                        <Label className="text-xs text-muted-foreground text-center block">
+                          {monthNames[monthIndex]}
+                        </Label>
+                         <Input
+                          type="number"
+                          value={cost}
+                          onChange={(e) => updateMarketingCost(
+                            field.key as keyof ROICalculatorData['marketingCosts'],
+                            monthIndex,
+                            parseInt(e.target.value) || 0
+                          )}
+                          className="text-center text-xs h-8"
+                          min="0"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground text-center">
+                    Celkem za rok: {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].reduce((sum, cost) => sum + cost, 0).toLocaleString()} Kč
                   </div>
                 </div>
-
-                {/* Preview timeline */}
-                <div className="bg-accent/10 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-3">Předpokládaná timeline:</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span>Investiční fáze: {roiData.startupPlan.preLaunchMonths} měsíců před {monthNames[roiData.startupPlan.launchMonth]}</span>
+              ))}
+              
+              <div className="bg-accent/10 p-4 rounded-lg">
+                <h4 className="text-sm font-medium mb-2">💡 Rychlé akce:</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      marketingFields.forEach(field => {
+                        const constantValue = roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts][0];
+                        setAllMonthsMarketingCost(field.key as keyof ROICalculatorData['marketingCosts'], constantValue);
+                      });
+                    }}
+                  >
+                    Konstantní hodnoty
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      marketingFields.forEach(field => {
+                        const baseValue = roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts][0];
+                        const newValues = Array.from({length: 12}, (_, i) => Math.round(baseValue * (1 + i * 0.1)));
+                        setRoiData(prev => ({
+                          ...prev,
+                          marketingCosts: {
+                            ...prev.marketingCosts,
+                            [field.key]: newValues
+                          }
+                        }));
+                      });
+                    }}
+                  >
+                    Postupný nárůst
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+          
+          {/* Operational Costs - Red Theme */}
+          <Card className="bg-red-50/50 border-red-200 p-6">
+            <h2 className="text-xl font-semibold text-red-700 mb-4 flex items-center">
+              <TrendingDown className="w-5 h-5 mr-2 text-red-600" />
+              Provozní náklady (měsíčně)
+            </h2>
+            
+            <div className="space-y-6">
+              {operationalFields.map((field) => (
+                <div key={field.key} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-sm font-medium">{field.label}</Label>
+                      <p className="text-xs text-muted-foreground">{field.hint}</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <span>Spuštění: {monthNames[roiData.startupPlan.launchMonth]} s {roiData.startupPlan.monthlyOrders[0]} objednávkami</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span>Rok po spuštění: {roiData.startupPlan.monthlyOrders[11]} objednávek/měsíc</span>
+                      <Input
+                        type="number"
+                        placeholder="Konstantní hodnota"
+                        className="w-32"
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          if (value > 0) {
+                            setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], value);
+                          }
+                        }}
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], 0)}
+                      >
+                        Reset
+                      </Button>
                     </div>
                   </div>
+                  
+                  <div className="grid grid-cols-12 gap-1">
+                    {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].map((cost, monthIndex) => (
+                      <div key={monthIndex} className="space-y-1">
+                        <Label className="text-xs text-muted-foreground text-center block">
+                          {monthNames[monthIndex]}
+                        </Label>
+                         <Input
+                          type="number"
+                          value={cost}
+                          onChange={(e) => updateOperationalCost(
+                            field.key as keyof ROICalculatorData['operationalCosts'],
+                            monthIndex,
+                            parseInt(e.target.value) || 0
+                          )}
+                          className="text-center text-xs h-8"
+                          min="0"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground text-center">
+                    Celkem za rok: {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].reduce((sum, cost) => sum + cost, 0).toLocaleString()} Kč
+                  </div>
                 </div>
+              ))}
+              
+              <div className="bg-accent/10 p-4 rounded-lg">
+                <h4 className="text-sm font-medium mb-2">💡 Rychlé akce:</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      operationalFields.forEach(field => {
+                        const constantValue = roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts][0];
+                        setAllMonthsOperationalCost(field.key as keyof ROICalculatorData['operationalCosts'], constantValue);
+                      });
+                    }}
+                  >
+                    Konstantní hodnoty
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      operationalFields.forEach(field => {
+                        const baseValue = roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts][0];
+                        const newValues = Array.from({length: 12}, (_, i) => Math.round(baseValue * (1 + i * 0.05)));
+                        setRoiData(prev => ({
+                          ...prev,
+                          operationalCosts: {
+                            ...prev.operationalCosts,
+                            [field.key]: newValues
+                          }
+                        }));
+                      });
+                    }}
+                  >
+                    Postupný nárůst
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+          
+          {/* Startup Launch Planning - Purple Theme */}
+          <Card className="bg-purple-50/50 border-purple-200 p-6">
+            <h2 className="text-xl font-semibold text-purple-700 mb-4 flex items-center">
+              <Rocket className="w-5 h-5 mr-2 text-purple-600" />
+              Plánování spuštění startupu
+            </h2>
+            
+            <div className="space-y-6">
+              {/* Launch settings */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Měsíc spuštění produktu</Label>
+                  <select 
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={roiData.startupPlan.launchMonth}
+                    onChange={(e) => updateStartupPlan('launchMonth', parseInt(e.target.value))}
+                  >
+                    {monthNames.map((month, index) => (
+                      <option key={index} value={index}>{month}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Měsíce před spuštěním (investice)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="6"
+                    value={roiData.startupPlan.preLaunchMonths}
+                    onChange={(e) => updateStartupPlan('preLaunchMonths', parseInt(e.target.value) || 0)}
+                  />
+                </div>
+              </div>
 
-                {/* Scenario descriptions */}
-                <div className="bg-accent/10 p-3 rounded-lg">
+              {/* Growth scenario buttons */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Scénář růstu objednávek:</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <Button
+                    variant={roiData.startupPlan.selectedScenario === 'slow-start' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => updateGrowthScenario('slow-start')}
+                    className="flex items-center space-x-2"
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Pozvolný start</span>
+                  </Button>
+                  <Button
+                    variant={roiData.startupPlan.selectedScenario === 'aggressive' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => updateGrowthScenario('aggressive')}
+                    className="flex items-center space-x-2"
+                  >
+                    <Rocket className="w-4 h-4" />
+                    <span>Agresivní růst</span>
+                  </Button>
+                  <Button
+                    variant={roiData.startupPlan.selectedScenario === 'seasonal' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => updateGrowthScenario('seasonal')}
+                    className="flex items-center space-x-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Sezónní byznys</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Monthly orders table */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Měsíční objednávky po spuštění:</Label>
+                  {roiData.startupPlan.selectedScenario === 'custom' && (
+                    <Badge variant="secondary">Vlastní scénář</Badge>
+                  )}
+                </div>
+                
+                <div className="grid grid-cols-4 gap-3">
+                  {roiData.startupPlan.monthlyOrders.map((orders, index) => {
+                    const monthsSinceLaunch = index;
+                    const isPreLaunch = monthsSinceLaunch < 0;
+                    
+                    return (
+                      <div key={index} className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">
+                          {monthsSinceLaunch === 0 ? 'Launch' : `M${monthsSinceLaunch + 1}`}
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={orders}
+                          onChange={(e) => updateMonthlyOrder(index, parseInt(e.target.value) || 0)}
+                          className={`text-center ${
+                            orders === 0 ? 'bg-muted/50' : 
+                            orders > 50 ? 'bg-green-50 border-green-200' : 
+                            'bg-blue-50 border-blue-200'
+                          }`}
+                          disabled={isPreLaunch}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Preview timeline */}
+              <div className="bg-accent/10 p-4 rounded-lg">
+                <h4 className="text-sm font-medium mb-3">Předpokládaná timeline:</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span>Investiční fáze: {roiData.startupPlan.preLaunchMonths} měsíců před {monthNames[roiData.startupPlan.launchMonth]}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <span>Spuštění: {monthNames[roiData.startupPlan.launchMonth]} s {roiData.startupPlan.monthlyOrders[0]} objednávkami</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span>Rok po spuštění: {roiData.startupPlan.monthlyOrders[11]} objednávek/měsíc</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scenario descriptions */}
+              <div className="bg-accent/10 p-3 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  💡 <strong>Pozvolný start:</strong> Konzervativní růst 0→60 objednávek za rok<br/>
+                  🚀 <strong>Agresivní:</strong> Rychlý růst 0→300 objednávek (vyžaduje více investic)<br/>
+                  📅 <strong>Sezónní:</strong> Růst s ohledem na sezónní výkyvy v odvětví
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Revenue & Taxes - Blue Theme */}
+          <Card className="bg-blue-50/50 border-blue-200 p-6">
+            <h2 className="text-xl font-semibold text-blue-700 mb-4 flex items-center">
+              <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
+              Výnosy a daně
+            </h2>
+            <div className="space-y-4">
+              {/* Startup plan summary */}
+              <div className="bg-blue-100/50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium mb-2 text-blue-800">Založeno na plánu spuštění:</h4>
+                <div className="text-sm text-blue-600 space-y-1">
+                  <div>• Průměrně {Math.round(roiData.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12)} objednávek/měsíc</div>
+                  <div>• Spuštění v {monthNames[roiData.startupPlan.launchMonth]}</div>
+                  <div>• Růst z {roiData.startupPlan.monthlyOrders[0]} na {roiData.startupPlan.monthlyOrders[11]} objednávek za rok</div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="productPrice" className="text-sm font-medium">
+                    Cena produktu/služby
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="productPrice"
+                      type="number"
+                      value={roiData.revenue.productPrice}
+                      onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="pr-12"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                      Kč
+                    </span>
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    💡 <strong>Pozvolný start:</strong> Konzervativní růst 0→60 objednávek za rok<br/>
-                    🚀 <strong>Agresivní:</strong> Rychlý růst 0→300 objednávek (vyžaduje více investic)<br/>
-                    📅 <strong>Sezónní:</strong> Růst s ohledem na sezónní výkyvy v odvětví
+                    Počet objednávek se automaticky bere z plánu spuštění výše
                   </p>
                 </div>
-              </div>
-            </Card>
-
-            {/* Revenue & Taxes - Blue Theme */}
-            <Card className="bg-blue-50/50 border-blue-200 p-6">
-              <h2 className="text-xl font-semibold text-blue-700 mb-4 flex items-center">
-                <DollarSign className="w-5 h-5 mr-2 text-blue-600" />
-                Výnosy a daně
-              </h2>
-              <div className="space-y-4">
-                {/* Startup plan summary */}
-                <div className="bg-blue-100/50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-2 text-blue-800">Založeno na plánu spuštění:</h4>
-                  <div className="text-sm text-blue-600 space-y-1">
-                    <div>• Průměrně {Math.round(roiData.startupPlan.monthlyOrders.reduce((sum, orders) => sum + orders, 0) / 12)} objednávek/měsíc</div>
-                    <div>• Spuštění v {monthNames[roiData.startupPlan.launchMonth]}</div>
-                    <div>• Růst z {roiData.startupPlan.monthlyOrders[0]} na {roiData.startupPlan.monthlyOrders[11]} objednávek za rok</div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="productPrice" className="text-sm font-medium">
-                      Cena produktu/služby
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="productPrice"
-                        type="number"
-                        value={roiData.revenue.productPrice}
-                        onChange={(e) => updateRevenue('productPrice', parseInt(e.target.value) || 0)}
-                        placeholder="0"
-                        className="pr-12"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        Kč
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Počet objednávek se automaticky bere z plánu spuštění výše
-                    </p>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
-                      Daň z příjmu
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="incomeTaxRate"
-                        type="number"
-                        value={roiData.taxes.incomeTaxRate}
-                        onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
-                        placeholder="15"
-                        className="pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="growthReserveRate" className="text-sm font-medium">
-                      Rezerva na růst
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="growthReserveRate"
-                        type="number"
-                        value={roiData.taxes.growthReserveRate}
-                        onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
-                        placeholder="10"
-                        className="pr-8"
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-          
-          {/* Right Column - AI Analysis */}
-          <div className="space-y-6">
-            {/* AI Analysis */}
-            <Card className="card-apple p-6">
-              <div className="flex items-center mb-4">
-                <Brain className="w-6 h-6 mr-2 text-primary" />
-                <h2 className="text-xl font-semibold text-foreground">AI Analýza projektu</h2>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  {analysis.isViable ? (
-                    <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
-                  ) : (
-                    <AlertTriangle className="w-6 h-6 text-orange-500 mt-1 flex-shrink-0" />
-                  )}
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      {analysis.isViable ? "✅ Projekt je ekonomicky viabilní" : "⚠️ Projekt potřebuje optimalizaci"}
-                    </h3>
-                    <p className="text-muted-foreground">{analysis.reasoning}</p>
+              <Separator />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="incomeTaxRate" className="text-sm font-medium">
+                    Daň z příjmu
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="incomeTaxRate"
+                      type="number"
+                      value={roiData.taxes.incomeTaxRate}
+                      onChange={(e) => updateTax('incomeTaxRate', parseInt(e.target.value) || 0)}
+                      placeholder="15"
+                      className="pr-8"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                      %
+                    </span>
                   </div>
                 </div>
                 
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2">Doporučení:</h3>
-                  <ul className="space-y-1">
-                    {analysis.recommendations.map((recommendation, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {recommendation}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {breakEvenPoint && (
-                  <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
-                    <p className="text-sm text-muted-foreground">
-                      🎯 <strong>Break-even dosažen v měsíci {breakEvenPoint.monthName}</strong> - 
-                      od tohoto okamžiku začne projekt generovat zisk.
-                    </p>
+                <div className="space-y-2">
+                  <Label htmlFor="growthReserveRate" className="text-sm font-medium">
+                    Rezerva na růst
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="growthReserveRate"
+                      type="number"
+                      value={roiData.taxes.growthReserveRate}
+                      onChange={(e) => updateTax('growthReserveRate', parseInt(e.target.value) || 0)}
+                      placeholder="10"
+                      className="pr-8"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm">
+                      %
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
-            </Card>
+            </div>
+          </Card>
+          
+          {/* AI Analysis */}
+          <Card className="card-apple p-6">
+            <div className="flex items-center mb-4">
+              <Brain className="w-6 h-6 mr-2 text-primary" />
+              <h2 className="text-xl font-semibold text-foreground">AI Analýza projektu</h2>
+            </div>
             
-            {/* Completion */}
-            <Card className="card-apple p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
-              <div className="text-center space-y-4">
-                <h3 className="text-lg font-semibold text-foreground">
-                  Analýza dokončena
-                </h3>
-                <p className="text-muted-foreground">
-                  {analysis.isViable 
-                    ? "Projekt má dobré finanční základy včetně sezónních vlivů. Můžete pokračovat k implementaci."
-                    : "Projekt vyžaduje optimalizaci před pokračováním. Prostudujte si doporučení výše."
-                  }
-                </p>
-                <Button 
-                  onClick={onComplete}
-                  className="btn-apple px-8"
-                  disabled={progressPercentage < 80}
-                >
-                  {analysis.isViable ? "Pokračovat na implementaci" : "Dokončit analýzu"}
-                </Button>
-                {progressPercentage < 80 && (
-                  <p className="text-xs text-muted-foreground">
-                    Vyplňte alespoň 80% polí pro pokračování
-                  </p>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                {analysis.isViable ? (
+                  <CheckCircle className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
+                ) : (
+                  <AlertTriangle className="w-6 h-6 text-orange-500 mt-1 flex-shrink-0" />
                 )}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">
+                    {analysis.isViable ? "✅ Projekt je ekonomicky viabilní" : "⚠️ Projekt potřebuje optimalizaci"}
+                  </h3>
+                  <p className="text-muted-foreground">{analysis.reasoning}</p>
+                </div>
               </div>
-            </Card>
-          </div>
+              
+              <div>
+                <h3 className="font-semibold text-foreground mb-2">Doporučení:</h3>
+                <ul className="space-y-1">
+                  {analysis.recommendations.map((recommendation, index) => (
+                    <li key={index} className="text-sm text-muted-foreground">
+                      • {recommendation}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {breakEvenPoint && (
+                <div className="mt-4 p-3 bg-success/10 rounded-lg border border-success/20">
+                  <p className="text-sm text-muted-foreground">
+                    🎯 <strong>Break-even dosažen v měsíci {breakEvenPoint.monthName}</strong> - 
+                    od tohoto okamžiku začne projekt generovat zisk.
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+          
+          {/* Completion */}
+          <Card className="card-apple p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+            <div className="text-center space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">
+                Analýza dokončena
+              </h3>
+              <p className="text-muted-foreground">
+                {analysis.isViable 
+                  ? "Projekt má dobré finanční základy včetně sezónních vlivů. Můžete pokračovat k implementaci."
+                  : "Projekt vyžaduje optimalizaci před pokračováním. Prostudujte si doporučení výše."
+                }
+              </p>
+              <Button 
+                onClick={onComplete}
+                className="btn-apple px-8"
+                disabled={progressPercentage < 80}
+              >
+                {analysis.isViable ? "Pokračovat na implementaci" : "Dokončit analýzu"}
+              </Button>
+              {progressPercentage < 80 && (
+                <p className="text-xs text-muted-foreground">
+                  Vyplňte alespoň 80% polí pro pokračování
+                </p>
+              )}
+            </div>
+          </Card>
         </div>
       </div>
     </div>
