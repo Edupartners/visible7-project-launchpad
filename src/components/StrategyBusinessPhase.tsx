@@ -1045,13 +1045,13 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-12 gap-1">
                       {roiData.marketingCosts[field.key as keyof typeof roiData.marketingCosts].map((cost, monthIndex) => (
                         <div key={monthIndex} className="space-y-1">
                           <Label className="text-xs text-muted-foreground text-center block">
                             {monthNames[monthIndex]}
                           </Label>
-                          <Input
+                           <Input
                             type="number"
                             value={cost}
                             onChange={(e) => updateMarketingCost(
@@ -1059,7 +1059,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                               monthIndex,
                               parseInt(e.target.value) || 0
                             )}
-                            className="text-center text-sm"
+                            className="text-center text-xs h-8"
                             min="0"
                           />
                         </div>
@@ -1148,13 +1148,13 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-12 gap-1">
                       {roiData.operationalCosts[field.key as keyof typeof roiData.operationalCosts].map((cost, monthIndex) => (
                         <div key={monthIndex} className="space-y-1">
                           <Label className="text-xs text-muted-foreground text-center block">
                             {monthNames[monthIndex]}
                           </Label>
-                          <Input
+                           <Input
                             type="number"
                             value={cost}
                             onChange={(e) => updateOperationalCost(
@@ -1162,7 +1162,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
                               monthIndex,
                               parseInt(e.target.value) || 0
                             )}
-                            className="text-center text-sm"
+                            className="text-center text-xs h-8"
                             min="0"
                           />
                         </div>
@@ -1438,94 +1438,6 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
           
           {/* Right Column - Results & Analysis */}
           <div className="space-y-6">
-            {/* Key Metrics */}
-            <Card className="card-apple p-6">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Klíčové ukazatele</h2>
-              
-              {/* Relativní ukazatele */}
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">Relativní ukazatele</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-2xl font-bold text-primary">
-                      {analysis.roi.toFixed(1)}%
-                    </div>
-                    <div className="text-sm text-muted-foreground">ROI (roční)</div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-2xl font-bold text-primary">
-                      {analysis.pno.toFixed(1)}%
-                    </div>
-                    <div className="text-sm text-muted-foreground">PNO</div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-2xl font-bold text-primary">
-                      {analysis.breakEvenMonth > 24 ? "25+" : analysis.breakEvenMonth}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Break-even (měsíc)</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Absolutní částky */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">Absolutní částky (12 měsíců)</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-green-500/5 rounded-lg border border-green-500/20">
-                    <div className="text-2xl font-bold text-green-600">
-                      {(analysis.totalProfit / 1000).toFixed(0)}k Kč
-                    </div>
-                    <div className="text-sm text-muted-foreground">Celkový zisk</div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-red-500/5 rounded-lg border border-red-500/20">
-                    <div className="text-2xl font-bold text-red-600">
-                      {(analysis.totalCosts / 1000).toFixed(0)}k Kč
-                    </div>
-                    <div className="text-sm text-muted-foreground">Celkové náklady</div>
-                  </div>
-                  
-                  <div className="text-center p-4 bg-blue-500/5 rounded-lg border border-blue-500/20">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {(analysis.totalRevenue / 1000).toFixed(0)}k Kč
-                    </div>
-                    <div className="text-sm text-muted-foreground">Celkový obrat</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Dodatečné metriky */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="text-center p-3 bg-accent/10 rounded-lg">
-                  <div className="text-lg font-semibold text-foreground">
-                    {(analysis.averageMonthlyProfit / 1000).toFixed(1)}k Kč
-                  </div>
-                  <div className="text-xs text-muted-foreground">Průměrný měsíční zisk</div>
-                </div>
-                
-                <div className="text-center p-3 bg-accent/10 rounded-lg">
-                  <div className="text-lg font-semibold text-foreground">
-                    {analysis.profitMargin.toFixed(1)}%
-                  </div>
-                  <div className="text-xs text-muted-foreground">Marže</div>
-                </div>
-              </div>
-              
-              <div className="mt-4 p-3 rounded-lg border">
-                <div className="text-sm text-muted-foreground mb-1">Doporučená PNO (marketing vs. marže)</div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full" 
-                      style={{ width: '60%' }}
-                    ></div>
-                  </div>
-                  <span className="text-sm text-muted-foreground">40-60%</span>
-                </div>
-              </div>
-            </Card>
             
             {/* Revenue & Taxes */}
             <Card className="card-apple p-6">
