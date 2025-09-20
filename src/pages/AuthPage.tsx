@@ -20,7 +20,7 @@ const AuthPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/home');
     }
   }, [user, navigate]);
 
@@ -31,7 +31,7 @@ const AuthPage = () => {
     const { error } = await signIn(email, password);
     
     if (!error) {
-      navigate('/');
+      navigate('/home');
     }
     
     setIsLoading(false);
