@@ -1,18 +1,37 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserProfile, UserSettings, defaultUserSettings } from '@/types/user';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+interface Profile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 interface AuthContextType {
-  currentUser: string | null;
+  user: User | null;
+  session: Session | null;
+  profile: Profile | null;
+  loading: boolean;
+  // Keep backward compatibility
   isAuthenticated: boolean;
-  isLoading: boolean;
+  currentUser: string | null;
   hasPromoAccess: boolean;
   userName: string | null;
-  userProfile: UserProfile | null;
-  userSettings: UserSettings;
+  userProfile: any; // Backward compatibility
+  userSettings: any; // Backward compatibility
+  signUp: (email: string, password: string, firstName?: string, lastName?: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+  updateProfile: (updates: any) => any; // More flexible for backward compatibility
+  updateSettings: (settings: any) => void; // Backward compatibility
+  // Keep backward compatibility
   login: (email: string, hasPromoAccess?: boolean, name?: string) => void;
   logout: () => void;
-  updateProfile: (profile: Partial<UserProfile>) => void;
-  updateSettings: (settings: Partial<UserSettings>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,167 +44,232 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Backward compatibility states
   const [hasPromoAccess, setHasPromoAccess] = useState<boolean>(false);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [userSettings, setUserSettings] = useState<UserSettings>(defaultUserSettings);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   useEffect(() => {
-    // Check if user is already logged in on app start
-    const storedEmail = localStorage.getItem('currentUser');
+    // Check localStorage for promo access (backward compatibility)
     const storedPromoAccess = localStorage.getItem('hasPromoAccess') === 'true';
-    const storedUserName = localStorage.getItem('userName');
-    const storedProfile = localStorage.getItem('userProfile');
-    const storedSettings = localStorage.getItem('userSettings');
-    
-    if (storedEmail) {
-      setCurrentUser(storedEmail);
-      setHasPromoAccess(storedPromoAccess);
-      setUserName(storedUserName);
-      
-      if (storedProfile) {
-        try {
-          const parsedProfile = JSON.parse(storedProfile);
-          // Migrate old name field to firstName/lastName if needed
-          if (parsedProfile.name && !parsedProfile.firstName && !parsedProfile.lastName) {
-            const nameParts = parsedProfile.name.split(' ');
-            parsedProfile.firstName = nameParts[0] || '';
-            parsedProfile.lastName = nameParts.slice(1).join(' ') || '';
-          }
-          setUserProfile(parsedProfile);
-        } catch (error) {
-          console.warn('Failed to parse stored profile:', error);
+    setHasPromoAccess(storedPromoAccess);
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Defer profile fetching to avoid potential deadlocks
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
         }
+        
+        setLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          fetchProfile(session.user.id);
+        }, 0);
       }
       
-      if (storedSettings) {
-        try {
-          const parsedSettings = JSON.parse(storedSettings);
-          // Migrate old settings structure to new simplified one
-          const migratedSettings = {
-            privacy: {
-              dataProcessingConsent: parsedSettings.account?.allowAnalytics ?? defaultUserSettings.privacy.dataProcessingConsent,
-              marketingConsent: parsedSettings.notifications?.marketing ?? defaultUserSettings.privacy.marketingConsent,
-              analyticsConsent: parsedSettings.account?.allowAnalytics ?? defaultUserSettings.privacy.analyticsConsent,
-            },
-            basic: {
-              language: parsedSettings.general?.language ?? defaultUserSettings.basic.language,
-              theme: parsedSettings.display?.theme ?? defaultUserSettings.basic.theme,
-            },
-            communication: {
-              emailNotifications: parsedSettings.notifications?.email ?? defaultUserSettings.communication.emailNotifications,
-              newsletter: parsedSettings.account?.subscribeNewsletter ?? defaultUserSettings.communication.newsletter,
-            }
-          };
-          setUserSettings(migratedSettings);
-        } catch (error) {
-          console.warn('Failed to parse stored settings:', error);
-          setUserSettings(defaultUserSettings);
-        }
-      }
-    }
-    
-    setIsLoading(false);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
+  const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+        }
+      }
+    });
+
+    if (error) {
+      console.error('Sign up error:', error);
+      toast.error(error.message);
+    } else {
+      toast.success('Zkontrolujte svůj email pro ověření účtu!');
+    }
+
+    return { error };
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error('Sign in error:', error);
+      toast.error('Neplatné přihlašovací údaje');
+    } else {
+      toast.success('Úspěšně přihlášen!');
+    }
+
+    return { error };
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Sign out error:', error);
+      toast.error('Chyba při odhlášení');
+    } else {
+      // Clear localStorage for backward compatibility
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('hasPromoAccess');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userProfile');
+      localStorage.removeItem('userSettings');
+      setHasPromoAccess(false);
+      toast.success('Úspěšně odhlášen!');
+    }
+  };
+
+  const updateProfile = async (updates: any) => {
+    if (!user) return { error: new Error('No user logged in') };
+
+    // Handle legacy updates format
+    const profileUpdates: Partial<Profile> = {};
+    if (updates.firstName) profileUpdates.first_name = updates.firstName;
+    if (updates.lastName) profileUpdates.last_name = updates.lastName;
+    if (updates.first_name) profileUpdates.first_name = updates.first_name;
+    if (updates.last_name) profileUpdates.last_name = updates.last_name;
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update(profileUpdates)
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('Profile update error:', error);
+      toast.error('Chyba při aktualizaci profilu');
+    } else {
+      toast.success('Profil byl aktualizován!');
+      // Refresh profile data
+      await fetchProfile(user.id);
+    }
+
+    return { error };
+  };
+
+  // Backward compatibility for settings
+  const updateSettings = (settings: any) => {
+    console.warn('updateSettings is deprecated - settings are now handled differently');
+    // For now, just save to localStorage for backward compatibility
+    localStorage.setItem('userSettings', JSON.stringify(settings));
+  };
+
+  // Backward compatibility methods
   const login = (email: string, hasPromoAccess?: boolean, name?: string) => {
-    console.log("🔐 AuthContext - Login:", { email, hasPromoAccess, name });
-    
-    setCurrentUser(email);
-    localStorage.setItem('currentUser', email);
-    
+    // This is for backward compatibility - redirect to proper auth
+    console.warn('Using deprecated login method. Use signIn instead.');
     if (hasPromoAccess) {
       setHasPromoAccess(true);
       localStorage.setItem('hasPromoAccess', 'true');
-    } else {
-      setHasPromoAccess(false);
-      localStorage.removeItem('hasPromoAccess');
-    }
-    
-    if (name) {
-      setUserName(name);
-      localStorage.setItem('userName', name);
-    }
-
-    // Create default profile if none exists
-    if (!userProfile) {
-      const defaultName = name || email.split('@')[0];
-      const nameParts = defaultName.split(' ');
-      const defaultProfile: UserProfile = {
-        id: crypto.randomUUID(),
-        email,
-        name: defaultName,
-        firstName: nameParts[0] || '',
-        lastName: nameParts.slice(1).join(' ') || '',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-      };
-      setUserProfile(defaultProfile);
-      localStorage.setItem('userProfile', JSON.stringify(defaultProfile));
     }
   };
 
   const logout = () => {
-    console.log("🚪 AuthContext - Logout");
-    setCurrentUser(null);
-    setHasPromoAccess(false);
-    setUserName(null);
-    setUserProfile(null);
-    setUserSettings(defaultUserSettings);
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('hasPromoAccess');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('userSettings');
+    signOut();
   };
 
-  const updateProfile = (profileUpdates: Partial<UserProfile>) => {
-    if (!userProfile) return;
-    
-    const updatedProfile = { ...userProfile, ...profileUpdates };
-    
-    // Update the name field if firstName or lastName changed
-    if (profileUpdates.firstName || profileUpdates.lastName) {
-      const firstName = profileUpdates.firstName || userProfile.firstName || '';
-      const lastName = profileUpdates.lastName || userProfile.lastName || '';
-      updatedProfile.name = `${firstName} ${lastName}`.trim();
+  // Computed values for backward compatibility
+  const isAuthenticated = !!user;
+  const currentUser = user?.email || null;
+  const userName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || user?.email : null;
+  
+  // Create userProfile for backward compatibility
+  const userProfile = user && profile ? {
+    id: profile.id,
+    email: user.email || '',
+    name: userName,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    createdAt: profile.created_at,
+    lastLogin: new Date().toISOString(),
+  } : null;
+
+  // Default settings for backward compatibility
+  const userSettings = {
+    privacy: {
+      dataProcessingConsent: true,
+      marketingConsent: false,
+      analyticsConsent: false,
+    },
+    basic: {
+      language: 'cs',
+      theme: 'system',
+    },
+    communication: {
+      emailNotifications: true,
+      newsletter: false,
     }
-    
-    setUserProfile(updatedProfile);
-    localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-    
-    // Update userName if name was changed
-    if (updatedProfile.name) {
-      setUserName(updatedProfile.name);
-      localStorage.setItem('userName', updatedProfile.name);
-    }
   };
 
-  const updateSettings = (settingsUpdates: Partial<UserSettings>) => {
-    const updatedSettings = { ...userSettings, ...settingsUpdates };
-    setUserSettings(updatedSettings);
-    localStorage.setItem('userSettings', JSON.stringify(updatedSettings));
-  };
-
-  const value = {
+  const value: AuthContextType = {
+    user,
+    session,
+    profile,
+    loading,
+    isAuthenticated,
     currentUser,
-    isAuthenticated: !!currentUser,
-    isLoading,
     hasPromoAccess,
     userName,
     userProfile,
     userSettings,
+    signUp,
+    signIn,
+    signOut,
+    updateProfile,
+    updateSettings,
     login,
     logout,
-    updateProfile,
-    updateSettings
   };
 
   return (
