@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dashboard } from "@/components/Dashboard";
+import { Footer } from "@/components/layout/Footer";
 import { SimpleRegistrationModal } from "@/components/SimpleRegistrationModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { getTrialStatus, cleanupOldBetaAccess } from "@/lib/promoCodes";
@@ -61,6 +62,8 @@ const HomePage = () => {
         onLogout={logout} 
         isAuthenticated={isAuthenticated}
       />
+      
+      <Footer />
       
       <SimpleRegistrationModal 
         isOpen={showRegistrationModal}
