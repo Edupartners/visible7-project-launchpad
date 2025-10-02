@@ -60,7 +60,7 @@ export const WordPressInstallForm = ({ open, onOpenChange }: WordPressInstallFor
     };
 
     try {
-      const response = await fetch('https://api.micek.group/api/index.php', {
+      const response = await fetch('http://api.micek.group/api/index.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
