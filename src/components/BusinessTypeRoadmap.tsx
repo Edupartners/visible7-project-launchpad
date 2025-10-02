@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BackButton } from "@/components/ui/back-button";
-import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Lock, Crown, Shield, FileText, Zap } from "lucide-react";
+import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Lock, Crown, Shield, FileText, Zap, Settings } from "lucide-react";
 import { businessTypes, type RoadmapStep } from "@/types/implementation";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { TemplatePaymentModal } from "./TemplatePaymentModal";
+import { WordPressInstallForm } from "./WordPressInstallForm";
 
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
@@ -24,6 +25,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPayme
     businessType?.steps || []
   );
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showInstallForm, setShowInstallForm] = useState(false);
 
   useEffect(() => {
     if (businessType && steps.length === 0) {
@@ -276,6 +278,14 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPayme
                       Po zakoupení přístupu
                     </Button>
                   )}
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => setShowInstallForm(true)}
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Automatická instalace
+                  </Button>
                   <Button variant="outline" className="flex-1">
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Návod na import
@@ -383,6 +393,12 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPayme
         onClose={() => setShowPaymentModal(false)}
         onSuccess={handlePaymentSuccessInternal}
         templateName={businessType?.name || 'WordPress šablonu'}
+      />
+
+      {/* WordPress Install Form */}
+      <WordPressInstallForm
+        open={showInstallForm}
+        onOpenChange={setShowInstallForm}
       />
     </div>
   );
