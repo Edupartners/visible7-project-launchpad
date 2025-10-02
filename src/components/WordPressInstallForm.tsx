@@ -60,13 +60,17 @@ export const WordPressInstallForm = ({ open, onOpenChange }: WordPressInstallFor
     };
 
     try {
-      const response = await fetch('http://api.micek.group/api/index.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wordpress-install-proxy`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       const responseText = await response.text();
       let parsedResult: InstallationResult;
