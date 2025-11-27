@@ -8,7 +8,7 @@ const HomePage = () => {
       <Dashboard 
         userEmail="guest@example.com" 
         onLogout={() => {}} 
-        isAuthenticated={false}
+        isAuthenticated={true}
       />
       
       <Footer />

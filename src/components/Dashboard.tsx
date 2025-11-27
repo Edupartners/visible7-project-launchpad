@@ -111,18 +111,12 @@ export const Dashboard = ({
   const allCoreCompleted = coreCompletedCount === 3;
   
   const handlePhaseClick = (phaseId: number) => {
-    console.log("🖱️ Phase click:", { phaseId, hasAccess, promoCodeAccess, isAuthenticated });
-    
-    // If user is not authenticated, prevent navigation
-    if (!isAuthenticated) {
-      console.log("❌ User not authenticated, blocking navigation");
-      return;
-    }
+    console.log("🖱️ Phase click:", { phaseId, hasAccess, promoCodeAccess });
     
     const phase = phases.find(p => p.id === phaseId);
     console.log("📋 Phase details:", { phase: phase?.title, isFree: phase?.isFree, previewOnly: phase?.previewOnly });
     
-    // Free phases (1-4) - always accessible for authenticated users
+    // Free phases (1-4) - always accessible
     if (phase?.isFree) {
       console.log("✅ Free phase, navigating to:", phase.route);
       navigate(phase.route || '/');
@@ -207,9 +201,6 @@ export const Dashboard = ({
   };
 
   const canAccessPhase = (phaseId: number) => {
-    // If user is not authenticated, they can't access any phase
-    if (!isAuthenticated) return false;
-    
     const phase = phases.find(p => p.id === phaseId);
     if (phase?.isFree) return true;
     if (phase?.previewOnly) return true; // Preview phases are always "accessible" 
@@ -220,11 +211,10 @@ export const Dashboard = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
       {/* Unified Header */}
-      <UnifiedHeader showTrialInfo={isAuthenticated} />
+      <UnifiedHeader showTrialInfo={false} />
       
-      {/* Admin Controls Bar - only show for authenticated users */}
-      {isAuthenticated && (
-        <div className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
+      {/* Admin Controls Bar */}
+      <div className="border-b border-border/50 bg-background/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-12">
               <div className="flex items-center space-x-2">
@@ -271,34 +261,10 @@ export const Dashboard = ({
             </div>
           </div>
         </div>
-      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Registration prompt for unauthenticated users */}
-        {!isAuthenticated && (
-          <div className="mb-8">
-            <Card className="card-apple p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Registrujte se pro přístup k VISIBLE7
-                </h2>
-                <p className="text-apple-body mb-6">
-                  Dokončete rychlou registraci pro odemknutí fází 1-3 zdarma navždy
-                </p>
-                <Button 
-                  onClick={() => window.location.href = '/?register=true'}
-                  className="btn-apple text-base px-8"
-                >
-                  Začít registraci zdarma
-                </Button>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Progress Overview - only show for authenticated users */}
-        {isAuthenticated && (
-          <div className="mb-8">
+        {/* Progress Overview */}
+        <div className="mb-8">
             <Card className="card-apple p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -314,10 +280,9 @@ export const Dashboard = ({
                   <div className="text-sm text-muted-foreground">hotovo</div>
                 </div>
               </div>
-              <Progress value={progressPercentage} className="h-3" />
-            </Card>
-          </div>
-        )}
+            <Progress value={progressPercentage} className="h-3" />
+          </Card>
+        </div>
 
         {/* Fáze */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -393,8 +358,8 @@ export const Dashboard = ({
           })}
         </div>
 
-        {/* Investor Pitch CTA - only show for authenticated users */}
-        {isAuthenticated && allCoreCompleted && (
+        {/* Investor Pitch CTA */}
+        {allCoreCompleted && (
           <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -425,8 +390,8 @@ export const Dashboard = ({
           </Card>
         )}
 
-        {/* CTA pro odemknutí pokročilých fází - only show for authenticated users */}
-        {isAuthenticated && !hasAccess && !promoCodeAccess && allCoreCompleted && (
+        {/* CTA pro odemknutí pokročilých fází */}
+        {!hasAccess && !promoCodeAccess && allCoreCompleted && (
           <Card className="card-apple mt-8 p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
             <div className="text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -449,8 +414,8 @@ export const Dashboard = ({
         )}
       </div>
 
-      {/* Pricing Modal - only show for authenticated users */}
-      {isAuthenticated && showPricingModal && (
+      {/* Pricing Modal */}
+      {showPricingModal && (
         <PricingModal 
           onClose={() => setShowPricingModal(false)} 
           onSuccess={handlePaymentSuccess} 
