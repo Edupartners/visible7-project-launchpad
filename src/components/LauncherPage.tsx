@@ -49,8 +49,7 @@ export const LauncherPage = ({
   onAccessGranted
 }: LauncherPageProps) => {
   const handleStartFree = () => {
-    console.log('Redirecting to authentication');
-    window.location.href = '/auth';
+    onAccessGranted();
   };
 
   return <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
