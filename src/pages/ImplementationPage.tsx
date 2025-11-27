@@ -1,17 +1,10 @@
 import { ImplementationPhase } from "@/components/ImplementationPhase";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { usePersistedState } from "@/hooks/usePersistedState";
 
 const ImplementationPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completed_phases", []);
-
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
 
   const handleComplete = () => {
     // Mark phase 4 as completed

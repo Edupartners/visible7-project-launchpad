@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Lock, Crown, CheckCircle, Search, BarChart3, Target, TrendingUp, Share2, Mail, MessageSquare, Users, PenTool } from "lucide-react";
 import { useState } from "react";
 import { PricingModal } from "./PricingModal";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface PhasePreviewProps {
   phaseId: number;
@@ -83,7 +82,6 @@ export const PhasePreview = ({
   estimatedTime 
 }: PhasePreviewProps) => {
   const [showPricingModal, setShowPricingModal] = useState(false);
-  const { hasPromoAccess } = useAuth();
 
   const handlePaymentSuccess = () => {
     setShowPricingModal(false);
@@ -186,15 +184,14 @@ export const PhasePreview = ({
           })}
         </div>
 
-        {/* Unlock CTA - only show if user doesn't have promo access */}
-        {!hasPromoAccess && (
-          <Card className="card-apple p-8 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Crown className="w-8 h-8 text-primary" />
-              </div>
-              <h3 className="text-2xl font-semibold text-foreground mb-2">
-                Odemkněte pokročilé fáze
+        {/* Phase complete message or locked phases message */}
+        <Card className="card-apple p-8 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Crown className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
+              Odemkněte pokročilé fáze
               </h3>
               <p className="text-apple-body mb-6 max-w-2xl mx-auto">
                 Získejte přístup k plné verzi fází 5-7 s interaktivními nástroji, 
@@ -232,8 +229,7 @@ export const PhasePreview = ({
               </div>
             </div>
           </Card>
-        )}
-      </div>
+        </div>
 
       {/* Pricing Modal */}
       {showPricingModal && (
