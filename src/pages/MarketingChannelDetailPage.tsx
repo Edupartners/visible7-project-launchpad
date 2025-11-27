@@ -1,16 +1,9 @@
 import { MarketingChannelDetail } from "@/components/MarketingChannelDetail";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 
 const MarketingChannelDetailPage = () => {
   const navigate = useNavigate();
   const { channelId } = useParams<{ channelId: string }>();
-  const { isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
 
   const handleBack = () => {
     navigate('/home');

@@ -4,11 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import AuthPage from "./pages/AuthPage";
 import LauncherPage from "./pages/LauncherPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import SettingsPage from "./pages/SettingsPage";
@@ -32,101 +28,33 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LauncherPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/home" element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <UserProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/vision" element={
-              <ProtectedRoute>
-                <VisionPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/ideation" element={
-              <ProtectedRoute>
-                <IdeationPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/strategy" element={
-              <ProtectedRoute>
-                <StrategyPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/implementation" element={
-              <ProtectedRoute>
-                <ImplementationPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/benchmarking-phase" element={
-              <ProtectedRoute>
-                <BenchmarkingPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/launch" element={
-              <ProtectedRoute>
-                <LaunchPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/expansion" element={
-              <ProtectedRoute>
-                <ExpansionPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/business-type/:businessTypeId" element={
-              <ProtectedRoute>
-                <BusinessTypeDetailPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/marketing-channel/:channelId" element={
-              <ProtectedRoute>
-                <MarketingChannelDetailPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/investor-pitch" element={
-              <ProtectedRoute>
-                <InvestorPitchPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/benchmarking-phase/preview" element={
-              <ProtectedRoute>
-                <BenchmarkingPreviewPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/launch/preview" element={
-              <ProtectedRoute>
-                <LaunchPreviewPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/expansion/preview" element={
-              <ProtectedRoute>
-                <ExpansionPreviewPage />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LauncherPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/profile" element={<UserProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/vision" element={<VisionPage />} />
+          <Route path="/ideation" element={<IdeationPage />} />
+          <Route path="/strategy" element={<StrategyPage />} />
+          <Route path="/implementation" element={<ImplementationPage />} />
+          <Route path="/benchmarking-phase" element={<BenchmarkingPage />} />
+          <Route path="/launch" element={<LaunchPage />} />
+          <Route path="/expansion" element={<ExpansionPage />} />
+          <Route path="/business-type/:businessTypeId" element={<BusinessTypeDetailPage />} />
+          <Route path="/marketing-channel/:channelId" element={<MarketingChannelDetailPage />} />
+          <Route path="/investor-pitch" element={<InvestorPitchPage />} />
+          <Route path="/benchmarking-phase/preview" element={<BenchmarkingPreviewPage />} />
+          <Route path="/launch/preview" element={<LaunchPreviewPage />} />
+          <Route path="/expansion/preview" element={<ExpansionPreviewPage />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

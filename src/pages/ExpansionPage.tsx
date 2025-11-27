@@ -3,21 +3,14 @@ import { ExpansionPhase } from "@/components/ExpansionPhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { usePersistedState } from "@/hooks/usePersistedState";
 import { useState } from "react";
 import { TrendingUp } from "lucide-react";
 
 const ExpansionPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completed_phases", []);
   const [showIntro, setShowIntro] = useState(true);
-
-  if (!isAuthenticated) {
-    navigate('/login');
-    return null;
-  }
 
   const handleComplete = () => {
     setCompletedPhases(prev => {
