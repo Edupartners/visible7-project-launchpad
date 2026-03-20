@@ -198,11 +198,7 @@ export const Dashboard = ({
   };
 
   const canAccessPhase = (phaseId: number) => {
-    const phase = phases.find(p => p.id === phaseId);
-    if (phase?.isFree) return true;
-    if (phase?.previewOnly) return true; // Preview phases are always "accessible" 
-    if (hasAccess || promoCodeAccess) return true;
-    return false;
+    return true;
   };
 
   return (
