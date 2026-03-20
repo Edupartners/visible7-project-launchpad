@@ -315,11 +315,6 @@ export const Dashboard = ({
                         ZDARMA
                       </Badge>
                     )}
-                    {phase.previewOnly && !hasAccess && !promoCodeAccess && (
-                      <Badge variant="outline" className="text-xs">
-                        NÁHLED
-                      </Badge>
-                    )}
                     {isCompleted && (
                       <Badge className="bg-primary/10 text-primary border-primary/20">
                         <CheckCircle className="w-3 h-3 mr-1" />
