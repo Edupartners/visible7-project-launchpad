@@ -111,7 +111,7 @@ export const Dashboard = ({
     console.log("🖱️ Phase click:", { phaseId, hasAccess, promoCodeAccess });
     
     const phase = phases.find(p => p.id === phaseId);
-    console.log("📋 Phase details:", { phase: phase?.title, isFree: phase?.isFree, previewOnly: phase?.previewOnly });
+    console.log("📋 Phase details:", { phase: phase?.title, isFree: phase?.isFree });
     
     // Free phases (1-4) - always accessible
     if (phase?.isFree) {
