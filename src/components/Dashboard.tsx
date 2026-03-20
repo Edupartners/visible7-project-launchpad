@@ -58,8 +58,7 @@ const phases = [
     description: "Identifikujte nejefektivnější kanály pro váš segment",
     icon: BarChart3,
     estimatedTime: "35 min",
-    isFree: false,
-    previewOnly: true, // New property for preview mode
+    isFree: true,
     route: "/benchmarking-phase"
   },
   {
@@ -69,8 +68,7 @@ const phases = [
     description: "Připravte si detailní plán uvedení produktu na trh",
     icon: Rocket,
     estimatedTime: "40 min",
-    isFree: false,
-    previewOnly: true, // New property for preview mode
+    isFree: true,
     route: "/launch"
   },
   {
@@ -80,8 +78,7 @@ const phases = [
     description: "Strategie pro rozšiřování a zvyšování tržního podílu",
     icon: Layers,
     estimatedTime: "50 min",
-    isFree: false,
-    previewOnly: true, // New property for preview mode
+    isFree: true,
     route: "/expansion"
   }
 ];
