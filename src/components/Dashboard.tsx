@@ -120,8 +120,8 @@ export const Dashboard = ({
       return;
     }
     
-    // Paid phases (5-7) - check access and navigate accordingly
-    if (phase?.previewOnly) {
+    // Fallback for any non-free phase
+    if (phase) {
       const userHasAccess = hasAccess || promoCodeAccess;
       console.log("💰 Paid phase access check:", { 
         userHasAccess, 
