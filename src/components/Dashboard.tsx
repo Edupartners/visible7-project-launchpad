@@ -336,7 +336,7 @@ export const Dashboard = ({
                     {isAccessible && (
                       <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
                         <Play className="w-3 h-3 mr-1" />
-                        {phase.previewOnly && !hasAccess && !promoCodeAccess ? 'Náhled' : isCompleted ? 'Znovu' : 'Začít'}
+                        {isCompleted ? 'Znovu' : 'Začít'}
                       </Button>
                     )}
                   </div>
