@@ -58,8 +58,7 @@ const phases = [
     description: "Identifikujte nejefektivnější kanály pro váš segment",
     icon: BarChart3,
     estimatedTime: "35 min",
-    isFree: false,
-    previewOnly: true, // New property for preview mode
+    isFree: true,
     route: "/benchmarking-phase"
   },
   {
@@ -69,8 +68,7 @@ const phases = [
     description: "Připravte si detailní plán uvedení produktu na trh",
     icon: Rocket,
     estimatedTime: "40 min",
-    isFree: false,
-    previewOnly: true, // New property for preview mode
+    isFree: true,
     route: "/launch"
   },
   {
@@ -80,8 +78,7 @@ const phases = [
     description: "Strategie pro rozšiřování a zvyšování tržního podílu",
     icon: Layers,
     estimatedTime: "50 min",
-    isFree: false,
-    previewOnly: true, // New property for preview mode
+    isFree: true,
     route: "/expansion"
   }
 ];
@@ -114,7 +111,7 @@ export const Dashboard = ({
     console.log("🖱️ Phase click:", { phaseId, hasAccess, promoCodeAccess });
     
     const phase = phases.find(p => p.id === phaseId);
-    console.log("📋 Phase details:", { phase: phase?.title, isFree: phase?.isFree, previewOnly: phase?.previewOnly });
+    console.log("📋 Phase details:", { phase: phase?.title, isFree: phase?.isFree });
     
     // Free phases (1-4) - always accessible
     if (phase?.isFree) {
@@ -123,8 +120,8 @@ export const Dashboard = ({
       return;
     }
     
-    // Paid phases (5-7) - check access and navigate accordingly
-    if (phase?.previewOnly) {
+    // Fallback for any non-free phase
+    if (phase) {
       const userHasAccess = hasAccess || promoCodeAccess;
       console.log("💰 Paid phase access check:", { 
         userHasAccess, 
@@ -201,11 +198,7 @@ export const Dashboard = ({
   };
 
   const canAccessPhase = (phaseId: number) => {
-    const phase = phases.find(p => p.id === phaseId);
-    if (phase?.isFree) return true;
-    if (phase?.previewOnly) return true; // Preview phases are always "accessible" 
-    if (hasAccess || promoCodeAccess) return true;
-    return false;
+    return true;
   };
 
   return (
@@ -322,11 +315,6 @@ export const Dashboard = ({
                         ZDARMA
                       </Badge>
                     )}
-                    {phase.previewOnly && !hasAccess && !promoCodeAccess && (
-                      <Badge variant="outline" className="text-xs">
-                        NÁHLED
-                      </Badge>
-                    )}
                     {isCompleted && (
                       <Badge className="bg-primary/10 text-primary border-primary/20">
                         <CheckCircle className="w-3 h-3 mr-1" />
@@ -348,7 +336,7 @@ export const Dashboard = ({
                     {isAccessible && (
                       <Button size="sm" variant="ghost" className="text-primary hover:text-primary/80">
                         <Play className="w-3 h-3 mr-1" />
-                        {phase.previewOnly && !hasAccess && !promoCodeAccess ? 'Náhled' : isCompleted ? 'Znovu' : 'Začít'}
+                        {isCompleted ? 'Znovu' : 'Začít'}
                       </Button>
                     )}
                   </div>
