@@ -4,8 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+import { AuthGate } from "@/components/AuthGate";
 import LauncherPage from "./pages/LauncherPage";
+import HomePage from "./pages/HomePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 
@@ -26,6 +27,31 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Vnitřní (chráněné) routy - přístupné jen po přihlášení, AuthGate je obaluje společně.
+const ProtectedRoutes = () => (
+  <AuthGate>
+    <Routes>
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/profile" element={<UserProfilePage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/vision" element={<VisionPage />} />
+      <Route path="/ideation" element={<IdeationPage />} />
+      <Route path="/strategy" element={<StrategyPage />} />
+      <Route path="/implementation" element={<ImplementationPage />} />
+      <Route path="/benchmarking-phase" element={<BenchmarkingPage />} />
+      <Route path="/launch" element={<LaunchPage />} />
+      <Route path="/expansion" element={<ExpansionPage />} />
+      <Route path="/business-type/:businessTypeId" element={<BusinessTypeDetailPage />} />
+      <Route path="/marketing-channel/:channelId" element={<MarketingChannelDetailPage />} />
+      <Route path="/investor-pitch" element={<InvestorPitchPage />} />
+      <Route path="/benchmarking-phase/preview" element={<BenchmarkingPreviewPage />} />
+      <Route path="/launch/preview" element={<LaunchPreviewPage />} />
+      <Route path="/expansion/preview" element={<ExpansionPreviewPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </AuthGate>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -33,25 +59,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Veřejná marketingová landing page - bez přihlášení */}
           <Route path="/" element={<LauncherPage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/profile" element={<UserProfilePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/vision" element={<VisionPage />} />
-          <Route path="/ideation" element={<IdeationPage />} />
-          <Route path="/strategy" element={<StrategyPage />} />
-          <Route path="/implementation" element={<ImplementationPage />} />
-          <Route path="/benchmarking-phase" element={<BenchmarkingPage />} />
-          <Route path="/launch" element={<LaunchPage />} />
-          <Route path="/expansion" element={<ExpansionPage />} />
-          <Route path="/business-type/:businessTypeId" element={<BusinessTypeDetailPage />} />
-          <Route path="/marketing-channel/:channelId" element={<MarketingChannelDetailPage />} />
-          <Route path="/investor-pitch" element={<InvestorPitchPage />} />
-          <Route path="/benchmarking-phase/preview" element={<BenchmarkingPreviewPage />} />
-          <Route path="/launch/preview" element={<LaunchPreviewPage />} />
-          <Route path="/expansion/preview" element={<ExpansionPreviewPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          {/* Vše ostatní vyžaduje přihlášení */}
+          <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

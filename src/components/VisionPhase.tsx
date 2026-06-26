@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -81,20 +81,20 @@ export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
 
   const [showIntro, setShowIntro] = useState(true);
   
-  // Form data - persisted in localStorage
-  const [projectData, setProjectData] = usePersistedState<ProjectData>("vision_project_data", { name: "", slogan: "" });
-  const [errcData, setERRCData] = usePersistedState<ERRCData>("vision_errc_data", {
+  // Form data - persisted in Supabase (per-user, cross-device)
+  const [projectData, setProjectData] = useSupabaseProgress<ProjectData>("vision_project_data", { name: "", slogan: "" });
+  const [errcData, setERRCData] = useSupabaseProgress<ERRCData>("vision_errc_data", {
     eliminate: ["", ""],
     reduce: ["", ""],
     raise: ["", ""],
     create: ["", ""]
   });
-  const [valueCurve, setValueCurve] = usePersistedState<ValueCurveAttribute[]>("vision_value_curve", defaultAttributes);
-  const [visionStatement, setVisionStatement] = usePersistedState<string>("vision_statement", "");
+  const [valueCurve, setValueCurve] = useSupabaseProgress<ValueCurveAttribute[]>("vision_value_curve", defaultAttributes);
+  const [visionStatement, setVisionStatement] = useSupabaseProgress<string>("vision_statement", "");
   
-  // AI Analysis - persisted in localStorage
+  // AI Analysis - persisted in Supabase
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
-  const [analysis, setAnalysis] = usePersistedState<string | null>("vision_analysis", null);
+  const [analysis, setAnalysis] = useSupabaseProgress<string | null>("vision_analysis", null);
   const [canProceed, setCanProceed] = useState(false);
 
   // Reset all data function

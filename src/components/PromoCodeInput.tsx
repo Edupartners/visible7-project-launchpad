@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Check, Gift, AlertCircle } from "lucide-react";
-import { validatePromoCode, savePromoCodeAccess } from "@/lib/promoCodes";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useToast } from "@/hooks/use-toast";
 
 interface PromoCodeInputProps {
@@ -13,6 +13,7 @@ interface PromoCodeInputProps {
 export const PromoCodeInput = ({ onSuccess }: PromoCodeInputProps) => {
   const [promoCode, setPromoCode] = useState("");
   const [isValidating, setIsValidating] = useState(false);
+  const { redeemPromoCode } = useSubscription();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,28 +21,22 @@ export const PromoCodeInput = ({ onSuccess }: PromoCodeInputProps) => {
     if (!promoCode.trim()) return;
 
     setIsValidating(true);
+    const result = await redeemPromoCode(promoCode.trim());
+    setIsValidating(false);
 
-    // Simulate validation delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const isValid = validatePromoCode(promoCode.trim());
-
-    if (isValid) {
-      savePromoCodeAccess(promoCode.trim());
+    if (result.success) {
       toast({
         title: "Promokód úspěšně aktivován!",
-        description: "Máte nyní přístup ke všem fázím VISIBLE7 zdarma.",
+        description: result.message,
       });
       onSuccess();
     } else {
       toast({
         title: "Neplatný promokód",
-        description: "Zkontrolujte prosím správnost zadaného kódu.",
+        description: result.message,
         variant: "destructive",
       });
     }
-
-    setIsValidating(false);
   };
 
   return (

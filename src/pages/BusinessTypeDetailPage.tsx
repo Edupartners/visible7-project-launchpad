@@ -1,36 +1,22 @@
 
 import { BusinessTypeRoadmap } from "@/components/BusinessTypeRoadmap";
 import { useNavigate, useParams } from "react-router-dom";
-import { usePersistedState } from "@/hooks/usePersistedState";
-import { getPromoCodeAccess } from "@/lib/promoCodes";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const BusinessTypeDetailPage = () => {
   const navigate = useNavigate();
   const { businessTypeId } = useParams<{ businessTypeId: string }>();
-  const [hasAccess, setHasAccess] = usePersistedState<boolean>("hasAccess", false);
-  const promoCodeAccess = !!getPromoCodeAccess();
+  const { hasAccess, refresh } = useSubscription();
 
   const handleBack = () => {
     navigate('/home');
   };
 
   const handlePaymentSuccess = () => {
-    console.log("💳 Template payment successful, granting global access");
-    
-    // Set unified access state
-    setHasAccess(true);
-    
-    // Force localStorage update to ensure persistence
-    localStorage.setItem('hasAccess', 'true');
-    
-    console.log("✅ Global access granted:", { 
-      hasAccess: true, 
-      localStorage: localStorage.getItem('hasAccess') 
-    });
-
-    // Navigate back to home to force Dashboard to reload with new access state
+    // Stav přístupu se po platbě/promo kódu mění v databázi (subscriptions),
+    // takže stačí znovu načíst aktuální stav a vrátit se na dashboard.
+    refresh();
     setTimeout(() => {
-      console.log("🔄 Navigating back to home to sync access state");
       navigate('/home');
     }, 1000);
   };
@@ -39,7 +25,7 @@ const BusinessTypeDetailPage = () => {
     <BusinessTypeRoadmap 
       businessTypeId={businessTypeId || ''} 
       onBack={handleBack}
-      hasAccess={hasAccess || promoCodeAccess}
+      hasAccess={hasAccess}
       onPaymentSuccess={handlePaymentSuccess}
     />
   );

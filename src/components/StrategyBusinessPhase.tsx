@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -396,72 +396,62 @@ const generateChartData = (data: ROICalculatorData, viewMode: 'monthly' | 'cumul
   return chartData;
 };
 
-// Custom hook for migrated persisted state
+// Hook pro ROI data - ukládá do Supabase (cross-device), s jednorázovou
+// migrací starších dat z localStorage (pokud tam nějaká zůstala ze starší verze appky).
 const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData) => {
-  const [state, setState] = useState<ROICalculatorData>(() => {
-    try {
-      const item = localStorage.getItem(key);
-      if (item) {
-        const parsed = JSON.parse(item);
-        
-        // Migration logic for marketing costs (number -> number[])
-        const needsMarketingMigration = parsed.marketingCosts && 
-          Object.values(parsed.marketingCosts).some((value: any) => typeof value === 'number');
-        
-        if (needsMarketingMigration) {
-          const migratedMarketingCosts: any = {};
-          Object.entries(parsed.marketingCosts).forEach(([key, value]: [string, any]) => {
-            migratedMarketingCosts[key] = typeof value === 'number' ? Array(12).fill(value) : value;
-          });
-          parsed.marketingCosts = migratedMarketingCosts;
-          console.log('Migrated marketing costs from single values to monthly arrays');
-        }
-        
-        // Migration logic for operational costs (number -> number[])
-        const needsOperationalMigration = parsed.operationalCosts && 
-          Object.values(parsed.operationalCosts).some((value: any) => typeof value === 'number');
-        
-        if (needsOperationalMigration) {
-          const migratedOperationalCosts: any = {};
-          Object.entries(parsed.operationalCosts).forEach(([key, value]: [string, any]) => {
-            migratedOperationalCosts[key] = typeof value === 'number' ? Array(12).fill(value) : value;
-          });
-          parsed.operationalCosts = migratedOperationalCosts;
-          console.log('Migrated operational costs from single values to monthly arrays');
-        }
-        
-        // Migration logic - remove seasonal adjustments if they exist
-        if (parsed.seasonalAdjustments) {
-          delete parsed.seasonalAdjustments;
-          console.log('Removed seasonal adjustments from stored data');
-        }
-        
-        // Migration logic - ensure all required properties exist
-        if (!parsed.startupPlan) {
-          const migrated = {
-            ...defaultValue,
-            ...parsed,
-            startupPlan: parsed.startupPlan || defaultValue.startupPlan
-          };
-          console.log('Migrated ROI data with missing properties');
-          return migrated;
-        }
-        return parsed;
-      }
-      return defaultValue;
-    } catch (error) {
-      console.warn(`Failed to load ${key} from localStorage:`, error);
-      return defaultValue;
-    }
-  });
+  const [state, setState, { loading }] = useSupabaseProgress<ROICalculatorData>(key, defaultValue);
+  const [migrationChecked, setMigrationChecked] = useState(false);
 
   useEffect(() => {
+    if (loading || migrationChecked) return;
+    setMigrationChecked(true);
+
+    // Pokud v Supabase ještě nic není (stav == defaultValue) a v localStorage
+    // existují starší data z dřívější verze appky, jednorázově je převezmeme.
+    const isStillDefault = JSON.stringify(state) === JSON.stringify(defaultValue);
+    if (!isStillDefault) return;
+
     try {
-      localStorage.setItem(key, JSON.stringify(state));
+      const item = localStorage.getItem(key);
+      if (!item) return;
+      const parsed = JSON.parse(item);
+
+      // Migration logic for marketing costs (number -> number[])
+      const needsMarketingMigration = parsed.marketingCosts &&
+        Object.values(parsed.marketingCosts).some((value: any) => typeof value === 'number');
+      if (needsMarketingMigration) {
+        const migratedMarketingCosts: any = {};
+        Object.entries(parsed.marketingCosts).forEach(([k, value]: [string, any]) => {
+          migratedMarketingCosts[k] = typeof value === 'number' ? Array(12).fill(value) : value;
+        });
+        parsed.marketingCosts = migratedMarketingCosts;
+      }
+
+      // Migration logic for operational costs (number -> number[])
+      const needsOperationalMigration = parsed.operationalCosts &&
+        Object.values(parsed.operationalCosts).some((value: any) => typeof value === 'number');
+      if (needsOperationalMigration) {
+        const migratedOperationalCosts: any = {};
+        Object.entries(parsed.operationalCosts).forEach(([k, value]: [string, any]) => {
+          migratedOperationalCosts[k] = typeof value === 'number' ? Array(12).fill(value) : value;
+        });
+        parsed.operationalCosts = migratedOperationalCosts;
+      }
+
+      if (parsed.seasonalAdjustments) {
+        delete parsed.seasonalAdjustments;
+      }
+
+      const migrated = parsed.startupPlan
+        ? parsed
+        : { ...defaultValue, ...parsed, startupPlan: defaultValue.startupPlan };
+
+      setState(migrated);
+      localStorage.removeItem(key); // hotovo, staré klíče v localStorage už nepotřebujeme
     } catch (error) {
-      console.warn(`Failed to save ${key} to localStorage:`, error);
+      console.warn(`Failed to migrate ${key} from localStorage:`, error);
     }
-  }, [key, state]);
+  }, [loading, migrationChecked, state, defaultValue, key, setState]);
 
   return [state, setState] as const;
 };

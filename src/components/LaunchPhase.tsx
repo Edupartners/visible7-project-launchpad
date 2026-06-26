@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { LaunchData, ProductPerformance, ChannelPerformance } from "@/types/launch";
 
 interface LaunchPhaseProps {
@@ -22,7 +22,7 @@ interface LaunchPhaseProps {
 export const LaunchPhase = ({ onBack, onComplete }: LaunchPhaseProps) => {
   const { toast } = useToast();
   
-  const [launchData, setLaunchData] = usePersistedState<LaunchData>("launchData", {
+  const [launchData, setLaunchData] = useSupabaseProgress<LaunchData>("launchData", {
     kpis: {
       target: { orders: 0, avgOrderValue: 0, visitors: 0, conversionRate: 0, cpc: 0, roas: 0 },
       actual: { orders: 0, avgOrderValue: 0, visitors: 0, conversionRate: 0, cpc: 0, roas: 0 }
