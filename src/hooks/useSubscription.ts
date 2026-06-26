@@ -43,10 +43,12 @@ export function useSubscription() {
     }
 
     const { data, error } = await supabase
-      .from('subscriptions')
+      .from('subscriptions' as any)
       .select('status, trial_ends_at, access_until')
       .eq('user_id', authData.user.id)
       .maybeSingle();
+
+    const subscriptionData = data as { status: string; trial_ends_at: string | null; access_until: string | null } | null;
 
     if (error || !data) {
       console.warn('Failed to load subscription:', error);

@@ -33,16 +33,18 @@ export function useSupabaseProgress<T>(
       }
 
       const { data, error } = await supabase
-        .from('user_progress')
+        .from('user_progress' as any)
         .select('data_value')
         .eq('user_id', userId)
         .eq('data_key', key)
         .maybeSingle();
 
+      const progressData = data as { data_value: unknown } | null;
+
       if (!active) return;
 
-      if (!error && data) {
-        setState(data.data_value as T);
+      if (!error && progressData) {
+        setState(progressData.data_value as T);
       }
       setLoading(false);
     })();
@@ -60,9 +62,9 @@ export function useSupabaseProgress<T>(
         return;
       }
       const { error } = await supabase
-        .from('user_progress')
+        .from('user_progress' as any)
         .upsert(
-          { user_id: userId, data_key: key, data_value: value as unknown as Record<string, unknown> },
+          { user_id: userId, data_key: key, data_value: value as unknown } as any,
           { onConflict: 'user_id,data_key' }
         );
       if (error) {
