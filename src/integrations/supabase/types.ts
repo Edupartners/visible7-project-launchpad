@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          expires_at: string | null
+          extends_access_days: number
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          times_used: number
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          extends_access_days?: number
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          times_used?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          extends_access_days?: number
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          times_used?: number
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          access_until: string | null
+          created_at: string | null
+          id: string
+          promo_code_used: string | null
+          status: string
+          trial_ends_at: string | null
+          trial_started_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_until?: string | null
+          created_at?: string | null
+          id?: string
+          promo_code_used?: string | null
+          status?: string
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_until?: string | null
+          created_at?: string | null
+          id?: string
+          promo_code_used?: string | null
+          status?: string
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          data_key: string
+          data_value: Json
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          data_key: string
+          data_value?: Json
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          data_key?: string
+          data_value?: Json
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
