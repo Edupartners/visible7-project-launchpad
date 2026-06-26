@@ -69,7 +69,21 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
     setIsSubmitting(false);
   };
 
-  const handleGoogleLogin = async () => {
+  const handleAppleLogin = async () => {
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast({
+        title: "Přihlášení přes Apple se nezdařilo",
+        description: result.error instanceof Error ? result.error.message : String(result.error),
+        variant: "destructive",
+      });
+    }
+    if (result.redirected) {
+      return;
+    }
+  };
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
