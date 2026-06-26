@@ -70,19 +70,22 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
   };
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/home` },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
     });
-    if (error) {
+    if (result.error) {
       toast({
         title: "Přihlášení přes Google se nezdařilo",
-        description: error.message,
+        description: result.error instanceof Error ? result.error.message : String(result.error),
         variant: "destructive",
       });
     }
-    // Při úspěchu Supabase přesměruje na Google a zpět - onLogin() zavolá
-    // listener na onAuthStateChange ve vyšší komponentě (App/AuthGate).
+    if (result.redirected) {
+      // Browser redirects to Google - just return
+      return;
+    }
+    // Tokens received - user is authenticated, onAuthStateChange listener
+    // in AuthGate will update the session and render protected content.
   };
 
   return (
