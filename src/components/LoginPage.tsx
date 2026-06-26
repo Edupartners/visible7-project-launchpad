@@ -88,6 +88,22 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
     // in AuthGate will update the session and render protected content.
   };
 
+  const handleAppleLogin = async () => {
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast({
+        title: "Přihlášení přes Apple se nezdařilo",
+        description: result.error instanceof Error ? result.error.message : String(result.error),
+        variant: "destructive",
+      });
+    }
+    if (result.redirected) {
+      return;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-accent/10 to-primary/5">
       {/* Hero Section */}
@@ -310,6 +326,17 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Pokračovat s Google
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleAppleLogin}
+                className="btn-apple-secondary w-full h-12 text-base bg-black hover:bg-black/90 text-white"
+              >
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.21-1.05 3.95-.84 1.65.16 2.77.97 3.42 2.16-2.95 1.71-2.32 5.98.22 7.13-.57 1.5-1.31 2.99-2.54 4.09l.22-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                </svg>
+                Pokračovat s Apple
               </Button>
             </form>
           </Card>
