@@ -69,21 +69,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
     setIsSubmitting(false);
   };
 
-  const handleAppleLogin = async () => {
-    const result = await lovable.auth.signInWithOAuth("apple", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast({
-        title: "Přihlášení přes Apple se nezdařilo",
-        description: result.error instanceof Error ? result.error.message : String(result.error),
-        variant: "destructive",
-      });
-    }
-    if (result.redirected) {
-      return;
-    }
-  };
+  const handleGoogleLogin = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
@@ -100,6 +86,22 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
     }
     // Tokens received - user is authenticated, onAuthStateChange listener
     // in AuthGate will update the session and render protected content.
+  };
+
+  const handleAppleLogin = async () => {
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast({
+        title: "Přihlášení přes Apple se nezdařilo",
+        description: result.error instanceof Error ? result.error.message : String(result.error),
+        variant: "destructive",
+      });
+    }
+    if (result.redirected) {
+      return;
+    }
   };
 
   return (
