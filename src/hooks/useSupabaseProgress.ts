@@ -32,8 +32,8 @@ export function useSupabaseProgress<T>(
         return;
       }
 
-      const { data, error } = await supabase
-        .from('user_progress' as any)
+      const { data, error } = await (supabase as any)
+        .from('user_progress')
         .select('data_value')
         .eq('user_id', userId)
         .eq('data_key', key)
@@ -61,10 +61,10 @@ export function useSupabaseProgress<T>(
         console.warn(`useSupabaseProgress: cannot save "${key}", user not logged in`);
         return;
       }
-      const { error } = await supabase
-        .from('user_progress' as any)
+      const { error } = await (supabase as any)
+        .from('user_progress')
         .upsert(
-          { user_id: userId, data_key: key, data_value: value as unknown } as any,
+          { user_id: userId, data_key: key, data_value: value as unknown },
           { onConflict: 'user_id,data_key' }
         );
       if (error) {
