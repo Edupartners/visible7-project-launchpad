@@ -32,17 +32,19 @@ export function useSupabaseProgress<T>(
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_progress')
         .select('data_value')
         .eq('user_id', userId)
         .eq('data_key', key)
         .maybeSingle();
 
+      const progressData = data as { data_value: unknown } | null;
+
       if (!active) return;
 
-      if (!error && data) {
-        setState(data.data_value as T);
+      if (!error && progressData) {
+        setState(progressData.data_value as T);
       }
       setLoading(false);
     })();
@@ -59,10 +61,10 @@ export function useSupabaseProgress<T>(
         console.warn(`useSupabaseProgress: cannot save "${key}", user not logged in`);
         return;
       }
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('user_progress')
         .upsert(
-          { user_id: userId, data_key: key, data_value: value as unknown as Record<string, unknown> },
+          { user_id: userId, data_key: key, data_value: value as unknown },
           { onConflict: 'user_id,data_key' }
         );
       if (error) {
