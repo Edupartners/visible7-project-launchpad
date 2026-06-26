@@ -6,7 +6,9 @@ const LauncherPage = () => {
   const navigate = useNavigate();
 
   const handleAccessGranted = () => {
-    navigate('/home?register=true');
+    // /home je chráněná routa - AuthGate nepřihlášeného uživatele
+    // automaticky zobrazí registrační formulář (LoginPage).
+    navigate('/home');
   };
 
   return (

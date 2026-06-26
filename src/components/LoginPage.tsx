@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Mail, Eye, EyeOff, User, CheckCircle, Users, Star, TrendingUp, Shield, Clock, Award, Gift, Check, Zap, Briefcase } from "lucide-react";
-import { PromoCodeInput } from "@/components/PromoCodeInput";
-import { PricingModal } from "@/components/PricingModal";
-import { getPromoCodeAccess } from "@/lib/promoCodes";
+import { ArrowRight, Mail, Eye, EyeOff, User, Users, Star, TrendingUp, Shield, Clock, Award, Gift, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface LoginPageProps {
-  onLogin: (email: string, hasPromoAccess?: boolean, name?: string) => void;
+  // onLogin se volá až po reálném ověření v Supabase (přes onAuthStateChange ve vyšší komponentě)
+  onLogin: () => void;
 }
 
 export const LoginPage = ({ onLogin }: LoginPageProps) => {
@@ -18,21 +18,70 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [showPricing, setShowPricing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && (!isLogin || password)) {
-      const fullName = `${firstName} ${lastName}`.trim();
-      const hasPromoAccess = !!getPromoCodeAccess();
-      onLogin(email, hasPromoAccess, fullName);
+    if (!email || (isLogin && !password) || (!isLogin && (!firstName || !lastName))) return;
+
+    setIsSubmitting(true);
+
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast({
+          title: "Přihlášení se nezdařilo",
+          description: error.message === "Invalid login credentials"
+            ? "Nesprávný e-mail nebo heslo."
+            : error.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      onLogin();
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { first_name: firstName, last_name: lastName } },
+      });
+      if (error) {
+        toast({
+          title: "Registrace se nezdařila",
+          description: error.message === "User already registered"
+            ? "Tento e-mail už je zaregistrovaný. Zkuste se přihlásit."
+            : error.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      toast({
+        title: "Registrace úspěšná!",
+        description: "Vítejte ve VISIBLE7 - spouštíme váš 14denní zkušební přístup.",
+      });
+      onLogin();
     }
+
+    setIsSubmitting(false);
   };
 
-  const handleGoogleLogin = () => {
-    // Simulace Google přihlášení
-    const hasPromoAccess = !!getPromoCodeAccess();
-    onLogin("user@gmail.com", hasPromoAccess, "Google User");
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/home` },
+    });
+    if (error) {
+      toast({
+        title: "Přihlášení přes Google se nezdařilo",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    // Při úspěchu Supabase přesměruje na Google a zpět - onLogin() zavolá
+    // listener na onAuthStateChange ve vyšší komponentě (App/AuthGate).
   };
 
   return (
@@ -51,65 +100,50 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 <span className="text-primary">online podnikání</span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Projděte si ověřenou metodiku VISIBLE7, kterou využilo už <strong>500+ podnikatelů</strong> k vybudování prosperujícího online byznysu
+                Projděte si ověřenou metodiku VISIBLE7 a vybudujte prosperující online byznys
               </p>
 
-              {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Button 
+                <Button
                   onClick={(e) => {
                     e.preventDefault();
-                    e.stopPropagation();
-                    const registerSection = document.getElementById('register');
-                    registerSection?.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' });
                   }}
                   className="btn-apple px-8 py-3 text-base relative z-50"
                 >
                   Začít zdarma
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
-                <Button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowPricing(true);
-                  }}
-                  variant="outline"
-                  className="px-8 py-3 text-base border-border/50 hover:border-primary relative z-50"
-                >
-                  Zobrazit plány
-                </Button>
               </div>
-              
-              {/* Benefits */}
+
               <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-primary" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-sm">Růst tržeb</h3>
-                    <p className="text-xs text-muted-foreground">Průměrně +150% za rok</p>
+                    <h3 className="font-semibold text-sm">Strukturovaný postup</h3>
+                    <p className="text-xs text-muted-foreground">7 kroků od vize k expanzi</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Clock className="w-5 h-5 text-primary" />
                   </div>
                   <div className="text-left">
                     <h3 className="font-semibold text-sm">Úspora času</h3>
-                    <p className="text-xs text-muted-foreground">Strukturovaný postup</p>
+                    <p className="text-xs text-muted-foreground">Vše na jednom místě</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Shield className="w-5 h-5 text-primary" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-sm">Ověřená metoda</h3>
-                    <p className="text-xs text-muted-foreground">500+ úspěšných případů</p>
+                    <h3 className="font-semibold text-sm">Ověřená metodika</h3>
+                    <p className="text-xs text-muted-foreground">VISIBLE7 MICEK</p>
                   </div>
                 </div>
               </div>
@@ -118,119 +152,51 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
         </div>
       </div>
 
-      {/* Pricing Section */}
+      {/* Pricing - zjednodušený jeden plán */}
       <div className="container mx-auto px-4 py-16" id="pricing">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Vyberte si plán</h2>
-            <p className="text-muted-foreground">Začněte zdarma nebo si vyberte plán pro kompletní metodiku</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
-            {/* Trial Notice */}
-            <div className="md:col-span-2 text-center mb-8 p-6 bg-primary/5 rounded-xl border border-primary/20">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Gift className="w-5 h-5 text-primary" />
-                <span className="text-lg font-semibold text-primary">15denní zkušební verze zdarma</span>
-              </div>
-              <p className="text-muted-foreground">
-                Vyzkoušejte celou metodiku VISIBLE7 úplně zdarma. Po skončení trialu si můžete vybrat plán podle svých potřeb.
-              </p>
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="p-6 bg-primary/5 rounded-xl border border-primary/20 mb-8">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Gift className="w-5 h-5 text-primary" />
+              <span className="text-lg font-semibold text-primary">14denní zkušební přístup zdarma</span>
             </div>
-
-            {/* STARTER Plan */}
-            <Card className="p-6 relative">
-              <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">STARTER</h3>
-                <div className="text-3xl font-bold text-primary mb-1">299 Kč</div>
-                <p className="text-sm text-muted-foreground mb-6">Jednorázová platba</p>
-                
-                <ul className="text-sm space-y-3 mb-6 text-left">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Fáze 1-4: Vision až Strategy</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Blue Ocean Strategy</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Business Model Canvas</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />ROI kalkulačka</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />PDF exporty</li>
-                </ul>
-                
-                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat STARTER</Button>
-              </div>
-            </Card>
-
-            {/* BUSINESS Plan */}
-            <Card className="p-6 relative border-primary">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">Nejoblíbenější</span>
-              </div>
-              <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">BUSINESS</h3>
-                <div className="text-3xl font-bold text-primary mb-1">990 Kč</div>
-                <p className="text-sm text-muted-foreground mb-6">Kompletní metodika</p>
-                
-                <ul className="text-sm space-y-3 mb-6 text-left">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Všech 7 fází VISIBLE7</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Implementation roadmap</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Launch strategie</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Growth & Expansion plány</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Investor pitch deck</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2" />Benchmarking nástroje</li>
-                </ul>
-                
-                <Button onClick={() => setShowPricing(true)} className="w-full">Vybrat BUSINESS</Button>
-              </div>
-            </Card>
+            <p className="text-muted-foreground">
+              Vyzkoušejte celou metodiku VISIBLE7 zdarma. Po skončení zkušebního období pokračujete za 290 Kč/měsíc.
+            </p>
           </div>
 
-          {/* Future Plans Preview */}
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-4">🚀 Připravujeme pro vás</p>
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card className="p-4 bg-muted/30">
-                <div className="flex items-center space-x-3">
-                  <Zap className="w-6 h-6 text-primary" />
-                  <div className="text-left">
-                    <h4 className="font-semibold">Premium+ (99 Kč/měsíc)</h4>
-                    <p className="text-xs text-muted-foreground">Měsíční updates + expertní konzultace</p>
-                  </div>
-                </div>
-              </Card>
-              <Card className="p-4 bg-muted/30">
-                <div className="flex items-center space-x-3">
-                  <Briefcase className="w-6 h-6 text-primary" />
-                  <div className="text-left">
-                    <h4 className="font-semibold">Business (199 Kč/měsíc)</h4>
-                    <p className="text-xs text-muted-foreground">Team access + networking events</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </div>
+          <Card className="p-8">
+            <h3 className="text-xl font-semibold mb-2">VISIBLE7</h3>
+            <div className="text-4xl font-bold text-primary mb-1">290 Kč<span className="text-base font-normal text-muted-foreground"> / měsíc</span></div>
+            <p className="text-sm text-muted-foreground mb-6">Zrušitelné kdykoliv</p>
+            <ul className="text-sm space-y-3 mb-2 text-left max-w-xs mx-auto">
+              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />Všech 7 fází VISIBLE7</li>
+              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />Uložený postup vašeho projektu</li>
+              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />AI validace a doporučení</li>
+              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />PDF a Excel exporty</li>
+            </ul>
+          </Card>
         </div>
       </div>
 
-        {/* Registration Form */}
+      {/* Registration / Login Form */}
       <div className="flex items-center justify-center p-4" id="register">
         <div className="w-full max-w-md animate-fade-in">
-
-          {/* Hlavní karta */}
           <Card className="card-apple p-8">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-foreground mb-2">
                 {isLogin ? "Přihlaste se" : "Začněte svou cestu"}
               </h2>
               <p className="text-muted-foreground">
-                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Zaregistrujte se zdarma a získejte okamžitý přístup k základním fázím"}
+                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Zaregistrujte se a získejte 14 dní zdarma"}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Jméno - pouze pro registraci */}
               {!isLogin && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      Křestní jméno
-                    </label>
+                    <label className="text-sm font-medium text-foreground">Křestní jméno</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                       <Input
@@ -243,11 +209,8 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                       />
                     </div>
                   </div>
-                  
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      Příjmení
-                    </label>
+                    <label className="text-sm font-medium text-foreground">Příjmení</label>
                     <Input
                       type="text"
                       value={lastName}
@@ -260,11 +223,8 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 </div>
               )}
 
-              {/* Email */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  E-mailová adresa
-                </label>
+                <label className="text-sm font-medium text-foreground">E-mailová adresa</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
@@ -278,11 +238,8 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 </div>
               </div>
 
-              {/* Heslo */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Heslo
-                </label>
+                <label className="text-sm font-medium text-foreground">Heslo</label>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
@@ -290,7 +247,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={isLogin ? "Zadejte heslo" : "Minimálně 6 znaků"}
                     className="h-12 rounded-xl border-border/50 focus:border-primary pr-10"
-                    required={isLogin}
+                    required
                     minLength={isLogin ? undefined : 6}
                   />
                   <button
@@ -303,7 +260,6 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 </div>
               </div>
 
-              {/* Přihlášení / Registrace toggle */}
               <div className="text-center">
                 <button
                   type="button"
@@ -314,17 +270,21 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 </button>
               </div>
 
-              {/* Tlačítko pro odeslání */}
               <Button
                 type="submit"
                 className="btn-apple w-full h-12 text-base"
-                disabled={!email || (isLogin && !password) || (!isLogin && (!firstName || !lastName))}
+                disabled={isSubmitting || !email || (isLogin && !password) || (!isLogin && (!firstName || !lastName))}
               >
-                {isLogin ? "Přihlásit se" : "Pokračovat"}
-                <ArrowRight className="ml-2 w-4 h-4" />
+                {isSubmitting ? (
+                  <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                ) : (
+                  <>
+                    {isLogin ? "Přihlásit se" : "Pokračovat"}
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </>
+                )}
               </Button>
 
-              {/* Děličku */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border/50" />
@@ -334,36 +294,22 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 </div>
               </div>
 
-              {/* Google přihlášení */}
               <Button
                 type="button"
                 onClick={handleGoogleLogin}
                 className="btn-apple-secondary w-full h-12 text-base"
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Pokračovat s Google
               </Button>
             </form>
           </Card>
 
-          {/* Social Proof - pouze pro přihlášení */}
           {isLogin && (
             <div className="mt-8">
               <Card className="p-6 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
@@ -374,22 +320,18 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                     ))}
                   </div>
                   <p className="text-sm text-muted-foreground italic">
-                    "VISIBLE7 mi pomohla zvýšit tržby o 200% za 6 měsíců!"
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    - Marie K., e-shop majitelka
+                    "VISIBLE7 mi pomohla strukturovat celé podnikání od nuly."
                   </p>
                 </div>
               </Card>
             </div>
           )}
 
-          {/* Footer */}
           <div className="text-center mt-8 text-apple-body">
             <div className="flex items-center justify-center gap-6 mb-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Users className="w-3 h-3" />
-                <span>500+ podnikatelů</span>
+                <span>Komunita podnikatelů</span>
               </div>
               <div className="flex items-center gap-1">
                 <Award className="w-3 h-3" />
@@ -402,30 +344,13 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
             </div>
             <p className="text-xs">
               Pokračováním souhlasíte s našimi{" "}
-              <a href="#" className="text-primary hover:text-primary/80">
-                Obchodními podmínkami
-              </a>{" "}
+              <a href="#" className="text-primary hover:text-primary/80">Obchodními podmínkami</a>{" "}
               a{" "}
-              <a href="#" className="text-primary hover:text-primary/80">
-                Zásadami ochrany osobních údajů
-              </a>
+              <a href="#" className="text-primary hover:text-primary/80">Zásadami ochrany osobních údajů</a>
             </p>
           </div>
         </div>
       </div>
-
-      {/* Pricing Modal */}
-      {showPricing && (
-        <PricingModal 
-          onClose={() => setShowPricing(false)}
-          onSuccess={() => {
-            setShowPricing(false);
-            onLogin(email || "user@example.com", true, `${firstName} ${lastName}`.trim());
-          }}
-          completedPhases={0}
-          totalPhases={7}
-        />
-      )}
     </div>
   );
 };

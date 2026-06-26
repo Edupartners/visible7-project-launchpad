@@ -1,10 +1,10 @@
 import { ImplementationPhase } from "@/components/ImplementationPhase";
 import { useNavigate } from "react-router-dom";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 
 const ImplementationPage = () => {
   const navigate = useNavigate();
-  const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completed_phases", []);
+  const [completedPhases, setCompletedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
 
   const handleComplete = () => {
     // Mark phase 4 as completed

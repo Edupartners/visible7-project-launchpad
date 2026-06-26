@@ -3,13 +3,13 @@ import { LaunchPhase } from "@/components/LaunchPhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
 import { useNavigate } from "react-router-dom";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useState } from "react";
 import { Rocket } from "lucide-react";
 
 const LaunchPage = () => {
   const navigate = useNavigate();
-  const [completedPhases, setCompletedPhases] = usePersistedState<number[]>("completed_phases", []);
+  const [completedPhases, setCompletedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const [showIntro, setShowIntro] = useState(true);
 
   const handleComplete = () => {

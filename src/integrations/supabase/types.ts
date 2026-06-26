@@ -41,6 +41,102 @@ export type Database = {
         }
         Relationships: []
       }
+      user_progress: {
+        Row: {
+          id: string
+          user_id: string
+          data_key: string
+          data_value: Json
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          data_key: string
+          data_value: Json
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          data_key?: string
+          data_value?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          status: string
+          trial_started_at: string | null
+          trial_ends_at: string | null
+          access_until: string | null
+          promo_code_used: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          status?: string
+          trial_started_at?: string | null
+          trial_ends_at?: string | null
+          access_until?: string | null
+          promo_code_used?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          status?: string
+          trial_started_at?: string | null
+          trial_ends_at?: string | null
+          access_until?: string | null
+          promo_code_used?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          id: string
+          code: string
+          description: string | null
+          extends_access_days: number
+          max_uses: number | null
+          times_used: number
+          is_active: boolean
+          expires_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          code: string
+          description?: string | null
+          extends_access_days?: number
+          max_uses?: number | null
+          times_used?: number
+          is_active?: boolean
+          expires_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          code?: string
+          description?: string | null
+          extends_access_days?: number
+          max_uses?: number | null
+          times_used?: number
+          is_active?: boolean
+          expires_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

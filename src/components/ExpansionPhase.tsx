@@ -14,7 +14,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BackButton } from "@/components/ui/back-button";
 import { CheckCircle, AlertTriangle, TrendingUp, Calculator, DollarSign, Clock, BarChart3, Users, Target, Lightbulb } from "lucide-react";
 import { ExpansionData, defaultExpansionData } from "@/types/expansion";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 
 interface ExpansionPhaseProps {
   onComplete: () => void;
@@ -22,7 +22,7 @@ interface ExpansionPhaseProps {
 }
 
 export const ExpansionPhase = ({ onComplete, onBack }: ExpansionPhaseProps) => {
-  const [data, setData] = usePersistedState<ExpansionData>("expansion-data", defaultExpansionData);
+  const [data, setData] = useSupabaseProgress<ExpansionData>("expansion-data", defaultExpansionData);
   const [activeSection, setActiveSection] = useState(0);
 
   const sections = [

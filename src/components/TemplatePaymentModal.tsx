@@ -2,7 +2,11 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, Download, Crown, X, Zap, FileText, Users, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Crown, X, Zap, FileText, Shield, Check, Gift } from "lucide-react";
+import { useState } from "react";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useToast } from "@/hooks/use-toast";
 
 interface TemplatePaymentModalProps {
   isOpen: boolean;
@@ -11,150 +15,114 @@ interface TemplatePaymentModalProps {
   templateName: string;
 }
 
-export const TemplatePaymentModal = ({ isOpen, onClose, onSuccess, templateName }: TemplatePaymentModalProps) => {
+const benefits = [
+  { icon: Zap, title: "Všech 7 fází metodiky", description: "Od vize po škálování" },
+  { icon: FileText, title: "Všechny šablony a roadmapy", description: "Kompletní knihovna pro všechny typy podnikání" },
+  { icon: Crown, title: "AI analýzy a doporučení", description: "Personalizovaná zpětná vazba v každé fázi" },
+];
+
+export const TemplatePaymentModal = ({ isOpen, onClose, onSuccess }: TemplatePaymentModalProps) => {
+  const [promoCode, setPromoCode] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
+  const { redeemPromoCode } = useSubscription();
+  const { toast } = useToast();
+
   const handlePayment = () => {
-    // Simulate payment success
-    setTimeout(() => {
-      onSuccess();
-      onClose();
-    }, 1000);
+    toast({
+      title: "Platby zatím nejsou aktivní",
+      description: "Brzy doplníme možnost platby kartou. Pokud máte promo kód od kurzu, použijte ho níže.",
+    });
   };
 
-  const benefits = [
-    {
-      icon: Download,
-      title: "Všechny šablony a roadmapy",
-      description: "Přístup ke kompletní knihovně šablon pro všechny typy podnikání"
-    },
-    {
-      icon: Crown,
-      title: "Odemknutí všech fází (1-7)",
-      description: "Kompletní metodika VISIBLE7 od vize po škálování"
-    },
-    {
-      icon: FileText,
-      title: "WordPress šablony",
-      description: "Připravené šablony pro rychlé spuštění webu"
-    },
-    {
-      icon: Zap,
-      title: "AI analýzy a doporučení",
-      description: "Personalizované doporučení pro váš projekt"
-    },
-    {
-      icon: Download,
-      title: "Export dat",
-      description: "Všechny výsledky a analýzy v přehledném formátu"
-    },
-    {
-      icon: Users,
-      title: "Premium support",
-      description: "Prioritní podpora a pomoc s implementací"
-    },
-    {
-      icon: Shield,
-      title: "30 dní záruka",
-      description: "Vrátíme peníze, pokud nebudete spokojeni"
+  const handlePromoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoCode.trim()) return;
+
+    setIsValidating(true);
+    const result = await redeemPromoCode(promoCode.trim());
+    setIsValidating(false);
+
+    if (result.success) {
+      toast({ title: "Promo kód uplatněn!", description: result.message });
+      onSuccess();
+      onClose();
+    } else {
+      toast({ title: "Neplatný promo kód", description: result.message, variant: "destructive" });
     }
-  ];
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-center">
-          <DialogTitle className="text-2xl font-bold">
-            Odemkněte PLNÝ PŘÍSTUP K VISIBLE7
-          </DialogTitle>
-          <DialogDescription className="text-lg">
-            Získejte přístup ke kompletní metodice a všem šablonám
-          </DialogDescription>
+          <DialogTitle className="text-2xl font-bold">Aktivujte přístup k VISIBLE7</DialogTitle>
+          <DialogDescription>Pokračujte ve svém projektu s plným přístupem</DialogDescription>
         </DialogHeader>
 
-        <div className="py-6">
-          {/* Main offer card */}
-          <Card className="p-8 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <Crown className="w-10 h-10 text-primary" />
-              </div>
-              
-              <h3 className="text-2xl font-bold mb-3">PLNÝ PŘÍSTUP K VISIBLE7</h3>
-              <div className="text-4xl font-bold text-primary mb-2">999 Kč</div>
-              <p className="text-muted-foreground mb-6">Jednorázová platba • Přístup navždy</p>
-              
-              <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-                <Zap className="w-4 h-4" />
-                Kompletní balíček pro úspěšné podnikání
-              </div>
+        <Card className="p-8 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 border-primary/20">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Crown className="w-8 h-8 text-primary" />
             </div>
+            <div className="text-4xl font-bold text-primary mb-1">290 Kč<span className="text-base font-normal text-muted-foreground"> / měsíc</span></div>
+            <p className="text-muted-foreground text-sm">Zrušitelné kdykoliv</p>
+          </div>
 
-            {/* Benefits grid */}
-            <div className="grid md:grid-cols-2 gap-4 mb-8">
-              {benefits.map((benefit, index) => {
-                const IconComponent = benefit.icon;
-                return (
-                  <div key={index} className="flex items-start gap-3 p-4 bg-background/50 rounded-lg">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-                      <IconComponent className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground mb-1">
-                        {benefit.title}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {benefit.description}
-                      </div>
-                    </div>
+          <div className="space-y-3 mb-6">
+            {benefits.map((benefit, index) => {
+              const Icon = benefit.icon;
+              return (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-4 h-4" />
                   </div>
-                );
-              })}
-            </div>
+                  <div>
+                    <div className="font-medium text-foreground text-sm">{benefit.title}</div>
+                    <div className="text-xs text-muted-foreground">{benefit.description}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-            {/* Highlighted features */}
-            <div className="bg-background/80 rounded-lg p-4 mb-6">
-              <h4 className="font-semibold mb-3 text-center">🎯 Co konkrétně získáte:</h4>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="text-center">
-                  <div className="font-medium text-primary">12+ šablon</div>
-                  <div className="text-muted-foreground">Pro různé typy podnikání</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-medium text-primary">7 fází metodiky</div>
-                  <div className="text-muted-foreground">Od vize po škálování</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-medium text-primary">AI nástroje</div>
-                  <div className="text-muted-foreground">Analýzy a doporučení</div>
-                </div>
-              </div>
-            </div>
+          <Button onClick={handlePayment} className="btn-apple w-full h-12 mb-6">
+            <Crown className="w-4 h-4 mr-2" />
+            Aktivovat za 290 Kč/měsíc
+          </Button>
 
-            {/* CTA Button */}
-            <Button 
-              onClick={handlePayment}
-              className="btn-apple w-full h-14 text-lg font-semibold"
-            >
-              <Crown className="w-5 h-5 mr-2" />
-              Koupit plný přístup za 999 Kč
-            </Button>
+          <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <div className="flex items-center gap-2 mb-3">
+              <Gift className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium text-green-800">Jste studentem kurzu?</span>
+            </div>
+            <form onSubmit={handlePromoSubmit} className="space-y-3">
+              <Input
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                placeholder="Zadejte promo kód"
+                className="h-10 border-green-300 focus:border-green-500"
+                disabled={isValidating}
+              />
+              <Button type="submit" disabled={!promoCode.trim() || isValidating} className="w-full h-10 bg-green-600 hover:bg-green-700 text-white">
+                {isValidating ? (
+                  <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                ) : (
+                  <><Check className="mr-2 w-4 h-4" />Uplatnit promo kód</>
+                )}
+              </Button>
+            </form>
           </Card>
-        </div>
+        </Card>
 
-        {/* Footer actions */}
-        <div className="flex items-center justify-between pt-6 border-t">
+        <div className="flex items-center justify-between pt-4">
           <Button variant="outline" onClick={onClose}>
             <X className="w-4 h-4 mr-2" />
             Zrušit
           </Button>
-          
-          <div className="text-right">
-            <div className="text-2xl font-bold text-primary">999 Kč</div>
-            <div className="text-xs text-muted-foreground">Jednorázová platba</div>
-          </div>
-        </div>
-
-        <div className="text-center text-xs text-muted-foreground pt-4">
-          Bezpečná platba • 30 dní záruka vrácení peněz • Žádné skryté poplatky
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            Bezpečné a vázané jen na váš účet
+          </p>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -193,7 +193,7 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
   const [preFilledFields, setPreFilledFields] = useState<string[]>([]);
   
   // Persisted data
-  const [leanCanvasData, setLeanCanvasData] = usePersistedState<LeanCanvasData>("ideation_lean_canvas", {
+  const [leanCanvasData, setLeanCanvasData] = useSupabaseProgress<LeanCanvasData>("ideation_lean_canvas", {
     problem: "",
     solution: "",
     uniqueValueProposition: "",
@@ -204,7 +204,7 @@ export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
     revenueStreams: ""
   });
   
-  const [analysis, setAnalysis] = usePersistedState<AIAnalysis | null>("ideation_analysis", null);
+  const [analysis, setAnalysis] = useSupabaseProgress<AIAnalysis | null>("ideation_analysis", null);
   
   // Pre-fill data on component mount
   useEffect(() => {

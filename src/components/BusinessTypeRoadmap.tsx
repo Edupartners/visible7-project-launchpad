@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { BackButton } from "@/components/ui/back-button";
 import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Lock, Crown, Shield, FileText, Zap, Settings } from "lucide-react";
 import { businessTypes, type RoadmapStep } from "@/types/implementation";
-import { usePersistedState } from "@/hooks/usePersistedState";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { TemplatePaymentModal } from "./TemplatePaymentModal";
 import { WordPressInstallForm } from "./WordPressInstallForm";
 
@@ -20,7 +20,7 @@ interface BusinessTypeRoadmapProps {
 
 export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPaymentSuccess }: BusinessTypeRoadmapProps) => {
   const businessType = businessTypes.find(bt => bt.id === businessTypeId);
-  const [steps, setSteps] = usePersistedState<RoadmapStep[]>(
+  const [steps, setSteps] = useSupabaseProgress<RoadmapStep[]>(
     `roadmap-${businessTypeId}`, 
     businessType?.steps || []
   );
@@ -65,7 +65,6 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPayme
   };
 
   const handlePaymentSuccessInternal = () => {
-    console.log("💳 Template payment modal success - calling parent handler");
     onPaymentSuccess();
     setShowPaymentModal(false);
     
