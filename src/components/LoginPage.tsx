@@ -327,6 +327,17 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
                 </svg>
                 Pokračovat s Google
               </Button>
+
+              <Button
+                type="button"
+                onClick={handleAppleLogin}
+                className="btn-apple-secondary w-full h-12 text-base bg-black hover:bg-black/90 text-white"
+              >
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.21-1.05 3.95-.84 1.65.16 2.77.97 3.42 2.16-2.95 1.71-2.32 5.98.22 7.13-.57 1.5-1.31 2.99-2.54 4.09l.22-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                </svg>
+                Pokračovat s Apple
+              </Button>
             </form>
           </Card>
 
