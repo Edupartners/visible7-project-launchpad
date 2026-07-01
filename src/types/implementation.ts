@@ -341,5 +341,31 @@ export const businessTypes: BusinessType[] = [
       { id: '15', task: 'Community guidelines', platform: 'WordPress pages', note: 'Pravidla komunity', price: 0, completed: false },
       { id: '16', task: 'Launch strategie', platform: 'Social media', note: 'První členové a obsah', price: 0, completed: false }
     ]
+  },
+  {
+    id: 'vlastni-napad-app',
+    name: 'Vlastní nápad app',
+    difficulty: 'Vyšší',
+    duration: '14–30 dní',
+    description: 'Vytvořte si vlastní aplikaci na míru pomocí vibe codingu a AI nástrojů. Bez nutnosti umět programovat.',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    templateUrl: '#template-vibe-coding',
+    steps: [
+      { id: '1', task: 'Ujasnění nápadu a sepsání zadání', platform: 'Notion / Google Docs', note: 'Popište problém, cílovou skupinu a hlavní funkce', price: 0, completed: false },
+      { id: '2', task: 'Rozvedení konceptu pomocí AI', platform: 'Google AI Studio (Gemini)', note: 'Brainstorming a validace nápadu s AI', price: 0, completed: false },
+      { id: '3', task: 'Vytvoření detailního product briefu', platform: 'Claude (Anthropic)', note: 'Prompt pro generování aplikace', price: 0, completed: false },
+      { id: '4', task: 'Návrh UI/UX wireframů', platform: 'Figma + AI pluginy', note: 'Vizuální podoba obrazovek', price: 0, completed: false },
+      { id: '5', task: 'Založení účtu na Lovable', platform: 'Lovable.dev', note: 'Free tier na start postačí', price: 0, completed: false },
+      { id: '6', task: 'Vygenerování prototypu aplikace', platform: 'Lovable / v0.dev / Bolt.new', note: 'Vibe coding — popíšete a AI kóduje', price: 0, completed: false },
+      { id: '7', task: 'Založení repozitáře pro verzování kódu', platform: 'GitHub', note: 'Zdarma pro veřejné i privátní repo', price: 0, completed: false },
+      { id: '8', task: 'Napojení backendu a databáze', platform: 'Supabase / Lovable Cloud', note: 'Free tier pro start', price: 0, completed: false },
+      { id: '9', task: 'Automatizace workflow a integrací', platform: 'n8n / Make', note: 'n8n zdarma self-hosted', price: 0, completed: false },
+      { id: '10', task: 'Napojení AI funkcionalit do aplikace', platform: 'OpenAI / Anthropic API / Lovable AI', note: 'Pay-as-you-go dle spotřeby', price: 500, completed: false },
+      { id: '11', task: 'Nastavení plateb', platform: 'Stripe', note: 'Bez měsíčního poplatku, jen provize z transakcí', price: 0, completed: false },
+      { id: '12', task: 'Deploy aplikace', platform: 'Vercel / Lovable hosting', note: 'Free tier pro MVP', price: 0, completed: false },
+      { id: '13', task: 'Napojení vlastní domény', platform: 'WEDOS.cz + DNS', note: 'Doména .cz nebo .com', price: 299, completed: false },
+      { id: '14', task: 'Testování a ladění s AI', platform: 'Cursor / Claude Code', note: 'AI-asistované debugging', price: 0, completed: false },
+      { id: '15', task: 'Spuštění a sběr zpětné vazby', platform: 'PostHog / Plausible', note: 'Analytika chování uživatelů', price: 0, completed: false }
+    ]
   }
 ];
