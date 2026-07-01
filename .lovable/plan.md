@@ -1,19 +1,41 @@
+## Cíl
+Přidat nový typ podnikání "Vlastní nápad app" do fáze Implementation. Uživatel si pomocí vibe codingu (AI-asistovaného programování) postaví aplikaci přesně podle své vize. Kroky ukážou konkrétní nástroje jako AI Studio, Claude, n8n, GitHub a další.
 
+## Změny
 
-## Odemknutí fáze 7 (Expansion) a všech placených fází
+### 1. `src/types/implementation.ts`
+Přidat nový záznam do pole `businessTypes` (na konec, jako 13. položku):
 
-### Problém
-Dashboard naviguje na `/expansion/preview` místo `/expansion`, protože fáze 5-7 mají `isFree: false` a `previewOnly: true`. Přístup závisí na `hasAccess` nebo `promoCodeAccess`, které jsou `false`.
+- `id`: `vlastni-napad-app`
+- `name`: `Vlastní nápad app`
+- `difficulty`: `Vyšší`
+- `duration`: `14–30 dní`
+- `description`: Vytvořte si vlastní aplikaci na míru pomocí vibe codingu a AI nástrojů. Bez nutnosti umět programovat.
+- `videoUrl`: placeholder (jako ostatní)
+- `templateUrl`: `#template-vibe-coding` (žádná WP šablona — je to app, ne web)
+- `steps`: cca 13–15 kroků pokrývajících celý workflow vibe codingu:
 
-### Řešení
-Označit všechny fáze jako `isFree: true` a odstranit `previewOnly` flag z fází 5-7 v `Dashboard.tsx`. Tím se všechny fáze odemknou bez nutnosti platby.
+  1. Ujasnění nápadu a sepsání zadání (Notion / Google Docs, 0 Kč)
+  2. Rozvedení konceptu pomocí AI (Google AI Studio – Gemini, 0 Kč)
+  3. Vytvoření detailního product briefu (Claude – Anthropic, 0 / 500 Kč měsíčně Pro)
+  4. Návrh UI/UX wireframů (Figma + AI pluginy, 0 Kč)
+  5. Založení účtu na Lovable (Lovable.dev, 0 / od 500 Kč)
+  6. Vygenerování prototypu aplikace (Lovable / v0.dev / Bolt.new, dle plánu)
+  7. Založení repozitáře pro verzování kódu (GitHub, 0 Kč)
+  8. Napojení backendu a databáze (Supabase / Lovable Cloud, 0 Kč free tier)
+  9. Automatizace workflow a integrací (n8n / Make, 0 Kč self-host / od 500 Kč)
+  10. Napojení AI funkcionalit do aplikace (OpenAI API / Anthropic API / Lovable AI, dle spotřeby)
+  11. Nastavení plateb (Stripe, 0 Kč + provize z transakcí)
+  12. Deploy aplikace (Vercel / Lovable hosting, 0 Kč free tier)
+  13. Napojení vlastní domény (WEDOS.cz + DNS, 299 Kč)
+  14. Testování a ladění s AI (Cursor / Claude Code, 0 / od 500 Kč)
+  15. Spuštění a sběr zpětné vazby uživatelů (PostHog / Plausible, 0 Kč free tier)
 
-### Technické změny
+Konkrétní ceny a znění polí `note` sladím s tónem ostatních záznamů (krátká, praktická poznámka).
 
-**Soubor: `src/components/Dashboard.tsx`**
-- Fáze 5 (Benchmarking): `isFree: true`, odstranit `previewOnly: true`
-- Fáze 6 (Launch): `isFree: true`, odstranit `previewOnly: true`
-- Fáze 7 (Expansion): `isFree: true`, odstranit `previewOnly: true`
+### 2. Nic dalšího není potřeba
+- `ImplementationPhase.tsx` čte pole `businessTypes` a filtruje/vykresluje automaticky — nová karta se objeví bez dalších úprav.
+- `BusinessTypeRoadmap.tsx` (detail) pracuje generický nad `steps` a `templateUrl` — funguje out-of-the-box. Tlačítko "Automatická instalace WordPress" má smysl skrýt pro tento typ, protože nejde o WP → pokud se to bude hodit, přidám jednoduchou podmínku `if businessType.id !== 'vlastni-napad-app'`.
 
-Tím se zjednoduší logika v `handlePhaseClick` — všechny fáze projdou větví pro free fáze a navigují přímo na plnou verzi.
-
+## Otázka na potvrzení
+- Skrýt u tohoto typu tlačítko "Automatická instalace WordPress" v roadmap detailu? (dává smysl, není to WP projekt) — pokud ano, přidám tu podmínku.
