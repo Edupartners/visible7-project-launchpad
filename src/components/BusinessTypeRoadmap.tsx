@@ -245,6 +245,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPayme
           </Card>
 
           {/* Template Download */}
+          {businessType.id !== 'vlastni-napad-app' && (
           <Card className="card-apple">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -296,6 +297,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId, onBack, hasAccess, onPayme
               </p>
             </CardContent>
           </Card>
+          )}
         </div>
 
         {/* Roadmap Checklist */}
