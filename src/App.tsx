@@ -24,6 +24,7 @@ import BenchmarkingPreviewPage from "./pages/BenchmarkingPreviewPage";
 import LaunchPreviewPage from "./pages/LaunchPreviewPage";
 import ExpansionPreviewPage from "./pages/ExpansionPreviewPage";
 import NotFound from "./pages/NotFound";
+import OAuthConsentPage from "./pages/OAuthConsentPage";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,8 @@ const App = () => (
         <Routes>
           {/* Veřejná marketingová landing page - bez přihlášení */}
           <Route path="/" element={<LauncherPage />} />
+          {/* OAuth consent pro MCP klienty (vlastní přihlášení uvnitř stránky) */}
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           {/* Vše ostatní vyžaduje přihlášení */}
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>
