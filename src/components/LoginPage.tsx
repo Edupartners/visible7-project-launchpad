@@ -10,9 +10,12 @@ import { useToast } from "@/hooks/use-toast";
 interface LoginPageProps {
   // onLogin se volá až po reálném ověření v Supabase (přes onAuthStateChange ve vyšší komponentě)
   onLogin: () => void;
+  // Kam se má uživatel vrátit po sociálním/e-mailovém přihlášení (např. OAuth consent URL).
+  redirectTo?: string;
 }
 
-export const LoginPage = ({ onLogin }: LoginPageProps) => {
+export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
+  const returnUrl = redirectTo ?? window.location.origin;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -46,7 +49,10 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { first_name: firstName, last_name: lastName } },
+        options: {
+          emailRedirectTo: returnUrl,
+          data: { first_name: firstName, last_name: lastName },
+        },
       });
       if (error) {
         toast({
@@ -71,7 +77,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
 
   const handleGoogleLogin = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: returnUrl,
     });
     if (result.error) {
       toast({
@@ -90,7 +96,7 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
 
   const handleAppleLogin = async () => {
     const result = await lovable.auth.signInWithOAuth("apple", {
-      redirect_uri: window.location.origin,
+      redirect_uri: returnUrl,
     });
     if (result.error) {
       toast({
