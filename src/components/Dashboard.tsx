@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UnifiedHeader } from "./layout/UnifiedHeader";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
