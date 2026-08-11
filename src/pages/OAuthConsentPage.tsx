@@ -99,7 +99,12 @@ export default function OAuthConsentPage() {
 
   // Přihlášení proběhne na stejné URL, takže po loginu zůstáváme na consent stránce.
   if (!user) {
-    return <LoginPage onLogin={() => { /* session se aktualizuje přes onAuthStateChange */ }} />;
+    return (
+      <LoginPage
+        redirectTo={window.location.origin + window.location.pathname + window.location.search}
+        onLogin={() => { /* session se aktualizuje přes onAuthStateChange */ }}
+      />
+    );
   }
 
   return (
