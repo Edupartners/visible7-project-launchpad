@@ -178,33 +178,6 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
         </div>
       </div>
 
-      {/* Pricing - zjednodušený jeden plán */}
-      <div className="container mx-auto px-4 py-16" id="pricing">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="p-6 bg-primary/5 rounded-xl border border-primary/20 mb-8">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Gift className="w-5 h-5 text-primary" />
-              <span className="text-lg font-semibold text-primary">14denní zkušební přístup zdarma</span>
-            </div>
-            <p className="text-muted-foreground">
-              Vyzkoušejte celou metodiku VISIBLE7 zdarma. Po skončení zkušebního období pokračujete za 290 Kč/měsíc.
-            </p>
-          </div>
-
-          <Card className="p-8">
-            <h3 className="text-xl font-semibold mb-2">VISIBLE7</h3>
-            <div className="text-4xl font-bold text-primary mb-1">290 Kč<span className="text-base font-normal text-muted-foreground"> / měsíc</span></div>
-            <p className="text-sm text-muted-foreground mb-6">Zrušitelné kdykoliv</p>
-            <ul className="text-sm space-y-3 mb-2 text-left max-w-xs mx-auto">
-              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />Všech 7 fází VISIBLE7</li>
-              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />Uložený postup vašeho projektu</li>
-              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />AI validace a doporučení</li>
-              <li className="flex items-center"><Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />PDF a Excel exporty</li>
-            </ul>
-          </Card>
-        </div>
-      </div>
-
       {/* Registration / Login Form */}
       <div className="flex items-center justify-center p-4" id="register">
         <div className="w-full max-w-md animate-fade-in">
@@ -214,7 +187,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                 {isLogin ? "Přihlaste se" : "Začněte svou cestu"}
               </h2>
               <p className="text-muted-foreground">
-                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Zaregistrujte se a získejte 14 dní zdarma"}
+                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Zaregistrujte se a získejte plný přístup zdarma"}
               </p>
             </div>
 
