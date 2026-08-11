@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Mail, Eye, EyeOff, User, Users, Star, TrendingUp, Shield, Clock, Award, Gift, Check } from "lucide-react";
+import { ArrowRight, Mail, Eye, EyeOff, User, Users, Star, TrendingUp, Shield, Clock, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useToast } from "@/hooks/use-toast";
@@ -67,7 +67,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
       }
       toast({
         title: "Registrace úspěšná!",
-        description: "Vítejte ve VISIBLE7 - spouštíme váš 14denní zkušební přístup.",
+        description: "Vítejte ve VISIBLE7 - máte přístup ke všem fázím.",
       });
       onLogin();
     }
