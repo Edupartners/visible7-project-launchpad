@@ -138,41 +138,18 @@ var save_progress_default = defineTool3({
   }
 });
 
-// src/lib/mcp/tools/get-subscription.ts
-import { defineTool as defineTool4 } from "npm:@lovable.dev/mcp-js@0.26.2";
-var get_subscription_default = defineTool4({
-  name: "get_subscription",
-  title: "Get subscription status",
-  description: "Read the signed-in user's VISIBLE7 subscription status, trial dates and access expiry.",
-  inputSchema: {},
-  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
-  handler: async (_input, ctx) => {
-    if (!ctx.isAuthenticated()) {
-      return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
-    }
-    const supabase = supabaseForUser(ctx);
-    const { data, error } = await supabase.from("subscriptions").select("status, trial_started_at, trial_ends_at, access_until, promo_code_used, updated_at").eq("user_id", ctx.getUserId()).maybeSingle();
-    if (error) return { content: [{ type: "text", text: error.message }], isError: true };
-    if (!data) return { content: [{ type: "text", text: "No subscription record found." }] };
-    return {
-      content: [{ type: "text", text: JSON.stringify(data) }],
-      structuredContent: { subscription: data }
-    };
-  }
-});
-
 // src/lib/mcp/index.ts
 var projectRef = "antxexuffsuoyryghaey";
 var mcp_default = defineMcp({
   name: "visible7-new",
   title: "visible7-new",
   version: "0.1.0",
-  instructions: "Tools for VISIBLE7 MICEK, a 7-step online business methodology app. Use `list_progress` and `get_progress` to read the signed-in user's saved phase data (vision, ideation, strategy, implementation, benchmarking, launch, expansion), `save_progress` to write a phase entry, and `get_subscription` to check their access level. All tools act as the authenticated user.",
+  instructions: "Tools for VISIBLE7 MICEK, a 7-step online business methodology app. Use `list_progress` and `get_progress` to read the signed-in user's saved phase data (vision, ideation, strategy, implementation, benchmarking, launch, expansion), `save_progress` to write a phase entry. All tools act as the authenticated user.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated"
   }),
-  tools: [list_progress_default, get_progress_default, save_progress_default, get_subscription_default]
+  tools: [list_progress_default, get_progress_default, save_progress_default]
 });
 
 // lovable-mcp-supabase-entry.ts
