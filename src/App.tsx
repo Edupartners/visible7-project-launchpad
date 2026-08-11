@@ -20,9 +20,6 @@ import ExpansionPage from "./pages/ExpansionPage";
 import BusinessTypeDetailPage from "./pages/BusinessTypeDetailPage";
 import MarketingChannelDetailPage from "./pages/MarketingChannelDetailPage";
 import InvestorPitchPage from "./pages/InvestorPitchPage";
-import BenchmarkingPreviewPage from "./pages/BenchmarkingPreviewPage";
-import LaunchPreviewPage from "./pages/LaunchPreviewPage";
-import ExpansionPreviewPage from "./pages/ExpansionPreviewPage";
 import NotFound from "./pages/NotFound";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 
@@ -45,9 +42,6 @@ const ProtectedRoutes = () => (
       <Route path="/business-type/:businessTypeId" element={<BusinessTypeDetailPage />} />
       <Route path="/marketing-channel/:channelId" element={<MarketingChannelDetailPage />} />
       <Route path="/investor-pitch" element={<InvestorPitchPage />} />
-      <Route path="/benchmarking-phase/preview" element={<BenchmarkingPreviewPage />} />
-      <Route path="/launch/preview" element={<LaunchPreviewPage />} />
-      <Route path="/expansion/preview" element={<ExpansionPreviewPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </AuthGate>
