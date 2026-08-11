@@ -89,22 +89,6 @@
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
-      },
-      {
-        "name": "get_subscription",
-        "title": "Get subscription status",
-        "description": "Read the signed-in user's VISIBLE7 subscription status, trial dates and access expiry.",
-        "annotations": {
-          "readOnlyHint": true,
-          "idempotentHint": true,
-          "openWorldHint": false
-        },
-        "inputSchema": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
-          "type": "object",
-          "properties": {}
-        },
-        "outputSchema": null
       }
     ]
   }
