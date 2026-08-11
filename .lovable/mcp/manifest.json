@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://antxexuffsuoyryghaey.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "visible7-new",
+      "version": "0.1.0",
+      "title": "visible7-new"
+    },
+    "tools": [
+      {
+        "name": "list_progress",
+        "title": "List saved progress keys",
+        "description": "List all VISIBLE7 methodology progress entries (keys and last update time) saved by the signed-in user.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_progress",
+        "title": "Get saved progress",
+        "description": "Read the stored value of one VISIBLE7 progress entry (e.g. a phase's saved form data) for the signed-in user.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data_key": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Progress key, as returned by list_progress."
+            }
+          },
+          "required": [
+            "data_key"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "save_progress",
+        "title": "Save progress",
+        "description": "Create or overwrite one VISIBLE7 progress entry for the signed-in user. The value must be JSON matching what the app stores under that key.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data_key": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Progress key to write."
+            },
+            "data_value": {
+              "type": "string",
+              "minLength": 1,
+              "description": "JSON-encoded value to store for this key."
+            }
+          },
+          "required": [
+            "data_key",
+            "data_value"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_subscription",
+        "title": "Get subscription status",
+        "description": "Read the signed-in user's VISIBLE7 subscription status, trial dates and access expiry.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
