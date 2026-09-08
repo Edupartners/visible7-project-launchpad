@@ -2,6 +2,8 @@ import { useState, useEffect, createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { LoginPage } from "@/components/LoginPage";
+import { AccessPasswordGate } from "@/components/AccessPasswordGate";
+import { clearTestSession, fetchTestMode, hasValidTestSession } from "@/lib/testMode";
 
 interface AuthContextValue {
   user: User | null;
@@ -22,9 +24,24 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthGate = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [testMode, setTestMode] = useState(false);
+  const [testUnlocked, setTestUnlocked] = useState(hasValidTestSession());
 
   useEffect(() => {
+    let active = true;
+
+    // Testovací režim (TEST_MODE secret) se ověřuje na serveru, default je vypnutý.
+    fetchTestMode().then((enabled) => {
+      if (!active) return;
+      setTestMode(enabled);
+      if (enabled) {
+        setTestUnlocked(hasValidTestSession());
+        setLoading(false);
+      }
+    });
+
     supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
       setUser(data.session?.user ?? null);
       setLoading(false);
     });
@@ -34,10 +51,18 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     });
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
+    if (testMode) {
+      clearTestSession();
+      setTestUnlocked(false);
+      return;
+    }
     await supabase.auth.signOut();
   };
 
@@ -47,6 +72,14 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
         <div className="animate-spin w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full" />
       </div>
     );
+  }
+
+  // TEST_MODE: jedno společné heslo místo přihlášení, vše odemčené.
+  if (testMode) {
+    if (!testUnlocked) {
+      return <AccessPasswordGate onUnlocked={() => setTestUnlocked(true)} />;
+    }
+    return <AuthContext.Provider value={{ user, signOut }}>{children}</AuthContext.Provider>;
   }
 
   if (!user) {
