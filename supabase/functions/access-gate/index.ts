@@ -11,8 +11,9 @@ const json = (body: unknown, status = 200) =>
     status,
   })
 
-// TEST_MODE je vypnutý, dokud není secret explicitně nastaven na "true".
-const isTestMode = () => (Deno.env.get('TEST_MODE') ?? 'false').trim().toLowerCase() === 'true'
+// Testovací režim je vypnutý, dokud není TEST_MODE nebo ACCESS_GATE_ENABLED nastaveno na "true".
+const flag = (name: string) => (Deno.env.get(name) ?? 'false').trim().toLowerCase() === 'true'
+const isTestMode = () => flag('TEST_MODE') || flag('ACCESS_GATE_ENABLED')
 
 // Časově konstantní porovnání, aby nešlo heslo hádat po znacích.
 const safeEqual = (a: string, b: string) => {
