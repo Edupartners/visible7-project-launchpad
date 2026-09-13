@@ -23,7 +23,7 @@ export const Footer = () => {
           
           <div className="border-t pt-4 space-y-2">
             <div className="text-sm font-medium text-foreground">
-              © 2025 MICEK™ - Všechna práva vyhrazena
+              © 2026 MICEK™ - Všechna práva vyhrazena
             </div>
             <div className="text-xs text-muted-foreground max-w-2xl mx-auto">
               Toto dílo je chráněno autorským zákonem. Jakékoli neoprávněné užití, 

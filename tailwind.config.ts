@@ -26,6 +26,17 @@ export default {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
+				ink: 'hsl(var(--ink))',
+				paper: 'hsl(var(--paper))',
+				'brand-blue': 'hsl(var(--brand-blue))',
+				'gate-copper': {
+					DEFAULT: 'hsl(var(--gate-copper))',
+					foreground: 'hsl(var(--gate-copper-foreground))'
+				},
+				'gate-teal': {
+					DEFAULT: 'hsl(var(--gate-teal))',
+					foreground: 'hsl(var(--gate-teal-foreground))'
+				},
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
