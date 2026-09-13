@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,6 +40,15 @@
     --border: 0 0% 90%;
     --input: 0 0% 95%;
     --ring: 210 100% 50%;
+
+    /* VISIBLE7 pilot palette */
+    --ink: 216 55% 15%;
+    --paper: 60 13% 95%;
+    --brand-blue: 215 65% 33%;
+    --gate-copper: 29 51% 47%;
+    --gate-copper-foreground: 60 13% 98%;
+    --gate-teal: 163 33% 37%;
+    --gate-teal-foreground: 60 13% 98%;
 
     --radius: 12px;
 
@@ -111,6 +118,14 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    --ink: 60 13% 95%;
+    --paper: 216 55% 10%;
+    --brand-blue: 214 50% 55%;
+    --gate-copper: 29 58% 56%;
+    --gate-copper-foreground: 216 55% 10%;
+    --gate-teal: 163 35% 52%;
+    --gate-teal-foreground: 216 55% 10%;
     
     /* Chart colors - dark mode */
     --chart-1: 210 40% 98%;   /* Revenue - Light for dark mode */
