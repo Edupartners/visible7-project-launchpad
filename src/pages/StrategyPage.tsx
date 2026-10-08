@@ -1,8 +1,7 @@
 
-import { StrategyBusinessPhase } from "@/components/StrategyBusinessPhase";
+import { BusinessCasePhase } from "@/components/BusinessCasePhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
-import { ExcelExportButton } from "@/components/ExcelExportButton";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useState } from "react";
@@ -20,7 +19,6 @@ const StrategyPage = () => {
       }
       return prev;
     });
-    navigate('/home');
   };
 
   const handleBack = () => {
@@ -32,24 +30,24 @@ const StrategyPage = () => {
   };
 
   const learningPoints = [
-    { text: "Business model canvas a revenue streams", color: "bg-emerald-500" },
-    { text: "Analýza konkurence a market positioning", color: "bg-blue-500" },
-    { text: "Pricing strategie a cost structure", color: "bg-orange-500" },
-    { text: "Go-to-market strategie", color: "bg-violet-500" }
+    { text: "Obrat, zisk a marže na dva roky dopředu", color: "bg-emerald-500" },
+    { text: "Potřebný kapitál, bod zvratu a návratnost", color: "bg-blue-500" },
+    { text: "Kolik smíte dát do marketingu (PNO z vaší marže)", color: "bg-orange-500" },
+    { text: "Tři scénáře a komentář AI mentora", color: "bg-violet-500" }
   ];
 
   if (showIntro) {
     return (
       <PageLayout onBack={handleBack}>
         <PhaseIntroTemplate
-          title="Strategy & Business"
-          subtitle="Obchodní model a tržní strategie"
-          description="V této fázi vytvoříte kompletní obchodní model pomocí Business Model Canvas. Analyzujete konkurenci, definujete pricing strategii a připravíte go-to-market plán. Zaměříme se na praktické aspekty spuštění vašeho projektu včetně kalkulace nákladů, stanovení cen a identifikace klíčových metrik úspěchu."
+          title="Byznys case"
+          subtitle="Vyplatí se to?"
+          description="Náklady a kanály z Lean Canvasu doplníte o čísla. Aplikace spočítá obrat, zisk, potřebný kapitál, bod zvratu a návratnost ve třech scénářích. Maximální PNO odvodí z vaší marže, takže uvidíte, kolik smíte utratit za marketing."
           phaseNumber={3}
           icon={Target}
           learningPoints={learningPoints}
-          estimatedTime="40 minut"
-          steps={7}
+          estimatedTime="45 minut"
+          steps={4}
           hasAiValidation={true}
           onStart={handleStart}
           onBack={handleBack}
@@ -61,13 +59,7 @@ const StrategyPage = () => {
 
   return (
     <PageLayout onBack={handleBack}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Strategy & Business</h1>
-          <ExcelExportButton variant="outline" />
-        </div>
-        <StrategyBusinessPhase onComplete={handleComplete} onBack={handleBack} />
-      </div>
+      <BusinessCasePhase onComplete={handleComplete} />
     </PageLayout>
   );
 };

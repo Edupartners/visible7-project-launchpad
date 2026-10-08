@@ -1,8 +1,8 @@
-// VISIBLE7 – AI asistent (fáze 2: Lean Canvas).
+// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: komentář k byznys casu).
 //
 // Náklady drží na uzdě:
 //  - jen přihlášený vlastník projektu,
-//  - limity: 3 návrhy + 3 vyhodnocení na fázi a projekt, 20 volání AI denně na uživatele,
+//  - limity: 3 návrhy + 3 vyhodnocení/komentáře na fázi a projekt, 20 volání AI denně na uživatele,
 //    celkový denní strop pro celou aplikaci (AI_GLOBAL_DAILY_LIMIT, výchozí 300),
 //  - levný model (AI_MODEL, výchozí claude-haiku-5-5), pevný strop max_tokens,
 //  - vstupy se zkracují, všechna pole canvasu v jednom volání.
@@ -154,6 +154,39 @@ const EVALUATE_TOOL = {
   },
 };
 
+const COMMENT_TOOL = {
+  name: "komentar_byznys_casu",
+  description: "Komentář mentora ke spočítanému byznys casu.",
+  input_schema: {
+    type: "object",
+    properties: {
+      summary: { type: "string", description: "2–4 věty: co čísla říkají o projektu." },
+      sensitivities: { type: "array", items: { type: "string" }, description: "2–4 místa, kde je plán citlivý (předpoklad, na kterém nejvíc záleží)." },
+      toVerify: { type: "array", items: { type: "string" }, description: "2–4 předpoklady, které je potřeba ověřit v praxi a jak." },
+      nextSteps: { type: "array", items: { type: "string" }, description: "3 konkrétní kroky." },
+    },
+    required: ["summary", "sensitivities", "toVerify", "nextSteps"],
+  },
+};
+
+function commentPrompt(vision: string, canvas: string, businessType: string, caseJson: string) {
+  return `Výstup fáze 1 (Modrý oceán):
+${vision}
+
+Lean Canvas:
+${canvas}
+
+Typ byznysu: ${BUSINESS_TYPES[businessType] ?? "neurčen"}
+
+Spočítaný byznys case (horizont 24 měsíců, měsíc 0 = investice před spuštěním; scénáře opatrný = 60 %, realistický = 100 %, optimistický = 140 % plánovaného objemu; částky v Kč; PNO = marketing / obrat; max. PNO = hrubá marže − ostatní náklady v % obratu − cílový zisk):
+${caseJson}
+
+Úkol: okomentuj výsledek jako zkušený mentor. Čísla nepřepočítávej ani nevymýšlej nová, pracuj jen s uvedenými. Nevynášej verdikt „ano/ne“.
+- Upozorni, pokud chybí důležitá nákladová položka typická pro tento typ byznysu (např. vlastní odměna, účetní, platební brána) nebo pokud předpoklady (marže, objem, konverze, odchodovost) vypadají pro tento typ nereálně.
+- Porovnej skutečné PNO s maximálním a řekni, co z toho plyne pro marketing.
+- U opatrného scénáře řekni, co by to znamenalo pro potřebný kapitál.`;
+}
+
 function suggestPrompt(vision: string, canvas: string) {
   return `Výstup fáze 1 (Modrý oceán):
 ${vision}
@@ -186,7 +219,7 @@ ${canvas}
 - nextSteps: 3 konkrétní kroky, co udělat teď (např. ověřit problém rozhovorem s 5 zákazníky).`;
 }
 
-async function callClaude(prompt: string, tool: typeof SUGGEST_TOOL | typeof EVALUATE_TOOL, maxTokens: number) {
+async function callClaude(prompt: string, tool: { name: string; description: string; input_schema: unknown }, maxTokens: number) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -236,10 +269,11 @@ Deno.serve(async (req) => {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const { projectId, action } = body;
-  if (!projectId || (action !== "canvas_suggest" && action !== "canvas_evaluate")) {
+  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const kind = action === "canvas_suggest" ? "navrh" : "vyhodnoceni";
+  const phase = action === "case_comment" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -254,7 +288,7 @@ Deno.serve(async (req) => {
   // 3) Limity
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const [perProject, perUser, global] = await Promise.all([
-    admin.from("ai_outputs").select("id", { count: "exact", head: true }).eq("project_id", projectId).eq("phase", "2").eq("kind", kind),
+    admin.from("ai_outputs").select("id", { count: "exact", head: true }).eq("project_id", projectId).eq("phase", phase).eq("kind", kind),
     admin.from("ai_outputs").select("id", { count: "exact", head: true }).eq("user_id", user.id).gte("created_at", dayAgo),
     admin.from("ai_outputs").select("id", { count: "exact", head: true }).gte("created_at", dayAgo),
   ]);
@@ -262,7 +296,8 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    return json({ error: `Limit ${limit} ${kind === "navrh" ? "návrhů" : "vyhodnocení"} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
+    const what = kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= LIMITS.userDaily) {
     return json({ error: "Dnešní limit AI je vyčerpán. Zkuste to zítra.", code: "limit_daily" }, 429);
@@ -278,13 +313,18 @@ Deno.serve(async (req) => {
     .from("project_data")
     .select("data_key, data_value")
     .eq("project_id", projectId)
-    .in("data_key", ["vision_project_data", "vision_errc_v2", "vision_usp", "ideation_lean_canvas"]);
+    .in("data_key", ["vision_project_data", "vision_errc_v2", "vision_usp", "ideation_lean_canvas", "business_case_summary"]);
   const raw = Object.fromEntries((rows ?? []).map((r) => [r.data_key, r.data_value]));
   const vision = describeVision(raw);
   const canvasObj = (raw["ideation_lean_canvas"] ?? {}) as Record<string, unknown>;
   const canvas = describeCanvas(canvasObj);
 
-  if (kind === "vyhodnoceni") {
+  const caseSummary = raw["business_case_summary"] as Record<string, unknown> | undefined;
+  if (action === "case_comment" && !caseSummary?.scenare) {
+    return json({ error: "Nejdřív vyplňte příjmy a náklady byznys casu." }, 400);
+  }
+
+  if (action === "canvas_evaluate") {
     const filled = CANVAS_KEYS.filter((k) => cut(canvasObj[k]).length > 0).length;
     if (filled < 7) return json({ error: "Nejdřív vyplňte alespoň 7 polí canvasu." }, 400);
   }
@@ -293,9 +333,15 @@ Deno.serve(async (req) => {
   let result: { output: Record<string, unknown>; usage: unknown };
   try {
     result =
-      kind === "navrh"
+      action === "canvas_suggest"
         ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 2400)
-        : await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500);
+        : action === "canvas_evaluate"
+          ? await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500)
+          : await callClaude(
+              commentPrompt(vision, canvas, project.business_type ?? "", JSON.stringify(caseSummary).slice(0, 6000)),
+              COMMENT_TOOL,
+              2500,
+            );
   } catch (e) {
     console.error(e);
     return json({ error: "AI teď neodpovídá. Zkuste to prosím za chvíli." }, 502);
@@ -307,7 +353,7 @@ Deno.serve(async (req) => {
   await admin.from("ai_outputs").insert({
     project_id: projectId,
     user_id: user.id,
-    phase: "2",
+    phase,
     kind,
     output: { ...output, _model: MODEL, _usage: result.usage },
   });

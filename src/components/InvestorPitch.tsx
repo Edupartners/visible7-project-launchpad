@@ -113,7 +113,13 @@ const loadPhaseData = async (projectId: string): Promise<PitchData> => {
     "ideation_analysis",
     "strategy_roi_data",
     "strategy_analysis",
+    "business_case_summary",
   ]);
+  // Nový byznys case (fáze 3) – realistický scénář.
+  const bc = raw["business_case_summary"] as
+    | { prijmy?: { price?: number; volume12?: number }; scenare?: Record<string, Record<string, number | null>> }
+    | undefined;
+  const real = bc?.scenare?.realisticky;
   const vision = await loadVisionSummary(projectId);
   const errc = vision?.errc;
 
@@ -135,10 +141,26 @@ const loadPhaseData = async (projectId: string): Promise<PitchData> => {
       leanCanvasData: (raw["ideation_lean_canvas"] ?? {}) as PitchData["ideation"]["leanCanvasData"],
       analysis: (raw["ideation_analysis"] as PitchData["ideation"]["analysis"]) || null
     },
-    strategy: {
-      roiData: (raw["strategy_roi_data"] ?? {}) as PitchData["strategy"]["roiData"],
-      analysis: (raw["strategy_analysis"] as PitchData["strategy"]["analysis"]) || null
-    }
+    strategy: real
+      ? {
+          roiData: {
+            revenue: { productPrice: bc?.prijmy?.price ?? 0, monthlyOrders: bc?.prijmy?.volume12 ?? 0 },
+            requiredCapital: real.potrebny_kapital ?? 0,
+          } as unknown as PitchData["strategy"]["roiData"],
+          analysis: {
+            roi: Math.round(real.roi_pct ?? 0),
+            // Pole „pno“ se v šabloně zobrazuje jako zisk – předáváme zisk za 2 roky.
+            pno: real.zisk_24m ?? 0,
+            breakEvenMonth: real.bod_zvratu_mesic ?? 0,
+            isViable: (real.zisk_24m ?? 0) > 0,
+            reasoning: `Obrat za 2 roky ${(real.obrat_24m ?? 0).toLocaleString("cs-CZ")} Kč, potřebný kapitál ${(real.potrebny_kapital ?? 0).toLocaleString("cs-CZ")} Kč.`,
+            recommendations: [],
+          },
+        }
+      : {
+          roiData: (raw["strategy_roi_data"] ?? {}) as PitchData["strategy"]["roiData"],
+          analysis: (raw["strategy_analysis"] as PitchData["strategy"]["analysis"]) || null
+        }
   };
 };
 
@@ -197,14 +219,14 @@ Tato strategie nám umožňuje vytvořit "modrý oceán" - volný tržní prosto
     financialProjections: `${strategy?.analysis ? `
 ROI: ${strategy.analysis.roi}%
 Break-even: ${strategy.analysis.breakEvenMonth}. měsíc
-Čistý zisk (roční): ${strategy.analysis.pno ? strategy.analysis.pno.toLocaleString() : "TBD"} Kč
+Zisk za 2 roky: ${strategy.analysis.pno ? strategy.analysis.pno.toLocaleString("cs-CZ") : "TBD"} Kč
 
 ${strategy.analysis.isViable ? "✅ Projekt je finančně životaschopný" : "⚠️ Projekt vyžaduje optimalizaci"}
 
 ${strategy.analysis.reasoning}
 ` : "Finanční projekce budou doplněny na základě ROI kalkulátoru."}`,
 
-    investmentAsk: `Na základě analýzy nákladové struktury a growth plánu požadujeme investici ve výši ${strategy?.roiData ? Math.round((strategy.roiData.revenue.productPrice * strategy.roiData.revenue.monthlyOrders * 6) / 10000) * 10000 : 500000} Kč.
+    investmentAsk: `Na základě analýzy nákladové struktury a growth plánu požadujeme investici ve výši ${(strategy?.roiData as unknown as { requiredCapital?: number })?.requiredCapital ? Math.ceil(((strategy?.roiData as unknown as { requiredCapital: number }).requiredCapital * 1.2) / 10000) * 10000 : strategy?.roiData?.revenue ? Math.round((strategy.roiData.revenue.productPrice * strategy.roiData.revenue.monthlyOrders * 6) / 10000) * 10000 : 500000} Kč.
 
 Tato částka pokryje:
 • 6-12 měsíců provozu
