@@ -266,31 +266,57 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         </div>
       </Card>
 
-      {/* Úvod: USP */}
+      {/* Úvod: modrý oceán = přidaná hodnota, USP */}
       <Card className="card-apple p-6">
         <div className="mb-3 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
             <Lightbulb className="h-5 w-5" />
           </div>
-          <h3 className="text-lg font-semibold">Co je USP a proč tu je</h3>
+          <h3 className="text-lg font-semibold">Modrý oceán = víc hodnoty, ne nižší cena</h3>
         </div>
-        <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+        <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
           <p>
-            <strong className="text-foreground">USP (unique selling proposition)</strong> je jeden hlavní důvod, proč si
-            zákazník vybere vás, a ne konkurenci. Není to seznam vlastností, ale jedna věc, kterou u ostatních nedostane
-            nebo dostane výrazně hůř.
+            Modrý oceán není o tom být levnější. Je o tom <strong className="text-foreground">přidat zákazníkovi tolik
+            hodnoty</strong>, že vás přestane srovnávat s konkurencí. Kdo soutěží cenou, prohrává s tím, kdo je ochotný
+            prodělávat víc.
           </p>
+
+          <div>
+            <p className="mb-2 font-medium text-foreground">Kde hodnota vzniká (rovnice hodnoty podle Alexe Hormoziho)</p>
+            <div className="rounded-xl border border-border/60 p-4">
+              <div className="flex flex-col items-center gap-1 text-center text-foreground">
+                <span className="font-semibold">Vysněný výsledek × Jistota, že ho dosáhnu</span>
+                <span className="h-px w-full max-w-sm bg-foreground/40" />
+                <span className="font-semibold">Čas do výsledku × Úsilí a oběti</span>
+              </div>
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                <li><strong className="text-foreground">↑ Výsledek:</strong> co přesně zákazník získá, ne co dostane do ruky.</li>
+                <li><strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit – postup, záruka, důkazy.</li>
+                <li><strong className="text-foreground">↓ Čas:</strong> jak rychle uvidí první výsledek.</li>
+                <li><strong className="text-foreground">↓ Úsilí:</strong> co za něj uděláte vy, aby nemusel on.</li>
+              </ul>
+            </div>
+            <p className="mt-2">
+              V ERRC matici to funguje stejně: <strong className="text-foreground">Eliminovat a Snížit</strong> ubírá
+              zákazníkovi čas, úsilí a zbytečné náklady, <strong className="text-foreground">Zvýšit a Vytvořit</strong>{" "}
+              přidává výsledek a jistotu.
+            </p>
+          </div>
+
           <p>
-            Modrý oceán vám ji pomůže najít: porovnáte se s levnou i prémiovou konkurencí a rozhodnete, co vynecháte, co
-            snížíte, co zlepšíte a co přinesete nového.
+            <strong className="text-foreground">USP</strong> je pak jedna věta, ze které je jasné, jakou hodnotu zákazník
+            dostane: jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Ne seznam vlastností.
           </p>
+
           <div className="rounded-xl bg-muted/60 p-4">
             <p className="mb-1 font-medium text-foreground">Příklad: online kurz vaření pro pracující rodiče</p>
             <p>
-              Levná konkurence jsou recepty zdarma na YouTube, prémiová kurzy se šéfkuchařem. Kurz vynechá exotické
-              suroviny, zkrátí lekci na 15 minut, zvýší praktičnost a přinese týdenní plán jídel s nákupním seznamem.
+              Výsledek: domácí večeře pro celou rodinu každý den. Jistota: hotový týdenní plán a nákupní seznam. Čas: 30
+              minut. Úsilí: nic nevymýšlí. Kurz proto vynechá exotické suroviny a dlouhé lekce a přidá plán jídel.
             </p>
-            <p className="mt-2 italic text-foreground">„Večeře pro celou rodinu za 30 minut – s plánem na celý týden.“</p>
+            <p className="mt-2 italic text-foreground">
+              „Večeře pro celou rodinu za 30 minut – bez vymýšlení, s plánem a nákupním seznamem na celý týden.“
+            </p>
           </div>
         </div>
       </Card>
@@ -478,7 +504,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           icon={Sparkles}
           step={5}
           title="Moje USP"
-          subtitle="Jedna věta: komu, co a čím se liší. Vycházejte z položek Vytvořit a Zvýšit."
+          subtitle="Jedna věta: komu, jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Vycházejte z položek Vytvořit a Zvýšit."
         />
         <Textarea
           value={usp}
