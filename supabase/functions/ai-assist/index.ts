@@ -7,6 +7,7 @@
 //  - levný model (AI_MODEL, výchozí claude-haiku-5-5), pevný strop max_tokens,
 //  - vstupy se zkracují, všechna pole canvasu v jednom volání.
 // Klíč ANTHROPIC_API_KEY je jen v Supabase secrets, nikdy v prohlížeči.
+// verify_jwt je vypnuté (projekt používá nové podpisové klíče) – uživatele ověřujeme sami přes auth.getUser().
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
@@ -219,8 +220,10 @@ Deno.serve(async (req) => {
 
   // 1) Kdo volá
   const authHeader = req.headers.get("Authorization") ?? "";
-  const userClient = createClient(SUPABASE_URL, ANON_KEY, { global: { headers: { Authorization: authHeader } } });
-  const { data: userData, error: userErr } = await userClient.auth.getUser();
+  const jwt = authHeader.replace(/^Bearer\s+/i, "");
+  if (!jwt) return json({ error: "Přihlaste se prosím znovu." }, 401);
+  const userClient = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
+  const { data: userData, error: userErr } = await userClient.auth.getUser(jwt);
   const user = userData?.user;
   if (userErr || !user) return json({ error: "Přihlaste se prosím znovu." }, 401);
 
