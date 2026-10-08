@@ -1,25 +1,40 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Award, Crown, ExternalLink, FileBadge } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Award, Download, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProject } from "@/contexts/ProjectContext";
 import { CertificateIssueDialog } from "@/components/CertificateIssueDialog";
-import { Certificate, CertificateKind, GATE_NAMES, certificateTitle, listMyCertificates } from "@/lib/certificates";
+import {
+  Certificate,
+  CertificateKind,
+  GATE_NAMES,
+  certificateTitle,
+  linkedInAddUrl,
+  listMyCertificates,
+} from "@/lib/certificates";
 
 interface Offer {
   kind: CertificateKind;
   phase: number | null;
 }
 
-/** Získaná osvědčení a ta, která si uživatel může v aktuálním projektu vydat. */
+const offerLabel = (o: Offer) =>
+  o.kind === "phase"
+    ? `Fáze ${o.phase}: ${GATE_NAMES[o.phase ?? 0]}`
+    : o.kind === "zamer"
+      ? "Podnikatelský záměr (fáze 1–4)"
+      : "VISIBLE7 Gold – spuštěný projekt";
+
+/** Osvědčení: co si uživatel může vystavit a co už má ke stažení. */
 export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
   const { currentProject } = useProject();
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [dialog, setDialog] = useState<Offer | null>(null);
 
+  const reload = () => listMyCertificates().then(setCerts);
+
   useEffect(() => {
-    listMyCertificates().then(setCerts);
+    reload();
   }, [currentProject?.id]);
 
   const done = new Set(completed);
@@ -33,63 +48,96 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
     if (done.has(p) && !has("phase", p)) offers.push({ kind: "phase", phase: p });
   });
 
-  if (certs.length === 0 && offers.length === 0) return null;
-
   return (
-    <Card className="card-apple p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <FileBadge className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold">Osvědčení</h2>
+    <section className="rounded-2xl border border-border bg-card">
+      <div className="px-6 pb-4 pt-6 sm:px-8">
+        <h2 className="text-xl font-bold">Osvědčení</h2>
+        <p className="mt-1 max-w-2xl text-muted-foreground">
+          Za každou dokončenou fázi si vystavíte osvědčení s ověřovacím kódem. Stáhnete ho jako PDF a můžete ho přidat na
+          LinkedIn nebo do životopisu.
+        </p>
       </div>
 
-      {offers.length > 0 && (
-        <div className="mb-4 space-y-2">
-          <p className="text-sm text-muted-foreground">K vydání v projektu „{currentProject?.name}“:</p>
-          <div className="flex flex-wrap gap-2">
-            {offers.map((o) => (
-              <Button
-                key={`${o.kind}-${o.phase ?? 0}`}
-                variant={o.kind === "phase" ? "outline" : "default"}
-                className={`rounded-xl ${o.kind === "gold" ? "bg-amber-500 text-white hover:bg-amber-500/90" : ""}`}
-                onClick={() => setDialog(o)}
-              >
-                {o.kind === "gold" ? <Crown className="mr-2 h-4 w-4" /> : <Award className="mr-2 h-4 w-4" />}
-                {o.kind === "phase" ? `Fáze ${o.phase}: ${GATE_NAMES[o.phase ?? 0]}` : certificateTitle(o.kind, o.phase)}
-              </Button>
-            ))}
-          </div>
-        </div>
+      {certs.length === 0 && offers.length === 0 && (
+        <p className="border-t border-border px-6 py-4 text-sm text-muted-foreground sm:px-8">
+          Zatím tu nic není. První osvědčení získáte po dokončení brány 1 – Modrý oceán.
+        </p>
       )}
 
-      {certs.length > 0 && (
-        <ul className="divide-y divide-border/60">
-          {certs.map((c) => (
-            <li key={c.code} className="flex items-center justify-between gap-3 py-2 text-sm">
-              <div className="min-w-0">
-                <p className="truncate font-medium">{certificateTitle(c.kind, c.phase)}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {c.project_name} · {new Date(c.issued_at).toLocaleDateString("cs-CZ")} · {c.code}
-                </p>
+      {offers.length > 0 && (
+        <ul className="border-t border-border">
+          {offers.map((o) => (
+            <li
+              key={`${o.kind}-${o.phase ?? 0}`}
+              className="flex flex-col gap-3 border-b border-border px-6 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+            >
+              <div className="flex items-start gap-3">
+                <Award className={`mt-0.5 h-5 w-5 shrink-0 ${o.kind === "gold" ? "text-gate-copper" : "text-primary"}`} />
+                <div>
+                  <p className="font-semibold">{offerLabel(o)}</p>
+                  <p className="text-sm text-muted-foreground">Připraveno k vystavení pro projekt „{currentProject?.name}“</p>
+                </div>
               </div>
-              <Button asChild variant="ghost" size="sm" className="shrink-0 rounded-lg">
-                <Link to={`/osvedceni/${c.code}`}>
-                  Zobrazit
-                  <ExternalLink className="ml-1 h-3.5 w-3.5" />
-                </Link>
+              <Button className="btn-apple shrink-0 py-2" onClick={() => setDialog(o)}>
+                Získat osvědčení
               </Button>
             </li>
           ))}
         </ul>
       )}
 
+      {certs.length > 0 && (
+        <>
+          <h3 className="border-t border-border px-6 pb-1 pt-4 text-sm font-semibold text-muted-foreground sm:px-8">
+            Vaše osvědčení
+          </h3>
+          <ul>
+            {certs.map((c) => (
+              <li
+                key={c.code}
+                className="flex flex-col gap-3 border-b border-border px-6 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+              >
+                <div className="min-w-0">
+                  <Link to={`/osvedceni/${c.code}`} className="font-semibold hover:underline">
+                    {certificateTitle(c.kind, c.phase)}
+                  </Link>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {c.project_name}, vystaveno {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <Button asChild variant="outline" size="sm" className="rounded-[10px]">
+                    <Link to={`/osvedceni/${c.code}?stahnout`}>
+                      <Download className="mr-1.5 h-4 w-4" />
+                      Stáhnout PDF
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm" className="rounded-[10px]">
+                    <a href={linkedInAddUrl(c)} target="_blank" rel="noopener noreferrer">
+                      <Linkedin className="mr-1.5 h-4 w-4" />
+                      Přidat na LinkedIn
+                    </a>
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
       {dialog && (
         <CertificateIssueDialog
           open={!!dialog}
-          onOpenChange={(o) => !o && setDialog(null)}
+          onOpenChange={(o) => {
+            if (!o) {
+              setDialog(null);
+              reload();
+            }
+          }}
           kind={dialog.kind}
           phase={dialog.phase}
         />
       )}
-    </Card>
+    </section>
   );
 };

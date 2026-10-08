@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Award } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,9 +51,6 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
       <DialogContent className="sm:max-w-md">
         <form onSubmit={submit}>
           <DialogHeader>
-            <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-              <Award className="h-6 w-6 text-primary" />
-            </div>
             <DialogTitle>{certificateTitle(kind, phase)}</DialogTitle>
             <DialogDescription>
               Zkontrolujte jméno – na osvědčení bude přesně takhle a později ho už nepůjde změnit.
@@ -66,7 +62,7 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
               <label className="text-sm font-medium" htmlFor="cert-name">
                 Jméno a příjmení
               </label>
-              <Input id="cert-name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 rounded-xl" autoFocus />
+              <Input id="cert-name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 rounded-[10px]" autoFocus />
             </div>
             {kind === "gold" && (
               <div className="space-y-1.5">
@@ -78,22 +74,22 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://"
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-[10px]"
                 />
                 <p className="text-xs text-muted-foreground">Bude uvedený na osvědčení jako důkaz spuštění.</p>
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" className="rounded-xl" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" className="rounded-[10px]" onClick={() => onOpenChange(false)}>
               Zrušit
             </Button>
             <Button
               type="submit"
-              className="rounded-xl"
+              className="rounded-[10px]"
               disabled={busy || name.trim().length < 3 || (kind === "gold" && !/^https?:\/\/\S+\.\S+/.test(url.trim()))}
             >
-              {busy ? "Vydávám…" : "Vydat osvědčení"}
+              {busy ? "Vystavuji…" : "Získat osvědčení"}
             </Button>
           </DialogFooter>
         </form>

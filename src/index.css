@@ -2,35 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-/* VISIBLE7 Design System - Apple-inspired minimalism */
+/* VISIBLE7 MICEK – vizuální styl: bílý papír, inkoustová námořnická modř, měď jen pro získané odznaky a osvědčení */
 
 @layer base {
   :root {
-    /* Apple-inspired color palette */
-    /* Plocha stránky: světle šedá jako na apple.com, karty bílé */
-    --background: 240 11% 96%;
-    --foreground: 240 3% 11%;
+    /* Bílý papír, inkoustový text */
+    --background: 0 0% 100%;
+    --foreground: 216 40% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 3% 11%;
+    --card-foreground: 216 40% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 3% 11%;
+    --popover-foreground: 216 40% 13%;
 
-    /* Primary: Apple-like blue */
-    --primary: 211 100% 45%;
+    /* Primary: námořnická modř VISIBLE7 */
+    --primary: 216 62% 24%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 211 100% 40%;
+    --primary-hover: 216 62% 17%;
 
     /* Secondary: Subtle gray */
-    --secondary: 240 6% 92%;
-    --secondary-foreground: 240 3% 11%;
+    --secondary: 40 14% 95%;
+    --secondary-foreground: 216 40% 13%;
 
-    --muted: 240 9% 94%;
-    --muted-foreground: 240 2% 40%;
+    --muted: 40 14% 96%;
+    --muted-foreground: 216 9% 38%;
 
-    --accent: 211 100% 96%;
-    --accent-foreground: 211 100% 30%;
+    --accent: 216 45% 96%;
+    --accent-foreground: 216 62% 24%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -38,29 +37,29 @@
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 240 6% 84%;
-    --input: 240 6% 82%;
-    --ring: 211 100% 45%;
+    --border: 40 9% 87%;
+    --input: 40 7% 80%;
+    --ring: 215 65% 40%;
 
     /* VISIBLE7 pilot palette */
     --ink: 216 55% 15%;
     --paper: 60 13% 95%;
     --brand-blue: 215 65% 33%;
-    --gate-copper: 29 51% 47%;
+    --gate-copper: 28 58% 38%;
     --gate-copper-foreground: 60 13% 98%;
     --gate-teal: 163 33% 37%;
     --gate-teal-foreground: 60 13% 98%;
 
-    --radius: 14px;
+    --radius: 10px;
 
     /* Apple-style gradients */
     --gradient-primary: linear-gradient(135deg, hsl(210 100% 50%), hsl(220 100% 60%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
     
     /* Apple-style shadows */
-    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.04), 0 6px 20px hsl(0 0% 0% / 0.05);
+    --shadow-card: none;
     --shadow-button: none;
-    --shadow-elevated: 0 2px 4px hsl(0 0% 0% / 0.05), 0 12px 32px hsl(0 0% 0% / 0.09);
+    --shadow-elevated: 0 18px 48px -12px hsl(216 40% 13% / 0.22);
 
     /* Animations */
     --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -156,19 +155,20 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
-    letter-spacing: -0.01em;
+    font-family: "Schibsted Grotesk", -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-feature-settings: "tnum" 0;
   }
 
   h1, h2, h3 {
-    letter-spacing: -0.022em;
+    letter-spacing: -0.015em;
+    font-weight: 700;
   }
 }
 
 @layer components {
-  /* Tlačítka ve stylu Apple: plné modré „pilulky“ a tiché šedé sekundární */
+  /* Hlavní tlačítko: plná námořnická modř, mírně zaoblené */
   .btn-apple {
-    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full;
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-[10px];
     @apply bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))];
     @apply transition-colors duration-150 ease-out;
     @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30;
@@ -176,16 +176,15 @@
   }
 
   .btn-apple-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full;
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-[10px];
     @apply bg-secondary text-secondary-foreground hover:bg-secondary/70;
     @apply transition-colors duration-150 ease-out;
     @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30;
   }
 
-  /* Karty: bílé na šedé ploše, bez rámečku, jemný stín */
+  /* Karty: bílé s jemnou linkou, bez stínu */
   .card-apple {
-    @apply bg-card rounded-[20px] border-0;
-    @apply shadow-[var(--shadow-card)];
+    @apply bg-card rounded-2xl border border-border;
   }
 
   .card-apple-hover {

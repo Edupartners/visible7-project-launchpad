@@ -3,7 +3,7 @@ import { CertificateIssueDialog } from "@/components/CertificateIssueDialog";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Award, PartyPopper } from "lucide-react";
+import { ArrowRight, Award, Check } from "lucide-react";
 
 interface PhaseCelebrationProps {
   gate: number;
@@ -33,10 +33,10 @@ export const PhaseCelebration = ({ gate, title, message, nextLabel, onNext, onHo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
       <Card className="card-apple w-full max-w-md p-8 text-center animate-fade-in">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-          <PartyPopper className="h-8 w-8 text-primary" />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gate-copper text-white">
+          <Check className="h-8 w-8" strokeWidth={3} />
         </div>
-        <p className="text-sm font-medium uppercase tracking-wide text-primary">Brána {gate} otevřena</p>
+        <p className="font-semibold text-gate-copper">Brána {gate} je otevřená</p>
         <h2 className="mt-2 text-2xl font-bold text-foreground">{title}</h2>
         <p className="mt-3 text-muted-foreground">{message}</p>
         <div className="mt-6 flex flex-col gap-2">
@@ -46,11 +46,11 @@ export const PhaseCelebration = ({ gate, title, message, nextLabel, onNext, onHo
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
-          <Button variant="outline" className="h-12 rounded-xl" onClick={() => setCertOpen(true)}>
+          <Button variant="outline" className="h-12 rounded-[10px]" onClick={() => setCertOpen(true)}>
             <Award className="mr-2 h-4 w-4" />
             Získat osvědčení za fázi {gate}
           </Button>
-          <Button variant="ghost" className="h-12 rounded-xl" onClick={onHome}>
+          <Button variant="ghost" className="h-12 rounded-[10px]" onClick={onHome}>
             Zpět na přehled
           </Button>
         </div>

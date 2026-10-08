@@ -256,7 +256,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-primary">Fáze 2 · Brána 2</p>
+            <p className="text-sm font-semibold text-primary">Fáze 2 ze 7</p>
             <h2 className="text-2xl font-bold text-foreground">Lean Canvas</h2>
             <p className="text-sm text-muted-foreground">Celý byznys na jedné stránce – navazuje na váš modrý oceán.</p>
           </div>
@@ -282,9 +282,6 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-              <Sparkles className="h-5 w-5 text-primary" />
-            </div>
             <div>
               <h3 className="text-lg font-semibold">AI pomocník</h3>
               <p className="text-sm text-muted-foreground">
@@ -381,10 +378,8 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
               </div>
 
               {s && (
-                <div className="mb-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                  <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-                    <Sparkles className="h-3.5 w-3.5" /> Návrh AI
-                  </p>
+                <div className="mb-3 rounded-xl border-l-2 border-primary bg-accent/60 p-4">
+                  <p className="mb-1 text-sm font-semibold text-primary">Návrh AI</p>
                   <p className="whitespace-pre-line text-sm text-foreground">{s}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button size="sm" className="rounded-lg" onClick={() => applySuggestion(f.key, s)}>
@@ -426,7 +421,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
           <div className="lean-grid mt-4 grid gap-2 text-sm">
             {FIELDS.map((f) => (
               <div key={f.key} className="rounded-xl bg-secondary p-3" style={{ gridArea: f.area }}>
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{f.title}</p>
+                <p className="mb-1 text-sm font-semibold text-muted-foreground">{f.title}</p>
                 <p className="whitespace-pre-line">{canvas[f.key]?.trim() || "—"}</p>
               </div>
             ))}
@@ -439,9 +434,6 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
         <Card className="card-apple p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <ClipboardCheck className="h-5 w-5 text-primary" />
-              </div>
               <div>
                 <h3 className="text-lg font-semibold">Vyhodnocení canvasu</h3>
                 <p className="text-sm text-muted-foreground">
@@ -456,7 +448,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
             </div>
             <Button
               variant={evaluation ? "outline" : "default"}
-              className="shrink-0 rounded-full"
+              className="shrink-0 rounded-[10px]"
               onClick={() => runAi("vyhodnoceni")}
               disabled={busy !== null || filled < 7 || left("vyhodnoceni") === 0 || aiOff}
             >

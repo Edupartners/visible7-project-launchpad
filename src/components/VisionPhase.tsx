@@ -107,7 +107,7 @@ const SectionHeader = ({ icon: Icon, step, title, subtitle }: { icon: typeof Use
       <Icon className="h-5 w-5" />
     </div>
     <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Krok {step}</p>
+      <p className="text-sm font-semibold text-muted-foreground">Krok {step}</p>
       <h3 className="text-lg font-semibold text-foreground">{title}</h3>
       <p className="text-sm text-muted-foreground">{subtitle}</p>
     </div>
@@ -258,7 +258,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-primary">Fáze 1 · Brána 1</p>
+            <p className="text-sm font-semibold text-primary">Fáze 1 ze 7</p>
             <h2 className="text-2xl font-bold text-foreground">Modrý oceán</h2>
             <p className="text-sm text-muted-foreground">Najděte místo na trhu mezi levnou a prémiovou konkurencí.</p>
           </div>

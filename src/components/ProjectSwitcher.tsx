@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, FolderOpen, Pencil, Plus, X } from "lucide-react";
+import { Check, Pencil, Plus, X } from "lucide-react";
 import { useProject } from "@/contexts/ProjectContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,9 +16,7 @@ export const ProjectSwitcher = () => {
 
   if (loading) {
     return (
-      <Card className="card-apple p-6 mb-6">
-        <div className="h-10 animate-pulse rounded-xl bg-muted" />
-      </Card>
+      <div className="mb-8 h-16 animate-pulse rounded-xl bg-muted" />
     );
   }
 
@@ -49,18 +46,15 @@ export const ProjectSwitcher = () => {
   };
 
   return (
-    <Card className="card-apple p-6 mb-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <FolderOpen className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Aktuální projekt</p>
-            {mode === "view" && (
-              <p className="text-lg font-semibold text-foreground">{currentProject?.name ?? "Žádný projekt"}</p>
-            )}
-          </div>
+    <header className="mb-8 pt-2">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="min-w-0">
+          <p className="text-muted-foreground">Váš projekt</p>
+          {mode === "view" && (
+            <h1 className="truncate text-3xl font-extrabold tracking-tight text-foreground sm:text-[2.5rem] sm:leading-tight">
+              {currentProject?.name ?? "Žádný projekt"}
+            </h1>
+          )}
         </div>
 
         {mode === "view" ? (
@@ -80,12 +74,12 @@ export const ProjectSwitcher = () => {
               </Select>
             )}
             {currentProject && (
-              <Button variant="outline" className="h-10 rounded-xl" onClick={startRename}>
+              <Button variant="outline" className="h-10 rounded-[10px]" onClick={startRename}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Přejmenovat
               </Button>
             )}
-            <Button className="h-10 rounded-xl" onClick={() => setMode("create")}>
+            <Button className="h-10 rounded-[10px]" onClick={() => setMode("create")}>
               <Plus className="mr-2 h-4 w-4" />
               Nový projekt
             </Button>
@@ -96,16 +90,16 @@ export const ProjectSwitcher = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={mode === "create" ? "Název nového projektu" : "Nový název"}
-              className="h-10 rounded-xl"
+              className="h-10 rounded-[10px]"
               autoFocus
             />
-            <Button type="submit" className="h-10 rounded-xl" disabled={busy || !name.trim()} aria-label="Uložit">
+            <Button type="submit" className="h-10 rounded-[10px]" disabled={busy || !name.trim()} aria-label="Uložit">
               <Check className="h-4 w-4" />
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="h-10 rounded-xl"
+              className="h-10 rounded-[10px]"
               onClick={() => {
                 setMode("view");
                 setName("");
@@ -117,6 +111,6 @@ export const ProjectSwitcher = () => {
           </form>
         )}
       </div>
-    </Card>
+    </header>
   );
 };

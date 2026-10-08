@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import QRCode from "qrcode";
 import { BadgeCheck, Linkedin, Printer, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import {
 /** Veřejná stránka osvědčení s ověřením pravosti. Přístupná bez přihlášení. */
 const CertificatePage = () => {
   const { code = "" } = useParams();
+  const [search] = useSearchParams();
+  const autoDownload = search.has("stahnout");
   const [cert, setCert] = useState<Certificate | null | undefined>(undefined);
   const [qr, setQr] = useState<string>("");
 
@@ -23,6 +25,13 @@ const CertificatePage = () => {
     verifyCertificate(code).then(setCert);
     QRCode.toDataURL(certificateUrl(code.toUpperCase()), { margin: 0, width: 220 }).then(setQr).catch(() => setQr(""));
   }, [code]);
+
+  // Odkaz „Stáhnout PDF“ z aplikace rovnou otevře okno pro uložení do PDF.
+  useEffect(() => {
+    if (!cert || !autoDownload) return;
+    const t = setTimeout(() => window.print(), 600);
+    return () => clearTimeout(t);
+  }, [cert, autoDownload]);
 
   if (cert === undefined) {
     return (
@@ -59,11 +68,11 @@ const CertificatePage = () => {
           </span>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="rounded-xl" onClick={() => window.print()}>
+          <Button variant="outline" className="rounded-[10px]" onClick={() => window.print()}>
             <Printer className="mr-2 h-4 w-4" />
-            Uložit jako PDF
+            Stáhnout PDF
           </Button>
-          <Button asChild className="rounded-xl bg-[#0a66c2] text-white hover:bg-[#0a66c2]/90">
+          <Button asChild className="rounded-[10px] bg-[#0a66c2] text-white hover:bg-[#0a66c2]/90">
             <a href={linkedInAddUrl(cert)} target="_blank" rel="noopener noreferrer">
               <Linkedin className="mr-2 h-4 w-4" />
               Přidat na LinkedIn
@@ -75,19 +84,19 @@ const CertificatePage = () => {
       <div className="certificate-sheet mx-auto aspect-[297/210] w-full max-w-5xl bg-white text-slate-900 shadow-xl print:max-w-none print:shadow-none">
         <div
           className={`flex h-full flex-col p-[4%] ${
-            gold ? "bg-gradient-to-br from-amber-50 via-white to-amber-100" : "bg-gradient-to-br from-sky-50 via-white to-blue-50"
+            gold ? "bg-[#FFFCF6]" : "bg-white"
           }`}
         >
           <div
             className={`flex h-full flex-col rounded-lg border-[3px] px-[6%] py-[4%] ${
-              gold ? "border-amber-500" : "border-blue-600"
+              gold ? "border-[#9A5F29] ring-1 ring-[#9A5F29]/30 ring-offset-4" : "border-[#183A66] ring-1 ring-[#183A66]/20 ring-offset-4"
             }`}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white ${
-                    gold ? "bg-amber-500" : "bg-blue-600"
+                    gold ? "bg-[#9A5F29]" : "bg-[#183A66]"
                   }`}
                 >
                   V7
@@ -102,7 +111,7 @@ const CertificatePage = () => {
 
             <div className="flex flex-1 flex-col items-center justify-center text-center">
               <p
-                className={`text-sm font-semibold uppercase tracking-[0.3em] ${gold ? "text-amber-600" : "text-blue-600"}`}
+                className={`text-sm font-semibold uppercase tracking-[0.3em] ${gold ? "text-[#9A5F29]" : "text-[#183A66]"}`}
               >
                 {gold ? "VISIBLE7 Gold" : "Osvědčení"}
               </p>
@@ -148,6 +157,9 @@ const CertificatePage = () => {
       </div>
 
       <p className="mx-auto mt-6 max-w-5xl text-center text-sm text-muted-foreground print:hidden">
+        Tip: v okně tisku zvolte „Uložit jako PDF“. Osvědčení pak můžete přiložit k životopisu.
+      </p>
+      <p className="mx-auto mt-2 max-w-5xl text-center text-sm text-muted-foreground print:hidden">
         <Link to="/home" className="underline underline-offset-4">
           Přejít do aplikace VISIBLE7
         </Link>
