@@ -209,6 +209,8 @@ async function callClaude(prompt: string, tool: typeof SUGGEST_TOOL | typeof EVA
     throw new Error(`AI ${res.status}`);
   }
   const data = await res.json();
+  // Useknutý výstup neukládáme (a nezapočítá se do limitu).
+  if (data.stop_reason === "max_tokens") throw new Error("AI odpověď byla useknutá");
   const block = (data.content ?? []).find((c: { type: string }) => c.type === "tool_use");
   if (!block) throw new Error("AI nevrátila strukturovaný výstup");
   return { output: block.input as Record<string, unknown>, usage: data.usage ?? null };
@@ -292,8 +294,8 @@ Deno.serve(async (req) => {
   try {
     result =
       kind === "navrh"
-        ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 1600)
-        : await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 1400);
+        ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 2400)
+        : await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500);
   } catch (e) {
     console.error(e);
     return json({ error: "AI teď neodpovídá. Zkuste to prosím za chvíli." }, 502);
