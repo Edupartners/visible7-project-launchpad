@@ -20,6 +20,7 @@ import {
   CostItem,
   CostKind,
   EMPTY_CASE,
+  EMPTY_REVENUE,
   GROUP_COPY,
   HELP,
   revenueFieldsFor,
@@ -466,7 +467,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     setData((prev) => {
       const revenue = { ...prev.revenue };
       for (const r of out.revenue ?? []) {
-        if (!revenue[r.field]) revenue[r.field] = r.value;
+        // Prázdné pole nebo výchozí hodnota aplikace (odchodovost 5 %, růst 20 %) = ještě nezadáno.
+        if (!revenue[r.field] || revenue[r.field] === EMPTY_REVENUE[r.field]) revenue[r.field] = r.value;
       }
       const costs = prev.costs.map((c) => {
         const h = out.items?.find((i) => i.id === c.id);
