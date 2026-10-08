@@ -3,9 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/visible7/client";
 import { ProjectProvider } from "@/contexts/ProjectContext";
 import { LoginPage } from "@/components/LoginPage";
-import { AccessPasswordGate } from "@/components/AccessPasswordGate";
 import { SetNewPasswordPage } from "@/components/SetNewPasswordPage";
-import { clearTestSession, fetchTestMode, hasValidTestSession } from "@/lib/testMode";
 
 interface AuthContextValue {
   user: User | null;
@@ -26,22 +24,10 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthGate = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [testMode, setTestMode] = useState(false);
-  const [testUnlocked, setTestUnlocked] = useState(hasValidTestSession());
   const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
     let active = true;
-
-    // Testovací režim (TEST_MODE secret) se ověřuje na serveru, default je vypnutý.
-    fetchTestMode().then((enabled) => {
-      if (!active) return;
-      setTestMode(enabled);
-      if (enabled) {
-        setTestUnlocked(hasValidTestSession());
-        setLoading(false);
-      }
-    });
 
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
@@ -62,11 +48,6 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    if (testMode) {
-      clearTestSession();
-      setTestUnlocked(false);
-      return;
-    }
     await supabase.auth.signOut();
   };
 
@@ -76,14 +57,6 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
         <div className="animate-spin w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full" />
       </div>
     );
-  }
-
-  // TEST_MODE: jedno společné heslo místo přihlášení, vše odemčené.
-  if (testMode) {
-    if (!testUnlocked) {
-      return <AccessPasswordGate onUnlocked={() => setTestUnlocked(true)} />;
-    }
-    return <AuthContext.Provider value={{ user, signOut }}>{children}</AuthContext.Provider>;
   }
 
   if (user && recovering) {
