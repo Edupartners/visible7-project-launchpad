@@ -17,6 +17,7 @@ interface ProjectContextValue {
   createProject: (name: string) => Promise<Project | null>;
   renameProject: (id: string, name: string) => Promise<boolean>;
   setBusinessType: (id: string, businessType: string | null) => Promise<boolean>;
+  deleteProject: (id: string) => Promise<boolean>;
 }
 
 const ProjectContext = createContext<ProjectContextValue>({
@@ -27,6 +28,7 @@ const ProjectContext = createContext<ProjectContextValue>({
   createProject: async () => null,
   renameProject: async () => false,
   setBusinessType: async () => false,
+  deleteProject: async () => false,
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -137,6 +139,30 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
     return true;
   }, []);
 
+  /**
+   * Smazání projektu z pohledu uživatele: projekt se archivuje a zmizí z přehledu.
+   * Data zůstávají v databázi, aby vystavená osvědčení šla dál ověřit.
+   */
+  const deleteProject = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from("projects").update({ archived_at: new Date().toISOString() }).eq("id", id);
+      if (error) return false;
+      const rest = projects.filter((p) => p.id !== id);
+      if (rest.length === 0) {
+        const { data } = await supabase
+          .from("projects")
+          .insert({ user_id: userId, name: "Můj první projekt" })
+          .select("id, name, business_type, created_at, updated_at")
+          .single();
+        if (data) rest.push(data as Project);
+      }
+      setProjects(rest);
+      if (currentId === id && rest[0]) switchProject(rest[0].id);
+      return true;
+    },
+    [projects, currentId, userId, switchProject]
+  );
+
   const value = useMemo<ProjectContextValue>(
     () => ({
       projects,
@@ -146,8 +172,9 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
       createProject,
       renameProject,
       setBusinessType,
+      deleteProject,
     }),
-    [projects, currentId, loading, switchProject, createProject, renameProject, setBusinessType]
+    [projects, currentId, loading, switchProject, createProject, renameProject, setBusinessType, deleteProject]
   );
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

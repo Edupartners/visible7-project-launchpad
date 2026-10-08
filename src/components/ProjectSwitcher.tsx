@@ -2,13 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, Pencil, Plus, X } from "lucide-react";
+import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useProject } from "@/contexts/ProjectContext";
 import { useToast } from "@/hooks/use-toast";
 
 /** Výběr, založení a přejmenování projektu na přehledu. */
 export const ProjectSwitcher = () => {
-  const { projects, currentProject, loading, switchProject, createProject, renameProject } = useProject();
+  const { projects, currentProject, loading, switchProject, createProject, renameProject, deleteProject } = useProject();
   const { toast } = useToast();
   const [mode, setMode] = useState<"view" | "create" | "rename">("view");
   const [name, setName] = useState("");
@@ -47,11 +58,11 @@ export const ProjectSwitcher = () => {
 
   return (
     <header className="mb-8 pt-2">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-4">
         <div className="min-w-0">
           <p className="text-muted-foreground">Váš projekt</p>
           {mode === "view" && (
-            <h1 className="truncate text-3xl font-extrabold tracking-tight text-foreground sm:text-[2.5rem] sm:leading-tight">
+            <h1 className="break-words text-3xl font-extrabold tracking-tight text-foreground sm:text-[2.5rem] sm:leading-tight">
               {currentProject?.name ?? "Žádný projekt"}
             </h1>
           )}
@@ -78,6 +89,42 @@ export const ProjectSwitcher = () => {
                 <Pencil className="mr-2 h-4 w-4" />
                 Přejmenovat
               </Button>
+            )}
+            {currentProject && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" className="h-10 rounded-[10px] text-red-700 hover:text-red-800">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Smazat
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Smazat projekt „{currentProject.name}“?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Projekt i všechny jeho fáze zmizí z vašeho přehledu a nepůjde ho obnovit. Osvědčení, která jste za něj
+                      získali, zůstanou platná.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="rounded-[10px]">Ponechat</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="rounded-[10px] bg-red-700 text-white hover:bg-red-800"
+                      onClick={async () => {
+                        const name = currentProject.name;
+                        const ok = await deleteProject(currentProject.id);
+                        toast(
+                          ok
+                            ? { title: "Projekt smazán", description: `„${name}“ už na přehledu neuvidíte.` }
+                            : { title: "Projekt se nepodařilo smazat", variant: "destructive" }
+                        );
+                      }}
+                    >
+                      Smazat projekt
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             <Button className="h-10 rounded-[10px]" onClick={() => setMode("create")}>
               <Plus className="mr-2 h-4 w-4" />
