@@ -16,6 +16,7 @@ interface ProjectContextValue {
   switchProject: (id: string) => void;
   createProject: (name: string) => Promise<Project | null>;
   renameProject: (id: string, name: string) => Promise<boolean>;
+  setBusinessType: (id: string, businessType: string | null) => Promise<boolean>;
 }
 
 const ProjectContext = createContext<ProjectContextValue>({
@@ -25,6 +26,7 @@ const ProjectContext = createContext<ProjectContextValue>({
   switchProject: () => {},
   createProject: async () => null,
   renameProject: async () => false,
+  setBusinessType: async () => false,
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -128,6 +130,13 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
     return true;
   }, []);
 
+  const setBusinessType = useCallback(async (id: string, businessType: string | null) => {
+    const { error } = await supabase.from("projects").update({ business_type: businessType }).eq("id", id);
+    if (error) return false;
+    setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, business_type: businessType } : p)));
+    return true;
+  }, []);
+
   const value = useMemo<ProjectContextValue>(
     () => ({
       projects,
@@ -136,8 +145,9 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
       switchProject,
       createProject,
       renameProject,
+      setBusinessType,
     }),
-    [projects, currentId, loading, switchProject, createProject, renameProject]
+    [projects, currentId, loading, switchProject, createProject, renameProject, setBusinessType]
   );
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

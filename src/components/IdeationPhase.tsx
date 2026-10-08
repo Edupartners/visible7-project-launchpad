@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
 import { VisionSummary, errcTexts, loadVisionSummary } from "@/lib/projectData";
+import { AI_LIMITS, AiUsage, CanvasEvaluation, CanvasSuggestion, callAi, loadAiUsage } from "@/lib/ai";
+import { businessTypes } from "@/types/implementation";
+import { PhaseCelebration } from "@/components/PhaseCelebration";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, Lightbulb, Brain, AlertCircle, ThumbsUp, AlertTriangle, Zap, Info, RefreshCw, Eye } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertTriangle,
+  Check,
+  CheckCircle2,
+  ClipboardCheck,
+  Info,
+  LayoutGrid,
+  Loader2,
+  Pencil,
+  RefreshCw,
+  Sparkles,
+  X,
+} from "lucide-react";
 
 interface LeanCanvasData {
   problem: string;
@@ -21,105 +36,39 @@ interface LeanCanvasData {
   revenueStreams: string;
 }
 
+type FieldKey = keyof LeanCanvasData;
+
 interface IdeationPhaseProps {
   onComplete: () => void;
   onBack: () => void;
 }
 
-// Vision Phase data interfaces
-const leanCanvasFields = [
-  {
-    key: "problem" as keyof LeanCanvasData,
-    title: "Problém",
-    placeholder: "Zaneprázdnění lidé nemají čas nakupovat zdravé bio potraviny. Supermarkety nabízejí málo bio produktů s nejistou čerstvostí. Složité hledání kvalitních místních dodavatelů.",
-    gridArea: "problem"
-  },
-  {
-    key: "solution" as keyof LeanCanvasData,
-    title: "Řešení",
-    placeholder: "Mobilní aplikace s katalogem bio potravin od ověřených místních farmářů. Objednávka s doručením do 2 hodin. Garance čerstvosti a kvality. Jednoduché hodnocení dodavatelů.",
-    gridArea: "solution"
-  },
-  {
-    key: "uniqueValueProposition" as keyof LeanCanvasData,
-    title: "Unikátní řešení nebo výhoda",
-    placeholder: "Bio potraviny od místních farmářů doručené do 2 hodin s garancí čerstvosti. Podpora lokálních producentů. Transparentnost původu každého produktu.",
-    gridArea: "unique-value-proposition"
-  },
-  {
-    key: "customerSegments" as keyof LeanCanvasData,
-    title: "Segment zákazníků",
-    placeholder: "Mladí profesionálové 28-42 let v Praze a Brně. Příjem 50K+ měsíčně. Aktivní životní styl, zájem o zdraví a udržitelnost. Ochotni platit více za kvalitu.",
-    gridArea: "customer-segments"
-  },
-  {
-    key: "existingAlternatives" as keyof LeanCanvasData,
-    title: "Existující alternativy",
-    placeholder: "Tesco, Albert bio sekce. Rohlik.cz, Košík.cz s bio produkty. Farmářské trhy o víkendech. Speciální bio obchody v centrech měst.",
-    gridArea: "existing-alternatives"
-  },
-  {
-    key: "channels" as keyof LeanCanvasData,
-    title: "Marketingové kanály",
-    placeholder: "Instagram a TikTok marketing, spolupráce s wellness influencery, Google Ads, mobilní aplikace v App Store/Google Play, doporučení od stávajících zákazníků.",
-    gridArea: "channels"
-  },
-  {
-    key: "costStructure" as keyof LeanCanvasData,
-    title: "Náklady",
-    placeholder: "Vývoj a údržba aplikace (200K/měsíc), platy kurýrů (300K/měsíc), marketing a reklama (150K/měsíc), skladování a logistika (100K/měsíc), provoz a administrativa (80K/měsíc).",
-    gridArea: "cost-structure"
-  },
-  {
-    key: "revenueStreams" as keyof LeanCanvasData,
-    title: "Předpokládané příjmy",
-    placeholder: "Provize z prodeje 15% z každé objednávky, měsíční předplatné Premium za 299 Kč (rychlejší doručení), poplatek za doručení 49 Kč, partnership marketing s farmáři.",
-    gridArea: "revenue-streams"
-  }
+const EMPTY_CANVAS: LeanCanvasData = {
+  problem: "",
+  solution: "",
+  uniqueValueProposition: "",
+  customerSegments: "",
+  existingAlternatives: "",
+  channels: "",
+  costStructure: "",
+  revenueStreams: "",
+};
+
+const FIELDS: { key: FieldKey; title: string; hint: string; area: string }[] = [
+  { key: "customerSegments", title: "Segment zákazníků", hint: "Komu konkrétně prodáváte? Kdo bude první zákazník?", area: "customer" },
+  { key: "problem", title: "Problém", hint: "Co zákazníka trápí? 1–3 hlavní problémy jeho slovy.", area: "problem" },
+  { key: "uniqueValueProposition", title: "Unikátní hodnota (USP)", hint: "Proč koupí právě u vás? Jedna jasná věta.", area: "usp" },
+  { key: "solution", title: "Řešení", hint: "Jak problém řešíte – hlavní funkce nebo obsah nabídky.", area: "solution" },
+  { key: "existingAlternatives", title: "Existující alternativy", hint: "Jak to zákazník řeší dnes? Levná a prémiová konkurence.", area: "alternatives" },
+  { key: "channels", title: "Marketingové kanály", hint: "Kudy se k zákazníkovi dostanete? 3–5 kanálů.", area: "channels" },
+  { key: "costStructure", title: "Náklady", hint: "Položky nákladů online projektu – zatím bez částek, spočítáme je ve fázi 3.", area: "costs" },
+  { key: "revenueStreams", title: "Příjmy", hint: "Za co vám zákazník zaplatí? Prodej, předplatné, upsell…", area: "revenue" },
 ];
 
-interface AIAnalysis {
-  isViable: boolean;
-  reasoning: string;
-  strengths: string[];
-  weaknesses: string[];
-  risks: string[];
-  recommendations: string[];
-}
-
-const generateLeanCanvasAnalysis = async (data: LeanCanvasData): Promise<AIAnalysis> => {
-  // Simulate AI analysis - in real implementation, this would call an AI service
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  const filledFields = Object.values(data).filter(value => value.trim().length > 0).length;
-  const isViable = filledFields >= 7; // At least 7 out of 9 fields should be filled
-  
-  return {
-    isViable,
-    reasoning: isViable 
-      ? "Váš projekt vykazuje solidní základy s dobře definovaným problémem a cílovým segmentem. Business model je logicky strukturovaný."
-      : "Projekt potřebuje více rozpracování klíčových elementů. Některé oblasti vyžadují hlubší analýzu před pokračováním.",
-    strengths: [
-      "Jasně definovaný problém a cílový segment",
-      "Konkrétní řešení s měřitelnými výstupy",
-      "Realistický pohled na nákladovou strukturu"
-    ],
-    weaknesses: [
-      "Konkurenční výhoda by mohla být více specifická",
-      "Kanály distribuce potřebují detailnější rozpracování",
-      "Příjmový model by měl obsahovat více variant"
-    ],
-    risks: [
-      "Vysoká závislost na externích dodavatelích",
-      "Možné problémy s škálováním",
-      "Intenzivní konkurence v segmentu"
-    ],
-    recommendations: [
-      "Proveďte průzkum trhu pro validaci předpokladů",
-      "Vytvořte MVP pro testování s reálnými zákazníky",
-      "Připravte si backup plán pro klíčové partnery"
-    ]
-  };
+const RATING_STYLE: Record<string, string> = {
+  silné: "bg-emerald-100 text-emerald-800",
+  "v pořádku": "bg-sky-100 text-sky-800",
+  doplnit: "bg-amber-100 text-amber-800",
 };
 
 // Převod výstupu fáze 1 (Modrý oceán) do polí Lean Canvasu.
@@ -149,408 +98,448 @@ const mapVisionToLeanCanvas = (vision: VisionSummary): Partial<LeanCanvasData> =
   return Object.fromEntries(Object.entries(mapped).filter(([, v]) => v)) as Partial<LeanCanvasData>;
 };
 
-export const IdeationPhase = ({ onComplete, onBack }: IdeationPhaseProps) => {
-  const [showIntro, setShowIntro] = useState(true);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [showVisualization, setShowVisualization] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
-  // Pre-fill state
-  const [isPreFilled, setIsPreFilled] = useState(false);
-  const [preFilledFields, setPreFilledFields] = useState<string[]>([]);
-  
-  // Persisted data
-  const { currentProject } = useProject();
-  const [leanCanvasData, setLeanCanvasData, { loading: canvasLoading }] = useSupabaseProgress<LeanCanvasData>("ideation_lean_canvas", {
-    problem: "",
-    solution: "",
-    uniqueValueProposition: "",
-    customerSegments: "",
-    existingAlternatives: "",
-    channels: "",
-    costStructure: "",
-    revenueStreams: ""
-  });
-  
-  const [analysis, setAnalysis] = useSupabaseProgress<AIAnalysis | null>("ideation_analysis", null);
-  
+const typeName = (id: string | null | undefined) => businessTypes.find((t) => t.id === id)?.name ?? null;
+
+export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { currentProject, setBusinessType } = useProject();
+  const [canvas, setCanvas, { loading: canvasLoading }] = useSupabaseProgress<LeanCanvasData>(
+    "ideation_lean_canvas",
+    EMPTY_CANVAS
+  );
+
+  const [preFilled, setPreFilled] = useState<FieldKey[]>([]);
+  const [usage, setUsage] = useState<AiUsage | null>(null);
+  const [suggestion, setSuggestion] = useState<CanvasSuggestion | null>(null);
+  const [evaluation, setEvaluation] = useState<CanvasEvaluation | null>(null);
+  const [dismissed, setDismissed] = useState<Set<FieldKey>>(new Set());
+  const [busy, setBusy] = useState<"navrh" | "vyhodnoceni" | null>(null);
+  const [aiOff, setAiOff] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
+  const fieldRefs = useRef<Partial<Record<FieldKey, HTMLTextAreaElement | null>>>({});
+  const evalRef = useRef<HTMLDivElement | null>(null);
+
+  const projectId = currentProject?.id;
+
   // Předvyplnění z fáze 1 – jen pole, která jsou zatím prázdná.
   useEffect(() => {
-    if (canvasLoading || !currentProject) return;
+    if (canvasLoading || !projectId) return;
     let active = true;
-    loadVisionSummary(currentProject.id).then((vision) => {
+    loadVisionSummary(projectId).then((vision) => {
       if (!active || !vision) return;
       const mapped = mapVisionToLeanCanvas(vision);
-      const toFill = (Object.keys(mapped) as (keyof LeanCanvasData)[]).filter(
-        (field) => !leanCanvasData[field]?.trim()
-      );
+      const toFill = (Object.keys(mapped) as FieldKey[]).filter((f) => !canvas[f]?.trim());
       if (toFill.length === 0) return;
-      setLeanCanvasData((prev) => ({
-        ...prev,
-        ...Object.fromEntries(toFill.map((f) => [f, mapped[f]])),
-      }));
-      setIsPreFilled(true);
-      setPreFilledFields(toFill);
+      setCanvas((prev) => ({ ...prev, ...Object.fromEntries(toFill.map((f) => [f, mapped[f]])) }));
+      setPreFilled(toFill);
     });
     return () => {
       active = false;
     };
     // Spouští se jednou po načtení canvasu daného projektu.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canvasLoading, currentProject?.id]);
-  
-  // Reset to empty form
-  const resetForm = () => {
-    setLeanCanvasData({
-      problem: "",
-      solution: "",
-      uniqueValueProposition: "",
-      customerSegments: "",
-      existingAlternatives: "",
-      channels: "",
-      costStructure: "",
-      revenueStreams: ""
+  }, [canvasLoading, projectId]);
+
+  // Poslední výstupy AI a spotřebované limity.
+  useEffect(() => {
+    if (!projectId) return;
+    let active = true;
+    setSuggestion(null);
+    setEvaluation(null);
+    setDismissed(new Set());
+    loadAiUsage(projectId, "2").then((u) => {
+      if (!active) return;
+      setUsage(u);
+      setSuggestion(u.latest.navrh);
+      setEvaluation(u.latest.vyhodnoceni);
     });
-    setIsPreFilled(false);
-    setPreFilledFields([]);
-  };
-  
-  const filledFields = Object.values(leanCanvasData).filter(value => value.trim().length > 0).length;
-  const progressPercentage = (filledFields / leanCanvasFields.length) * 100;
-  
-  const handleFieldChange = (key: keyof LeanCanvasData, value: string) => {
-    setLeanCanvasData(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-  
-  const handleAnalyze = async () => {
-    if (filledFields < 7) {
+    return () => {
+      active = false;
+    };
+  }, [projectId]);
+
+  const filled = FIELDS.filter((f) => canvas[f.key]?.trim()).length;
+  const left = (k: "navrh" | "vyhodnoceni") =>
+    usage ? Math.max(0, Math.min(AI_LIMITS[k] - usage.used[k], AI_LIMITS.daily - usage.usedDaily)) : AI_LIMITS[k];
+
+  const setField = (key: FieldKey, value: string) => setCanvas((prev) => ({ ...prev, [key]: value }));
+
+  const runAi = async (kind: "navrh" | "vyhodnoceni") => {
+    if (!projectId) return;
+    setBusy(kind);
+    const res = await callAi<CanvasSuggestion | CanvasEvaluation>(
+      projectId,
+      kind === "navrh" ? "canvas_suggest" : "canvas_evaluate"
+    );
+    setBusy(null);
+    if (res.error || !res.output) {
+      if (res.code === "ai_off") setAiOff(true);
+      toast({ title: "AI se nepodařilo použít", description: res.error, variant: "destructive" });
       return;
     }
-    
-    setIsAnalyzing(true);
-    try {
-      const aiAnalysis = await generateLeanCanvasAnalysis(leanCanvasData);
-      setAnalysis(aiAnalysis);
-      setShowVisualization(true);
-    } catch (error) {
-      console.error("Error analyzing canvas:", error);
-    } finally {
-      setIsAnalyzing(false);
+    setUsage((u) =>
+      u ? { ...u, used: { ...u.used, [kind]: u.used[kind] + 1 }, usedDaily: u.usedDaily + 1 } : u
+    );
+    if (kind === "navrh") {
+      const s = res.output as CanvasSuggestion;
+      setSuggestion(s);
+      setDismissed(new Set());
+      if (!currentProject?.business_type && s.businessType) await setBusinessType(projectId, s.businessType);
+      toast({ title: "Návrh je připravený", description: "U každého pole ho můžete použít nebo upravit." });
+    } else {
+      setEvaluation(res.output as CanvasEvaluation);
+      setTimeout(() => evalRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
   };
-  
-  const handleComplete = () => {
-    onComplete();
+
+  const suggestionFor = (key: FieldKey) => {
+    const text = suggestion?.fields?.[key]?.trim();
+    if (!text || dismissed.has(key) || text === canvas[key]?.trim()) return null;
+    return text;
   };
-  
-  if (showIntro) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
+
+  const dismiss = (key: FieldKey) => setDismissed((prev) => new Set(prev).add(key));
+
+  const applySuggestion = (key: FieldKey, text: string, edit = false) => {
+    setField(key, text);
+    dismiss(key);
+    if (edit) {
+      setTimeout(() => {
+        const el = fieldRefs.current[key];
+        el?.focus();
+        el?.setSelectionRange(el.value.length, el.value.length);
+      }, 0);
+    }
+  };
+
+  const fillEmptyFromSuggestion = () => {
+    if (!suggestion) return;
+    const empty = FIELDS.filter((f) => !canvas[f.key]?.trim() && suggestion.fields?.[f.key]?.trim());
+    setCanvas((prev) => ({ ...prev, ...Object.fromEntries(empty.map((f) => [f.key, suggestion.fields[f.key]])) }));
+  };
+
+  const pendingSuggestions = FIELDS.filter((f) => suggestionFor(f.key)).length;
+  const emptyWithSuggestion = suggestion
+    ? FIELDS.filter((f) => !canvas[f.key]?.trim() && suggestion.fields?.[f.key]?.trim()).length
+    : 0;
+
+  const checks = [
+    { label: "Alespoň 7 z 8 polí vyplněno", ok: filled >= 7, required: true },
+    { label: "Zvolený typ byznysu", ok: !!currentProject?.business_type, required: true },
+    { label: "Vyhodnocení canvasu (doporučeno)", ok: !!evaluation, required: false },
+  ];
+  const canFinish = checks.filter((c) => c.required).every((c) => c.ok);
+
+  const finish = () => {
+    onComplete();
+    setCelebrate(true);
+  };
+
+  const aiType = suggestion?.businessType;
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
+      {celebrate && (
+        <PhaseCelebration
+          gate={2}
+          title="Lean Canvas je hotový"
+          message="Typ byznysu, náklady a příjmy se propíšou do byznys case."
+          nextLabel="Pokračovat na Byznys case"
+          onNext={() => navigate("/strategy")}
+          onHome={() => navigate("/home")}
+        />
+      )}
+
+      {/* Hlavička */}
+      <Card className="card-apple p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-primary">Fáze 2 · Brána 2</p>
+            <h2 className="text-2xl font-bold text-foreground">Lean Canvas</h2>
+            <p className="text-sm text-muted-foreground">Celý byznys na jedné stránce – navazuje na váš modrý oceán.</p>
           </div>
-          
-          <Card className="card-apple p-8">
-            <div className="text-center space-y-6">
-              <div className="p-4 bg-primary/10 rounded-full w-20 h-20 mx-auto flex items-center justify-center">
-                <Lightbulb className="w-10 h-10 text-primary" />
-              </div>
-              
-              <div className="space-y-3">
-                <h1 className="text-3xl font-bold text-foreground">Fáze 2: Ideation</h1>
-                <p className="text-xl text-primary font-medium">Lean Canvas</p>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Vytvoříme business model pro váš projekt pomocí Lean Canvas metodiky. 
-                  Projdeme 9 klíčových oblastí, které definují úspěšný byznys.
-                </p>
-              </div>
-              
-              <div className="bg-accent/10 p-4 rounded-lg">
-                <h3 className="font-semibold text-foreground mb-2">Co vás čeká:</h3>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Vyplnění 9 polí Lean Canvas</li>
-                  <li>• AI analýza vašeho business modelu</li>
-                  <li>• Identifikace silných a slabých stránek</li>
-                  <li>• Doporučení pro další kroky</li>
-                </ul>
-              </div>
-              
-              <Button 
-                onClick={() => setShowIntro(false)}
-                className="btn-apple px-8 py-3 text-base"
-              >
-                Začít s Lean Canvas
-              </Button>
-            </div>
-          </Card>
+          <div className="text-right">
+            <p className="text-2xl font-bold text-primary">{filled}/8</p>
+            <p className="text-xs text-muted-foreground">polí vyplněno</p>
+          </div>
         </div>
-      </div>
-    );
-  }
-  
-  if (showVisualization && analysis) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
+        <Progress value={(filled / 8) * 100} className="mt-4 h-2" />
+      </Card>
+
+      {preFilled.length > 0 && (
+        <div className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 text-sm">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <p>
+            Z fáze 1 (Modrý oceán) jsme předvyplnili {preFilled.length}{" "}
+            {preFilled.length === 1 ? "pole" : preFilled.length < 5 ? "pole" : "polí"}. Klidně je upravte.
+          </p>
+        </div>
+      )}
+
+      {/* AI pomocník */}
+      <Card className="card-apple p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">AI pomocník</h3>
+              <p className="text-sm text-muted-foreground">
+                Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u každého
+                pole sami rozhodnete.
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Zbývá {left("navrh")} z {AI_LIMITS.navrh} návrhů pro tento projekt.
+              </p>
+            </div>
           </div>
-          
-          <div className="space-y-6">
-            {/* Lean Canvas Visualization */}
-            <Card className="card-apple p-6">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Váš Lean Canvas</h2>
-              <div className="lean-canvas-grid" style={{
-                // Add explicit debugging styles
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)',
-                gridTemplateRows: 'repeat(4, auto)',
-                gap: '1rem',
-                gridTemplateAreas: `
-                  "problem problem solution solution customer-segments"
-                  "existing-alternatives existing-alternatives unique-value-proposition unique-value-proposition customer-segments"
-                  "existing-alternatives existing-alternatives unique-value-proposition unique-value-proposition channels"
-                  "cost-structure cost-structure cost-structure revenue-streams revenue-streams"
-                `,
-                border: '2px solid red' // Debug border
-              }}>
-                {leanCanvasFields.map((field) => {
-                  const className = `lean-canvas-${field.key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
-                  console.log(`Field: ${field.key}, Generated class: ${className}, Grid area: ${field.gridArea}`);
-                  return (
-                    <Card key={field.key} className={`p-4 border-2 border-primary/20 min-h-[120px] ${className}`} 
-                          style={{ 
-                            gridArea: field.gridArea,
-                            border: '1px solid blue' // Debug border
-                          }}>
-                      <h3 className="font-semibold text-sm mb-2 text-foreground">{field.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {leanCanvasData[field.key] || "Nevyplněno"}
-                      </p>
-                    </Card>
-                  );
-                })}
+          <Button
+            className="btn-apple shrink-0"
+            onClick={() => runAi("navrh")}
+            disabled={busy !== null || left("navrh") === 0 || aiOff}
+          >
+            {busy === "navrh" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            {busy === "navrh" ? "Připravuji návrh…" : suggestion ? "Navrhnout znovu" : "Navrhnout s AI"}
+          </Button>
+        </div>
+
+        {aiOff && (
+          <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+            AI zatím není zapnutá. Canvas můžete vyplnit ručně a fázi dokončit i bez ní.
+          </p>
+        )}
+
+        {suggestion && emptyWithSuggestion > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-secondary p-3 text-sm">
+            <span>
+              Návrh je připravený u {pendingSuggestions} {pendingSuggestions === 1 ? "pole" : "polí"}.
+            </span>
+            <Button size="sm" variant="outline" className="rounded-lg" onClick={fillEmptyFromSuggestion}>
+              Vyplnit prázdná pole ({emptyWithSuggestion})
+            </Button>
+          </div>
+        )}
+      </Card>
+
+      {/* Typ byznysu */}
+      <Card className="card-apple p-6">
+        <h3 className="text-lg font-semibold">Typ online byznysu</h3>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Podle typu doporučíme ve fázi 4 postup tvorby a ve fázi 3 hlídané ukazatele.
+          {aiType && typeName(aiType) && (
+            <>
+              {" "}
+              AI doporučuje: <strong className="text-foreground">{typeName(aiType)}</strong>
+              {suggestion?.businessTypeReason ? ` – ${suggestion.businessTypeReason}` : ""}
+            </>
+          )}
+        </p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {businessTypes.map((t) => {
+            const selected = currentProject?.business_type === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => projectId && setBusinessType(projectId, t.id)}
+                className={`relative rounded-xl border px-3 py-2.5 text-left text-sm transition ${
+                  selected
+                    ? "border-primary bg-primary/10 font-semibold text-foreground"
+                    : "border-border bg-card hover:border-primary/40"
+                }`}
+                aria-pressed={selected}
+              >
+                {t.name}
+                {aiType === t.id && (
+                  <span className="mt-0.5 block text-xs font-normal text-primary">Doporučeno AI</span>
+                )}
+                {selected && <Check className="absolute right-2 top-2 h-4 w-4 text-primary" />}
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Pole canvasu */}
+      <div className="space-y-4">
+        {FIELDS.map((f, i) => {
+          const s = suggestionFor(f.key);
+          return (
+            <Card key={f.key} className="card-apple p-6">
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    <span className="mr-2 text-muted-foreground">{i + 1}.</span>
+                    {f.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{f.hint}</p>
+                </div>
+                {canvas[f.key]?.trim() && <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />}
               </div>
-            </Card>
-            
-            {/* AI Analysis */}
-            <Card className="card-apple p-6">
-              <div className="flex items-center mb-4">
-                <Brain className="w-6 h-6 mr-2 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">AI Analýza projektu</h2>
-              </div>
-              
-              <div className="space-y-6">
-                {/* Viability */}
-                <div className="flex items-start space-x-3">
-                  {analysis.isViable ? (
-                    <CheckCircle className="w-6 h-6 text-green-500 mt-1" />
-                  ) : (
-                    <AlertTriangle className="w-6 h-6 text-orange-500 mt-1" />
-                  )}
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      {analysis.isViable ? "✅ Projekt dává smysl" : "⚠️ Projekt vyžaduje úpravy"}
-                    </h3>
-                    <p className="text-muted-foreground">{analysis.reasoning}</p>
+
+              {s && (
+                <div className="mb-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
+                    <Sparkles className="h-3.5 w-3.5" /> Návrh AI
+                  </p>
+                  <p className="whitespace-pre-line text-sm text-foreground">{s}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button size="sm" className="rounded-lg" onClick={() => applySuggestion(f.key, s)}>
+                      <Check className="mr-1 h-4 w-4" /> Použít
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-lg" onClick={() => applySuggestion(f.key, s, true)}>
+                      <Pencil className="mr-1 h-4 w-4" /> Upravit
+                    </Button>
+                    <Button size="sm" variant="ghost" className="rounded-lg" onClick={() => dismiss(f.key)}>
+                      <X className="mr-1 h-4 w-4" /> Ponechat můj text
+                    </Button>
                   </div>
                 </div>
-                
-                {/* Strengths */}
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2 flex items-center">
-                    <ThumbsUp className="w-5 h-5 mr-2 text-green-500" />
-                    Silné stránky
-                  </h3>
-                  <ul className="space-y-1">
-                    {analysis.strengths.map((strength, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {strength}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                {/* Weaknesses */}
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2 flex items-center">
-                    <AlertTriangle className="w-5 h-5 mr-2 text-orange-500" />
-                    Slabé stránky
-                  </h3>
-                  <ul className="space-y-1">
-                    {analysis.weaknesses.map((weakness, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {weakness}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                {/* Risks */}
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2 flex items-center">
-                    <AlertCircle className="w-5 h-5 mr-2 text-red-500" />
-                    Hlavní rizika
-                  </h3>
-                  <ul className="space-y-1">
-                    {analysis.risks.map((risk, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {risk}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                {/* Recommendations */}
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2 flex items-center">
-                    <Zap className="w-5 h-5 mr-2 text-primary" />
-                    Doporučení
-                  </h3>
-                  <ul className="space-y-1">
-                    {analysis.recommendations.map((recommendation, index) => (
-                      <li key={index} className="text-sm text-muted-foreground">
-                        • {recommendation}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              )}
+
+              <Textarea
+                ref={(el) => (fieldRefs.current[f.key] = el)}
+                value={canvas[f.key]}
+                onChange={(e) => setField(f.key, e.target.value)}
+                placeholder={`Napište: ${f.title.toLowerCase()}`}
+                className="min-h-[110px]"
+              />
             </Card>
-            
-            {/* Next Steps */}
-            {analysis.isViable && (
-              <Card className="card-apple p-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-primary/20">
-                <div className="text-center space-y-4">
-                  <h3 className="text-xl font-semibold text-foreground">
-                    ✅ Tvůj projekt vypadá smysluplně
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Chceš nyní spočítat, zda bude ziskový a kdy se ti vrátí investice?
-                  </p>
-                  <Button 
-                    onClick={handleComplete}
-                    className="btn-apple px-8 py-3 text-base"
-                  >
-                    Pokračovat do fáze Business Case → Výpočet profitability a ROI
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
-        </div>
+          );
+        })}
       </div>
-    );
-  }
-  
-  return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
+
+      {/* Náhled canvasu */}
+      <Card className="card-apple p-6">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="flex items-center gap-2 text-lg font-semibold">
+            <LayoutGrid className="h-5 w-5 text-primary" /> Náhled na jedné stránce
+          </h3>
+          <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setShowGrid((v) => !v)}>
+            {showGrid ? "Skrýt" : "Zobrazit"}
+          </Button>
         </div>
-        
-        {/* Progress */}
-        <Card className="card-apple p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground">Lean Canvas</h2>
-              <p className="text-sm text-muted-foreground">
-                Vyplněno {filledFields} z {leanCanvasFields.length} polí
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary">
-                {Math.round(progressPercentage)}%
+        {showGrid && (
+          <div className="lean-grid mt-4 grid gap-2 text-sm">
+            {FIELDS.map((f) => (
+              <div key={f.key} className="rounded-xl bg-secondary p-3" style={{ gridArea: f.area }}>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{f.title}</p>
+                <p className="whitespace-pre-line">{canvas[f.key]?.trim() || "—"}</p>
               </div>
-              <div className="text-sm text-muted-foreground">hotovo</div>
-            </div>
+            ))}
           </div>
-          <Progress value={progressPercentage} className="h-2" />
-        </Card>
-        
-        {/* Pre-filled Data Notification */}
-        {isPreFilled && (
-          <Alert className="mb-6 border-primary/30 bg-primary/5">
-            <Info className="h-4 w-4 text-primary" />
-            <AlertDescription>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">
-                  Některá pole byla předvyplněna z Vision fáze ({preFilledFields.length} polí): <Eye className="w-4 h-4 inline ml-1" />
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={resetForm}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <RefreshCw className="w-4 h-4 mr-1" />
-                  Resetovat
-                </Button>
-              </div>
-            </AlertDescription>
-          </Alert>
         )}
-        
-        {/* Form */}
-        <div className="space-y-6">
-          {leanCanvasFields.map((field, index) => (
-            <Card key={field.key} className="card-apple p-6">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-foreground">{field.title}</h3>
+      </Card>
+
+      {/* Vyhodnocení */}
+      <div ref={evalRef}>
+        <Card className="card-apple p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                <ClipboardCheck className="h-5 w-5 text-primary" />
               </div>
-              
-              <div className="space-y-3">
-                <div className="bg-accent/10 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Vzorové vyplnění (EcoFood):</p>
-                  <p className="text-sm text-foreground italic">{field.placeholder}</p>
+              <div>
+                <h3 className="text-lg font-semibold">Vyhodnocení canvasu</h3>
+                <p className="text-sm text-muted-foreground">
+                  AI se podívá na canvas jako mentor: co je silné, co doplnit a kde si pole odporují.
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {filled < 7
+                    ? `Nejdřív vyplňte alespoň 7 polí (zbývá ${7 - filled}).`
+                    : `Zbývá ${left("vyhodnoceni")} z ${AI_LIMITS.vyhodnoceni} vyhodnocení pro tento projekt.`}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant={evaluation ? "outline" : "default"}
+              className="shrink-0 rounded-full"
+              onClick={() => runAi("vyhodnoceni")}
+              disabled={busy !== null || filled < 7 || left("vyhodnoceni") === 0 || aiOff}
+            >
+              {busy === "vyhodnoceni" ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : evaluation ? (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              ) : (
+                <ClipboardCheck className="mr-2 h-4 w-4" />
+              )}
+              {busy === "vyhodnoceni" ? "Vyhodnocuji…" : evaluation ? "Vyhodnotit znovu" : "Vyhodnotit canvas"}
+            </Button>
+          </div>
+
+          {evaluation && (
+            <div className="mt-6 space-y-5">
+              <p className="text-base leading-relaxed">{evaluation.summary}</p>
+              <ul className="divide-y divide-border/60 rounded-xl bg-secondary/60">
+                {evaluation.criteria?.map((c) => (
+                  <li key={c.name} className="flex flex-col gap-1 p-4 sm:flex-row sm:items-start sm:gap-4">
+                    <div className="flex shrink-0 items-center gap-2 sm:w-56">
+                      <span className="font-medium">{c.name}</span>
+                    </div>
+                    <span
+                      className={`w-fit shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        RATING_STYLE[c.rating] ?? "bg-secondary"
+                      }`}
+                    >
+                      {c.rating}
+                    </span>
+                    <p className="text-sm text-muted-foreground">{c.comment}</p>
+                  </li>
+                ))}
+              </ul>
+              {evaluation.contradictions?.length > 0 && (
+                <div>
+                  <h4 className="mb-2 flex items-center gap-2 font-semibold">
+                    <AlertTriangle className="h-4 w-4 text-amber-500" /> Rozpory k dořešení
+                  </h4>
+                  <ul className="list-disc space-y-1 pl-5 text-sm">
+                    {evaluation.contradictions.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
                 </div>
-                
-                <Textarea
-                  placeholder={`Napište svůj vlastní text pro: ${field.title}`}
-                  value={leanCanvasData[field.key]}
-                  onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                  className="min-h-[100px] resize-none"
-                />
-              </div>
-            </Card>
-          ))}
-        </div>
-        
-        {/* Actions */}
-        <Card className="card-apple p-6 mt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">
-                {filledFields < 7 ? 
-                  `Vyplňte alespoň 7 polí pro pokračování (${7 - filledFields} zbývá)` :
-                  "Všechna klíčová pole jsou vyplněna"
-                }
+              )}
+              {evaluation.nextSteps?.length > 0 && (
+                <div>
+                  <h4 className="mb-2 font-semibold">Co udělat teď</h4>
+                  <ol className="list-decimal space-y-1 pl-5 text-sm">
+                    {evaluation.nextSteps.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Vyhodnocení je doporučení, ne verdikt. Rozhodnutí je na vás – případně ho proberte s lektorem.
               </p>
             </div>
-            <div className="space-x-3">
-              <Button 
-                onClick={handleAnalyze}
-                disabled={filledFields < 7 || isAnalyzing}
-                className="btn-apple"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
-                    Analyzuji...
-                  </>
-                ) : (
-                  <>
-                    <Brain className="w-4 h-4 mr-2" />
-                    Vyhodnotit projekt
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
+          )}
         </Card>
       </div>
+
+      {/* Kontrola a dokončení */}
+      <Card className="card-apple p-6">
+        <h3 className="mb-3 text-lg font-semibold">Kontrola před dokončením</h3>
+        <ul className="mb-5 space-y-2 text-sm">
+          {checks.map((c) => (
+            <li key={c.label} className="flex items-center gap-2">
+              {c.ok ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              ) : (
+                <span className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`} />
+              )}
+              <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
+            </li>
+          ))}
+        </ul>
+        <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
+          Dokončit fázi 2
+        </Button>
+      </Card>
     </div>
   );
 };

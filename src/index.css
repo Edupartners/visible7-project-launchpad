@@ -268,3 +268,17 @@
     height: 210mm !important;
   }
 }
+
+/* Lean Canvas – náhled na jedné stránce */
+@media (min-width: 768px) {
+  .lean-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-areas:
+      "problem solution usp customer customer"
+      "alternatives channels usp customer customer"
+      "costs costs costs revenue revenue";
+  }
+}
+@media (max-width: 767px) {
+  .lean-grid > * { grid-area: auto !important; }
+}

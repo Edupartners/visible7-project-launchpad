@@ -19,7 +19,6 @@ const IdeationPage = () => {
       }
       return prev;
     });
-    navigate('/home');
   };
 
   const handleBack = () => {
@@ -31,24 +30,24 @@ const IdeationPage = () => {
   };
 
   const learningPoints = [
-    { text: "Design Thinking proces - od empatie k testování", color: "bg-violet-500" },
-    { text: "Persony a customer journey mapping", color: "bg-emerald-500" },
-    { text: "Brainstorming a ideation techniky", color: "bg-orange-500" },
-    { text: "Validace nápadů a concept testování", color: "bg-cyan-500" }
+    { text: "Celý byznys na jedné stránce – 8 polí Lean Canvasu", color: "bg-violet-500" },
+    { text: "Navázání na modrý oceán: zákazník, problém, USP", color: "bg-emerald-500" },
+    { text: "Volba typu online byznysu", color: "bg-orange-500" },
+    { text: "Vyhodnocení canvasu s AI mentorem", color: "bg-cyan-500" }
   ];
 
   if (showIntro) {
     return (
       <PageLayout onBack={handleBack}>
         <PhaseIntroTemplate
-          title="Ideation"
-          subtitle="Design Thinking a generování nápadů"
-          description="Ve fázi Ideation se zaměříme na systematické generování a validaci nápadů pomocí Design Thinking metodiky. Naučíte se vytvářet persony, mapovat customer journey a aplikovat pokročilé brainstorming techniky. Cílem je transformovat vaši vizi z předchozí fáze na konkrétní, validované nápady, které můžete dále rozvíjet."
+          title="Lean Canvas"
+          subtitle="Celý byznys na jedné stránce"
+          description="Z modrého oceánu převezmeme zákazníka, problém a USP. AI pomocník navrhne zbylá pole – řešení, kanály, náklady a příjmy – a odhadne typ online byznysu. Vy rozhodnete, co použijete. Nakonec canvas vyhodnotí AI mentor."
           phaseNumber={2}
           icon={Lightbulb}
           learningPoints={learningPoints}
-          estimatedTime="35 minut"
-          steps={6}
+          estimatedTime="25 minut"
+          steps={4}
           hasAiValidation={true}
           onStart={handleStart}
           onBack={handleBack}
