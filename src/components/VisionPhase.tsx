@@ -1,1112 +1,528 @@
-
-import React, { useState, useEffect } from "react";
-import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  Circle,
+  Lightbulb,
+  Minus,
+  Package,
+  Plus,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Users,
+  Wand2,
+  X,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
-import { 
-  ArrowRight, 
-  Eye, 
-  Lightbulb, 
-  FileText, 
-  Sparkles,
-  Download,
-  Info,
-  Plus,
-  Minus,
-  TrendingUp,
-  Target,
-  VideoIcon,
-  BookOpen,
-  ExternalLink,
-  RefreshCw
-} from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import { PhaseCelebration } from "@/components/PhaseCelebration";
+import {
+  EMPTY_ERRC,
+  ErrcItem,
+  ErrcMatrix,
+  ErrcQuadrant,
+  VISION_KEYS,
+  VisionBasics,
+  errcTexts,
+} from "@/lib/projectData";
 
 interface VisionPhaseProps {
   onComplete: () => void;
   onBack: () => void;
 }
 
-interface ProjectData {
-  name: string;
-  slogan: string;
-}
-
-interface ERRCData {
-  eliminate: string[];
-  reduce: string[];
-  raise: string[];
-  create: string[];
-}
-
-interface ValueCurveAttribute {
-  name: string;
-  lowCost: number;
-  premium: number;
-  myProject: number;
-  type?: string;
-  color?: string;
-}
-
-const defaultAttributes: ValueCurveAttribute[] = [
-  { name: "Cena", lowCost: 90, premium: 20, myProject: 60 },
-  { name: "Kvalita", lowCost: 30, premium: 90, myProject: 75 },
-  { name: "Důvěra", lowCost: 20, premium: 80, myProject: 85 },
-  { name: "Masovost", lowCost: 90, premium: 30, myProject: 40 },
-  { name: "Rychlost", lowCost: 40, premium: 60, myProject: 90 },
-  { name: "Přizpůsobení", lowCost: 10, premium: 70, myProject: 95 }
+const QUADRANTS: {
+  key: ErrcQuadrant;
+  title: string;
+  question: string;
+  placeholder: string;
+  icon: typeof Minus;
+  tone: string;
+}[] = [
+  {
+    key: "eliminate",
+    title: "Eliminovat",
+    question: "Co trh považuje za samozřejmé, ale vy to vůbec nabízet nebudete?",
+    placeholder: "např. kamenná pobočka",
+    icon: X,
+    tone: "text-red-600 bg-red-500/10",
+  },
+  {
+    key: "reduce",
+    title: "Snížit",
+    question: "Co nabídnete výrazně méně než konkurence?",
+    placeholder: "např. délka lekce",
+    icon: ArrowDown,
+    tone: "text-orange-600 bg-orange-500/10",
+  },
+  {
+    key: "raise",
+    title: "Zvýšit",
+    question: "Co uděláte výrazně lépe než konkurence?",
+    placeholder: "např. praktičnost",
+    icon: ArrowUp,
+    tone: "text-blue-600 bg-blue-500/10",
+  },
+  {
+    key: "create",
+    title: "Vytvořit",
+    question: "Co přinesete úplně nového, co na trhu není?",
+    placeholder: "např. týdenní plán jídel",
+    icon: Plus,
+    tone: "text-emerald-600 bg-emerald-500/10",
+  },
 ];
 
-const errcTemplate = {
-  eliminate: ["Vysoké režijní náklady", "Složité procesy"],
-  reduce: ["Čas dodání", "Administrativu"],
-  raise: ["Kvalita služeb", "Zákaznický servis", "Personalizace"],
-  create: ["Unikátní metodiku", "Komunitní přístup", "AI analýzy"]
+const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(Number.isFinite(n) ? n : 0)));
+const newId = () => Math.random().toString(36).slice(2, 10);
+
+const defaultsFor = (q: ErrcQuadrant): Omit<ErrcItem, "id" | "text"> => {
+  switch (q) {
+    case "eliminate":
+      return { lowCost: 50, premium: 80, mine: 0 };
+    case "reduce":
+      return { lowCost: 50, premium: 80, mine: 20 };
+    case "raise":
+      return { lowCost: 30, premium: 60, mine: 90 };
+    case "create":
+      return { lowCost: 0, premium: 0, mine: 80 };
+  }
 };
 
-export const VisionPhase = ({ onComplete, onBack }: VisionPhaseProps) => {
-  // Debug cache busting - Vision v2.2 with create attributes fix
-  const VISION_VERSION = "VisionPhase_v2.2_CreateAttributesFix_" + Date.now();
-  
-  useEffect(() => {
-    console.log("🎯 VisionPhase Loading - Version:", VISION_VERSION);
-    console.log("🎨 Create attributes will show only myProject values");
-    console.log("📊 Value curve filtered for create attributes");
-  }, []);
+/** Pole, které je v daném kvadrantu dané metodikou a nedá se měnit. */
+const isLocked = (q: ErrcQuadrant, field: "lowCost" | "premium" | "mine") =>
+  (q === "eliminate" && field === "mine") || (q === "create" && field !== "mine");
 
-  const [showIntro, setShowIntro] = useState(true);
-  
-  // Form data - persisted in Supabase (per-user, cross-device)
-  const [projectData, setProjectData] = useSupabaseProgress<ProjectData>("vision_project_data", { name: "", slogan: "" });
-  const [errcData, setERRCData] = useSupabaseProgress<ERRCData>("vision_errc_data", {
-    eliminate: ["", ""],
-    reduce: ["", ""],
-    raise: ["", ""],
-    create: ["", ""]
+const SectionHeader = ({ icon: Icon, step, title, subtitle }: { icon: typeof Users; step: number; title: string; subtitle: string }) => (
+  <div className="mb-5 flex items-start gap-3">
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      <Icon className="h-5 w-5" />
+    </div>
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Krok {step}</p>
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+      <p className="text-sm text-muted-foreground">{subtitle}</p>
+    </div>
+  </div>
+);
+
+const Field = ({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) => (
+  <div className="space-y-1.5">
+    <label className="block text-sm font-medium text-foreground">{label}</label>
+    {children}
+    {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+  </div>
+);
+
+const shorten = (s: string, n = 16) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
+
+export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
+  const navigate = useNavigate();
+  const [basics, setBasics] = useSupabaseProgress<VisionBasics>(VISION_KEYS.basics, {
+    name: "",
+    slogan: "",
+    customer: "",
+    problem: "",
+    offering: "",
   });
-  const [valueCurve, setValueCurve] = useSupabaseProgress<ValueCurveAttribute[]>("vision_value_curve", defaultAttributes);
-  const [visionStatement, setVisionStatement] = useSupabaseProgress<string>("vision_statement", "");
-  
-  // AI Analysis - persisted in Supabase
-  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
-  const [analysis, setAnalysis] = useSupabaseProgress<string | null>("vision_analysis", null);
-  const [canProceed, setCanProceed] = useState(false);
+  const [errc, setErrc, { loading: errcLoading }] = useSupabaseProgress<ErrcMatrix>(VISION_KEYS.errc, EMPTY_ERRC);
+  const [legacyErrc, , { loading: legacyLoading }] = useSupabaseProgress<Record<ErrcQuadrant, string[]> | null>(
+    "vision_errc_data",
+    null
+  );
+  const [usp, setUsp] = useSupabaseProgress<string>(VISION_KEYS.usp, "");
+  const [celebrate, setCelebrate] = useState(false);
+  const migrated = useRef(false);
 
-  // Reset all data function
-  const resetAllData = () => {
-    console.log("🔄 Resetting all Vision phase data");
-    setProjectData({ name: "", slogan: "" });
-    setERRCData({
-      eliminate: ["", ""],
-      reduce: ["", ""],
-      raise: ["", ""],
-      create: ["", ""]
-    });
-    setValueCurve(defaultAttributes);
-    setVisionStatement("");
-    setAnalysis(null);
-    setCanProceed(false);
-  };
+  // Převzetí položek ze starší verze matice (jen texty, hodnoty výchozí).
+  useEffect(() => {
+    if (migrated.current || errcLoading || legacyLoading) return;
+    migrated.current = true;
+    if (!legacyErrc) return;
+    const empty = QUADRANTS.every((q) => (errc[q.key] ?? []).length === 0);
+    if (!empty) return;
+    const converted = Object.fromEntries(
+      QUADRANTS.map((q) => [
+        q.key,
+        (legacyErrc[q.key] ?? [])
+          .filter((t) => typeof t === "string" && t.trim())
+          .map((t) => ({ id: newId(), text: t.trim(), ...defaultsFor(q.key) })),
+      ])
+    ) as ErrcMatrix;
+    if (QUADRANTS.some((q) => converted[q.key].length > 0)) setErrc(converted);
+  }, [errcLoading, legacyLoading, legacyErrc, errc, setErrc]);
 
-  const sections = [
-    { id: "basic", title: "Základní informace", icon: FileText, completed: () => projectData.name.trim() && projectData.slogan.trim() },
-    { id: "errc", title: "ERRC Matice", icon: Target, completed: () => Object.values(errcData).every(arr => arr.some(item => item.trim())) },
-    { id: "curve", title: "Hodnotová křivka", icon: TrendingUp, completed: () => true },
-    { id: "vision", title: "Vision Statement", icon: Eye, completed: () => visionStatement.trim().length > 0 },
-    { id: "analysis", title: "AI Validace", icon: Sparkles, completed: () => analysis !== null }
-  ];
+  const setBasic = (field: keyof VisionBasics, value: string) => setBasics((prev) => ({ ...prev, [field]: value }));
 
-  const updateERRCItem = (category: keyof ERRCData, index: number, value: string) => {
-    setERRCData(prev => ({
-      ...prev,
-      [category]: prev[category].map((item, i) => i === index ? value : item)
-    }));
-  };
+  const addItem = (q: ErrcQuadrant) =>
+    setErrc((prev) => ({ ...prev, [q]: [...(prev[q] ?? []), { id: newId(), text: "", ...defaultsFor(q) }] }));
 
-  const addERRCItem = (category: keyof ERRCData) => {
-    setERRCData(prev => ({
-      ...prev,
-      [category]: [...prev[category], ""]
-    }));
-  };
+  const updateItem = (q: ErrcQuadrant, id: string, patch: Partial<ErrcItem>) =>
+    setErrc((prev) => ({ ...prev, [q]: (prev[q] ?? []).map((i) => (i.id === id ? { ...i, ...patch } : i)) }));
 
-  const removeERRCItem = (category: keyof ERRCData, index: number) => {
-    setERRCData(prev => ({
-      ...prev,
-      [category]: prev[category].filter((_, i) => i !== index)
-    }));
-  };
+  const removeItem = (q: ErrcQuadrant, id: string) =>
+    setErrc((prev) => ({ ...prev, [q]: (prev[q] ?? []).filter((i) => i.id !== id) }));
 
-  // ERRC to Value Curve conversion
-  const generateValueCurveFromERRC = () => {
-    console.log("🔄 Generating value curve with ERRC - Create attributes will have lowCost=0, premium=0");
-    const errcAttributes = [];
-    
-    // Add attributes from ERRC matrix in order: Eliminate → Reduce → Raise → Create
-    errcData.eliminate.filter(item => item.trim()).forEach(item => {
-      errcAttributes.push({
-        name: item,
-        lowCost: 50,
-        premium: 50,
-        myProject: 50,
-        type: 'eliminate',
-        color: '#ef4444' // red
-      });
-    });
-    
-    errcData.reduce.filter(item => item.trim()).forEach(item => {
-      errcAttributes.push({
-        name: item,
-        lowCost: 50,
-        premium: 50,
-        myProject: 50,
-        type: 'reduce',
-        color: '#f97316' // orange
-      });
-    });
-    
-    errcData.raise.filter(item => item.trim()).forEach(item => {
-      errcAttributes.push({
-        name: item,
-        lowCost: 50,
-        premium: 50,
-        myProject: 50,
-        type: 'raise',
-        color: '#3b82f6' // blue
-      });
-    });
-    
-    errcData.create.filter(item => item.trim()).forEach(item => {
-      errcAttributes.push({
-        name: item,
-        lowCost: 0,  // Always 0 for create attributes
-        premium: 0,  // Always 0 for create attributes
-        myProject: 50,
-        type: 'create',
-        color: '#10b981' // green
-      });
-    });
-    
-    return errcAttributes;
-  };
-
-  // Generate ERRC attributes and update value curve
-  const generateERRCAttributes = () => {
-    console.log("🎯 Manual ERRC attribute generation triggered");
-    const errcAttributes = generateValueCurveFromERRC();
-    console.log("🔍 Generated ERRC attributes:", errcAttributes);
-    
-    if (errcAttributes.length > 0) {
-      console.log("✅ Updating value curve with ERRC attributes");
-      setValueCurve(prev => {
-        // Always preserve "Cena" as first attribute
-        const cenaAttribute = prev.find(attr => attr.name === "Cena") || {
-          name: "Cena",
-          lowCost: 90,
-          premium: 20,
-          myProject: 60
-        };
-        
-        // Preserve existing values for matching ERRC attributes
-        const updatedERRCAttributes = errcAttributes.map(newAttr => {
-          const existingAttr = prev.find(attr => attr.name === newAttr.name);
-          if (existingAttr) {
-            return { ...newAttr, lowCost: existingAttr.lowCost, premium: existingAttr.premium, myProject: existingAttr.myProject };
-          }
-          return newAttr;
-        });
-        
-        // Return array with Cena first, followed by ERRC attributes
-        const newValueCurve = [cenaAttribute, ...updatedERRCAttributes];
-        console.log("📊 New value curve:", newValueCurve);
-        return newValueCurve;
-      });
-    } else {
-      console.log("⚠️ No ERRC attributes generated - ERRC data might be empty");
-    }
-  };
-
-  // Update value curve when ERRC data changes
-  React.useEffect(() => {
-    console.log("🔄 ERRC data changed, updating value curve...");
-    console.log("📝 Current ERRC data:", errcData);
-    generateERRCAttributes();
-  }, [errcData]);
-
-  const updateValueCurve = (attributeIndex: number, type: 'lowCost' | 'premium' | 'myProject', value: number) => {
-    setValueCurve(prev => prev.map((attr, i) => 
-      i === attributeIndex ? { ...attr, [type]: value } : attr
-    ));
-  };
-
-  const updateAttributeName = (attributeIndex: number, newName: string) => {
-    setValueCurve(prev => prev.map((attr, i) => 
-      i === attributeIndex ? { ...attr, name: newName } : attr
-    ));
-  };
-
-  const addCustomAttribute = () => {
-    if (valueCurve.length < 10) {
-      setValueCurve(prev => [...prev, { 
-        name: `Nový atribut ${valueCurve.length + 1}`, 
-        lowCost: 50, 
-        premium: 50, 
-        myProject: 50 
-      }]);
-    }
-  };
-
-  const removeCustomAttribute = (attributeIndex: number) => {
-    if (attributeIndex >= 0 && valueCurve.length > 1) {
-      setValueCurve(prev => prev.filter((_, i) => i !== attributeIndex));
-    }
-  };
-
-  const getCompletionProgress = () => {
-    const completedCount = sections.filter(section => section.completed()).length;
-    return (completedCount / sections.length) * 100;
-  };
-
-  const canGenerateAnalysis = () => {
-    return sections.slice(0, 4).every(section => section.completed());
-  };
-
-  const allDataComplete = () => {
-    return sections.every(section => section.completed());
-  };
-
-  const generateAnalysis = async () => {
-    if (!canGenerateAnalysis()) return;
-    
-    setIsGeneratingAnalysis(true);
-    
-    // Simulace AI analýzy (zde by byla integrace s OpenAI)
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    const mockAnalysis = `
-**Blue Ocean Strategy Analýza - ${projectData.name}**
-
-🎯 **Hodnocení vaší vize:**
-${projectData.slogan ? `"${projectData.slogan}" - silný a jasný slogan, který komunikuje hodnotu.` : ""}
-
-📊 **ERRC Matice hodnocení:**
-• **Eliminace**: ${errcData.eliminate.filter(Boolean).length}/2 definováno - ${errcData.eliminate.filter(Boolean).length >= 1 ? '✅ Dobře identifikováno' : '⚠️ Potřebuje doplnění'}
-• **Redukce**: ${errcData.reduce.filter(Boolean).length}/2 definováno - ${errcData.reduce.filter(Boolean).length >= 1 ? '✅ Jasné úspory' : '⚠️ Potřebuje doplnění'}  
-• **Pozvýšení**: ${errcData.raise.filter(Boolean).length}/2 definováno - ${errcData.raise.filter(Boolean).length >= 1 ? '✅ Konkurenční výhoda' : '⚠️ Potřebuje doplnění'}
-• **Vytvoření**: ${errcData.create.filter(Boolean).length}/2 definováno - ${errcData.create.filter(Boolean).length >= 1 ? '✅ Inovativní přístup' : '⚠️ Potřebuje doplnění'}
-
-🌊 **Blue Ocean potenciál:**
-${getBlueOceanScore()}/10 - ${getBlueOceanScore() >= 7 ? 'Vysoký potenciál pro modré oceán!' : getBlueOceanScore() >= 5 ? 'Střední potenciál, optimalizujte strategii' : 'Nízký potenciál, přepracujte koncept'}
-
-💡 **Doporučení:**
-${getRecommendations()}
-
-📈 **Váš Vision Score: ${getVisionScore()}/10**
-
-${getVisionScore() >= 7 ? '🎉 Vaše vize má silný potenciál! Můžete pokračovat k další fázi Ideation.' : '⚠️ Doporučujeme vylepšit vizi před pokračováním do další fáze.'}
-    `;
-    
-    setAnalysis(mockAnalysis.trim());
-    setCanProceed(getVisionScore() >= 7);
-    setIsGeneratingAnalysis(false);
-  };
-
-  const getBlueOceanScore = () => {
-    const uniquePositions = valueCurve.filter(attr => 
-      Math.abs(attr.myProject - attr.lowCost) > 20 && 
-      Math.abs(attr.myProject - attr.premium) > 20
-    ).length;
-    return Math.round((uniquePositions / valueCurve.length) * 10);
-  };
-
-  const getVisionScore = () => {
-    let score = 0;
-    if (projectData.name.trim()) score += 1;
-    if (projectData.slogan.trim()) score += 1;
-    if (errcData.eliminate.filter(Boolean).length >= 1) score += 2;
-    if (errcData.reduce.filter(Boolean).length >= 1) score += 1;
-    if (errcData.raise.filter(Boolean).length >= 1) score += 1;
-    if (errcData.create.filter(Boolean).length >= 1) score += 2;
-    if (visionStatement.trim().length > 50) score += 2;
-    return score;
-  };
-
-  const getRecommendations = () => {
-    const recommendations = [];
-    if (!projectData.name.trim()) recommendations.push("• Definujte jasný název projektu");
-    if (!projectData.slogan.trim()) recommendations.push("• Vytvořte výstižný slogan");
-    if (errcData.eliminate.filter(Boolean).length === 0) recommendations.push("• Identifikujte co eliminovat z trhu");
-    if (errcData.create.filter(Boolean).length === 0) recommendations.push("• Definujte inovativní prvky");
-    if (visionStatement.length < 50) recommendations.push("• Rozšiřte vision statement (min. 50 znaků)");
-    
-    return recommendations.length > 0 ? recommendations.join("\n") : "• Vaše vize je dobře strukturovaná, pokračujte k implementaci";
-  };
-
-  const exportToPDF = () => {
-    const dataStr = `VISIBLE7 - Vision Phase Results
-
-Projekt: ${projectData.name}
-Slogan: ${projectData.slogan}
-
-ERRC Matice:
-Eliminovat: ${errcData.eliminate.filter(Boolean).join(', ')}
-Redukovat: ${errcData.reduce.filter(Boolean).join(', ')}
-Pozvednout: ${errcData.raise.filter(Boolean).join(', ')}
-Vytvořit: ${errcData.create.filter(Boolean).join(', ')}
-
-Hodnotová křivka:
-${valueCurve.map(attr => 
-  `${attr.name}: Low-cost(${attr.lowCost}), Premium(${attr.premium}), Můj projekt(${attr.myProject})`
-).join('\n')}
-
-Vision Statement:
-${visionStatement}
-
-AI Analýza:
-${analysis}`;
-    
-    const dataBlob = new Blob([dataStr], {type: 'text/plain'});
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `VISIBLE7-Vision-${projectData.name || 'Project'}.txt`;
-    link.click();
-  };
-
-  // Prepare chart data - filter out create attributes with zero values
-  const prepareChartData = () => {
-    return valueCurve.map(attr => ({
-      name: attr.name,
-      lowCost: attr.type === 'create' ? null : attr.lowCost, // Hide create attributes from chart
-      premium: attr.type === 'create' ? null : attr.premium, // Hide create attributes from chart
-      myProject: attr.myProject,
-      type: attr.type
-    }));
-  };
-
-  // Render Methods
-  const renderBasicInfo = () => (
-    <Card className="card-apple p-6 mb-6">
-      <div className="flex items-center mb-4">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-blue-600 flex items-center justify-center mr-3">
-          <FileText className="w-4 h-4" />
-        </div>
-        <h3 className="text-lg font-semibold">Základní informace o projektu</h3>
-      </div>
-      
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Název projektu *</label>
-          <Input
-            value={projectData.name}
-            onChange={(e) => setProjectData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Zadejte název vašeho projektu..."
-            className="input-apple"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-2">Slogan / tagline</label>
-          <Input
-            value={projectData.slogan}
-            onChange={(e) => setProjectData(prev => ({ ...prev, slogan: e.target.value }))}
-            placeholder="Stručně popište hodnotu vašeho produktu..."
-            className="input-apple"
-          />
-        </div>
-      </div>
-    </Card>
+  const curve = useMemo(
+    () =>
+      QUADRANTS.flatMap((q) =>
+        (errc[q.key] ?? [])
+          .filter((i) => i.text.trim())
+          .map((i) => ({
+            name: shorten(i.text.trim()),
+            full: `${q.title}: ${i.text.trim()}`,
+            "Low-cost konkurence": q.key === "create" ? 0 : i.lowCost,
+            "Prémiová konkurence": q.key === "create" ? 0 : i.premium,
+            "Můj projekt": q.key === "eliminate" ? 0 : i.mine,
+          }))
+      ),
+    [errc]
   );
 
-  const renderERRCMatrix = () => (
-    <Card className="card-apple p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-purple-600 flex items-center justify-center mr-3">
-            <Target className="w-4 h-4" />
-          </div>
-          <h3 className="text-lg font-semibold">ERRC Matice</h3>
-        </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="w-4 h-4 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs">Definujte co eliminovat, redukovat, pozvýšit a vytvořit oproti konkurenci</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Eliminate */}
-        <div className="space-y-3">
-          <div className="flex items-center">
-            <h4 className="font-medium text-red-600 flex items-center">
-              <Minus className="w-4 h-4 mr-2" />
-              Eliminovat
-            </h4>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-red-600 ml-2" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">Co můžete úplně odstranit z trhu? Zamyslete se nad zbytečnými funkcemi, službami nebo procesy, které konkurence nabízí, ale zákazníci je nepotřebují nebo je považují za obtěžující.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          {errcData.eliminate.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Input
-                value={item}
-                onChange={(e) => updateERRCItem('eliminate', index, e.target.value)}
-                placeholder="Co odstranit z trhu..."
-                className="input-apple flex-1"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeERRCItem('eliminate', index)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => addERRCItem('eliminate')}
-            className="w-full"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Přidat
-          </Button>
-        </div>
+  const suggestUsp = () => {
+    const created = errcTexts(errc, "create");
+    const raised = errcTexts(errc, "raise");
+    const parts = [
+      basics.customer?.trim() ? `Pro ${basics.customer.trim()}` : "",
+      basics.offering?.trim() ? `nabízíme ${basics.offering.trim()}` : "",
+    ].filter(Boolean);
+    const diff = [...created, ...raised].slice(0, 3);
+    const draft = `${parts.join(", ")}${parts.length ? "." : ""}${diff.length ? ` Na rozdíl od konkurence: ${diff.join(", ")}.` : ""}`;
+    setUsp(draft.trim());
+  };
 
-        {/* Reduce */}
-        <div className="space-y-3">
-          <div className="flex items-center">
-            <h4 className="font-medium text-orange-600 flex items-center">
-              <Minus className="w-4 h-4 mr-2" />
-              Redukovat
-            </h4>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-orange-600 ml-2" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">Co můžete výrazně snížit pod standardní úroveň? Identifikujte oblasti, kde lze ušetřit náklady nebo zjednodušit bez ztráty hodnoty pro zákazníka.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          {errcData.reduce.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Input
-                value={item}
-                onChange={(e) => updateERRCItem('reduce', index, e.target.value)}
-                placeholder="Co snížit pod standard..."
-                className="input-apple flex-1"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeERRCItem('reduce', index)}
-                className="text-orange-500 hover:text-orange-700"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => addERRCItem('reduce')}
-            className="w-full"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Přidat
-          </Button>
-        </div>
+  const checks = useMemo(() => {
+    const named = curve.length;
+    const diffFrom = (key: "Low-cost konkurence" | "Prémiová konkurence") =>
+      curve.filter((c) => Math.abs(c["Můj projekt"] - c[key]) >= 20).length;
+    return [
+      {
+        label: "Víte, komu prodáváte a jaký má problém",
+        ok: (basics.customer ?? "").trim().length >= 10 && (basics.problem ?? "").trim().length >= 10,
+        required: true,
+      },
+      {
+        label: "Víte, co prodáváte, a projekt má název",
+        ok: (basics.offering ?? "").trim().length >= 5 && basics.name.trim().length > 0,
+        required: true,
+      },
+      { label: "Něco přinášíte úplně nového (Vytvořit)", ok: errcTexts(errc, "create").length > 0, required: true },
+      {
+        label: "Něco vynecháváte nebo snižujete – bez toho modrý oceán nevznikne",
+        ok: errcTexts(errc, "eliminate").length + errcTexts(errc, "reduce").length > 0,
+        required: false,
+      },
+      {
+        label: "Vaše křivka se liší od low-cost i prémiové konkurence (aspoň ve 2 bodech o 20+)",
+        ok: named > 0 && diffFrom("Low-cost konkurence") >= 2 && diffFrom("Prémiová konkurence") >= 2,
+        required: false,
+      },
+      { label: "Máte napsané USP", ok: usp.trim().length >= 20, required: true },
+    ];
+  }, [basics, errc, usp, curve]);
 
-        {/* Raise */}
-        <div className="space-y-3">
-          <div className="flex items-center">
-            <h4 className="font-medium text-blue-600 flex items-center">
-              <Plus className="w-4 h-4 mr-2" />
-              Pozvýšit
-            </h4>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-blue-600 ml-2" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">Co můžete zvýšit nad standardní úroveň konkurence? Určete faktory, které jsou pro zákazníky důležité a kde můžete předčit očekávání.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          {errcData.raise.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Input
-                value={item}
-                onChange={(e) => updateERRCItem('raise', index, e.target.value)}
-                placeholder="Co zlepšit nad standard..."
-                className="input-apple flex-1"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeERRCItem('raise', index)}
-                className="text-blue-500 hover:text-blue-700"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => addERRCItem('raise')}
-            className="w-full"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Přidat
-          </Button>
-        </div>
+  const done = checks.filter((c) => c.ok).length;
+  const canFinish = checks.filter((c) => c.required).every((c) => c.ok);
 
-        {/* Create */}
-        <div className="space-y-3">
-          <div className="flex items-center">
-            <h4 className="font-medium text-green-600 flex items-center">
-              <Plus className="w-4 h-4 mr-2" />
-              Vytvořit
-            </h4>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="w-4 h-4 text-green-600 ml-2" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">Co můžete vytvořit úplně nového? Definujte inovativní prvky, služby nebo hodnoty, které na trhu ještě neexistují a které vytvoří novou poptávku.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          {errcData.create.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Input
-                value={item}
-                onChange={(e) => updateERRCItem('create', index, e.target.value)}
-                placeholder="Co nového přinést..."
-                className="input-apple flex-1"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeERRCItem('create', index)}
-                className="text-green-500 hover:text-green-700"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => addERRCItem('create')}
-            className="w-full"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Přidat
-          </Button>
-        </div>
-      </div>
-    </Card>
-  );
-
-  const renderValueCurve = () => (
-    <Card className="card-apple p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 flex items-center justify-center mr-3">
-            <TrendingUp className="w-4 h-4" />
-          </div>
-          <h3 className="text-lg font-semibold">Hodnotová křivka</h3>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="w-4 h-4 text-emerald-600 ml-2" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-xs">Vizualizace pozice vašeho projektu vůči konkurenci na různých atributech. Pomáhá identifikovat Blue Ocean příležitosti.</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={addCustomAttribute}
-          disabled={valueCurve.length >= 10}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Přidat atribut
-        </Button>
-      </div>
-      
-      {/* Info box explaining values and competition modeling */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg border border-blue-200">
-        <div className="flex items-start space-x-3">
-          <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Info className="w-3 h-3" />
-          </div>
-          <div className="space-y-3 text-sm">
-            <div>
-              <h4 className="font-semibold text-blue-900 mb-2">Jak nastavit hodnoty (0-100%):</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-blue-800">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span><strong>0%</strong> = Minimum/Nejhorší</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <span><strong>50%</strong> = Standardní tržní úroveň</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span><strong>100%</strong> = Maximum/Nejlepší</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-blue-900 mb-2">Jak modelovat konkurenci:</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-blue-800">
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <div className="w-3 h-1 bg-blue-500 rounded-full"></div>
-                    <span className="font-medium">Low-cost konkurence</span>
-                  </div>
-                  <p className="text-xs">Nižší kvalita/služby, vyšší dostupnost</p>
-                </div>
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <div className="w-3 h-1 bg-green-500 rounded-full"></div>
-                    <span className="font-medium">Premium konkurence</span>
-                  </div>
-                  <p className="text-xs">Vyšší kvalita/služby, nižší dostupnost</p>
-                </div>
-                <div>
-                  <div className="flex items-center space-x-2 mb-1">
-                    <div className="w-3 h-1 bg-orange-500 rounded-full"></div>
-                    <span className="font-medium">Váš projekt</span>
-                  </div>
-                  <p className="text-xs">Vaše Blue Ocean strategie</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="text-xs text-blue-700 bg-blue-100 rounded p-2">
-              <strong>💡 Příklad:</strong> U atributu "Cena" znamená 100% = nejlevnější možná cena, 0% = nejdražší možná cena na trhu.
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="mb-6">
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={prepareChartData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fontSize: 12 }}
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis domain={[0, 100]} />
-            <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="lowCost" 
-              stroke="#8884d8" 
-              strokeWidth={2} 
-              name="Low-cost konkurence"
-              connectNulls={false}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="premium" 
-              stroke="#82ca9d" 
-              strokeWidth={2} 
-              name="Premium konkurence"
-              connectNulls={false}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="myProject" 
-              stroke="#ff7300" 
-              strokeWidth={3} 
-              name="Můj projekt"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-      
-      <div className="space-y-4">
-        {valueCurve.map((attribute, index) => (
-          <div key={index} className="p-4 border rounded-lg bg-muted/50">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <Input
-                  value={attribute.name}
-                  onChange={(e) => updateAttributeName(index, e.target.value)}
-                  className="font-medium bg-transparent border-none p-0 text-base"
-                  style={{ color: attribute.color }}
-                />
-                {attribute.type === 'create' && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Badge variant="outline" className="ml-2 text-xs bg-green-50 text-green-700 border-green-200">
-                          Vytvoření
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">U "Vytvoření" se zobrazuje pouze hodnota vašeho projektu, protože konkurence tyto funkce nemá.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className="w-4 h-4 text-muted-foreground ml-2" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="max-w-xs space-y-1">
-                        <p className="font-medium">Příklady pro "{attribute.name}":</p>
-                        {attribute.name.toLowerCase().includes('cena') && (
-                          <>
-                            <p><strong>0%</strong> - Nejdražší možná cena</p>
-                            <p><strong>50%</strong> - Průměrná tržní cena</p>
-                            <p><strong>100%</strong> - Nejlevnější možná cena</p>
-                          </>
-                        )}
-                        {attribute.name.toLowerCase().includes('kvalita') && (
-                          <>
-                            <p><strong>0%</strong> - Základní kvalita</p>
-                            <p><strong>50%</strong> - Standardní kvalita</p>
-                            <p><strong>100%</strong> - Prémiová kvalita</p>
-                          </>
-                        )}
-                        {attribute.name.toLowerCase().includes('dostupnost') && (
-                          <>
-                            <p><strong>0%</strong> - Velmi omezená dostupnost</p>
-                            <p><strong>50%</strong> - Běžná dostupnost</p>
-                            <p><strong>100%</strong> - Všude dostupné</p>
-                          </>
-                        )}
-                        {!attribute.name.toLowerCase().includes('cena') && 
-                         !attribute.name.toLowerCase().includes('kvalita') && 
-                         !attribute.name.toLowerCase().includes('dostupnost') && (
-                          <>
-                            <p><strong>0%</strong> - Minimum/Nejhorší</p>
-                            <p><strong>50%</strong> - Průměrná úroveň</p>
-                            <p><strong>100%</strong> - Maximum/Nejlepší</p>
-                          </>
-                        )}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              {index > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeCustomAttribute(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <Minus className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              {/* Low Cost - Hidden for create attributes */}
-              {attribute.type !== 'create' && (
-                <div>
-                  <label className="block text-xs font-medium mb-1">Low-cost</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={attribute.lowCost}
-                    onChange={(e) => updateValueCurve(index, 'lowCost', parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                  <span className="text-xs text-muted-foreground">{attribute.lowCost}%</span>
-                </div>
-              )}
-              
-              {/* Premium - Hidden for create attributes */}
-              {attribute.type !== 'create' && (
-                <div>
-                  <label className="block text-xs font-medium mb-1">Premium</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={attribute.premium}
-                    onChange={(e) => updateValueCurve(index, 'premium', parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                  <span className="text-xs text-muted-foreground">{attribute.premium}%</span>
-                </div>
-              )}
-              
-              {/* My Project - Always visible */}
-              <div className={attribute.type === 'create' ? 'col-span-3' : ''}>
-                <label className="block text-xs font-medium mb-1">
-                  Můj projekt
-                  {attribute.type === 'create' && (
-                    <span className="text-green-600 ml-1">(Unikátní funkce)</span>
-                  )}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={attribute.myProject}
-                  onChange={(e) => updateValueCurve(index, 'myProject', parseInt(e.target.value))}
-                  className="w-full"
-                />
-                <span className="text-xs text-muted-foreground">{attribute.myProject}%</span>
-              </div>
-            </div>
-            
-            {/* Explanation for create attributes */}
-            {attribute.type === 'create' && (
-              <div className="mt-2 p-2 bg-green-50 rounded text-xs text-green-700">
-                💡 Tato funkce neexistuje u konkurence, proto se zobrazuje pouze hodnota vašeho projektu.
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </Card>
-  );
-
-  const renderVisionStatement = () => (
-    <Card className="card-apple p-6 mb-6">
-      <div className="flex items-center mb-4">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 text-amber-600 flex items-center justify-center mr-3">
-          <Eye className="w-4 h-4" />
-        </div>
-        <h3 className="text-lg font-semibold">Vision Statement</h3>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          Popište svou vizi (min. 50 znaků) *
-        </label>
-        <Textarea
-          value={visionStatement}
-          onChange={(e) => setVisionStatement(e.target.value)}
-          placeholder="Naše vize je vytvořit..."
-          className="textarea-apple min-h-[120px]"
-        />
-        <div className="text-xs text-muted-foreground mt-1">
-          {visionStatement.length}/50 znaků minimum
-        </div>
-      </div>
-    </Card>
-  );
-
-  const renderAIAnalysis = () => (
-    <Card className="card-apple p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 text-violet-600 flex items-center justify-center mr-3">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <h3 className="text-lg font-semibold">AI Validace</h3>
-        </div>
-        
-        <Button
-          onClick={generateAnalysis}
-          disabled={!canGenerateAnalysis() || isGeneratingAnalysis}
-          className="btn-apple bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600"
-        >
-          {isGeneratingAnalysis ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Analyzuji...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 mr-2" />
-              Spustit AI analýzu
-            </>
-          )}
-        </Button>
-      </div>
-      
-      {!canGenerateAnalysis() && (
-        <div className="text-sm text-muted-foreground mb-4">
-          💡 Dokončete všechny předchozí sekce pro spuštění AI analýzy
-        </div>
-      )}
-      
-      {analysis && (
-        <div className="bg-muted/50 rounded-lg p-4">
-          <div className="prose prose-sm max-w-none">
-            {analysis.split('\n').map((line, index) => (
-              <p key={index} className="mb-2 whitespace-pre-wrap">{line}</p>
-            ))}
-          </div>
-        </div>
-      )}
-    </Card>
-  );
+  const finish = () => {
+    onComplete();
+    setCelebrate(true);
+  };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-primary flex items-center justify-center">
-              <Eye className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Vision</h1>
-              <p className="text-sm text-muted-foreground">Blue Ocean Strategy</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
-              {Math.round(getCompletionProgress())}% hotovo
-            </Badge>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Reset All
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Resetovat všechna data?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Tato akce vymaže všechna vyplněná data ve Vision fázi. Tuto akci nelze vrátit zpět.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Zrušit</AlertDialogCancel>
-                  <AlertDialogAction onClick={resetAllData} className="bg-red-600 hover:bg-red-700">
-                    Resetovat vše
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </div>
-        
-        {/* Horizontal Progress Bar */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            {sections.map((section, index) => {
-              const Icon = section.icon;
-              const isCompleted = section.completed();
-              
-              return (
-                <div key={section.id} className="flex items-center">
-                  <div 
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-medium ${
-                      isCompleted 
-                        ? 'bg-green-500 text-white' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <div className="ml-2 hidden lg:block">
-                    <div className={`text-sm font-medium ${isCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
-                      {section.title}
-                    </div>
-                  </div>
-                  {index < sections.length - 1 && (
-                    <div 
-                      className={`h-1 w-16 xl:w-24 mx-4 rounded-full ${
-                        isCompleted ? 'bg-green-500' : 'bg-muted'
-                      }`} 
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="w-full bg-muted rounded-full h-2">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${getCompletionProgress()}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* All Sections */}
-      <div className="space-y-0">
-        {renderBasicInfo()}
-        {renderERRCMatrix()}
-        {renderValueCurve()}
-        {renderVisionStatement()}
-        {renderAIAnalysis()}
-      </div>
-
-      {/* Final Actions */}
-      {allDataComplete() && (
-        <Card className="card-apple p-6 text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-500/20 text-emerald-600 flex items-center justify-center mr-3">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-emerald-600">Vision fáze dokončena!</h3>
-              <p className="text-sm text-muted-foreground">Vaše vize je validována a připravena k implementaci</p>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={exportToPDF} className="btn-apple-secondary">
-              <Download className="mr-2 w-4 h-4" />
-              Stáhnout výsledky (PDF)
-            </Button>
-            
-            {canProceed && (
-              <Button onClick={onComplete} className="btn-apple bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
-                Pokračovat do fáze 2 - Ideation
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        </Card>
+    <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
+      {celebrate && (
+        <PhaseCelebration
+          gate={1}
+          title="Modrý oceán je hotový"
+          message="Váš zákazník, ERRC matice a USP se propíšou do Lean Canvasu."
+          nextLabel="Pokračovat na Lean Canvas"
+          onNext={() => navigate("/ideation")}
+          onHome={() => navigate("/home")}
+        />
       )}
+
+      <Card className="card-apple p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-primary">Fáze 1 · Brána 1</p>
+            <h2 className="text-2xl font-bold text-foreground">Modrý oceán</h2>
+            <p className="text-sm text-muted-foreground">Najděte místo na trhu mezi levnou a prémiovou konkurencí.</p>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-bold text-primary">
+              {done}/{checks.length}
+            </p>
+            <p className="text-xs text-muted-foreground">splněno</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Úvod: USP */}
+      <Card className="card-apple p-6">
+        <div className="mb-3 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+            <Lightbulb className="h-5 w-5" />
+          </div>
+          <h3 className="text-lg font-semibold">Co je USP a proč tu je</h3>
+        </div>
+        <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+          <p>
+            <strong className="text-foreground">USP (unique selling proposition)</strong> je jeden hlavní důvod, proč si
+            zákazník vybere vás, a ne konkurenci. Není to seznam vlastností, ale jedna věc, kterou u ostatních nedostane
+            nebo dostane výrazně hůř.
+          </p>
+          <p>
+            Modrý oceán vám ji pomůže najít: porovnáte se s levnou i prémiovou konkurencí a rozhodnete, co vynecháte, co
+            snížíte, co zlepšíte a co přinesete nového.
+          </p>
+          <div className="rounded-xl bg-muted/60 p-4">
+            <p className="mb-1 font-medium text-foreground">Příklad: online kurz vaření pro pracující rodiče</p>
+            <p>
+              Levná konkurence jsou recepty zdarma na YouTube, prémiová kurzy se šéfkuchařem. Kurz vynechá exotické
+              suroviny, zkrátí lekci na 15 minut, zvýší praktičnost a přinese týdenní plán jídel s nákupním seznamem.
+            </p>
+            <p className="mt-2 italic text-foreground">„Večeře pro celou rodinu za 30 minut – s plánem na celý týden.“</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Krok 1: Komu */}
+      <Card className="card-apple p-6">
+        <SectionHeader icon={Users} step={1} title="Komu" subtitle="Nejdřív zákazník, teprve potom produkt." />
+        <div className="space-y-4">
+          <Field label="Kdo je váš zákazník?" hint="Co nejkonkrétněji: kdo to je, v jaké je situaci.">
+            <Textarea
+              value={basics.customer ?? ""}
+              onChange={(e) => setBasic("customer", e.target.value)}
+              placeholder="např. pracující rodiče s malými dětmi, kteří chtějí vařit doma"
+              className="min-h-[80px] rounded-xl"
+            />
+          </Field>
+          <Field label="Jaký problém řeší?" hint="Co ho dnes trápí nebo co mu chybí.">
+            <Textarea
+              value={basics.problem ?? ""}
+              onChange={(e) => setBasic("problem", e.target.value)}
+              placeholder="např. nemají čas vymýšlet jídla a nakupovat, končí u polotovarů"
+              className="min-h-[80px] rounded-xl"
+            />
+          </Field>
+        </div>
+      </Card>
+
+      {/* Krok 2: Co prodávám */}
+      <Card className="card-apple p-6">
+        <SectionHeader icon={Package} step={2} title="Co prodávám" subtitle="Produkt nebo služba, název a slogan." />
+        <div className="space-y-4">
+          <Field label="Co prodáváte?" hint="Jednou dvěma větami. Počítáme s online podnikáním.">
+            <Textarea
+              value={basics.offering ?? ""}
+              onChange={(e) => setBasic("offering", e.target.value)}
+              placeholder="např. online kurz vaření s týdenními plány jídel"
+              className="min-h-[70px] rounded-xl"
+            />
+          </Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Název projektu">
+              <Input
+                value={basics.name}
+                onChange={(e) => setBasic("name", e.target.value)}
+                placeholder="Zadejte název vašeho projektu..."
+                className="h-11 rounded-xl"
+              />
+            </Field>
+            <Field label="Slogan" hint="Klidně později, až budete mít USP.">
+              <Input
+                value={basics.slogan}
+                onChange={(e) => setBasic("slogan", e.target.value)}
+                placeholder="např. Večeře za 30 minut"
+                className="h-11 rounded-xl"
+              />
+            </Field>
+          </div>
+        </div>
+      </Card>
+
+      {/* Krok 3: ERRC */}
+      <Card className="card-apple p-6">
+        <SectionHeader
+          icon={Target}
+          step={3}
+          title="ERRC matice"
+          subtitle="U každé položky zadejte, jak silně ji nabízí levná konkurence, prémiová konkurence a vy (0 = vůbec, 100 = maximum)."
+        />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {QUADRANTS.map((q) => {
+            const Icon = q.icon;
+            const items = errc[q.key] ?? [];
+            return (
+              <div key={q.key} className="rounded-2xl border border-border/60 p-4">
+                <div className="mb-1 flex items-center gap-2">
+                  <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${q.tone}`}>
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <h4 className="font-semibold">{q.title}</h4>
+                </div>
+                <p className="mb-3 text-xs text-muted-foreground">{q.question}</p>
+
+                {items.length > 0 && (
+                  <div className="mb-1 grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] gap-1.5 text-[11px] text-muted-foreground">
+                    <span />
+                    <span className="text-center">Levná</span>
+                    <span className="text-center">Prém.</span>
+                    <span className="text-center font-medium text-primary">Já</span>
+                    <span />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {items.map((item) => (
+                    <div key={item.id} className="grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] items-center gap-1.5">
+                      <Input
+                        value={item.text}
+                        onChange={(e) => updateItem(q.key, item.id, { text: e.target.value })}
+                        placeholder={q.placeholder}
+                        className="h-9 rounded-lg text-sm"
+                        aria-label={`${q.title}: položka`}
+                      />
+                      {(["lowCost", "premium", "mine"] as const).map((field) => {
+                        const locked = isLocked(q.key, field);
+                        const value = locked ? 0 : item[field];
+                        return (
+                          <Input
+                            key={field}
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            max={100}
+                            value={value}
+                            disabled={locked}
+                            title={locked ? "Dáno metodikou" : undefined}
+                            onChange={(e) => updateItem(q.key, item.id, { [field]: clamp(Number(e.target.value)) })}
+                            className={`h-9 rounded-lg px-1 text-center text-sm ${field === "mine" ? "border-primary/40 font-semibold" : ""}`}
+                            aria-label={`${item.text || q.title}: ${field === "lowCost" ? "levná konkurence" : field === "premium" ? "prémiová konkurence" : "můj projekt"}`}
+                          />
+                        );
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => removeItem(q.key, item.id)}
+                        className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                        aria-label="Odebrat položku"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <Button variant="ghost" size="sm" className="mt-2 w-full rounded-lg" onClick={() => addItem(q.key)}>
+                  <Plus className="mr-1 h-4 w-4" />
+                  Přidat
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Krok 4: Hodnotová křivka */}
+      <Card className="card-apple p-6">
+        <SectionHeader
+          icon={TrendingUp}
+          step={4}
+          title="Hodnotová křivka"
+          subtitle="Kreslí se sama z matice. Modrý oceán je tam, kde vaše čára vede jinudy než obě konkurence."
+        />
+        {curve.length === 0 ? (
+          <p className="rounded-xl bg-muted/60 p-6 text-center text-sm text-muted-foreground">
+            Jakmile v matici pojmenujete první položky, objeví se tu křivka.
+          </p>
+        ) : (
+          <div className="h-[340px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={curve} margin={{ top: 10, right: 24, left: -16, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis
+                  dataKey="name"
+                  interval={0}
+                  padding={{ left: 30, right: 30 }}
+                  angle={-30}
+                  textAnchor="end"
+                  height={70}
+                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                />
+                <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                <Tooltip labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string })?.full ?? ""} />
+                <Legend verticalAlign="top" height={32} wrapperStyle={{ fontSize: 13 }} />
+                <Line type="linear" dataKey="Low-cost konkurence" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
+                <Line type="linear" dataKey="Prémiová konkurence" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="linear" dataKey="Můj projekt" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </Card>
+
+      {/* Krok 5: USP */}
+      <Card className="card-apple p-6">
+        <SectionHeader
+          icon={Sparkles}
+          step={5}
+          title="Moje USP"
+          subtitle="Jedna věta: komu, co a čím se liší. Vycházejte z položek Vytvořit a Zvýšit."
+        />
+        <Textarea
+          value={usp}
+          onChange={(e) => setUsp(e.target.value)}
+          placeholder="např. Večeře pro celou rodinu za 30 minut – s plánem na celý týden."
+          className="min-h-[90px] rounded-xl"
+        />
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <Button variant="outline" className="rounded-xl" onClick={suggestUsp}>
+            <Wand2 className="mr-2 h-4 w-4" />
+            Sestavit koncept z mých odpovědí
+          </Button>
+          <p className="text-xs text-muted-foreground">Koncept je jen výchozí bod – přepište ho vlastními slovy.</p>
+        </div>
+      </Card>
+
+      {/* Kontrola a dokončení */}
+      <Card className="card-apple p-6">
+        <h3 className="mb-1 text-lg font-semibold">Kontrola</h3>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Povinné body odemknou další bránu. Doporučené body hlídají, aby šlo opravdu o modrý oceán. Vyhodnocení pomocí AI
+          přibude v další verzi.
+        </p>
+        <ul className="space-y-2">
+          {checks.map((c) => (
+            <li key={c.label} className="flex items-start gap-2 text-sm">
+              {c.ok ? (
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+              ) : c.required ? (
+                <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+              ) : (
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              )}
+              <span className={c.ok ? "text-foreground" : "text-muted-foreground"}>
+                {c.label}
+                {!c.required && !c.ok && <span className="ml-1 text-xs text-amber-600">(doporučeno)</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <Button className="btn-apple mt-6 h-12 w-full" disabled={!canFinish} onClick={finish}>
+          {canFinish ? "Dokončit fázi a otevřít bránu 2" : "Doplňte povinné body"}
+        </Button>
+      </Card>
     </div>
   );
 };

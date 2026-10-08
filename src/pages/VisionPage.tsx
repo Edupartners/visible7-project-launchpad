@@ -19,7 +19,6 @@ const VisionPage = () => {
       }
       return prev;
     });
-    navigate('/home');
   };
 
   const handleBack = () => {
@@ -31,10 +30,10 @@ const VisionPage = () => {
   };
 
   const learningPoints = [
-    { text: "Blue Ocean Strategy - jak najít volný prostor na trhu", color: "bg-blue-500" },
-    { text: "ERRC matice - eliminace, redukce, pozvýšení a vytvoření hodnot", color: "bg-emerald-500" },
-    { text: "Hodnotová křivka - positioning vůči konkurenci", color: "bg-violet-500" },
-    { text: "AI validace - ověření životaschopnosti vize", color: "bg-orange-500" }
+    { text: "Komu prodáváte a jaký problém řešíte", color: "bg-blue-500" },
+    { text: "ERRC matice – co vynechat, snížit, zvýšit a vytvořit", color: "bg-emerald-500" },
+    { text: "Hodnotová křivka – srovnání s levnou a prémiovou konkurencí", color: "bg-violet-500" },
+    { text: "USP – jeden důvod, proč si zákazník vybere vás", color: "bg-orange-500" }
   ];
 
   if (showIntro) {
@@ -49,7 +48,7 @@ const VisionPage = () => {
           learningPoints={learningPoints}
           estimatedTime="25 minut"
           steps={5}
-          hasAiValidation={true}
+          hasAiValidation={false}
           onStart={handleStart}
           onBack={handleBack}
           gradient="from-blue-500/10 to-cyan-500/10"

@@ -54,8 +54,7 @@ export function useSupabaseProgress<T>(
   }, [key, projectId]);
 
   const persist = useCallback(
-    async (value: T) => {
-      const pid = projectIdRef.current;
+    async (value: T, pid: string | null) => {
       if (!pid) {
         console.warn(`useSupabaseProgress: "${key}" nelze uložit, není otevřený žádný projekt`);
         return;
@@ -73,15 +72,32 @@ export function useSupabaseProgress<T>(
     [key]
   );
 
+  // Ukládání s krátkým zpožděním, aby psaní neposílalo požadavek po každém písmenu.
+  const pendingRef = useRef<{ value: T; pid: string | null } | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const flush = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = null;
+    const pending = pendingRef.current;
+    pendingRef.current = null;
+    if (pending) persist(pending.value, pending.pid);
+  }, [persist]);
+
+  // Při odchodu ze stránky nebo přepnutí projektu se rozepsaná změna uloží hned.
+  useEffect(() => flush, [flush, projectId]);
+
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       setState((prev) => {
         const next = typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
-        persist(next);
+        pendingRef.current = { value: next, pid: projectIdRef.current };
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(flush, 500);
         return next;
       });
     },
-    [persist]
+    [flush]
   );
 
   return [state, setValue, { loading }];

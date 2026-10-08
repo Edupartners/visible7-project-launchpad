@@ -12,7 +12,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tooltip as ChartTooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine, ReferenceArea } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { generatePredictiveData } from "@/lib/predictiveMapping";
+import { useProject } from "@/contexts/ProjectContext";
+import { loadProjectKeys } from "@/lib/projectData";
 import { BackButton } from "@/components/ui/back-button";
 import { Target, TrendingUp, Calculator, Brain, Info, AlertTriangle, CheckCircle, DollarSign, Percent, RefreshCw, Calendar, BarChart3, Rocket, PlayCircle, TrendingDown, Wand2 } from "lucide-react";
 
@@ -144,16 +145,6 @@ const operationalFields = [
 ];
 
 const monthNames = ['Led', 'Úno', 'Bře', 'Dub', 'Kvě', 'Čvn', 'Čvc', 'Srp', 'Zář', 'Říj', 'Lis', 'Pro'];
-
-const loadLeanCanvasData = (): LeanCanvasData | null => {
-  try {
-    const data = localStorage.getItem("ideation_lean_canvas");
-    return data ? JSON.parse(data) : null;
-  } catch (error) {
-    console.warn("Failed to load Lean Canvas data:", error);
-    return null;
-  }
-};
 
 const extractNumbersFromText = (text: string): number[] => {
   const numbers = text.match(/\d+[.,]?\d*/g);
@@ -453,7 +444,7 @@ const useMigratedPersistedState = (key: string, defaultValue: ROICalculatorData)
     }
   }, [loading, migrationChecked, state, defaultValue, key, setState]);
 
-  return [state, setState] as const;
+  return [state, setState, loading] as const;
 };
 
 export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPhaseProps) => {
@@ -461,7 +452,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   const [isPreFilled, setIsPreFilled] = useState(false);
   const [showPredictions, setShowPredictions] = useState(false);
   const [chartViewMode, setChartViewMode] = useState<'monthly' | 'cumulative'>('monthly');
-  const [roiData, setRoiData] = useMigratedPersistedState("strategy_roi_data", defaultROIData);
+  const [roiData, setRoiData, roiLoading] = useMigratedPersistedState("strategy_roi_data", defaultROIData);
   const [predictiveData, setPredictiveData] = useState<any>(null);
   const [hasAppliedPredictions, setHasAppliedPredictions] = useState(false);
   
@@ -469,20 +460,27 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   const chartData = generateChartData(roiData, chartViewMode);
   const breakEvenPoint = chartData.find(point => point.isBreakEven);
   
-  // Pre-fill from Lean Canvas on mount
+  // Předvyplnění z Lean Canvasu aktuálního projektu – jen dokud kalkulátor nikdo neupravil.
+  const { currentProject } = useProject();
   useEffect(() => {
-    const leanCanvas = loadLeanCanvasData();
-    if (leanCanvas && !isPreFilled) {
+    if (roiLoading || !currentProject || isPreFilled) return;
+    if (JSON.stringify(roiData) !== JSON.stringify(defaultROIData)) return;
+    let active = true;
+    loadProjectKeys(currentProject.id, ["ideation_lean_canvas"]).then((raw) => {
+      const leanCanvas = raw["ideation_lean_canvas"] as LeanCanvasData | undefined;
+      if (!active || !leanCanvas) return;
       const preFilledData = preFillfromLeanCanvas(leanCanvas);
       if (Object.keys(preFilledData).length > 0) {
-        setRoiData(prev => ({
-          ...prev,
-          ...preFilledData
-        }));
+        setRoiData(prev => ({ ...prev, ...preFilledData }));
         setIsPreFilled(true);
       }
-    }
-  }, []);
+    });
+    return () => {
+      active = false;
+    };
+    // Spouští se po načtení dat kalkulátoru daného projektu.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roiLoading, currentProject?.id]);
   
   const resetToDefaults = () => {
     setRoiData(defaultROIData);

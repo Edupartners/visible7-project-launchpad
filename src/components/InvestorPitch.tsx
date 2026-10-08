@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useProject } from "@/contexts/ProjectContext";
+import { errcTexts, loadProjectKeys, loadVisionSummary } from "@/lib/projectData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -104,31 +106,38 @@ interface GeneratedPitch {
   risksAndMitigation: string;
 }
 
-const loadPhaseData = (): PitchData => {
-  const loadFromStorage = (key: string) => {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : null;
-    } catch (error) {
-      console.warn(`Failed to load ${key}:`, error);
-      return null;
-    }
-  };
+const loadPhaseData = async (projectId: string): Promise<PitchData> => {
+  const raw = await loadProjectKeys(projectId, [
+    "vision_analysis",
+    "ideation_lean_canvas",
+    "ideation_analysis",
+    "strategy_roi_data",
+    "strategy_analysis",
+  ]);
+  const vision = await loadVisionSummary(projectId);
+  const errc = vision?.errc;
 
   return {
     vision: {
-      projectData: loadFromStorage("vision_project_data") || { name: "", slogan: "" },
-      errcData: loadFromStorage("vision_errc_data") || { eliminate: [], reduce: [], raise: [], create: [] },
-      visionStatement: loadFromStorage("vision_statement") || "",
-      analysis: loadFromStorage("vision_analysis") || ""
+      projectData: { name: vision?.basics.name ?? "", slogan: vision?.basics.slogan ?? "" },
+      errcData: errc
+        ? {
+            eliminate: errcTexts(errc, "eliminate"),
+            reduce: errcTexts(errc, "reduce"),
+            raise: errcTexts(errc, "raise"),
+            create: errcTexts(errc, "create"),
+          }
+        : { eliminate: [], reduce: [], raise: [], create: [] },
+      visionStatement: vision?.usp ?? "",
+      analysis: (raw["vision_analysis"] as string) || ""
     },
     ideation: {
-      leanCanvasData: loadFromStorage("ideation_lean_canvas") || {},
-      analysis: loadFromStorage("ideation_analysis") || null
+      leanCanvasData: (raw["ideation_lean_canvas"] ?? {}) as PitchData["ideation"]["leanCanvasData"],
+      analysis: (raw["ideation_analysis"] as PitchData["ideation"]["analysis"]) || null
     },
     strategy: {
-      roiData: loadFromStorage("strategy_roi_data") || {},
-      analysis: loadFromStorage("strategy_analysis") || null
+      roiData: (raw["strategy_roi_data"] ?? {}) as PitchData["strategy"]["roiData"],
+      analysis: (raw["strategy_analysis"] as PitchData["strategy"]["analysis"]) || null
     }
   };
 };
@@ -246,10 +255,18 @@ export const InvestorPitch = ({ onBack }: InvestorPitchProps) => {
   const [generatedPitch, setGeneratedPitch] = useState<GeneratedPitch | null>(null);
   const [currentSection, setCurrentSection] = useState(0);
 
+  const { currentProject } = useProject();
+
   useEffect(() => {
-    const data = loadPhaseData();
-    setPitchData(data);
-  }, []);
+    if (!currentProject) return;
+    let active = true;
+    loadPhaseData(currentProject.id).then((data) => {
+      if (active) setPitchData(data);
+    });
+    return () => {
+      active = false;
+    };
+  }, [currentProject]);
 
   const handleGeneratePitch = async () => {
     if (!pitchData) return;
