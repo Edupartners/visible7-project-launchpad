@@ -1,50 +1,49 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/visible7/client';
+import { useProject } from '@/contexts/ProjectContext';
 
 /**
- * Server-side náhrada za usePersistedState. Stejné API (key, defaultValue) => [value, setValue],
- * takže v existujících souborech stačí změnit import - zbytek kódu zůstává stejný.
+ * Ukládání postupu ve fázích. Stejné API jako dřív (key, defaultValue) => [value, setValue],
+ * takže komponenty fází se nemusely měnit.
  *
- * Rozdíl proti localStorage verzi:
- * - Data se ukládají do tabulky `user_progress` v Supabase (RLS: každý vidí jen svoje).
- * - Postup je tak dostupný z libovolného zařízení a přežije smazání cache v prohlížeči.
- * - Než se data z databáze stáhnou, používá se defaultValue (žádné "bliknutí" prázdného UI).
+ * Data se ukládají do tabulky `project_data` k aktuálně otevřenému projektu
+ * (RLS: uživatel vidí jen data svých projektů). Po přepnutí projektu se hodnota
+ * načte znovu pro nový projekt.
  */
 export function useSupabaseProgress<T>(
   key: string,
   defaultValue: T
 ): [T, (value: T | ((prev: T) => T)) => void, { loading: boolean }] {
+  const { currentProject } = useProject();
+  const projectId = currentProject?.id ?? null;
+
   const [state, setState] = useState<T>(defaultValue);
   const [loading, setLoading] = useState(true);
-  const userIdRef = useRef<string | null>(null);
+  const defaultRef = useRef(defaultValue);
+  const projectIdRef = useRef<string | null>(projectId);
+  projectIdRef.current = projectId;
 
-  // Načtení existující hodnoty z databáze při prvním renderu / přihlášení
   useEffect(() => {
     let active = true;
+    setState(defaultRef.current);
 
+    if (!projectId) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     (async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData?.user?.id ?? null;
-      userIdRef.current = userId;
-
-      if (!userId) {
-        if (active) setLoading(false);
-        return;
-      }
-
-      const { data, error } = await (supabase as any)
-        .from('user_progress')
+      const { data, error } = await supabase
+        .from('project_data')
         .select('data_value')
-        .eq('user_id', userId)
+        .eq('project_id', projectId)
         .eq('data_key', key)
         .maybeSingle();
 
-      const progressData = data as { data_value: unknown } | null;
-
       if (!active) return;
-
-      if (!error && progressData) {
-        setState(progressData.data_value as T);
+      if (!error && data) {
+        setState((data as { data_value: unknown }).data_value as T);
       }
       setLoading(false);
     })();
@@ -52,23 +51,23 @@ export function useSupabaseProgress<T>(
     return () => {
       active = false;
     };
-  }, [key]);
+  }, [key, projectId]);
 
   const persist = useCallback(
     async (value: T) => {
-      const userId = userIdRef.current;
-      if (!userId) {
-        console.warn(`useSupabaseProgress: cannot save "${key}", user not logged in`);
+      const pid = projectIdRef.current;
+      if (!pid) {
+        console.warn(`useSupabaseProgress: "${key}" nelze uložit, není otevřený žádný projekt`);
         return;
       }
-      const { error } = await (supabase as any)
-        .from('user_progress')
+      const { error } = await supabase
+        .from('project_data')
         .upsert(
-          { user_id: userId, data_key: key, data_value: value as unknown },
-          { onConflict: 'user_id,data_key' }
+          { project_id: pid, data_key: key, data_value: value as unknown },
+          { onConflict: 'project_id,data_key' }
         );
       if (error) {
-        console.warn(`Failed to save "${key}" to Supabase:`, error);
+        console.warn(`Uložení "${key}" se nezdařilo:`, error);
       }
     },
     [key]

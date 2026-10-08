@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { UnifiedHeader } from "./layout/UnifiedHeader";
+import { ProjectSwitcher } from "./ProjectSwitcher";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -109,6 +110,8 @@ export const Dashboard = ({
       <UnifiedHeader showTrialInfo={false} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ProjectSwitcher />
+
         {/* Progress Overview */}
         <div className="mb-8">
             <Card className="card-apple p-6">
