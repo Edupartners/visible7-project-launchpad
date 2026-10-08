@@ -33,10 +33,10 @@ export const PhaseCelebration = ({ gate, title, message, nextLabel, onNext, onHo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
       <Card className="card-apple w-full max-w-md p-8 text-center animate-fade-in">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gate-copper text-white">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white">
           <Check className="h-8 w-8" strokeWidth={3} />
         </div>
-        <p className="font-semibold text-gate-copper">Brána {gate} je otevřená</p>
+        <p className="font-semibold text-emerald-700">Brána {gate} je otevřená</p>
         <h2 className="mt-2 text-2xl font-bold text-foreground">{title}</h2>
         <p className="mt-3 text-muted-foreground">{message}</p>
         <div className="mt-6 flex flex-col gap-2">

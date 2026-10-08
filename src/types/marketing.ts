@@ -57,7 +57,7 @@ export const marketingChannels: MarketingChannel[] = [
   {
     id: 'ppc',
     name: 'PPC kampaně',
-    description: 'Google Ads, Seznam.cz - platba za klik',
+    description: 'Google Ads, Sklik a ChatGPT Ads – platba za proklik',
     difficulty: 'Vyšší',
     setupTime: '1-2 týdny',
     adType: 'Placená reklama',
@@ -68,7 +68,10 @@ export const marketingChannels: MarketingChannel[] = [
       { id: '4', task: 'Nastavení konverzního sledování', platform: 'Google Analytics', note: 'Sledování prodejů', price: 0, completed: false },
       { id: '5', task: 'Registrace na Sklik (Seznam)', platform: 'Sklik.cz', note: 'České vyhledávání', price: 0, completed: false },
       { id: '6', task: 'Vytvoření Sklik kampaně', platform: 'Sklik.cz', note: 'Lokální targeting', price: 1000, completed: false },
-      { id: '7', task: 'A/B testování reklam', platform: 'Google Ads + Sklik', note: 'Optimalizace CTR', price: 500, completed: false },
+      { id: '9', task: 'Založení účtu v ChatGPT Ads Manageru', platform: 'ChatGPT Ads (OpenAI)', note: 'Samoobsluha běží v Evropě od 31. 8. 2026, dostupnost pro ČR ověřte v Ads Manageru', price: 0, completed: false },
+      { id: '10', task: 'Vložení OpenAI Pixelu na web', platform: 'ChatGPT Ads (OpenAI)', note: 'Měří konverze z reklam v ChatGPT', price: 0, completed: false },
+      { id: '11', task: 'První kampaň v ChatGPT', platform: 'ChatGPT Ads (OpenAI)', note: 'Platba za proklik, začněte malým testovacím rozpočtem', price: 1000, completed: false },
+      { id: '7', task: 'A/B testování reklam', platform: 'Google Ads, Sklik, ChatGPT Ads', note: 'Optimalizace CTR', price: 500, completed: false },
       { id: '8', task: 'Měsíční optimalizace', platform: 'Všechny platformy', note: 'Průběžné ladění', price: 0, completed: false }
     ]
   },

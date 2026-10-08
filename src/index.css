@@ -155,7 +155,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Schibsted Grotesk", -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-family: "Poppins", -apple-system, "Segoe UI", system-ui, sans-serif;
     font-feature-settings: "tnum" 0;
   }
 

@@ -55,6 +55,9 @@ const RATING_STYLE: Record<Rating, string> = {
   nelze: "bg-secondary text-muted-foreground",
 };
 
+/** Nejčastější placené kanály k rychlému přidání do marketingu. */
+const AD_CHANNELS = ["Google Ads", "Sklik", "Meta (Facebook a Instagram)", "ChatGPT Ads", "TikTok Ads", "Srovnávače zboží"];
+
 const KIND_COPY: Record<CostKind, { title: string; hint: string; unit: string }> = {
   jednorazove: { title: "Jednorázové náklady před spuštěním", hint: "Web, logo, první zásoba, natočení kurzu…", unit: "Kč celkem" },
   mesicni: { title: "Měsíční provoz", hint: "Hosting, nástroje, účetní, vaše odměna nebo externí pomoc…", unit: "Kč měsíčně" },
@@ -462,6 +465,23 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <Button variant="ghost" size="sm" className="mt-2 text-primary" onClick={() => addCost(kind)}>
               <Plus className="mr-1 h-4 w-4" /> Přidat položku
             </Button>
+            {kind === "marketing" && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-sm text-muted-foreground">Rychle přidat:</span>
+                {AD_CHANNELS.filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase())).map((ch) => (
+                  <button
+                    key={ch}
+                    type="button"
+                    onClick={() =>
+                      setData((prev) => ({ ...prev, costs: [...prev.costs, { id: newId(), name: ch, amount: 0, kind: "marketing" }] }))
+                    }
+                    className="rounded-full border border-border px-3 py-1 text-sm hover:border-primary hover:text-primary"
+                  >
+                    + {ch}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         <div className="mt-5 border-t border-border pt-5 sm:max-w-xs">

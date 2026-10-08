@@ -201,7 +201,7 @@ ${canvas}
 2) Navrhni text pro všech 8 polí Lean Canvasu. Každé pole 2–4 krátké věty nebo výčet. Navaž na fázi 1 a na to, co už uživatel napsal – jeho text zpřesni, nepřepisuj jeho záměr.
 - Náklady: výčet typických položek online projektu tohoto typu (např. doména a hosting, nástroje, reklama, tvorba obsahu, poplatky platební brány), bez částek.
 - Příjmy: výčet zdrojů příjmů (např. jednorázový prodej, předplatné, upsell), bez částek.
-- Marketingové kanály: 3–5 kanálů nejvhodnějších pro tohoto zákazníka.`;
+- Marketingové kanály: 3–5 kanálů nejvhodnějších pro tohoto zákazníka (např. Google Ads, Sklik, Meta, ChatGPT Ads, TikTok, srovnávače, e-mail, SEO, influenceři).`;
 }
 
 function evaluatePrompt(vision: string, canvas: string, businessType: string) {
