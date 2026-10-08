@@ -92,7 +92,7 @@ const KIND_COPY: Record<CostKind, { title: string; hint: string; unit: string }>
   },
   marketing: {
     title: "Marketing",
-    hint: "Rozpočet na kanály z Lean Canvasu. Z něj se počítá PNO.",
+    hint: "Rozpočet na kanály z Lean Canvasu. Je to předpověď – skutečnou cenu za proklik a zákazníka zjistíte až testováním ve fázi 5. Z rozpočtu se počítá PNO.",
     unit: "Kč měsíčně",
   },
 };
@@ -732,7 +732,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                     {hint && (
                       <div className="mt-1 flex flex-col gap-1 pl-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
                         <span>
-                          <span className="font-semibold text-primary">AI: obvykle {czk(hint.typical)}</span>
+                          <span className="font-semibold text-primary">
+                            {c.kind === "marketing" ? "AI předpověď" : "AI: obvykle"} {czk(hint.typical)}
+                          </span>
                           {hint.high > hint.low && ` (${czk(hint.low)} – ${czk(hint.high)})`}. {hint.why}
                         </span>
                         {c.amount === hint.typical ? (
