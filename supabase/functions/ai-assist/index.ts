@@ -301,6 +301,60 @@ Do missing dej nejvýš 4 důležité položky, které v seznamu chybějí (nap�
 Zde výjimečně částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
 }
 
+// Fáze 3: vyplnění celého byznys casu jedním voláním (příjmy + náklady + hodnocení).
+const REVENUE_LABELS: Record<string, string> = {
+  price: "cena pro zákazníka v Kč bez DPH (u e-shopu průměrná objednávka, u předplatného měsíční cena, u zakázek hodnota zakázky, u marketplace průměrný prodej)",
+  volume12: "objem za měsíc ve 12. měsíci po spuštění (objednávky / noví zákazníci / kontakty / návštěvy / prodeje podle typu)",
+  ...FIELD_LABELS,
+};
+
+const autofillTool = (fields: string[]) => ({
+  name: "vyplneni_byznys_casu",
+  description: "Návrh všech hodnot byznys casu.",
+  input_schema: {
+    type: "object",
+    properties: {
+      revenue: assumptionsTool(fields).input_schema.properties.items,
+      items: COSTS_TOOL.input_schema.properties.items,
+      missing: COSTS_TOOL.input_schema.properties.missing,
+    },
+    required: ["revenue", "items", "missing"],
+  },
+});
+
+function autofillPrompt(
+  vision: string,
+  canvas: string,
+  businessType: string,
+  fields: string[],
+  costs: { id: string; name: string; kind: string }[],
+  revenue: unknown,
+) {
+  const kindLabel: Record<string, string> = {
+    jednorazove: "jednorázově před spuštěním (Kč celkem)",
+    mesicni: "měsíční provoz (Kč za měsíc)",
+    marketing: "marketing (Kč za měsíc)",
+  };
+  return `Výstup fáze 1 (Modrý oceán):
+${vision}
+
+Lean Canvas:
+${canvas}
+
+Typ byznysu: ${BUSINESS_TYPES[businessType] ?? "neurčen"}
+Co už uživatel zadal: ${JSON.stringify(revenue ?? {}).slice(0, 800)}
+
+Nákladové položky (id | název | druh):
+${costs.length ? costs.map((c) => `${c.id} | ${c.name} | ${kindLabel[c.kind] ?? c.kind}`).join("\n") : "(zatím žádné)"}
+
+Úkol: navrhni realistický byznys case pro tento projekt na českém online trhu v roce 2026. Buď spíš opatrný než optimistický a drž se podnikatelského minimalismu (rozjezd s malými náklady, bez agentur tam, kde to zvládne podnikatel sám).
+1) revenue: hodnoty těchto polí, u každého dvě krátké věty pro laika (z čeho vychází a kdy bývá vyšší či nižší):
+${fields.map((f) => `- ${f}: ${REVENUE_LABELS[f] ?? f}`).join("\n")}
+2) items: pro každou nákladovou položku orientační částku v Kč bez DPH (low, typical, high), krátké why a hodnocení fit: „doporuceno“ = opravdu potřebná nebo u marketingu kanál s dobrou konverzí pro tohoto zákazníka; „zvazit“ = může pomoct, ale ne hned nebo s nejistou konverzí; „nedoporuceno“ = pro tohoto zákazníka nedává smysl. Marketing hodnoť pohledem konverze: kde tento zákazník reálně nakupuje nebo poptává. Marketingový rozpočet sladi s plánovanými příjmy.
+3) missing: nejvýš 4 důležité položky, které chybějí (např. účetní, platební brána, vlastní odměna, hlavní marketingový kanál), s orientační částkou.
+Zde výjimečně čísla a částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
+}
+
 function commentPrompt(vision: string, canvas: string, businessType: string, caseJson: string) {
   return `Výstup fáze 1 (Modrý oceán):
 ${vision}
@@ -401,12 +455,15 @@ Deno.serve(async (req) => {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const { projectId, action } = body;
-  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs"].includes(action ?? "")) {
+  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
-  const kind = action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" ? "navrh" : "vyhodnoceni";
+  const kind =
+    action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill"
+      ? "navrh"
+      : "vyhodnoceni";
   // Odhady nákladů mají vlastní limit (fáze „3n“), aby nesdílely limit s doporučenými procenty.
-  const phase = action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
+  const phase = action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -429,7 +486,7 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    const what = action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    const what = action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= LIMITS.userDaily) {
@@ -459,7 +516,8 @@ Deno.serve(async (req) => {
 
   const group = GROUP_OF[project.business_type ?? ""] ?? "generic";
   const assumptionFields = ASSUMPTION_FIELDS[group];
-  if (action === "case_assumptions" && !project.business_type) {
+  const autofillFields = [group === "content" ? "rpm" : "price", "volume12", ...assumptionFields.filter((f) => f !== "rpm")];
+  if ((action === "case_assumptions" || action === "case_autofill") && !project.business_type) {
     return json({ error: "Nejdřív zvolte typ byznysu ve fázi 2." }, 400);
   }
 
@@ -488,6 +546,19 @@ Deno.serve(async (req) => {
         ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 2400)
         : action === "canvas_evaluate"
           ? await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500)
+          : action === "case_autofill"
+            ? await callClaude(
+                autofillPrompt(
+                  vision,
+                  canvas,
+                  project.business_type ?? "",
+                  autofillFields,
+                  caseCosts,
+                  (raw["business_case"] as Record<string, unknown> | undefined)?.revenue,
+                ),
+                autofillTool(autofillFields),
+                5000,
+              )
           : action === "case_costs"
             ? await callClaude(
                 costsPrompt(vision, canvas, project.business_type ?? "", caseCosts, (raw["business_case"] as Record<string, unknown> | undefined)?.revenue),
@@ -518,19 +589,22 @@ Deno.serve(async (req) => {
 
   const output = result.output;
   if (action === "canvas_suggest" && !(String(output.businessType) in BUSINESS_TYPES)) output.businessType = "vlastni-napad-app";
-  if (action === "case_assumptions") {
-    // Jen povolená pole, rozumné meze, jedno doporučení na pole.
+  // Jen povolená pole, rozumné meze, jedno doporučení na pole.
+  const cleanRevenue = (list: unknown, allowed: string[]) => {
     const seen = new Set<string>();
-    output.items = ((output.items as { field: string; value: number; why: string }[]) ?? [])
-      .filter((i) => assumptionFields.includes(i.field) && !seen.has(i.field) && seen.add(i.field))
+    const max: Record<string, number> = { ...FIELD_MAX, price: 10_000_000, volume12: 10_000_000 };
+    return ((list as { field: string; value: number; why: string }[]) ?? [])
+      .filter((i) => allowed.includes(i.field) && !seen.has(i.field) && seen.add(i.field))
       .map((i) => ({
         field: i.field,
-        value: Math.round(Math.min(Math.max(Number(i.value) || 0, 0), FIELD_MAX[i.field] ?? 100) * 10) / 10,
+        value: Math.round(Math.min(Math.max(Number(i.value) || 0, 0), max[i.field] ?? 100) * 10) / 10,
         why: String(i.why ?? "").slice(0, 400),
       }));
-  }
+  };
+  if (action === "case_assumptions") output.items = cleanRevenue(output.items, assumptionFields);
+  if (action === "case_autofill") output.revenue = cleanRevenue(output.revenue, autofillFields);
 
-  if (action === "case_costs") {
+  if (action === "case_costs" || action === "case_autofill") {
     const ids = new Set(caseCosts.map((c) => c.id));
     const money = (v: unknown) => Math.round(Math.min(Math.max(Number(v) || 0, 0), 10_000_000));
     output.items = ((output.items as Record<string, unknown>[]) ?? [])

@@ -131,6 +131,12 @@ interface CostHints {
 
 type Fit = "doporuceno" | "zvazit" | "nedoporuceno";
 
+interface AutofillResult {
+  revenue: AiAssumption[];
+  items: CostHints["items"];
+  missing: CostHints["missing"];
+}
+
 /** Barvy hodnocení položky: zelená = dává smysl, oranžová = zvážit, červená = nedává smysl. */
 const FIT_STYLE: Record<Fit, { label: string; border: string; badge: string }> = {
   doporuceno: { label: "Doporučeno", border: "border-l-emerald-500", badge: "bg-emerald-100 text-emerald-800" },
@@ -258,6 +264,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const [costHints, setCostHints] = useState<CostHints | null>(null);
   const [costHintsUsed, setCostHintsUsed] = useState(0);
   const [busyCosts, setBusyCosts] = useState(false);
+  const [autofillUsed, setAutofillUsed] = useState(0);
+  const [busyAutofill, setBusyAutofill] = useState(false);
 
   const group = groupOf(currentProject?.business_type);
   const copy = GROUP_COPY[group];
@@ -299,18 +307,22 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     setComment(null);
     setAssumptions(null);
     setCostHints(null);
-    loadAiUsage(projectId, "3n").then((u) => {
-      if (!active) return;
-      setCostHintsUsed(u.used.navrh);
-      setCostHints((u.latest.navrh as unknown as CostHints | null) ?? null);
-    });
-    loadAiUsage(projectId, "3").then((u) => {
-      if (!active) return;
-      setCommentsUsed(u.used.vyhodnoceni);
-      setComment(u.latest.vyhodnoceni as unknown as CaseComment | null);
-      setAssumptionsUsed(u.used.navrh);
-      setAssumptions((u.latest.navrh as unknown as { items?: AiAssumption[] } | null)?.items ?? null);
-    });
+    Promise.all([loadAiUsage(projectId, "3n"), loadAiUsage(projectId, "3"), loadAiUsage(projectId, "3a")]).then(
+      ([costs, phase3, auto]) => {
+        if (!active) return;
+        setCostHintsUsed(costs.used.navrh);
+        setCommentsUsed(phase3.used.vyhodnoceni);
+        setComment(phase3.latest.vyhodnoceni as unknown as CaseComment | null);
+        setAssumptionsUsed(phase3.used.navrh);
+        setAutofillUsed(auto.used.navrh);
+        // Vyplnění s AI má přednost – je to hlavní cesta; samostatné odhady ho doplňují.
+        const a = auto.latest.navrh as unknown as AutofillResult | null;
+        const ownAssumptions = (phase3.latest.navrh as unknown as { items?: AiAssumption[] } | null)?.items ?? null;
+        const ownCosts = (costs.latest.navrh as unknown as CostHints | null) ?? null;
+        setAssumptions(ownAssumptions ?? a?.revenue ?? null);
+        setCostHints(ownCosts ?? (a ? { items: a.items ?? [], missing: a.missing ?? [] } : null));
+      },
+    );
     return () => {
       active = false;
     };
@@ -431,6 +443,47 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     toast({
       title: "Doporučení jsou připravená",
       description: "U každého pole je můžete použít nebo ponechat svou hodnotu.",
+    });
+  };
+
+  /** Jedním voláním: příjmy, částky nákladů, hodnocení kanálů a chybějící položky. Vyplní jen prázdná pole. */
+  const runAutofill = async () => {
+    if (!projectId) return;
+    setBusyAutofill(true);
+    await supabase
+      .from("project_data")
+      .upsert(
+        { project_id: projectId, data_key: "business_case", data_value: data },
+        { onConflict: "project_id,data_key" },
+      );
+    const res = await callAi<AutofillResult>(projectId, "case_autofill");
+    setBusyAutofill(false);
+    if (res.error || !res.output) {
+      toast({ title: "AI se nepodařilo použít", description: res.error, variant: "destructive" });
+      return;
+    }
+    const out = res.output;
+    setData((prev) => {
+      const revenue = { ...prev.revenue };
+      for (const r of out.revenue ?? []) {
+        if (!revenue[r.field]) revenue[r.field] = r.value;
+      }
+      const costs = prev.costs.map((c) => {
+        const h = out.items?.find((i) => i.id === c.id);
+        if (h && !c.amount) return { ...c, amount: h.typical };
+        return c;
+      });
+      const added = (out.missing ?? [])
+        .filter((m) => !costs.some((c) => c.name.toLowerCase() === m.name.toLowerCase()))
+        .map((m) => ({ id: newId(), name: m.name, amount: m.typical, kind: m.kind }));
+      return { ...prev, revenue, costs: [...costs, ...added] };
+    });
+    setAssumptions(out.revenue ?? []);
+    setCostHints({ items: out.items ?? [], missing: out.missing ?? [] });
+    setAutofillUsed((n) => n + 1);
+    toast({
+      title: "AI vyplnila byznys case",
+      description: "Prázdná pole jsou doplněná. Projděte je – u každého je vysvětlení a vše můžete přepsat.",
     });
   };
 
@@ -563,6 +616,32 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
           </div>
         </dl>
       </Card>
+
+      {/* Vyplnit s AI */}
+      <section className="flex flex-col gap-4 rounded-2xl border-2 border-primary/20 bg-accent/50 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="flex items-center gap-2 text-lg font-bold">
+            <Sparkles className="h-5 w-5 text-primary" /> Vyplnit byznys case s AI
+          </h3>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            AI podle vašeho projektu doplní cenu, objem, marži, růst i částky nákladů, upozorní na chybějící položky a
+            barevně ohodnotí, které kanály dávají smysl. Vyplní jen prázdná pole – vše pak můžete přepsat.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {currentProject?.business_type
+              ? `Zbývá ${Math.max(0, AI_LIMITS.navrh - autofillUsed)} z ${AI_LIMITS.navrh} pro tento projekt.`
+              : "Nejdřív zvolte typ byznysu ve fázi 2."}
+          </p>
+        </div>
+        <Button
+          className="btn-apple shrink-0"
+          onClick={runAutofill}
+          disabled={busyAutofill || autofillUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
+        >
+          {busyAutofill ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+          {busyAutofill ? "Vyplňuji…" : autofillUsed ? "Vyplnit znovu" : "Vyplnit s AI"}
+        </Button>
+      </section>
 
       {/* Příjmy */}
       <Card className="card-apple p-6">
