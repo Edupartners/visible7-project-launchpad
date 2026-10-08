@@ -41,6 +41,7 @@ import { supabase } from "@/integrations/visible7/client";
 import { businessTypes } from "@/types/implementation";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
+import { PAUSAL_2026, TAX_FORMS, TaxForm, TaxRegimeAdvice } from "@/components/TaxRegimeAdvice";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -454,6 +455,20 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   };
 
   /** Jedním voláním: příjmy, částky nákladů, hodnocení kanálů a chybějící položky. Vyplní jen prázdná pole. */
+  /** Volba formy podnikání nastaví sazbu daně; paušál přidá pevnou měsíční platbu do nákladů. */
+  const chooseTaxForm = (form: TaxForm) =>
+    setData((prev) => {
+      const rate = TAX_FORMS.find((f) => f.id === form)?.rate ?? 0;
+      let costs = prev.costs.filter((c) => c.name !== PAUSAL_2026.itemName);
+      if (form === "pausal") {
+        costs = [
+          ...costs,
+          { id: newId(), name: PAUSAL_2026.itemName, amount: PAUSAL_2026.band1Monthly, kind: "mesicni" as CostKind },
+        ];
+      }
+      return { ...prev, taxForm: form, taxRate: rate, costs };
+    });
+
   const runAutofill = async () => {
     if (!projectId) return;
     setBusyAutofill(true);
@@ -910,6 +925,34 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             )}
           </div>
         ))}
+        <div className="mt-5 border-t border-border pt-5">
+          <p className="mb-2 text-sm font-semibold">Forma podnikání a daně</p>
+          <div role="radiogroup" aria-label="Forma podnikání" className="grid gap-2 sm:grid-cols-3">
+            {TAX_FORMS.map((f) => {
+              const selected = data.taxForm === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => chooseTaxForm(f.id)}
+                  className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${
+                    selected ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/40"
+                  }`}
+                >
+                  <span className="block font-semibold">{f.label}</span>
+                  <span className="block text-xs text-muted-foreground">{f.hint}</span>
+                </button>
+              );
+            })}
+          </div>
+          {hasRevenue && (
+            <div className="mt-4">
+              <TaxRegimeAdvice rows={results.realisticky.rows} data={data} />
+            </div>
+          )}
+        </div>
         <div className="mt-5 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
           <NumField
             id="tax-rate"

@@ -74,6 +74,8 @@ export interface BusinessCaseData {
   targetProfit: number;
   /** Daň z příjmu v % ze zisku (OSVČ 15 %, s.r.o. 21 %); 0 = nepočítat */
   taxRate?: number;
+  /** Forma podnikání pro výpočet daně */
+  taxForm?: "osvc" | "pausal" | "sro";
   scenario: ScenarioId;
   /** Položky už byly jednou převzaty z Lean Canvasu */
   prefilled: boolean;
