@@ -1,4 +1,4 @@
-// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: komentář k byznys casu).
+// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: doporučené hodnoty a komentář k byznys casu).
 //
 // Náklady drží na uzdě:
 //  - jen přihlášený vlastník projektu,
@@ -169,6 +169,72 @@ const COMMENT_TOOL = {
   },
 };
 
+// Fáze 3: obvyklé hodnoty předpokladů podle typu byznysu.
+const GROUP_OF: Record<string, string> = {
+  eshop: "commerce", "web-eshop": "commerce", dropshipping: "commerce",
+  members: "subscription", lms: "subscription", "forum-komunita": "subscription",
+  "web-prezentacni": "leads", "konverzni-web": "leads", "squeeze-page": "leads",
+  blog: "content", affiliate: "content", marketplace: "marketplace", "vlastni-napad-app": "generic",
+};
+const ASSUMPTION_FIELDS: Record<string, string[]> = {
+  commerce: ["grossMargin", "repeatRate", "growthYear2"],
+  subscription: ["grossMargin", "churn", "growthYear2"],
+  leads: ["grossMargin", "conversion", "growthYear2"],
+  content: ["rpm", "growthYear2"],
+  marketplace: ["grossMargin", "commission", "growthYear2"],
+  generic: ["grossMargin", "growthYear2"],
+};
+const FIELD_LABELS: Record<string, string> = {
+  grossMargin: "hrubá marže v % z ceny (po zboží, dopravě, platební bráně)",
+  repeatRate: "podíl opakovaných nákupů v % objednávek",
+  churn: "měsíční odchodovost předplatitelů v %",
+  conversion: "konverze kontaktu (poptávky) na zákazníka v %",
+  commission: "provize marketplace z prodeje v %",
+  rpm: "výnos z reklamy a provizí na 1 000 návštěv v Kč",
+  growthYear2: "růst objemu mezi 12. a 24. měsícem v %",
+};
+const FIELD_MAX: Record<string, number> = { rpm: 3000, growthYear2: 300 };
+
+const assumptionsTool = (fields: string[]) => ({
+  name: "doporucene_hodnoty",
+  description: "Obvyklé hodnoty předpokladů byznys casu podle oboru.",
+  input_schema: {
+    type: "object",
+    properties: {
+      items: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            field: { type: "string", enum: fields },
+            value: { type: "number" },
+            why: { type: "string", description: "Dvě krátké věty: z čeho hodnota vychází a kdy bývá vyšší či nižší." },
+          },
+          required: ["field", "value", "why"],
+        },
+      },
+    },
+    required: ["items"],
+  },
+});
+
+function assumptionsPrompt(vision: string, canvas: string, businessType: string, fields: string[], caseData: unknown) {
+  return `Výstup fáze 1 (Modrý oceán):
+${vision}
+
+Lean Canvas:
+${canvas}
+
+Typ byznysu: ${BUSINESS_TYPES[businessType] ?? "neurčen"}
+
+Co už uživatel zadal v byznys casu: ${JSON.stringify(caseData ?? {}).slice(0, 1500)}
+
+Úkol: pro tento konkrétní projekt na českém online trhu doporuč realistické hodnoty těchto předpokladů:
+${fields.map((f) => `- ${f}: ${FIELD_LABELS[f]}`).join("\n")}
+U každé hodnoty napiš přesně dvě krátké věty pro laika: z čeho vychází (obvyklé rozpětí v oboru) a kdy bývá vyšší či nižší.
+Buď spíš opatrný než optimistický. Hodnotu uveď jako jedno číslo (u procent bez znaku %). Zde výjimečně číselné hodnoty uvádět smíš.`;
+}
+
 function commentPrompt(vision: string, canvas: string, businessType: string, caseJson: string) {
   return `Výstup fáze 1 (Modrý oceán):
 ${vision}
@@ -269,11 +335,11 @@ Deno.serve(async (req) => {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const { projectId, action } = body;
-  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment"].includes(action ?? "")) {
+  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
-  const kind = action === "canvas_suggest" ? "navrh" : "vyhodnoceni";
-  const phase = action === "case_comment" ? "3" : "2";
+  const kind = action === "canvas_suggest" || action === "case_assumptions" ? "navrh" : "vyhodnoceni";
+  const phase = action === "case_comment" || action === "case_assumptions" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -296,7 +362,7 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    const what = kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    const what = action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= LIMITS.userDaily) {
@@ -313,7 +379,7 @@ Deno.serve(async (req) => {
     .from("project_data")
     .select("data_key, data_value")
     .eq("project_id", projectId)
-    .in("data_key", ["vision_project_data", "vision_errc_v2", "vision_usp", "ideation_lean_canvas", "business_case_summary"]);
+    .in("data_key", ["vision_project_data", "vision_errc_v2", "vision_usp", "ideation_lean_canvas", "business_case_summary", "business_case"]);
   const raw = Object.fromEntries((rows ?? []).map((r) => [r.data_key, r.data_value]));
   const vision = describeVision(raw);
   const canvasObj = (raw["ideation_lean_canvas"] ?? {}) as Record<string, unknown>;
@@ -322,6 +388,12 @@ Deno.serve(async (req) => {
   const caseSummary = raw["business_case_summary"] as Record<string, unknown> | undefined;
   if (action === "case_comment" && !caseSummary?.scenare) {
     return json({ error: "Nejdřív vyplňte příjmy a náklady byznys casu." }, 400);
+  }
+
+  const group = GROUP_OF[project.business_type ?? ""] ?? "generic";
+  const assumptionFields = ASSUMPTION_FIELDS[group];
+  if (action === "case_assumptions" && !project.business_type) {
+    return json({ error: "Nejdřív zvolte typ byznysu ve fázi 2." }, 400);
   }
 
   if (action === "canvas_evaluate") {
@@ -337,7 +409,19 @@ Deno.serve(async (req) => {
         ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 2400)
         : action === "canvas_evaluate"
           ? await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500)
-          : await callClaude(
+          : action === "case_assumptions"
+            ? await callClaude(
+                assumptionsPrompt(
+                  vision,
+                  canvas,
+                  project.business_type ?? "",
+                  assumptionFields,
+                  (raw["business_case"] as Record<string, unknown> | undefined)?.revenue,
+                ),
+                assumptionsTool(assumptionFields),
+                1500,
+              )
+            : await callClaude(
               commentPrompt(vision, canvas, project.business_type ?? "", JSON.stringify(caseSummary).slice(0, 6000)),
               COMMENT_TOOL,
               2500,
@@ -348,7 +432,18 @@ Deno.serve(async (req) => {
   }
 
   const output = result.output;
-  if (kind === "navrh" && !(String(output.businessType) in BUSINESS_TYPES)) output.businessType = "vlastni-napad-app";
+  if (action === "canvas_suggest" && !(String(output.businessType) in BUSINESS_TYPES)) output.businessType = "vlastni-napad-app";
+  if (action === "case_assumptions") {
+    // Jen povolená pole, rozumné meze, jedno doporučení na pole.
+    const seen = new Set<string>();
+    output.items = ((output.items as { field: string; value: number; why: string }[]) ?? [])
+      .filter((i) => assumptionFields.includes(i.field) && !seen.has(i.field) && seen.add(i.field))
+      .map((i) => ({
+        field: i.field,
+        value: Math.round(Math.min(Math.max(Number(i.value) || 0, 0), FIELD_MAX[i.field] ?? 100) * 10) / 10,
+        why: String(i.why ?? "").slice(0, 400),
+      }));
+  }
 
   await admin.from("ai_outputs").insert({
     project_id: projectId,

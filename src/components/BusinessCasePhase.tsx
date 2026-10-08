@@ -11,6 +11,8 @@ import {
   CostKind,
   EMPTY_CASE,
   GROUP_COPY,
+  HELP,
+  revenueFieldsFor,
   Metrics,
   Rating,
   RevenueInputs,
@@ -31,7 +33,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Loader2, Mail, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface BusinessCasePhaseProps {
   onComplete: () => void;
@@ -64,45 +67,99 @@ const KIND_COPY: Record<CostKind, { title: string; hint: string; unit: string }>
   marketing: { title: "Marketing", hint: "Rozpočet na kanály z Lean Canvasu. Z něj se počítá PNO.", unit: "Kč měsíčně" },
 };
 
-/** Číselné pole s popiskem; prázdná hodnota = 0. */
+/** Vysvětlivka „?“ – otevře se kliknutím i na mobilu. */
+const InfoTip = ({ text, label }: { text: string; label: string }) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <button
+        type="button"
+        aria-label={`Co znamená: ${label}`}
+        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold text-muted-foreground hover:border-primary hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        ?
+      </button>
+    </PopoverTrigger>
+    <PopoverContent className="max-w-xs text-sm leading-relaxed" side="top">
+      <p className="mb-1 font-semibold">{label}</p>
+      <p className="text-muted-foreground">{text}</p>
+    </PopoverContent>
+  </Popover>
+);
+
+export interface AiAssumption {
+  field: keyof RevenueInputs;
+  value: number;
+  why: string;
+}
+
+/** Číselné pole s popiskem, vysvětlivkou a případným doporučením AI; prázdná hodnota = 0. */
 const NumField = ({
+  id,
   label,
   value,
   onChange,
   suffix,
   placeholder,
-  hint,
+  help,
+  suggestion,
 }: {
+  id: string;
   label: string;
   value: number;
   onChange: (v: number) => void;
   suffix?: string;
   placeholder?: string;
-  hint?: string;
+  help?: string;
+  suggestion?: AiAssumption;
 }) => (
-  <label className="block">
-    <span className="mb-1.5 block text-sm font-semibold">{label}</span>
+  <div>
+    <div className="mb-1.5 flex items-center gap-2">
+      <label htmlFor={id} className="text-sm font-semibold">
+        {label}
+      </label>
+      {help && <InfoTip text={help} label={label} />}
+    </div>
     <span className="relative block">
       <Input
+        id={id}
         type="number"
         inputMode="decimal"
         min={0}
         value={value ? String(value) : ""}
         placeholder={placeholder}
         onChange={(e) => onChange(Math.max(0, Number(e.target.value.replace(",", ".")) || 0))}
-        className={suffix ? "pr-16" : ""}
+        className={suffix ? "pr-20" : ""}
       />
       {suffix && (
         <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">{suffix}</span>
       )}
     </span>
-    {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
-  </label>
+    {suggestion && (
+      <div className="mt-2 rounded-xl border-l-2 border-primary bg-accent/60 p-3 text-sm">
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-semibold text-primary">
+            AI doporučuje {suggestion.value.toLocaleString("cs-CZ")} {suffix}
+          </p>
+          {suggestion.value === value ? (
+            <span className="text-xs font-semibold text-emerald-700">Použito</span>
+          ) : (
+            <Button size="sm" variant="outline" className="h-7 rounded-lg px-2.5" onClick={() => onChange(suggestion.value)}>
+              Použít
+            </Button>
+          )}
+        </div>
+        <p className="mt-1 text-muted-foreground">{suggestion.why}</p>
+      </div>
+    )}
+  </div>
 );
 
-const Stat = ({ label, value, note }: { label: string; value: string; note?: string }) => (
+const Stat = ({ label, value, note, help }: { label: string; value: string; note?: string; help: string }) => (
   <div className="rounded-xl bg-secondary/70 p-3 sm:p-4">
-    <p className="text-sm text-muted-foreground">{label}</p>
+    <div className="flex items-start justify-between gap-1">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <InfoTip text={help} label={label} />
+    </div>
     <p className="mt-1 whitespace-nowrap text-base font-bold tabular-nums sm:text-xl">{value}</p>
     {note && <p className="mt-0.5 text-xs text-muted-foreground">{note}</p>}
   </div>
@@ -123,9 +180,13 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const [commentsUsed, setCommentsUsed] = useState(0);
   const [busy, setBusy] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
+  const [assumptions, setAssumptions] = useState<AiAssumption[] | null>(null);
+  const [assumptionsUsed, setAssumptionsUsed] = useState(0);
+  const [busyAssumptions, setBusyAssumptions] = useState(false);
 
   const group = groupOf(currentProject?.business_type);
   const copy = GROUP_COPY[group];
+  const revenueFields = revenueFieldsFor(group);
   const typeName = businessTypes.find((t) => t.id === currentProject?.business_type)?.name;
 
   // Převzetí řádků z Lean Canvasu (jen poprvé) a shrnutí fáze 1.
@@ -152,10 +213,13 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     if (!projectId) return;
     let active = true;
     setComment(null);
+    setAssumptions(null);
     loadAiUsage(projectId, "3").then((u) => {
       if (!active) return;
       setCommentsUsed(u.used.vyhodnoceni);
       setComment(u.latest.vyhodnoceni as unknown as CaseComment | null);
+      setAssumptionsUsed(u.used.navrh);
+      setAssumptions((u.latest.navrh as unknown as { items?: AiAssumption[] } | null)?.items ?? null);
     });
     return () => {
       active = false;
@@ -230,6 +294,20 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       );
   };
 
+  const runAssumptions = async () => {
+    if (!projectId) return;
+    setBusyAssumptions(true);
+    const res = await callAi<{ items: AiAssumption[] }>(projectId, "case_assumptions");
+    setBusyAssumptions(false);
+    if (res.error || !res.output) {
+      toast({ title: "AI se nepodařilo použít", description: res.error, variant: "destructive" });
+      return;
+    }
+    setAssumptions(res.output.items ?? []);
+    setAssumptionsUsed((n) => n + 1);
+    toast({ title: "Doporučení jsou připravená", description: "U každého pole je můžete použít nebo ponechat svou hodnotu." });
+  };
+
   const runComment = async () => {
     if (!projectId) return;
     setBusy(true);
@@ -261,9 +339,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       `Bod zvratu: ${monthLabel(s.bod_zvratu_mesic)}`,
       `PNO ve 12. měsíci: ${pct(s.pno_12_pct)} (max. ${pct(s.max_pno_pct)})`,
       "",
-      "Chtěl(a) bych svůj byznys case probrat s lektorem.",
+      "Mám zájem o 45minutovou konzultaci byznys casu se seniorním poradcem (orientačně 1 500 Kč).",
     ].join("\n");
-    return `mailto:michal.micek@edu-partners.cz?subject=${encodeURIComponent("VISIBLE7 – konzultace byznys casu")}&body=${encodeURIComponent(body)}`;
+    return `mailto:michal.micek@edu-partners.cz?subject=${encodeURIComponent("VISIBLE7 – konzultace se seniorním poradcem")}&body=${encodeURIComponent(body)}`;
   };
 
   const chartData = current.rows.map((r) => ({ month: r.month, cumulative: Math.round(r.cumulative) }));
@@ -326,88 +404,43 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
 
       {/* Příjmy */}
       <Card className="card-apple p-6">
-        <h3 className="text-lg font-bold">Příjmy</h3>
-        <p className="mb-5 text-sm text-muted-foreground">
-          Zadejte plán pro 12. měsíc po spuštění. Rozjezd k němu dopočítáme postupně, druhý rok podle zadaného růstu.
-        </p>
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-lg font-bold">Příjmy</h3>
+            <p className="text-sm text-muted-foreground">
+              Zadejte plán pro 12. měsíc po spuštění. Rozjezd k němu dopočítáme postupně, druhý rok podle zadaného růstu.
+              U každého pole najdete vysvětlivku pod otazníkem.
+            </p>
+          </div>
+          <div className="shrink-0 sm:text-right">
+            <Button
+              variant="outline"
+              className="rounded-[10px]"
+              onClick={runAssumptions}
+              disabled={busyAssumptions || assumptionsUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
+            >
+              {busyAssumptions ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {busyAssumptions ? "Hledám obvyklé hodnoty…" : assumptions ? "Doporučit znovu" : "Doporučit hodnoty s AI"}
+            </Button>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Marže, růst a další procenta podle oboru. Zbývá {Math.max(0, AI_LIMITS.navrh - assumptionsUsed)} z {AI_LIMITS.navrh}.
+            </p>
+          </div>
+        </div>
         <div className="grid gap-5 sm:grid-cols-2">
-          {group === "content" ? (
+          {revenueFields.map((f) => (
             <NumField
-              label="Výnos na 1 000 návštěv"
-              suffix="Kč"
-              placeholder="např. 150"
-              value={data.revenue.rpm}
-              onChange={(v) => setRevenue({ rpm: v })}
-              hint="Reklama a provize dohromady. U českých webů obvykle 50–300 Kč."
+              key={f.key}
+              id={`rev-${f.key}`}
+              label={f.label}
+              suffix={f.suffix}
+              placeholder={f.placeholder}
+              help={f.help}
+              value={data.revenue[f.key]}
+              onChange={(v) => setRevenue({ [f.key]: f.max ? Math.min(v, f.max) : v } as Partial<RevenueInputs>)}
+              suggestion={assumptions?.find((a) => a.field === f.key)}
             />
-          ) : (
-            <NumField
-              label={copy.price}
-              suffix="Kč"
-              placeholder={copy.priceHint}
-              value={data.revenue.price}
-              onChange={(v) => setRevenue({ price: v })}
-            />
-          )}
-          <NumField
-            label={copy.volume}
-            placeholder={copy.volumeHint}
-            value={data.revenue.volume12}
-            onChange={(v) => setRevenue({ volume12: v })}
-          />
-          <NumField
-            label="Hrubá marže"
-            suffix="%"
-            placeholder={group === "content" ? "100" : "např. 35"}
-            value={data.revenue.grossMargin}
-            onChange={(v) => setRevenue({ grossMargin: Math.min(v, 100) })}
-            hint={copy.marginHint}
-          />
-          {group === "commerce" && (
-            <NumField
-              label="Opakované nákupy"
-              suffix="%"
-              placeholder="např. 20"
-              value={data.revenue.repeatRate}
-              onChange={(v) => setRevenue({ repeatRate: Math.min(v, 90) })}
-              hint="Kolik objednávek udělají stávající zákazníci."
-            />
-          )}
-          {group === "subscription" && (
-            <NumField
-              label="Odchodovost měsíčně"
-              suffix="%"
-              placeholder="např. 5"
-              value={data.revenue.churn}
-              onChange={(v) => setRevenue({ churn: Math.min(v, 100) })}
-              hint="Kolik předplatitelů každý měsíc odejde. U kurzů s jednorázovou platbou dejte 100 %."
-            />
-          )}
-          {group === "leads" && (
-            <NumField
-              label="Konverze kontaktu na zákazníka"
-              suffix="%"
-              placeholder="např. 10"
-              value={data.revenue.conversion}
-              onChange={(v) => setRevenue({ conversion: Math.min(v, 100) })}
-            />
-          )}
-          {group === "marketplace" && (
-            <NumField
-              label="Provize z prodeje"
-              suffix="%"
-              placeholder="např. 10"
-              value={data.revenue.commission}
-              onChange={(v) => setRevenue({ commission: Math.min(v, 100) })}
-            />
-          )}
-          <NumField
-            label="Růst ve 2. roce"
-            suffix="%"
-            value={data.revenue.growthYear2}
-            onChange={(v) => setRevenue({ growthYear2: v })}
-            hint="O kolik vzroste objem mezi 12. a 24. měsícem."
-          />
+          ))}
         </div>
       </Card>
 
@@ -486,11 +519,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         ))}
         <div className="mt-5 border-t border-border pt-5 sm:max-w-xs">
           <NumField
-            label="Cílový zisk"
+            id="target-profit"
+            label="Cílový zisk (% z obratu)"
             suffix="% obratu"
             value={data.targetProfit}
             onChange={(v) => setData((prev) => ({ ...prev, targetProfit: Math.min(v, 90) }))}
-            hint="Kolik z obratu chcete mít jako zisk. Ovlivňuje maximální PNO."
+            help={HELP.cilovyZisk}
           />
         </div>
       </Card>
@@ -527,18 +561,19 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         ) : (
           <>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <Stat label="Obrat" value={czk(m.revenueTotal)} />
-              <Stat label="Zisk" value={czk(m.profitTotal)} note={`marže zisku ${pct(m.profitMargin)}`} />
-              <Stat label="Potřebný kapitál" value={czk(m.requiredCapital)} note="nejhlubší propad peněz" />
+              <Stat label="Obrat" value={czk(m.revenueTotal)} help={HELP.obrat} />
+              <Stat label="Zisk" value={czk(m.profitTotal)} note={`marže zisku ${pct(m.profitMargin)}`} help={HELP.zisk} />
+              <Stat label="Potřebný kapitál" value={czk(m.requiredCapital)} note="nejhlubší propad peněz" help={HELP.kapital} />
               <Stat
                 label="ROI"
                 value={m.roi === null ? "—" : pct(m.roi)}
                 note="zisk za 2 roky ÷ potřebný kapitál"
+                help={HELP.roi}
               />
-              <Stat label="Bod zvratu" value={monthLabel(m.breakEvenMonth)} note="první měsíc v zisku" />
-              <Stat label="Návratnost" value={monthLabel(m.paybackMonth)} note="vložené peníze zpět" />
-              <Stat label="Obrat ve 12. měsíci" value={czk(m.revenue12)} />
-              <Stat label="Zisk ve 12. měsíci" value={czk(m.profit12)} />
+              <Stat label="Bod zvratu" value={monthLabel(m.breakEvenMonth)} note="první měsíc v zisku" help={HELP.bodZvratu} />
+              <Stat label="Návratnost" value={monthLabel(m.paybackMonth)} note="vložené peníze zpět" help={HELP.navratnost} />
+              <Stat label="Obrat ve 12. měsíci" value={czk(m.revenue12)} help={HELP.obrat12} />
+              <Stat label="Zisk ve 12. měsíci" value={czk(m.profit12)} help={HELP.zisk12} />
             </div>
 
             {/* Graf peněz v projektu */}
@@ -593,7 +628,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-xl border border-border p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <h4 className="font-semibold">PNO – podíl marketingu na obratu</h4>
+                  <h4 className="flex items-center gap-2 font-semibold">
+                    PNO – podíl marketingu na obratu <InfoTip label="PNO" text={HELP.pno} />
+                  </h4>
                   <RatingPill rating={m.pnoRating} />
                 </div>
                 <p className="mt-3 text-3xl font-bold tabular-nums">{pct(m.pno12)}</p>
@@ -610,11 +647,15 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                 </div>
                 <dl className="mt-3 space-y-1.5 text-sm">
                   <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">LTV (zisk ze zákazníka za celou dobu)</dt>
+                    <dt className="flex items-center gap-1.5 text-muted-foreground">
+                      LTV (zisk ze zákazníka za celou dobu) <InfoTip label="LTV" text={HELP.ltv} />
+                    </dt>
                     <dd className="font-semibold tabular-nums">{m.ltv === null ? "—" : czk(m.ltv)}</dd>
                   </div>
                   <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">Cena za získání zákazníka</dt>
+                    <dt className="flex items-center gap-1.5 text-muted-foreground">
+                      Cena za získání zákazníka <InfoTip label="Cena za získání zákazníka (CAC)" text={HELP.cac} />
+                    </dt>
                     <dd className="font-semibold tabular-nums">{m.cac === null ? "—" : czk(m.cac)}</dd>
                   </div>
                   <div className="flex justify-between gap-3">
@@ -733,14 +774,17 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             )}
           </div>
         )}
-        <div className="mt-6 flex flex-col gap-3 rounded-xl bg-secondary/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm">
-            Chcete čísla projít s člověkem, který sám podniká? Konzultace s lektorem stojí 1 700 Kč za hodinu.
-          </p>
-          <Button asChild variant="outline" className="shrink-0 rounded-[10px]">
+        <div className="mt-6 flex flex-col gap-3 rounded-xl border border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div>
+            <p className="font-semibold">Projděte čísla se seniorním poradcem</p>
+            <p className="text-sm text-muted-foreground">
+              Poradci jsou podnikatelé, kteří sami rozjeli vlastní byznys. Konzultace 45 minut, orientační cena 1 500 Kč.
+            </p>
+          </div>
+          <Button asChild className="btn-apple shrink-0 py-2.5">
             <a href={lecturerMail()}>
               <Mail className="mr-2 h-4 w-4" />
-              Probrat s lektorem
+              Konzultovat se seniorním poradcem
             </a>
           </Button>
         </div>

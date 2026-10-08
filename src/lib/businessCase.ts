@@ -418,3 +418,141 @@ export const ratingLabel: Record<Rating, string> = {
   spatne: "rizikové",
   nelze: "zatím nelze spočítat",
 };
+
+// ---- Pole příjmů a vysvětlivky -------------------------------------------
+
+export interface RevenueFieldDef {
+  key: keyof RevenueInputs;
+  label: string;
+  suffix: string;
+  placeholder: string;
+  help: string;
+  max?: number;
+}
+
+const VOLUME_NOUN: Record<RevenueGroup, string> = {
+  commerce: "objednávek",
+  subscription: "nových zákazníků",
+  leads: "kontaktů",
+  content: "návštěv",
+  marketplace: "prodejů",
+  generic: "prodejů",
+};
+
+const PRICE_HELP: Record<RevenueGroup, string> = {
+  commerce: "Průměrná částka jedné objednávky. Pokud jste plátce DPH, zadejte ji bez DPH.",
+  subscription:
+    "Kolik zákazník platí za měsíc přístupu. Prodáváte-li kurz jednorázově, zadejte jeho cenu a odchodovost 100 %.",
+  leads: "Průměrná částka, kterou vám zákazník zaplatí za jednu zakázku.",
+  content: "",
+  marketplace: "Průměrná hodnota jednoho prodeje mezi prodávajícím a kupujícím. Vy si z ní berete provizi.",
+  generic: "Kolik zákazník zaplatí za jeden nákup nebo za měsíc služby.",
+};
+
+/** Pole příjmů pro daný typ byznysu, v pořadí zobrazení. */
+export function revenueFieldsFor(group: RevenueGroup): RevenueFieldDef[] {
+  const copy = GROUP_COPY[group];
+  const noun = VOLUME_NOUN[group];
+  const fields: RevenueFieldDef[] = [];
+  if (group === "content") {
+    fields.push({
+      key: "rpm",
+      label: "Výnos na 1 000 návštěv (Kč)",
+      suffix: "Kč",
+      placeholder: "např. 150",
+      help: "Kolik vyděláte z reklam a provizí na každých 1\u00a0000 návštěv webu. U českých webů obvykle 50–300 Kč.",
+    });
+  } else {
+    fields.push({ key: "price", label: copy.price, suffix: "Kč", placeholder: copy.priceHint, help: PRICE_HELP[group] });
+  }
+  fields.push({
+    key: "volume12",
+    label: copy.volume,
+    suffix: "",
+    placeholder: copy.volumeHint,
+    help: `Kolik ${noun} chcete mít za měsíc rok po spuštění. První měsíce budou slabší, rozjezd aplikace dopočítá sama.`,
+  });
+  if (group !== "content") {
+    fields.push({
+      key: "grossMargin",
+      label: "Hrubá marže (% z ceny)",
+      suffix: "%",
+      placeholder: "např. 35",
+      max: 100,
+      help:
+        "Kolik procent z ceny vám zůstane po zaplacení přímých nákladů na prodej: zboží, doprava, balné, platební brána. Příklad: prodáte za 1\u00a0000 Kč, zboží a doprava stojí 650 Kč, hrubá marže je 35 %. Reklamu a provoz sem nepočítejte, ty patří do nákladů.",
+    });
+  }
+  if (group === "commerce")
+    fields.push({
+      key: "repeatRate",
+      label: "Opakované nákupy (% objednávek)",
+      suffix: "%",
+      placeholder: "např. 20",
+      max: 90,
+      help: "Kolik procent objednávek udělají zákazníci, kteří už u vás nakoupili. Čím víc, tím levněji roste obrat.",
+    });
+  if (group === "subscription")
+    fields.push({
+      key: "churn",
+      label: "Odchodovost (% zákazníků měsíčně)",
+      suffix: "%",
+      placeholder: "např. 5",
+      max: 100,
+      help:
+        "Kolik procent předplatitelů každý měsíc předplatné zruší. 5 % znamená, že průměrný zákazník zůstane asi 20 měsíců. U jednorázově placeného kurzu zadejte 100 %.",
+    });
+  if (group === "leads")
+    fields.push({
+      key: "conversion",
+      label: "Konverze kontaktu na zákazníka (%)",
+      suffix: "%",
+      placeholder: "např. 10",
+      max: 100,
+      help: "Kolik procent lidí, kteří vás kontaktují, se stane platícím zákazníkem.",
+    });
+  if (group === "marketplace")
+    fields.push({
+      key: "commission",
+      label: "Provize z prodeje (%)",
+      suffix: "%",
+      placeholder: "např. 10",
+      max: 100,
+      help: "Kolik procent z každého zprostředkovaného prodeje si necháte vy.",
+    });
+  fields.push({
+    key: "growthYear2",
+    label: "Růst ve 2. roce (%)",
+    suffix: "%",
+    placeholder: "např. 20",
+    help: `O kolik procent vzroste počet ${noun} mezi 12. a 24. měsícem. Záleží na oboru a na tom, kolik budete dávat do marketingu. Doporučení podle oboru vám navrhne AI.`,
+  });
+  return fields;
+}
+
+/** Pole, ke kterým AI doporučuje obvyklé hodnoty podle oboru. */
+export const AI_ASSUMPTION_FIELDS: Record<RevenueGroup, (keyof RevenueInputs)[]> = {
+  commerce: ["grossMargin", "repeatRate", "growthYear2"],
+  subscription: ["grossMargin", "churn", "growthYear2"],
+  leads: ["grossMargin", "conversion", "growthYear2"],
+  content: ["rpm", "growthYear2"],
+  marketplace: ["grossMargin", "commission", "growthYear2"],
+  generic: ["grossMargin", "growthYear2"],
+};
+
+export const HELP = {
+  obrat: "Všechny příjmy od zákazníků za první 2 roky po spuštění.",
+  zisk: "Obrat minus všechny náklady za 2 roky včetně jednorázové investice. Před zdaněním.",
+  kapital:
+    "Kolik peněz musíte mít k dispozici, než se projekt začne financovat sám. V grafu je to nejnižší bod křivky.",
+  roi: "Návratnost investice: zisk za 2 roky vydělený potřebným kapitálem. 100 % znamená, že zisk se rovná penězům, které jste museli vložit.",
+  bodZvratu: "První měsíc, kdy příjmy pokryjí všechny měsíční náklady a projekt je v zisku.",
+  navratnost: "Měsíc, kdy se vám vrátí všechny vložené peníze včetně ztrát z rozjezdu.",
+  obrat12: "Měsíční příjmy rok po spuštění – ukazuje, kam se projekt dostane.",
+  zisk12: "Měsíční zisk rok po spuštění, po odečtení zboží, provozu i marketingu.",
+  pno: "Podíl nákladů na obratu: kolik procent z tržeb utratíte za marketing. Když je vyšší než maximum pro váš projekt, marketing vám sní zisk.",
+  ltv: "Kolik na jednom zákazníkovi vyděláte (po odečtení přímých nákladů) za celou dobu, co u vás nakupuje.",
+  cac: "Kolik vás stojí marketing na získání jednoho nového zákazníka. Měl by být alespoň třikrát nižší než LTV.",
+  cilovyZisk:
+    "Kolik procent z obratu chcete mít jako zisk. Čím vyšší cíl, tím méně peněz zbývá na marketing a tím nižší je maximální PNO.",
+};
