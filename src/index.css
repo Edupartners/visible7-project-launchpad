@@ -244,3 +244,19 @@
     }
   }
 }
+/* Tisk osvědčení: jen samotný list, A4 na šířku */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+  html,
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .certificate-sheet {
+    width: 297mm !important;
+    height: 210mm !important;
+  }
+}

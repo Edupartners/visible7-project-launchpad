@@ -10,6 +10,8 @@ import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
 import { supabase } from "@/integrations/visible7/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import { CertificatesPanel } from "@/components/CertificatesPanel";
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Zdarma (fáze 1 a 2)",
@@ -32,6 +34,7 @@ const UserProfilePage = () => {
   const [access, setAccess] = useState<Access | null>(null);
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
+  const [completed] = useSupabaseProgress<number[]>("completed_phases", []);
 
   const meta = (user?.user_metadata ?? {}) as { first_name?: string; last_name?: string };
   const fullName = [meta.first_name, meta.last_name].filter(Boolean).join(" ");
@@ -115,6 +118,8 @@ const UserProfilePage = () => {
             </Button>
           </CardContent>
         </Card>
+
+        <CertificatesPanel completed={completed} />
 
         <Card>
           <CardHeader>

@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { UnifiedHeader } from "./layout/UnifiedHeader";
 import { ProjectSwitcher } from "./ProjectSwitcher";
 import { GateJourney } from "./GateJourney";
+import { CertificatesPanel } from "./CertificatesPanel";
+import { GATE_NAMES } from "@/lib/certificates";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -75,16 +77,6 @@ const phases = [
   }
 ];
 
-const GATE_NAMES: Record<number, string> = {
-  1: "Modrý oceán",
-  2: "Lean Canvas",
-  3: "Byznys case",
-  4: "Tvorba",
-  5: "Marketing a testování",
-  6: "Launch",
-  7: "Růst",
-};
-
 interface DashboardProps {
   userEmail: string;
   onLogout: () => void;
@@ -129,6 +121,10 @@ export const Dashboard = ({
             completed={completedPhases}
             onOpen={(route) => navigate(route)}
           />
+        </div>
+
+        <div className="mb-8">
+          <CertificatesPanel completed={completedPhases} />
         </div>
 
         {/* Fáze */}

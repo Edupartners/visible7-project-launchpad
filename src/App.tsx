@@ -22,6 +22,7 @@ import MarketingChannelDetailPage from "./pages/MarketingChannelDetailPage";
 import InvestorPitchPage from "./pages/InvestorPitchPage";
 import NotFound from "./pages/NotFound";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
+import CertificatePage from "./pages/CertificatePage";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,8 @@ const App = () => (
           <Route path="/" element={<LauncherPage />} />
           {/* OAuth consent pro MCP klienty (vlastní přihlášení uvnitř stránky) */}
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
+          {/* Veřejné ověření osvědčení – bez přihlášení */}
+          <Route path="/osvedceni/:code" element={<CertificatePage />} />
           {/* Vše ostatní vyžaduje přihlášení */}
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>

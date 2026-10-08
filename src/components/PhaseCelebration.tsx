@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { CertificateIssueDialog } from "@/components/CertificateIssueDialog";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, PartyPopper } from "lucide-react";
+import { ArrowRight, Award, PartyPopper } from "lucide-react";
 
 interface PhaseCelebrationProps {
   gate: number;
@@ -15,6 +16,7 @@ interface PhaseCelebrationProps {
 
 /** Oslava po dokončení fáze: konfety a „Brána N otevřena“. */
 export const PhaseCelebration = ({ gate, title, message, nextLabel, onNext, onHome }: PhaseCelebrationProps) => {
+  const [certOpen, setCertOpen] = useState(false);
   useEffect(() => {
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
@@ -44,11 +46,16 @@ export const PhaseCelebration = ({ gate, title, message, nextLabel, onNext, onHo
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
-          <Button variant="outline" className="h-12 rounded-xl" onClick={onHome}>
+          <Button variant="outline" className="h-12 rounded-xl" onClick={() => setCertOpen(true)}>
+            <Award className="mr-2 h-4 w-4" />
+            Získat osvědčení za fázi {gate}
+          </Button>
+          <Button variant="ghost" className="h-12 rounded-xl" onClick={onHome}>
             Zpět na přehled
           </Button>
         </div>
       </Card>
+      <CertificateIssueDialog open={certOpen} onOpenChange={setCertOpen} kind="phase" phase={gate} />
     </div>
   );
 };
