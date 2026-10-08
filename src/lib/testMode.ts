@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/visible7/client";
 
 const STORAGE_KEY = "v7_test_access";
 

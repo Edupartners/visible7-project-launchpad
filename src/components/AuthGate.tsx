@@ -1,8 +1,10 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/visible7/client";
+import { ProjectProvider } from "@/contexts/ProjectContext";
 import { LoginPage } from "@/components/LoginPage";
 import { AccessPasswordGate } from "@/components/AccessPasswordGate";
+import { SetNewPasswordPage } from "@/components/SetNewPasswordPage";
 import { clearTestSession, fetchTestMode, hasValidTestSession } from "@/lib/testMode";
 
 interface AuthContextValue {
@@ -26,6 +28,7 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [testMode, setTestMode] = useState(false);
   const [testUnlocked, setTestUnlocked] = useState(hasValidTestSession());
+  const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -46,7 +49,8 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -82,9 +86,17 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
     return <AuthContext.Provider value={{ user, signOut }}>{children}</AuthContext.Provider>;
   }
 
+  if (user && recovering) {
+    return <SetNewPasswordPage onDone={() => setRecovering(false)} />;
+  }
+
   if (!user) {
     return <LoginPage onLogin={() => { /* stav se aktualizuje přes onAuthStateChange výše */ }} />;
   }
 
-  return <AuthContext.Provider value={{ user, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, signOut }}>
+      <ProjectProvider userId={user.id}>{children}</ProjectProvider>
+    </AuthContext.Provider>
+  );
 };
