@@ -28,28 +28,30 @@ export const UnifiedHeader = (_props: UnifiedHeaderProps) => {
   };
 
   return (
-    <header className="w-full bg-gradient-to-r from-background via-primary/5 to-accent/10 border-b border-border/50 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full border-b border-black/[0.06] bg-white/80 backdrop-blur-xl backdrop-saturate-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div
-            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
+        <div className="flex items-center justify-between h-14">
+          <button
+            type="button"
+            className="flex items-center gap-2.5 rounded-lg focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
             onClick={() => navigate("/home")}
+            aria-label="VISIBLE7 MICEK – přehled"
           >
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-sm font-bold text-primary-foreground">V7</span>
-            </div>
-            <span className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              VISIBLE7 MICEK™
+            <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-foreground">
+              <span className="text-[13px] font-bold tracking-tight text-white">V7</span>
             </span>
-          </div>
+            <span className="text-[19px] font-semibold tracking-tight text-foreground">
+              VISIBLE7 <span className="font-normal text-muted-foreground">MICEK™</span>
+            </span>
+          </button>
 
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                  <span className="hidden sm:inline text-sm text-muted-foreground">{email}</span>
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-medium">
+                  <span className="hidden sm:inline text-sm text-foreground/80">{email}</span>
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-secondary text-foreground text-sm font-semibold">
                       {initials(email || "?")}
                     </AvatarFallback>
                   </Avatar>

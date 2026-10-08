@@ -7,29 +7,30 @@
 @layer base {
   :root {
     /* Apple-inspired color palette */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    /* Plocha stránky: světle šedá jako na apple.com, karty bílé */
+    --background: 240 11% 96%;
+    --foreground: 240 3% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 240 3% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 240 3% 11%;
 
     /* Primary: Apple-like blue */
-    --primary: 210 100% 50%;
+    --primary: 211 100% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 210 100% 45%;
+    --primary-hover: 211 100% 40%;
 
     /* Secondary: Subtle gray */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 20%;
+    --secondary: 240 6% 92%;
+    --secondary-foreground: 240 3% 11%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 240 9% 94%;
+    --muted-foreground: 240 2% 40%;
 
-    --accent: 210 100% 96%;
-    --accent-foreground: 210 100% 20%;
+    --accent: 211 100% 96%;
+    --accent-foreground: 211 100% 30%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -37,9 +38,9 @@
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 95%;
-    --ring: 210 100% 50%;
+    --border: 240 6% 84%;
+    --input: 240 6% 82%;
+    --ring: 211 100% 45%;
 
     /* VISIBLE7 pilot palette */
     --ink: 216 55% 15%;
@@ -50,16 +51,16 @@
     --gate-teal: 163 33% 37%;
     --gate-teal-foreground: 60 13% 98%;
 
-    --radius: 12px;
+    --radius: 14px;
 
     /* Apple-style gradients */
     --gradient-primary: linear-gradient(135deg, hsl(210 100% 50%), hsl(220 100% 60%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
     
     /* Apple-style shadows */
-    --shadow-card: 0 4px 25px -8px hsl(0 0% 0% / 0.1);
-    --shadow-button: 0 2px 8px -2px hsl(210 100% 50% / 0.25);
-    --shadow-elevated: 0 8px 32px -8px hsl(0 0% 0% / 0.15);
+    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.04), 0 6px 20px hsl(0 0% 0% / 0.05);
+    --shadow-button: none;
+    --shadow-elevated: 0 2px 4px hsl(0 0% 0% / 0.05), 0 12px 32px hsl(0 0% 0% / 0.09);
 
     /* Animations */
     --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -148,40 +149,47 @@
     @apply border-border;
   }
 
+  /* Základní velikost písma 17 px jako v systémech Apple – vše v rem se úměrně zvětší */
+  html {
+    font-size: 106.25%;
+  }
+
   body {
-    @apply bg-background text-foreground font-inter antialiased;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    @apply bg-background text-foreground antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", system-ui, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.022em;
   }
 }
 
 @layer components {
-  /* Apple-style button variants */
+  /* Tlačítka ve stylu Apple: plné modré „pilulky“ a tiché šedé sekundární */
   .btn-apple {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl;
-    @apply bg-primary text-primary-foreground hover:bg-primary/90;
-    @apply transition-all duration-200 ease-out;
-    @apply shadow-[var(--shadow-button)] hover:shadow-lg;
-    @apply active:scale-[0.98];
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full;
+    @apply bg-primary text-primary-foreground hover:bg-[hsl(var(--primary-hover))];
+    @apply transition-colors duration-150 ease-out;
+    @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30;
+    @apply disabled:opacity-40 disabled:pointer-events-none;
   }
 
   .btn-apple-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium rounded-xl;
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
-    @apply transition-all duration-200 ease-out;
-    @apply border border-border;
-    @apply active:scale-[0.98];
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full;
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/70;
+    @apply transition-colors duration-150 ease-out;
+    @apply focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30;
   }
 
-  /* Apple-style cards */
+  /* Karty: bílé na šedé ploše, bez rámečku, jemný stín */
   .card-apple {
-    @apply bg-card rounded-2xl border border-border/50;
+    @apply bg-card rounded-[20px] border-0;
     @apply shadow-[var(--shadow-card)];
-    @apply transition-all duration-200 ease-out;
   }
 
   .card-apple-hover {
-    @apply card-apple hover:shadow-[var(--shadow-elevated)];
-    @apply hover:border-border hover:-translate-y-0.5;
+    @apply card-apple transition-shadow duration-200 ease-out hover:shadow-[var(--shadow-elevated)];
   }
 
   /* Progress indicators */
@@ -190,21 +198,21 @@
   }
 
   .progress-apple-fill {
-    @apply h-full bg-gradient-to-r from-primary to-primary/80 rounded-full;
+    @apply h-full bg-primary rounded-full;
     @apply transition-all duration-500 ease-out;
   }
 
-  /* Typography */
+  /* Typografie */
   .text-apple-title {
-    @apply text-2xl font-semibold tracking-tight text-foreground;
+    @apply text-2xl sm:text-3xl font-semibold tracking-tight text-foreground;
   }
 
   .text-apple-subtitle {
-    @apply text-base text-muted-foreground font-normal;
+    @apply text-lg text-muted-foreground font-normal;
   }
 
   .text-apple-body {
-    @apply text-sm text-foreground/80 leading-relaxed;
+    @apply text-base text-foreground/85 leading-relaxed;
   }
 
   /* Lean Canvas Grid Layout */

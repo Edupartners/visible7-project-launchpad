@@ -35,7 +35,7 @@ export const SetNewPasswordPage = ({ onDone }: { onDone: () => void }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-accent/10 to-primary/5">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="card-apple w-full max-w-md p-8 animate-fade-in">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4">

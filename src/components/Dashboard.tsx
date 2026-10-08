@@ -108,7 +108,7 @@ export const Dashboard = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+    <div className="min-h-screen bg-background">
       {/* Unified Header */}
       <UnifiedHeader showTrialInfo={false} />
 

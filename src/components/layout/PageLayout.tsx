@@ -18,7 +18,7 @@ export const PageLayout = ({
   showBackButton = true 
 }: PageLayoutProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <UnifiedHeader showTrialInfo={showTrialInfo} />
       
       {showBackButton && onBack && (

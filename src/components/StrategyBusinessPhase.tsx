@@ -635,7 +635,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   
   if (showIntro) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
             <BackButton onBack={onBack} />
@@ -769,7 +769,7 @@ export const StrategyBusinessPhase = ({ onComplete, onBack }: StrategyBusinessPh
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <BackButton onBack={onBack} />

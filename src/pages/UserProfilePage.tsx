@@ -67,7 +67,7 @@ const UserProfilePage = () => {
   const until = access?.access_until ? new Date(access.access_until).toLocaleDateString("cs-CZ") : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10">
+    <div className="min-h-screen bg-background">
       <UnifiedHeader />
       <div className="container mx-auto px-4 py-8 max-w-3xl space-y-6">
         <BackButton onBack={() => navigate("/home")} />
