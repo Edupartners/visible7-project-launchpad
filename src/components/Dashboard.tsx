@@ -59,6 +59,19 @@ export const Dashboard = ({
           <CertificatesPanel completed={completedPhases} />
         </div>
 
+        <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div>
+            <h2 className="text-xl font-bold">Senioroví poradci</h2>
+            <p className="max-w-2xl text-muted-foreground">
+              15 podnikatelů a lektorů Edu Partners – od strategie a účetnictví po PPC a sociální sítě. Konzultace 45 minut,
+              orientačně 1 500 Kč.
+            </p>
+          </div>
+          <Button variant="outline" className="shrink-0 rounded-[10px]" onClick={() => navigate("/poradci")}>
+            Vybrat poradce
+          </Button>
+        </section>
+
         {/* Investor pitch po fázích 1–3 */}
         {allCoreCompleted && (
           <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">

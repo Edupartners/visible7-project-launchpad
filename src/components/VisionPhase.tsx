@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
+import { AdvisorsInline } from "@/components/AdvisorsInline";
 import {
   EMPTY_ERRC,
   ErrcItem,
@@ -568,6 +569,8 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           <p className="text-xs text-muted-foreground">Koncept je jen výchozí bod – přepište ho vlastními slovy.</p>
         </div>
       </Card>
+
+      <AdvisorsInline phase={1} title="Probrat modrý oceán s poradcem" topic="Fáze 1 – Modrý oceán" />
 
       {/* Kontrola a dokončení */}
       <Card className="card-apple p-6">

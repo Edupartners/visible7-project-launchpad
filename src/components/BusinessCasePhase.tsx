@@ -29,11 +29,12 @@ import { AI_LIMITS, callAi, loadAiUsage } from "@/lib/ai";
 import { supabase } from "@/integrations/visible7/client";
 import { businessTypes } from "@/types/implementation";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
+import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Loader2, Mail, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { CheckCircle2, Loader2, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface BusinessCasePhaseProps {
@@ -328,20 +329,18 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     setCelebrate(true);
   };
 
-  const lecturerMail = () => {
+  const caseLines = () => {
+    if (!hasRevenue) return [];
     const s = summaryFor(data.scenario);
-    const body = [
-      `Projekt: ${currentProject?.name ?? ""}`,
+    return [
+      "",
       `Typ byznysu: ${typeName ?? "—"}`,
       `Obrat za 2 roky: ${czk(s.obrat_24m)}`,
       `Zisk za 2 roky: ${czk(s.zisk_24m)}`,
       `Potřebný kapitál: ${czk(s.potrebny_kapital)}`,
       `Bod zvratu: ${monthLabel(s.bod_zvratu_mesic)}`,
       `PNO ve 12. měsíci: ${pct(s.pno_12_pct)} (max. ${pct(s.max_pno_pct)})`,
-      "",
-      "Mám zájem o 45minutovou konzultaci byznys casu se seniorním poradcem (orientačně 1 500 Kč).",
-    ].join("\n");
-    return `mailto:michal.micek@edu-partners.cz?subject=${encodeURIComponent("VISIBLE7 – konzultace se seniorním poradcem")}&body=${encodeURIComponent(body)}`;
+    ];
   };
 
   const chartData = current.rows.map((r) => ({ month: r.month, cumulative: Math.round(r.cumulative) }));
@@ -774,21 +773,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             )}
           </div>
         )}
-        <div className="mt-6 flex flex-col gap-3 rounded-xl border border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-          <div>
-            <p className="font-semibold">Projděte čísla se seniorním poradcem</p>
-            <p className="text-sm text-muted-foreground">
-              Poradci jsou podnikatelé, kteří sami rozjeli vlastní byznys. Konzultace 45 minut, orientační cena 1 500 Kč.
-            </p>
-          </div>
-          <Button asChild className="btn-apple shrink-0 py-2.5">
-            <a href={lecturerMail()}>
-              <Mail className="mr-2 h-4 w-4" />
-              Konzultovat se seniorním poradcem
-            </a>
-          </Button>
-        </div>
       </Card>
+
+      <AdvisorsInline phase={3} title="Projděte čísla se seniorním poradcem" topic="Fáze 3 – Byznys case" lines={caseLines()} />
 
       {/* Kontrola */}
       <Card className="card-apple p-6">

@@ -23,6 +23,7 @@ import InvestorPitchPage from "./pages/InvestorPitchPage";
 import NotFound from "./pages/NotFound";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import CertificatePage from "./pages/CertificatePage";
+import AdvisorsPage from "./pages/AdvisorsPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const ProtectedRoutes = () => (
     <Routes>
       <Route path="/home" element={<HomePage />} />
       <Route path="/profile" element={<UserProfilePage />} />
+      <Route path="/poradci" element={<AdvisorsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/vision" element={<VisionPage />} />
       <Route path="/ideation" element={<IdeationPage />} />

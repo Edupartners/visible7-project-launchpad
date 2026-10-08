@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Users } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -66,6 +66,10 @@ export const UnifiedHeader = (_props: UnifiedHeaderProps) => {
                 <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile")}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Můj účet</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/poradci")}>
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Senioroví poradci</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600" onClick={handleLogout}>

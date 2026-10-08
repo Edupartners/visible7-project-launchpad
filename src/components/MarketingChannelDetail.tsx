@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -230,6 +231,10 @@ export function MarketingChannelDetail({ channelId, onBack }: MarketingChannelDe
             )}
           </CardContent>
         </Card>
+
+        <div className="mt-8">
+          <AdvisorsInline channel={channelId} title={`Poradci pro kanál ${channel.name}`} topic={`Marketingový kanál: ${channel.name}`} />
+        </div>
       </div>
     </div>
   );
