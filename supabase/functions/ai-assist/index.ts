@@ -1,4 +1,4 @@
-// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: doporučené hodnoty a komentář k byznys casu).
+// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: doporučené hodnoty, orientační náklady a komentář k byznys casu).
 //
 // Náklady drží na uzdě:
 //  - jen přihlášený vlastník projektu,
@@ -235,6 +235,69 @@ U každé hodnoty napiš přesně dvě krátké věty pro laika: z čeho vycház
 Buď spíš opatrný než optimistický. Hodnotu uveď jako jedno číslo (u procent bez znaku %). Zde výjimečně číselné hodnoty uvádět smíš.`;
 }
 
+// Fáze 3: orientační částky nákladů.
+const COSTS_TOOL = {
+  name: "orientacni_naklady",
+  description: "Orientační částky nákladových položek a chybějící položky.",
+  input_schema: {
+    type: "object",
+    properties: {
+      items: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "id položky ze seznamu" },
+            low: { type: "number" },
+            typical: { type: "number" },
+            high: { type: "number" },
+            why: { type: "string", description: "Jedna krátká věta: co částka zahrnuje nebo na čem závisí." },
+          },
+          required: ["id", "low", "typical", "high", "why"],
+        },
+      },
+      missing: {
+        type: "array",
+        description: "Nejvýš 4 důležité položky, které v seznamu chybějí.",
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            kind: { type: "string", enum: ["jednorazove", "mesicni", "marketing"] },
+            typical: { type: "number" },
+            why: { type: "string" },
+          },
+          required: ["name", "kind", "typical", "why"],
+        },
+      },
+    },
+    required: ["items", "missing"],
+  },
+};
+
+function costsPrompt(vision: string, canvas: string, businessType: string, costs: { id: string; name: string; kind: string }[], revenue: unknown) {
+  const kindLabel: Record<string, string> = {
+    jednorazove: "jednorázově před spuštěním (Kč celkem)",
+    mesicni: "měsíční provoz (Kč za měsíc)",
+    marketing: "marketing (Kč za měsíc)",
+  };
+  return `Výstup fáze 1 (Modrý oceán):
+${vision}
+
+Lean Canvas:
+${canvas}
+
+Typ byznysu: ${BUSINESS_TYPES[businessType] ?? "neurčen"}
+Plán příjmů zadaný uživatelem: ${JSON.stringify(revenue ?? {}).slice(0, 800)}
+
+Nákladové položky (id | název | druh):
+${costs.map((c) => `${c.id} | ${c.name} | ${kindLabel[c.kind] ?? c.kind}`).join("\n")}
+
+Úkol: pro každou položku odhadni orientační částku v Kč bez DPH pro začínající online projekt v Česku v roce 2026 – nízkou (low), obvyklou (typical) a vysokou (high). Drž se podnikatelského minimalismu: začínající projekt, rozjezd s malými náklady, žádná agentura tam, kde to zvládne podnikatel sám nebo levný nástroj. U marketingu vycházej z rozpočtu, který dává smysl k plánovaným příjmům.
+Do missing dej nejvýš 4 důležité položky, které v seznamu chybějí (např. účetní, platební brána, vlastní odměna), jinak prázdné pole.
+Zde výjimečně částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
+}
+
 function commentPrompt(vision: string, canvas: string, businessType: string, caseJson: string) {
   return `Výstup fáze 1 (Modrý oceán):
 ${vision}
@@ -335,11 +398,12 @@ Deno.serve(async (req) => {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const { projectId, action } = body;
-  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions"].includes(action ?? "")) {
+  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
-  const kind = action === "canvas_suggest" || action === "case_assumptions" ? "navrh" : "vyhodnoceni";
-  const phase = action === "case_comment" || action === "case_assumptions" ? "3" : "2";
+  const kind = action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" ? "navrh" : "vyhodnoceni";
+  // Odhady nákladů mají vlastní limit (fáze „3n“), aby nesdílely limit s doporučenými procenty.
+  const phase = action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -362,7 +426,7 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    const what = action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    const what = action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= LIMITS.userDaily) {
@@ -396,6 +460,18 @@ Deno.serve(async (req) => {
     return json({ error: "Nejdřív zvolte typ byznysu ve fázi 2." }, 400);
   }
 
+  const caseCosts = (((raw["business_case"] as Record<string, unknown> | undefined)?.costs ?? []) as {
+    id: string;
+    name: string;
+    kind: string;
+  }[])
+    .filter((c) => c?.id && c?.name?.trim())
+    .slice(0, 30)
+    .map((c) => ({ id: String(c.id).slice(0, 40), name: cut(c.name, 80), kind: String(c.kind) }));
+  if (action === "case_costs" && caseCosts.length === 0) {
+    return json({ error: "Nejdřív přidejte nákladové položky." }, 400);
+  }
+
   if (action === "canvas_evaluate") {
     const filled = CANVAS_KEYS.filter((k) => cut(canvasObj[k]).length > 0).length;
     if (filled < 7) return json({ error: "Nejdřív vyplňte alespoň 7 polí canvasu." }, 400);
@@ -409,6 +485,12 @@ Deno.serve(async (req) => {
         ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 2400)
         : action === "canvas_evaluate"
           ? await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500)
+          : action === "case_costs"
+            ? await callClaude(
+                costsPrompt(vision, canvas, project.business_type ?? "", caseCosts, (raw["business_case"] as Record<string, unknown> | undefined)?.revenue),
+                COSTS_TOOL,
+                2500,
+              )
           : action === "case_assumptions"
             ? await callClaude(
                 assumptionsPrompt(
@@ -443,6 +525,21 @@ Deno.serve(async (req) => {
         value: Math.round(Math.min(Math.max(Number(i.value) || 0, 0), FIELD_MAX[i.field] ?? 100) * 10) / 10,
         why: String(i.why ?? "").slice(0, 400),
       }));
+  }
+
+  if (action === "case_costs") {
+    const ids = new Set(caseCosts.map((c) => c.id));
+    const money = (v: unknown) => Math.round(Math.min(Math.max(Number(v) || 0, 0), 10_000_000));
+    output.items = ((output.items as Record<string, unknown>[]) ?? [])
+      .filter((i) => ids.has(String(i.id)))
+      .map((i) => {
+        const [low, typical, high] = [money(i.low), money(i.typical), money(i.high)].sort((a, b) => a - b);
+        return { id: String(i.id), low, typical, high, why: String(i.why ?? "").slice(0, 300) };
+      });
+    output.missing = ((output.missing as Record<string, unknown>[]) ?? [])
+      .filter((m) => ["jednorazove", "mesicni", "marketing"].includes(String(m.kind)) && String(m.name ?? "").trim())
+      .slice(0, 4)
+      .map((m) => ({ name: String(m.name).slice(0, 70), kind: String(m.kind), typical: money(m.typical), why: String(m.why ?? "").slice(0, 300) }));
   }
 
   await admin.from("ai_outputs").insert({

@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CartesianGrid, Line, LineChart, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceDot,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
 import { loadProjectKeys, loadVisionSummary } from "@/lib/projectData";
@@ -60,12 +70,31 @@ const RATING_STYLE: Record<Rating, string> = {
 };
 
 /** Nejčastější placené kanály k rychlému přidání do marketingu. */
-const AD_CHANNELS = ["Google Ads", "Sklik", "Meta (Facebook a Instagram)", "ChatGPT Ads", "TikTok Ads", "Srovnávače zboží"];
+const AD_CHANNELS = [
+  "Google Ads",
+  "Sklik",
+  "Meta (Facebook a Instagram)",
+  "ChatGPT Ads",
+  "TikTok Ads",
+  "Srovnávače zboží",
+];
 
 const KIND_COPY: Record<CostKind, { title: string; hint: string; unit: string }> = {
-  jednorazove: { title: "Jednorázové náklady před spuštěním", hint: "Web, logo, první zásoba, natočení kurzu…", unit: "Kč celkem" },
-  mesicni: { title: "Měsíční provoz", hint: "Hosting, nástroje, účetní, vaše odměna nebo externí pomoc…", unit: "Kč měsíčně" },
-  marketing: { title: "Marketing", hint: "Rozpočet na kanály z Lean Canvasu. Z něj se počítá PNO.", unit: "Kč měsíčně" },
+  jednorazove: {
+    title: "Jednorázové náklady před spuštěním",
+    hint: "Web, logo, první zásoba, natočení kurzu…",
+    unit: "Kč celkem",
+  },
+  mesicni: {
+    title: "Měsíční provoz",
+    hint: "Hosting, nástroje, účetní, vaše odměna nebo externí pomoc…",
+    unit: "Kč měsíčně",
+  },
+  marketing: {
+    title: "Marketing",
+    hint: "Rozpočet na kanály z Lean Canvasu. Z něj se počítá PNO.",
+    unit: "Kč měsíčně",
+  },
 };
 
 /** Vysvětlivka „?“ – otevře se kliknutím i na mobilu. */
@@ -86,6 +115,23 @@ const InfoTip = ({ text, label }: { text: string; label: string }) => (
     </PopoverContent>
   </Popover>
 );
+
+interface CostHints {
+  items: {
+    id: string;
+    low: number;
+    typical: number;
+    high: number;
+    why: string;
+  }[];
+  missing: { name: string; kind: CostKind; typical: number; why: string }[];
+}
+
+const KIND_SHORT: Record<CostKind, string> = {
+  jednorazove: "jednorázově",
+  mesicni: "měsíčně",
+  marketing: "marketing měsíčně",
+};
 
 export interface AiAssumption {
   field: keyof RevenueInputs;
@@ -132,7 +178,9 @@ const NumField = ({
         className={suffix ? "pr-20" : ""}
       />
       {suffix && (
-        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">{suffix}</span>
+        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+          {suffix}
+        </span>
       )}
     </span>
     {suggestion && (
@@ -144,7 +192,12 @@ const NumField = ({
           {suggestion.value === value ? (
             <span className="text-xs font-semibold text-emerald-700">Použito</span>
           ) : (
-            <Button size="sm" variant="outline" className="h-7 rounded-lg px-2.5" onClick={() => onChange(suggestion.value)}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 rounded-lg px-2.5"
+              onClick={() => onChange(suggestion.value)}
+            >
               Použít
             </Button>
           )}
@@ -167,7 +220,11 @@ const Stat = ({ label, value, note, help }: { label: string; value: string; note
 );
 
 const RatingPill = ({ rating }: { rating: Rating }) => (
-  <span className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${RATING_STYLE[rating]}`}>{ratingLabel[rating]}</span>
+  <span
+    className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${RATING_STYLE[rating]}`}
+  >
+    {ratingLabel[rating]}
+  </span>
 );
 
 export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
@@ -176,7 +233,10 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const { currentProject, setBusinessType } = useProject();
   const projectId = currentProject?.id;
   const [data, setData, { loading }] = useSupabaseProgress<BusinessCaseData>("business_case", EMPTY_CASE);
-  const [context, setContext] = useState<{ customer: string; usp: string } | null>(null);
+  const [context, setContext] = useState<{
+    customer: string;
+    usp: string;
+  } | null>(null);
   const [comment, setComment] = useState<CaseComment | null>(null);
   const [commentsUsed, setCommentsUsed] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -184,6 +244,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const [assumptions, setAssumptions] = useState<AiAssumption[] | null>(null);
   const [assumptionsUsed, setAssumptionsUsed] = useState(0);
   const [busyAssumptions, setBusyAssumptions] = useState(false);
+  const [costHints, setCostHints] = useState<CostHints | null>(null);
+  const [costHintsUsed, setCostHintsUsed] = useState(0);
+  const [busyCosts, setBusyCosts] = useState(false);
 
   const group = groupOf(currentProject?.business_type);
   const copy = GROUP_COPY[group];
@@ -200,8 +263,17 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     if (!data.prefilled && data.costs.length === 0) {
       loadProjectKeys(projectId, ["ideation_lean_canvas"]).then((raw) => {
         if (!active) return;
-        const fromCanvas = costsFromCanvas(raw["ideation_lean_canvas"] as { costStructure?: string; channels?: string } | null);
-        setData((prev) => ({ ...prev, costs: fromCanvas.length ? fromCanvas : BASE_COSTS(), prefilled: true }));
+        const fromCanvas = costsFromCanvas(
+          raw["ideation_lean_canvas"] as {
+            costStructure?: string;
+            channels?: string;
+          } | null,
+        );
+        setData((prev) => ({
+          ...prev,
+          costs: fromCanvas.length ? fromCanvas : BASE_COSTS(),
+          prefilled: true,
+        }));
       });
     }
     return () => {
@@ -215,6 +287,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     let active = true;
     setComment(null);
     setAssumptions(null);
+    setCostHints(null);
+    loadAiUsage(projectId, "3n").then((u) => {
+      if (!active) return;
+      setCostHintsUsed(u.used.navrh);
+      setCostHints((u.latest.navrh as unknown as CostHints | null) ?? null);
+    });
     loadAiUsage(projectId, "3").then((u) => {
       if (!active) return;
       setCommentsUsed(u.used.vyhodnoceni);
@@ -239,20 +317,47 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const current = results[data.scenario];
   const m = current.metrics;
 
-  const setRevenue = (patch: Partial<RevenueInputs>) => setData((prev) => ({ ...prev, revenue: { ...prev.revenue, ...patch } }));
+  const setRevenue = (patch: Partial<RevenueInputs>) =>
+    setData((prev) => ({ ...prev, revenue: { ...prev.revenue, ...patch } }));
   const updateCost = (id: string, patch: Partial<CostItem>) =>
-    setData((prev) => ({ ...prev, costs: prev.costs.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
-  const removeCost = (id: string) => setData((prev) => ({ ...prev, costs: prev.costs.filter((c) => c.id !== id) }));
+    setData((prev) => ({
+      ...prev,
+      costs: prev.costs.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    }));
+  const removeCost = (id: string) =>
+    setData((prev) => ({
+      ...prev,
+      costs: prev.costs.filter((c) => c.id !== id),
+    }));
   const addCost = (kind: CostKind) =>
-    setData((prev) => ({ ...prev, costs: [...prev.costs, { id: newId(), name: "", amount: 0, kind }] }));
+    setData((prev) => ({
+      ...prev,
+      costs: [...prev.costs, { id: newId(), name: "", amount: 0, kind }],
+    }));
 
   const hasRevenue = m.revenue12 > 0;
   const hasCosts = data.costs.some((c) => c.amount > 0);
   const checks = [
-    { label: "Typ byznysu zvolený ve fázi 2", ok: !!currentProject?.business_type, required: true },
-    { label: "Příjmy vyplněné (cena, objem a marže)", ok: hasRevenue && (data.revenue.grossMargin > 0 || group === "content"), required: true },
-    { label: "Alespoň jedna nákladová položka s částkou", ok: hasCosts, required: true },
-    { label: "Komentář AI k výsledku (doporučeno)", ok: !!comment, required: false },
+    {
+      label: "Typ byznysu zvolený ve fázi 2",
+      ok: !!currentProject?.business_type,
+      required: true,
+    },
+    {
+      label: "Příjmy vyplněné (cena, objem a marže)",
+      ok: hasRevenue && (data.revenue.grossMargin > 0 || group === "content"),
+      required: true,
+    },
+    {
+      label: "Alespoň jedna nákladová položka s částkou",
+      ok: hasCosts,
+      required: true,
+    },
+    {
+      label: "Komentář AI k výsledku (doporučeno)",
+      ok: !!comment,
+      required: false,
+    },
   ];
   const canFinish = checks.filter((c) => c.required).every((c) => c.ok);
 
@@ -287,12 +392,14 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   // Souhrn spočítaných čísel ukládáme hned (čte ho AI na serveru a navazující fáze).
   const saveSummary = async () => {
     if (!projectId) return;
-    await supabase
-      .from("project_data")
-      .upsert(
-        { project_id: projectId, data_key: "business_case_summary", data_value: buildSummary() },
-        { onConflict: "project_id,data_key" }
-      );
+    await supabase.from("project_data").upsert(
+      {
+        project_id: projectId,
+        data_key: "business_case_summary",
+        data_value: buildSummary(),
+      },
+      { onConflict: "project_id,data_key" },
+    );
   };
 
   const runAssumptions = async () => {
@@ -301,12 +408,50 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     const res = await callAi<{ items: AiAssumption[] }>(projectId, "case_assumptions");
     setBusyAssumptions(false);
     if (res.error || !res.output) {
-      toast({ title: "AI se nepodařilo použít", description: res.error, variant: "destructive" });
+      toast({
+        title: "AI se nepodařilo použít",
+        description: res.error,
+        variant: "destructive",
+      });
       return;
     }
     setAssumptions(res.output.items ?? []);
     setAssumptionsUsed((n) => n + 1);
-    toast({ title: "Doporučení jsou připravená", description: "U každého pole je můžete použít nebo ponechat svou hodnotu." });
+    toast({
+      title: "Doporučení jsou připravená",
+      description: "U každého pole je můžete použít nebo ponechat svou hodnotu.",
+    });
+  };
+
+  const runCostHints = async () => {
+    if (!projectId) return;
+    setBusyCosts(true);
+    // Položky se ukládají se zpožděním – uložíme je hned, ať AI vidí aktuální seznam.
+    await supabase
+      .from("project_data")
+      .upsert(
+        { project_id: projectId, data_key: "business_case", data_value: data },
+        { onConflict: "project_id,data_key" },
+      );
+    const res = await callAi<CostHints>(projectId, "case_costs");
+    setBusyCosts(false);
+    if (res.error || !res.output) {
+      toast({
+        title: "AI se nepodařilo použít",
+        description: res.error,
+        variant: "destructive",
+      });
+      return;
+    }
+    setCostHints({
+      items: res.output.items ?? [],
+      missing: res.output.missing ?? [],
+    });
+    setCostHintsUsed((n) => n + 1);
+    toast({
+      title: "Odhady jsou připravené",
+      description: "U položek je můžete použít nebo zadat vlastní částku.",
+    });
   };
 
   const runComment = async () => {
@@ -316,7 +461,11 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     const res = await callAi<CaseComment>(projectId, "case_comment");
     setBusy(false);
     if (res.error || !res.output) {
-      toast({ title: "AI se nepodařilo použít", description: res.error, variant: "destructive" });
+      toast({
+        title: "AI se nepodařilo použít",
+        description: res.error,
+        variant: "destructive",
+      });
       return;
     }
     setComment(res.output);
@@ -343,7 +492,10 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     ];
   };
 
-  const chartData = current.rows.map((r) => ({ month: r.month, cumulative: Math.round(r.cumulative) }));
+  const chartData = current.rows.map((r) => ({
+    month: r.month,
+    cumulative: Math.round(r.cumulative),
+  }));
   const trough = current.rows.reduce((a, b) => (b.cumulative < a.cumulative ? b : a), current.rows[0]);
   const costsByKind = (kind: CostKind) => data.costs.filter((c) => c.kind === kind);
 
@@ -365,8 +517,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         <p className="text-sm font-semibold text-primary">Fáze 3 ze 7</p>
         <h2 className="text-2xl font-bold">Byznys case</h2>
         <p className="mt-1 max-w-2xl text-muted-foreground">
-          Doplňte čísla a uvidíte, kolik peněz projekt potřebuje, kdy se dostane do zisku a kolik smíte dát do marketingu.
-          Položky jsme převzali z Lean Canvasu, částky zadáváte vy.
+          Doplňte čísla a uvidíte, kolik peněz projekt potřebuje, kdy se dostane do zisku a kolik smíte dát do
+          marketingu. Položky jsme převzali z Lean Canvasu, částky zadáváte vy.
         </p>
         <dl className="mt-5 grid gap-4 border-t border-border pt-5 text-sm sm:grid-cols-3">
           <div>
@@ -407,8 +559,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
           <div>
             <h3 className="text-lg font-bold">Příjmy</h3>
             <p className="text-sm text-muted-foreground">
-              Zadejte plán pro 12. měsíc po spuštění. Rozjezd k němu dopočítáme postupně, druhý rok podle zadaného růstu.
-              U každého pole najdete vysvětlivku pod otazníkem.
+              Zadejte plán pro 12. měsíc po spuštění. Rozjezd k němu dopočítáme postupně, druhý rok podle zadaného
+              růstu. U každého pole najdete vysvětlivku pod otazníkem.
             </p>
           </div>
           <div className="shrink-0 sm:text-right">
@@ -418,11 +570,16 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               onClick={runAssumptions}
               disabled={busyAssumptions || assumptionsUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
             >
-              {busyAssumptions ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {busyAssumptions ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="mr-2 h-4 w-4" />
+              )}
               {busyAssumptions ? "Hledám obvyklé hodnoty…" : assumptions ? "Doporučit znovu" : "Doporučit hodnoty s AI"}
             </Button>
             <p className="mt-1 text-xs text-muted-foreground">
-              Marže, růst a další procenta podle oboru. Zbývá {Math.max(0, AI_LIMITS.navrh - assumptionsUsed)} z {AI_LIMITS.navrh}.
+              Marže, růst a další procenta podle oboru. Zbývá {Math.max(0, AI_LIMITS.navrh - assumptionsUsed)} z{" "}
+              {AI_LIMITS.navrh}.
             </p>
           </div>
         </div>
@@ -436,7 +593,11 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               placeholder={f.placeholder}
               help={f.help}
               value={data.revenue[f.key]}
-              onChange={(v) => setRevenue({ [f.key]: f.max ? Math.min(v, f.max) : v } as Partial<RevenueInputs>)}
+              onChange={(v) =>
+                setRevenue({
+                  [f.key]: f.max ? Math.min(v, f.max) : v,
+                } as Partial<RevenueInputs>)
+              }
               suggestion={assumptions?.find((a) => a.field === f.key)}
             />
           ))}
@@ -445,10 +606,71 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
 
       {/* Náklady */}
       <Card className="card-apple p-6">
-        <h3 className="text-lg font-bold">Náklady</h3>
-        <p className="mb-2 text-sm text-muted-foreground">
-          Náklady na zboží a dopravu už jsou v hrubé marži. Sem patří vše ostatní. Položku bez částky nepočítáme.
-        </p>
+        <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-lg font-bold">Náklady</h3>
+            <p className="text-sm text-muted-foreground">
+              Náklady na zboží a dopravu už jsou v hrubé marži. Sem patří vše ostatní. Položku bez částky nepočítáme.
+            </p>
+          </div>
+          <div className="shrink-0 sm:text-right">
+            <Button
+              variant="outline"
+              className="rounded-[10px]"
+              onClick={runCostHints}
+              disabled={busyCosts || costHintsUsed >= AI_LIMITS.navrh || data.costs.length === 0}
+            >
+              {busyCosts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {busyCosts ? "Odhaduji částky…" : costHints ? "Odhadnout znovu" : "Odhadnout částky s AI"}
+            </Button>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Orientační ceny pro začínající projekt v ČR. Zbývá {Math.max(0, AI_LIMITS.navrh - costHintsUsed)} z{" "}
+              {AI_LIMITS.navrh}.
+            </p>
+          </div>
+        </div>
+        {costHints?.missing && costHints.missing.length > 0 && (
+          <div className="mt-4 rounded-xl border-l-2 border-primary bg-accent/60 p-4 text-sm">
+            <p className="font-semibold text-primary">AI upozorňuje na položky, které vám chybí</p>
+            <ul className="mt-2 space-y-2">
+              {costHints.missing.map((m) => {
+                const added = data.costs.some((c) => c.name.toLowerCase() === m.name.toLowerCase());
+                return (
+                  <li key={m.name} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span>
+                      <strong>{m.name}</strong> ({KIND_SHORT[m.kind]}, orientačně {czk(m.typical)}) – {m.why}
+                    </span>
+                    {added ? (
+                      <span className="shrink-0 text-xs font-semibold text-emerald-700">Přidáno</span>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 shrink-0 rounded-lg px-2.5"
+                        onClick={() =>
+                          setData((prev) => ({
+                            ...prev,
+                            costs: [
+                              ...prev.costs,
+                              {
+                                id: newId(),
+                                name: m.name,
+                                amount: m.typical,
+                                kind: m.kind,
+                              },
+                            ],
+                          }))
+                        }
+                      >
+                        <Plus className="mr-1 h-3.5 w-3.5" /> Přidat
+                      </Button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
         {(["jednorazove", "mesicni", "marketing"] as CostKind[]).map((kind) => (
           <div key={kind} className="border-t border-border pt-5 mt-5 first-of-type:mt-3">
             <div className="mb-3">
@@ -456,43 +678,79 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               <p className="text-sm text-muted-foreground">{KIND_COPY[kind].hint}</p>
             </div>
             <ul className="space-y-2">
-              {costsByKind(kind).map((c) => (
-                <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
-                  <Input
-                    value={c.name}
-                    onChange={(e) => updateCost(c.id, { name: e.target.value })}
-                    placeholder="Název položky"
-                    className="col-span-3 min-w-0 sm:flex-1"
-                    aria-label="Název položky"
-                  />
-                  <span className="relative min-w-0 sm:w-40 sm:shrink-0">
-                    <Input
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      value={c.amount ? String(c.amount) : ""}
-                      placeholder="0"
-                      onChange={(e) => updateCost(c.id, { amount: Math.max(0, Number(e.target.value) || 0) })}
-                      className="pr-10 text-right tabular-nums"
-                      aria-label={`Částka – ${c.name || "položka"} (${KIND_COPY[kind].unit})`}
-                    />
-                    <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">Kč</span>
-                  </span>
-                  <select
-                    value={c.kind}
-                    onChange={(e) => updateCost(c.id, { kind: e.target.value as CostKind })}
-                    className="h-11 w-[7.5rem] shrink-0 rounded-xl border border-input bg-card px-2 text-sm sm:w-auto"
-                    aria-label="Druh nákladu"
-                  >
-                    <option value="jednorazove">jednorázově</option>
-                    <option value="mesicni">měsíčně</option>
-                    <option value="marketing">marketing</option>
-                  </select>
-                  <Button variant="ghost" size="icon" className="shrink-0" onClick={() => removeCost(c.id)} aria-label="Odebrat položku">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </li>
-              ))}
+              {costsByKind(kind).map((c) => {
+                const hint = costHints?.items.find((h) => h.id === c.id);
+                return (
+                  <li key={c.id}>
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
+                      <Input
+                        value={c.name}
+                        onChange={(e) => updateCost(c.id, { name: e.target.value })}
+                        placeholder="Název položky"
+                        className="col-span-3 min-w-0 sm:flex-1"
+                        aria-label="Název položky"
+                      />
+                      <span className="relative min-w-0 sm:w-40 sm:shrink-0">
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          min={0}
+                          value={c.amount ? String(c.amount) : ""}
+                          placeholder="0"
+                          onChange={(e) =>
+                            updateCost(c.id, {
+                              amount: Math.max(0, Number(e.target.value) || 0),
+                            })
+                          }
+                          className="pr-10 text-right tabular-nums"
+                          aria-label={`Částka – ${c.name || "položka"} (${KIND_COPY[kind].unit})`}
+                        />
+                        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+                          Kč
+                        </span>
+                      </span>
+                      <select
+                        value={c.kind}
+                        onChange={(e) => updateCost(c.id, { kind: e.target.value as CostKind })}
+                        className="h-11 w-[7.5rem] shrink-0 rounded-xl border border-input bg-card px-2 text-sm sm:w-auto"
+                        aria-label="Druh nákladu"
+                      >
+                        <option value="jednorazove">jednorázově</option>
+                        <option value="mesicni">měsíčně</option>
+                        <option value="marketing">marketing</option>
+                      </select>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0"
+                        onClick={() => removeCost(c.id)}
+                        aria-label="Odebrat položku"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {hint && (
+                      <div className="mt-1 flex flex-col gap-1 pl-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
+                        <span>
+                          <span className="font-semibold text-primary">AI: obvykle {czk(hint.typical)}</span>
+                          {hint.high > hint.low && ` (${czk(hint.low)} – ${czk(hint.high)})`}. {hint.why}
+                        </span>
+                        {c.amount === hint.typical ? (
+                          <span className="shrink-0 font-semibold text-emerald-700">Použito</span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="shrink-0 self-start font-semibold text-primary hover:underline sm:self-auto"
+                            onClick={() => updateCost(c.id, { amount: hint.typical })}
+                          >
+                            Použít {czk(hint.typical)}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
             <Button variant="ghost" size="sm" className="mt-2 text-primary" onClick={() => addCost(kind)}>
               <Plus className="mr-1 h-4 w-4" /> Přidat položku
@@ -500,18 +758,31 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             {kind === "marketing" && (
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rychle přidat:</span>
-                {AD_CHANNELS.filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase())).map((ch) => (
-                  <button
-                    key={ch}
-                    type="button"
-                    onClick={() =>
-                      setData((prev) => ({ ...prev, costs: [...prev.costs, { id: newId(), name: ch, amount: 0, kind: "marketing" }] }))
-                    }
-                    className="rounded-full border border-border px-3 py-1 text-sm hover:border-primary hover:text-primary"
-                  >
-                    + {ch}
-                  </button>
-                ))}
+                {AD_CHANNELS.filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase())).map(
+                  (ch) => (
+                    <button
+                      key={ch}
+                      type="button"
+                      onClick={() =>
+                        setData((prev) => ({
+                          ...prev,
+                          costs: [
+                            ...prev.costs,
+                            {
+                              id: newId(),
+                              name: ch,
+                              amount: 0,
+                              kind: "marketing",
+                            },
+                          ],
+                        }))
+                      }
+                      className="rounded-full border border-border px-3 py-1 text-sm hover:border-primary hover:text-primary"
+                    >
+                      + {ch}
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
@@ -533,9 +804,15 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h3 className="text-lg font-bold">Výsledek za 2 roky</h3>
-            <p className="text-sm text-muted-foreground">Přepněte scénář a uvidíte, co se stane, když prodeje půjdou hůř nebo lépe.</p>
+            <p className="text-sm text-muted-foreground">
+              Přepněte scénář a uvidíte, co se stane, když prodeje půjdou hůř nebo lépe.
+            </p>
           </div>
-          <div role="radiogroup" aria-label="Scénář" className="flex rounded-xl border border-border p-1 sm:inline-flex">
+          <div
+            role="radiogroup"
+            aria-label="Scénář"
+            className="flex rounded-xl border border-border p-1 sm:inline-flex"
+          >
             {SCENARIOS.map((s) => (
               <button
                 key={s.id}
@@ -543,7 +820,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                 aria-checked={data.scenario === s.id}
                 onClick={() => setData((prev) => ({ ...prev, scenario: s.id }))}
                 className={`flex-1 rounded-lg px-1.5 py-1.5 text-[13px] font-semibold sm:text-sm transition-colors sm:flex-none sm:px-3 ${
-                  data.scenario === s.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  data.scenario === s.id
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
                 title={s.hint}
               >
@@ -561,16 +840,36 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
           <>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               <Stat label="Obrat" value={czk(m.revenueTotal)} help={HELP.obrat} />
-              <Stat label="Zisk" value={czk(m.profitTotal)} note={`marže zisku ${pct(m.profitMargin)}`} help={HELP.zisk} />
-              <Stat label="Potřebný kapitál" value={czk(m.requiredCapital)} note="nejhlubší propad peněz" help={HELP.kapital} />
+              <Stat
+                label="Zisk"
+                value={czk(m.profitTotal)}
+                note={`marže zisku ${pct(m.profitMargin)}`}
+                help={HELP.zisk}
+              />
+              <Stat
+                label="Potřebný kapitál"
+                value={czk(m.requiredCapital)}
+                note="nejhlubší propad peněz"
+                help={HELP.kapital}
+              />
               <Stat
                 label="ROI"
                 value={m.roi === null ? "—" : pct(m.roi)}
                 note="zisk za 2 roky ÷ potřebný kapitál"
                 help={HELP.roi}
               />
-              <Stat label="Bod zvratu" value={monthLabel(m.breakEvenMonth)} note="první měsíc v zisku" help={HELP.bodZvratu} />
-              <Stat label="Návratnost" value={monthLabel(m.paybackMonth)} note="vložené peníze zpět" help={HELP.navratnost} />
+              <Stat
+                label="Bod zvratu"
+                value={monthLabel(m.breakEvenMonth)}
+                note="první měsíc v zisku"
+                help={HELP.bodZvratu}
+              />
+              <Stat
+                label="Návratnost"
+                value={monthLabel(m.paybackMonth)}
+                note="vložené peníze zpět"
+                help={HELP.navratnost}
+              />
               <Stat label="Obrat ve 12. měsíci" value={czk(m.revenue12)} help={HELP.obrat12} />
               <Stat label="Zisk ve 12. měsíci" value={czk(m.profit12)} help={HELP.zisk12} />
             </div>
@@ -579,7 +878,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <div className="mt-6">
               <h4 className="font-semibold">Peníze v projektu celkem</h4>
               <p className="text-sm text-muted-foreground">
-                Nejnižší bod křivky je kapitál, který musíte mít připravený. Kde křivka protne nulu, máte vložené peníze zpět.
+                Nejnižší bod křivky je kapitál, který musíte mít připravený. Kde křivka protne nulu, máte vložené peníze
+                zpět.
               </p>
               <div className="mt-3 h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -589,7 +889,10 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                       dataKey="month"
                       tickLine={false}
                       axisLine={false}
-                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      tick={{
+                        fontSize: 12,
+                        fill: "hsl(var(--muted-foreground))",
+                      }}
                       ticks={[0, 6, 12, 18, 24]}
                       tickFormatter={(v) => (v === 0 ? "start" : `${v}. m.`)}
                     />
@@ -597,16 +900,30 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                       tickLine={false}
                       axisLine={false}
                       width={64}
-                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      tick={{
+                        fontSize: 12,
+                        fill: "hsl(var(--muted-foreground))",
+                      }}
                       tickFormatter={(v) => `${Math.round(v / 1000).toLocaleString("cs-CZ")} tis.`}
                     />
                     <ReferenceLine y={0} stroke="hsl(var(--foreground))" strokeOpacity={0.4} />
                     <Tooltip
                       formatter={(v: number) => [czk(v), "Peníze celkem"]}
                       labelFormatter={(l: number) => (l === 0 ? "Před spuštěním" : `${l}. měsíc`)}
-                      contentStyle={{ borderRadius: 10, border: "1px solid hsl(var(--border))", fontSize: 13 }}
+                      contentStyle={{
+                        borderRadius: 10,
+                        border: "1px solid hsl(var(--border))",
+                        fontSize: 13,
+                      }}
                     />
-                    <Line type="monotone" dataKey="cumulative" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="cumulative"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 5 }}
+                    />
                     {m.requiredCapital > 0 && (
                       <ReferenceDot
                         x={trough.month}
@@ -615,7 +932,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                         fill="hsl(var(--gate-copper))"
                         stroke="hsl(var(--card))"
                         strokeWidth={2}
-                        label={{ value: `potřebný kapitál ${czk(m.requiredCapital)}`, position: "bottom", fontSize: 12, fill: "hsl(var(--foreground))" }}
+                        label={{
+                          value: `potřebný kapitál ${czk(m.requiredCapital)}`,
+                          position: "bottom",
+                          fontSize: 12,
+                          fill: "hsl(var(--foreground))",
+                        }}
                       />
                     )}
                   </LineChart>
@@ -633,10 +955,13 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                   <RatingPill rating={m.pnoRating} />
                 </div>
                 <p className="mt-3 text-3xl font-bold tabular-nums">{pct(m.pno12)}</p>
-                <p className="text-sm text-muted-foreground">ve 12. měsíci, maximum pro váš projekt je {pct(m.maxPno)}</p>
+                <p className="text-sm text-muted-foreground">
+                  ve 12. měsíci, maximum pro váš projekt je {pct(m.maxPno)}
+                </p>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Maximum počítáme z vaší marže: hrubá marže {pct(m.grossMargin)} − ostatní náklady v % obratu − cílový zisk{" "}
-                  {pct(data.targetProfit)}. Kurz s vysokou marží unese PNO kolem 20 %, prodej elektroniky jen pár procent.
+                  Maximum počítáme z vaší marže: hrubá marže {pct(m.grossMargin)} − ostatní náklady v % obratu − cílový
+                  zisk {pct(data.targetProfit)}. Kurz s vysokou marží unese PNO kolem 20 %, prodej elektroniky jen pár
+                  procent.
                 </p>
               </div>
               <div className="rounded-xl border border-border p-5">
@@ -670,7 +995,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                     </div>
                   ))}
                 </dl>
-                <p className="mt-3 text-xs text-muted-foreground">Zdravý poměr LTV k ceně za získání je alespoň 3 : 1.</p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Zdravý poměr LTV k ceně za získání je alespoň 3 : 1.
+                </p>
               </div>
             </div>
 
@@ -734,7 +1061,11 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             onClick={runComment}
             disabled={busy || !hasRevenue || !hasCosts || commentsUsed >= AI_LIMITS.vyhodnoceni}
           >
-            {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : comment ? <RefreshCw className="mr-2 h-4 w-4" /> : null}
+            {busy ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : comment ? (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            ) : null}
             {busy ? "Připravuji komentář…" : comment ? "Okomentovat znovu" : "Okomentovat výsledek"}
           </Button>
         </div>
@@ -775,7 +1106,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         )}
       </Card>
 
-      <AdvisorsInline phase={3} title="Projděte čísla se seniorním poradcem" topic="Fáze 3 – Byznys case" lines={caseLines()} />
+      <AdvisorsInline
+        phase={3}
+        title="Projděte čísla se seniorním poradcem"
+        topic="Fáze 3 – Byznys case"
+        lines={caseLines()}
+      />
 
       {/* Kontrola */}
       <Card className="card-apple p-6">
@@ -786,7 +1122,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               {c.ok ? (
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               ) : (
-                <span className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`} />
+                <span
+                  className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`}
+                />
               )}
               <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
             </li>
