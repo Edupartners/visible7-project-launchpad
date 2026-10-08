@@ -123,9 +123,20 @@ interface CostHints {
     typical: number;
     high: number;
     why: string;
+    fit?: Fit;
+    fitWhy?: string;
   }[];
   missing: { name: string; kind: CostKind; typical: number; why: string }[];
 }
+
+type Fit = "doporuceno" | "zvazit" | "nedoporuceno";
+
+/** Barvy hodnocení položky: zelená = dává smysl, oranžová = zvážit, červená = nedává smysl. */
+const FIT_STYLE: Record<Fit, { label: string; border: string; badge: string }> = {
+  doporuceno: { label: "Doporučeno", border: "border-l-emerald-500", badge: "bg-emerald-100 text-emerald-800" },
+  zvazit: { label: "Zvážit", border: "border-l-orange-400", badge: "bg-orange-100 text-orange-800" },
+  nedoporuceno: { label: "Nedoporučeno", border: "border-l-red-500", badge: "bg-red-100 text-red-800" },
+};
 
 const KIND_SHORT: Record<CostKind, string> = {
   jednorazove: "jednorázově",
@@ -629,6 +640,22 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             </p>
           </div>
         </div>
+        {costHints?.items.some((h) => h.fit) && (
+          <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">
+              Hodnocení AI podle toho, co dává smysl pro vašeho zákazníka:
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-3 w-1 rounded bg-emerald-500" /> doporučeno
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-3 w-1 rounded bg-orange-400" /> zvážit
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-3 w-1 rounded bg-red-500" /> nedoporučeno
+            </span>
+          </p>
+        )}
         {costHints?.missing && costHints.missing.length > 0 && (
           <div className="mt-4 rounded-xl border-l-2 border-primary bg-accent/60 p-4 text-sm">
             <p className="font-semibold text-primary">AI upozorňuje na položky, které vám chybí</p>
@@ -680,8 +707,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <ul className="space-y-2">
               {costsByKind(kind).map((c) => {
                 const hint = costHints?.items.find((h) => h.id === c.id);
+                const fit = hint?.fit ? FIT_STYLE[hint.fit] : null;
                 return (
-                  <li key={c.id}>
+                  <li key={c.id} className={fit ? `border-l-4 pl-3 ${fit.border}` : ""}>
                     <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
                       <Input
                         value={c.name}
@@ -732,6 +760,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                     {hint && (
                       <div className="mt-1 flex flex-col gap-1 pl-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
                         <span>
+                          {fit && (
+                            <span className={`mr-1.5 inline-block rounded-full px-2 py-0.5 font-semibold ${fit.badge}`}>
+                              {fit.label}
+                            </span>
+                          )}
+                          {hint.fitWhy && <span className="text-foreground">{hint.fitWhy} </span>}
                           <span className="font-semibold text-primary">
                             {c.kind === "marketing" ? "AI předpověď" : "AI: obvykle"} {czk(hint.typical)}
                           </span>

@@ -252,8 +252,10 @@ const COSTS_TOOL = {
             typical: { type: "number" },
             high: { type: "number" },
             why: { type: "string", description: "Jedna krátká věta: co částka zahrnuje nebo na čem závisí." },
+            fit: { type: "string", enum: ["doporuceno", "zvazit", "nedoporuceno"] },
+            fitWhy: { type: "string", description: "Jedna krátká věta, proč položka (ne)dává smysl pro tento projekt." },
           },
-          required: ["id", "low", "typical", "high", "why"],
+          required: ["id", "low", "typical", "high", "why", "fit", "fitWhy"],
         },
       },
       missing: {
@@ -294,6 +296,7 @@ Nákladové položky (id | název | druh):
 ${costs.map((c) => `${c.id} | ${c.name} | ${kindLabel[c.kind] ?? c.kind}`).join("\n")}
 
 Úkol: pro každou položku odhadni orientační částku v Kč bez DPH pro začínající online projekt v Česku v roce 2026 – nízkou (low), obvyklou (typical) a vysokou (high). Drž se podnikatelského minimalismu: začínající projekt, rozjezd s malými náklady, žádná agentura tam, kde to zvládne podnikatel sám nebo levný nástroj. U marketingu vycházej z rozpočtu, který dává smysl k plánovaným příjmům.
+U každé položky urči fit: „doporuceno“ = pro tento projekt opravdu potřebná nebo u marketingu kanál s dobrou konverzí pro tohoto zákazníka; „zvazit“ = může pomoct, ale není nutná hned nebo je konverze nejistá; „nedoporuceno“ = pro tento projekt a zákazníka nedává smysl (např. kanál, kde cílový zákazník nehledá nebo nenakupuje). U marketingu hodnoť hlavně pohledem konverze: kde tento zákazník reálně nakupuje nebo poptává. Do fitWhy napiš jednu krátkou větu proč.
 Do missing dej nejvýš 4 důležité položky, které v seznamu chybějí (např. účetní, platební brána, vlastní odměna), jinak prázdné pole.
 Zde výjimečně částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
 }
@@ -489,7 +492,7 @@ Deno.serve(async (req) => {
             ? await callClaude(
                 costsPrompt(vision, canvas, project.business_type ?? "", caseCosts, (raw["business_case"] as Record<string, unknown> | undefined)?.revenue),
                 COSTS_TOOL,
-                2500,
+                4000,
               )
           : action === "case_assumptions"
             ? await callClaude(
@@ -534,7 +537,8 @@ Deno.serve(async (req) => {
       .filter((i) => ids.has(String(i.id)))
       .map((i) => {
         const [low, typical, high] = [money(i.low), money(i.typical), money(i.high)].sort((a, b) => a - b);
-        return { id: String(i.id), low, typical, high, why: String(i.why ?? "").slice(0, 300) };
+        const fit = ["doporuceno", "zvazit", "nedoporuceno"].includes(String(i.fit)) ? String(i.fit) : "zvazit";
+        return { id: String(i.id), low, typical, high, why: String(i.why ?? "").slice(0, 300), fit, fitWhy: String(i.fitWhy ?? "").slice(0, 300) };
       });
     output.missing = ((output.missing as Record<string, unknown>[]) ?? [])
       .filter((m) => ["jednorazove", "mesicni", "marketing"].includes(String(m.kind)) && String(m.name ?? "").trim())
