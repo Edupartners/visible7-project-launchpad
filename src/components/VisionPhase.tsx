@@ -210,6 +210,11 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         required: true,
       },
       {
+        label: "Víte, s kým se srovnáváte (levná i prémiová konkurence)",
+        ok: (basics.lowCostName ?? "").trim().length > 1 && (basics.premiumName ?? "").trim().length > 1,
+        required: true,
+      },
+      {
         label: "Víte, co prodáváte, a projekt má název",
         ok: (basics.offering ?? "").trim().length >= 5 && basics.name.trim().length > 0,
         required: true,
@@ -383,8 +388,51 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           icon={Target}
           step={3}
           title="ERRC matice"
-          subtitle="U každé položky zadejte, jak silně ji nabízí levná konkurence, prémiová konkurence a vy (0 = vůbec, 100 = maximum)."
+          subtitle="Srovnáte se se dvěma konkrétními konkurenty a najdete místo, kde budete jiní než oba."
         />
+
+        <div className="mb-5 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
+          <p className="mb-2 font-medium text-foreground">Jak matici vyplnit</p>
+          <ol className="list-decimal space-y-1.5 pl-5">
+            <li>
+              <strong className="text-foreground">Pojmenujte dva konkurenty.</strong> Levnou konkurenci – nejlevnější
+              způsob, jak zákazník svůj problém vyřeší dnes (často i zdarma). A prémiovou konkurenci – nejdražší a
+              nejkvalitnější řešení na trhu. Mezi nimi hledáte své místo.
+            </li>
+            <li>
+              <strong className="text-foreground">Napište, co zákazníci na trhu řeší.</strong> Cenu, kvalitu, rychlost,
+              osobní přístup… Každou věc dejte do kvadrantu podle toho, co s ní uděláte vy: vynecháte, snížíte, zvýšíte,
+              nebo ji přinesete nově.
+            </li>
+            <li>
+              <strong className="text-foreground">Ohodnoťte ji třemi čísly 0–100</strong>: kolik jí nabízí levná
+              konkurence, kolik prémiová a kolik vy. 0 = vůbec, 100 = maximum.
+            </li>
+          </ol>
+          <p className="mt-3">
+            Příklad: položka „osobní konzultace“ – levná konkurence (YouTube) 0, prémiová (kurz se šéfkuchařem) 90, vy
+            60. Výsledná křivka ukáže, jestli jste jen levnější kopie prémiového řešení, nebo opravdu něco jiného.
+          </p>
+        </div>
+
+        <div className="mb-5 grid gap-4 sm:grid-cols-2">
+          <Field label="Levná konkurence" hint="Kdo nebo co je nejlevnější alternativa?">
+            <Input
+              value={basics.lowCostName ?? ""}
+              onChange={(e) => setBasic("lowCostName", e.target.value)}
+              placeholder="např. recepty zdarma na YouTube"
+              className="h-11 rounded-xl"
+            />
+          </Field>
+          <Field label="Prémiová konkurence" hint="Kdo nebo co je nejdražší a nejkvalitnější řešení?">
+            <Input
+              value={basics.premiumName ?? ""}
+              onChange={(e) => setBasic("premiumName", e.target.value)}
+              placeholder="např. kurz se šéfkuchařem"
+              className="h-11 rounded-xl"
+            />
+          </Field>
+        </div>
         <div className="grid gap-4 lg:grid-cols-2">
           {QUADRANTS.map((q) => {
             const Icon = q.icon;
@@ -402,9 +450,9 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 {items.length > 0 && (
                   <div className="mb-1 grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] gap-1.5 text-[11px] text-muted-foreground">
                     <span />
-                    <span className="text-center">Levná</span>
-                    <span className="text-center">Prém.</span>
-                    <span className="text-center font-medium text-primary">Já</span>
+                    <span className="text-center" title={`Levná konkurence${basics.lowCostName ? `: ${basics.lowCostName}` : ""}`}>Levná</span>
+                    <span className="text-center" title={`Prémiová konkurence${basics.premiumName ? `: ${basics.premiumName}` : ""}`}>Prém.</span>
+                    <span className="text-center font-medium text-primary" title="Váš projekt">Já</span>
                     <span />
                   </div>
                 )}
@@ -489,8 +537,8 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                 <Tooltip labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string })?.full ?? ""} />
                 <Legend verticalAlign="top" height={32} wrapperStyle={{ fontSize: 13 }} />
-                <Line type="linear" dataKey="Low-cost konkurence" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
-                <Line type="linear" dataKey="Prémiová konkurence" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="linear" dataKey="Low-cost konkurence" name={basics.lowCostName?.trim() ? `Levná: ${shorten(basics.lowCostName.trim(), 28)}` : "Levná konkurence"} stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
+                <Line type="linear" dataKey="Prémiová konkurence" name={basics.premiumName?.trim() ? `Prémiová: ${shorten(basics.premiumName.trim(), 28)}` : "Prémiová konkurence"} stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="linear" dataKey="Můj projekt" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>

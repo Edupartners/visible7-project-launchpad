@@ -20,6 +20,10 @@ export interface VisionBasics {
   customer?: string;
   problem?: string;
   offering?: string;
+  /** Konkrétní levná konkurence, se kterou se projekt srovnává. */
+  lowCostName?: string;
+  /** Konkrétní prémiová konkurence, se kterou se projekt srovnává. */
+  premiumName?: string;
 }
 
 export const EMPTY_ERRC: ErrcMatrix = { eliminate: [], reduce: [], raise: [], create: [] };

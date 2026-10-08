@@ -139,6 +139,12 @@ const mapVisionToLeanCanvas = (vision: VisionSummary): Partial<LeanCanvasData> =
     problem: basics.problem?.trim() ?? "",
     uniqueValueProposition: usp.trim(),
     solution,
+    existingAlternatives: [
+      basics.lowCostName?.trim() ? `Levná alternativa: ${basics.lowCostName.trim()}` : "",
+      basics.premiumName?.trim() ? `Prémiová alternativa: ${basics.premiumName.trim()}` : "",
+    ]
+      .filter(Boolean)
+      .join(". "),
   };
   return Object.fromEntries(Object.entries(mapped).filter(([, v]) => v)) as Partial<LeanCanvasData>;
 };
