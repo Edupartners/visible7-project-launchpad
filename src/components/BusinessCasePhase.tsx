@@ -71,6 +71,9 @@ const RATING_STYLE: Record<Rating, string> = {
 };
 
 /** Nejčastější placené kanály k rychlému přidání do marketingu. */
+/** Častě zapomínané měsíční náklady. */
+const COMMON_MONTHLY = ["Sociální a zdravotní pojištění (OSVČ)", "Účetní", "Platební brána", "Vlastní odměna"];
+
 const AD_CHANNELS = [
   "Google Ads",
   "Sklik",
@@ -390,6 +393,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     return {
       obrat_24m: Math.round(x.revenueTotal),
       zisk_24m: Math.round(x.profitTotal),
+      dan_24m: Math.round(x.taxTotal),
+      zisk_po_dani_24m: Math.round(x.profitAfterTax),
       marze_zisku_pct: x.profitMargin,
       hruba_marze_pct: x.grossMargin,
       potrebny_kapital: Math.round(x.requiredCapital),
@@ -408,6 +413,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const buildSummary = () => ({
     typ: currentProject?.business_type,
     cilovy_zisk_pct: data.targetProfit,
+    dan_z_prijmu_pct: data.taxRate ?? 0,
     prijmy: data.revenue,
     naklady: data.costs.filter((c) => c.amount > 0).map((c) => ({ polozka: c.name, castka: c.amount, druh: c.kind })),
     scenare: Object.fromEntries(SCENARIOS.map((s) => [s.id, summaryFor(s.id)])),
@@ -872,11 +878,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <Button variant="ghost" size="sm" className="mt-2 text-primary" onClick={() => addCost(kind)}>
               <Plus className="mr-1 h-4 w-4" /> Přidat položku
             </Button>
-            {kind === "marketing" && (
+            {kind !== "jednorazove" && (
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="text-sm text-muted-foreground">Rychle přidat:</span>
-                {AD_CHANNELS.filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase())).map(
-                  (ch) => (
+                {(kind === "marketing" ? AD_CHANNELS : COMMON_MONTHLY)
+                  .filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase()))
+                  .map((ch) => (
                     <button
                       key={ch}
                       type="button"
@@ -889,7 +896,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                               id: newId(),
                               name: ch,
                               amount: 0,
-                              kind: "marketing",
+                              kind,
                             },
                           ],
                         }))
@@ -898,13 +905,21 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                     >
                       + {ch}
                     </button>
-                  ),
-                )}
+                  ))}
               </div>
             )}
           </div>
         ))}
-        <div className="mt-5 border-t border-border pt-5 sm:max-w-xs">
+        <div className="mt-5 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
+          <NumField
+            id="tax-rate"
+            label="Daň z příjmu (% ze zisku)"
+            suffix="%"
+            placeholder="např. 15"
+            value={data.taxRate ?? 0}
+            onChange={(v) => setData((prev) => ({ ...prev, taxRate: Math.min(v, 60) }))}
+            help={HELP.dan}
+          />
           <NumField
             id="target-profit"
             label="Cílový zisk (% z obratu)"
@@ -958,10 +973,10 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               <Stat label="Obrat" value={czk(m.revenueTotal)} help={HELP.obrat} />
               <Stat
-                label="Zisk"
+                label={data.taxRate ? "Zisk před daní" : "Zisk"}
                 value={czk(m.profitTotal)}
-                note={`marže zisku ${pct(m.profitMargin)}`}
-                help={HELP.zisk}
+                note={data.taxRate ? `po dani ${czk(m.profitAfterTax)}` : `marže zisku ${pct(m.profitMargin)}`}
+                help={data.taxRate ? `${HELP.zisk} ${HELP.ziskPoZdaneni}` : HELP.zisk}
               />
               <Stat
                 label="Potřebný kapitál"

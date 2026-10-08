@@ -72,6 +72,8 @@ export interface BusinessCaseData {
   costs: CostItem[];
   /** Cílový zisk v % obratu */
   targetProfit: number;
+  /** Daň z příjmu v % ze zisku (OSVČ 15 %, s.r.o. 21 %); 0 = nepočítat */
+  taxRate?: number;
   scenario: ScenarioId;
   /** Položky už byly jednou převzaty z Lean Canvasu */
   prefilled: boolean;
@@ -176,6 +178,9 @@ export interface Metrics {
   revenueTotal: number;
   costsTotal: number;
   profitTotal: number;
+  /** Daň z příjmu za 2 roky (počítaná zvlášť za každý rok ze zisku daného roku) */
+  taxTotal: number;
+  profitAfterTax: number;
   profitMargin: number | null;
   grossMargin: number;
   roi: number | null;
@@ -207,6 +212,11 @@ export function computeMetrics(group: RevenueGroup, data: BusinessCaseData, rows
   const marketingTotal = ops.reduce((s, x) => s + x.marketing, 0);
   const costsTotal = rows[0].oneOff + cogs + fixedTotal + marketingTotal;
   const profitTotal = revenueTotal - costsTotal;
+  // Daň z příjmu: zvlášť za 1. rok (investice + měsíce 1–12) a 2. rok (měsíce 13–24), jen z kladného zisku.
+  const rate = Math.min(Math.max(data.taxRate ?? 0, 0), 100) / 100;
+  const year1 = rows.filter((x) => x.month <= 12).reduce((s, x) => s + x.profit, 0);
+  const year2 = rows.filter((x) => x.month > 12).reduce((s, x) => s + x.profit, 0);
+  const taxTotal = (Math.max(0, year1) + Math.max(0, year2)) * rate;
   const minCum = Math.min(0, ...rows.map((x) => x.cumulative));
   const requiredCapital = -minCum;
   const breakEven = ops.find((x) => x.revenue > 0 && x.profit >= 0);
@@ -292,6 +302,8 @@ export function computeMetrics(group: RevenueGroup, data: BusinessCaseData, rows
     revenueTotal,
     costsTotal,
     profitTotal,
+    taxTotal,
+    profitAfterTax: profitTotal - taxTotal,
     profitMargin: revenueTotal > 0 ? (profitTotal / revenueTotal) * 100 : null,
     grossMargin: gm,
     roi: requiredCapital > 0 ? (profitTotal / requiredCapital) * 100 : null,
@@ -542,7 +554,7 @@ export const AI_ASSUMPTION_FIELDS: Record<RevenueGroup, (keyof RevenueInputs)[]>
 
 export const HELP = {
   obrat: "Všechny příjmy od zákazníků za první 2 roky po spuštění.",
-  zisk: "Obrat minus všechny náklady za 2 roky včetně jednorázové investice. Před zdaněním.",
+  zisk: "Obrat minus všechny náklady za 2 roky včetně jednorázové investice. Před daní z příjmu.",
   kapital:
     "Kolik peněz musíte mít k dispozici, než se projekt začne financovat sám. V grafu je to nejnižší bod křivky.",
   roi: "Návratnost investice: zisk za 2 roky vydělený potřebným kapitálem. 100 % znamená, že zisk se rovná penězům, které jste museli vložit.",
@@ -553,6 +565,9 @@ export const HELP = {
   pno: "Podíl nákladů na obratu: kolik procent z tržeb utratíte za marketing. Když je vyšší než maximum pro váš projekt, marketing vám sní zisk.",
   ltv: "Kolik na jednom zákazníkovi vyděláte (po odečtení přímých nákladů) za celou dobu, co u vás nakupuje.",
   cac: "Kolik vás stojí marketing na získání jednoho nového zákazníka. Měl by být alespoň třikrát nižší než LTV.",
+  dan:
+    "Daň z příjmu se platí ze zisku. Fyzická osoba (OSVČ) obvykle 15 %, s.r.o. 21 %. Počítáme ji zvlášť za každý rok a jen ze zisku. Paušální daň, pojištění a DPH tu nejsou – pojištění OSVČ přidejte do měsíčních nákladů, ceny zadávejte bez DPH.",
+  ziskPoZdaneni: "Zisk za 2 roky po odečtení daně z příjmu. Kolik vám z projektu opravdu zůstane.",
   cilovyZisk:
     "Kolik procent z obratu chcete mít jako zisk. Čím vyšší cíl, tím méně peněz zbývá na marketing a tím nižší je maximální PNO.",
 };
