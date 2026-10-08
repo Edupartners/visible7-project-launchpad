@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { UnifiedHeader } from "./layout/UnifiedHeader";
 import { ProjectSwitcher } from "./ProjectSwitcher";
+import { GateJourney } from "./GateJourney";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,16 @@ const phases = [
   }
 ];
 
+const GATE_NAMES: Record<number, string> = {
+  1: "Modrý oceán",
+  2: "Lean Canvas",
+  3: "Byznys case",
+  4: "Tvorba",
+  5: "Marketing a testování",
+  6: "Launch",
+  7: "Růst",
+};
+
 interface DashboardProps {
   userEmail: string;
   onLogout: () => void;
@@ -112,25 +123,12 @@ export const Dashboard = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProjectSwitcher />
 
-        {/* Progress Overview */}
         <div className="mb-8">
-            <Card className="card-apple p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-apple-title">Váš pokrok</h2>
-                  <p className="text-apple-subtitle mt-1">
-                    Dokončeno {completedCount} z {phases.length} fází
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">
-                    {Math.round(progressPercentage)}%
-                  </div>
-                  <div className="text-sm text-muted-foreground">hotovo</div>
-                </div>
-              </div>
-            <Progress value={progressPercentage} className="h-3" />
-          </Card>
+          <GateJourney
+            gates={phases.map((p) => ({ id: p.id, name: GATE_NAMES[p.id], icon: p.icon, route: p.route }))}
+            completed={completedPhases}
+            onOpen={(route) => navigate(route)}
+          />
         </div>
 
         {/* Fáze */}
