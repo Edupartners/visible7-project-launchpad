@@ -1,72 +1,41 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { BarChart3 } from "lucide-react";
 import { BenchmarkingTestingPhase } from "@/components/BenchmarkingTestingPhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
-import { useNavigate } from "react-router-dom";
-import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
-import { useState } from "react";
-import { BarChart3 } from "lucide-react";
+
+const learningPoints = [
+  { text: "Které 2–3 kanály se hodí právě pro vašeho zákazníka", color: "bg-emerald-500" },
+  { text: "Jak kanál nastavit podle videa krok za krokem", color: "bg-sky-500" },
+  { text: "Kde a čím inzeruje vaše konkurence", color: "bg-violet-500" },
+  { text: "Kdy kanál škálovat, ladit nebo vypnout podle PNO", color: "bg-orange-500" },
+];
 
 const BenchmarkingPage = () => {
   const navigate = useNavigate();
-  const [completedPhases, setCompletedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const [showIntro, setShowIntro] = useState(true);
+  const back = () => navigate("/home");
 
-  const handleComplete = () => {
-    setCompletedPhases(prev => {
-      if (!prev.includes(5)) {
-        return [...prev, 5];
-      }
-      return prev;
-    });
-    navigate('/home');
-  };
-
-  const handleBack = () => {
-    navigate('/home');
-  };
-
-  const handleChannelSelect = (channelId: string) => {
-    navigate(`/marketing-channel/${channelId}`);
-  };
-
-  const handleStart = () => {
-    setShowIntro(false);
-  };
-
-  const learningPoints = [
-    { text: "A/B testování a experiment design", color: "bg-cyan-500" },
-    { text: "Marketingové kanály a channel mix", color: "bg-emerald-500" },
-    { text: "Performance metriky a KPI tracking", color: "bg-violet-500" },
-    { text: "Benchmarking proti konkurenci", color: "bg-orange-500" }
-  ];
-
-  if (showIntro) {
-    return (
-      <PageLayout onBack={handleBack}>
+  return (
+    <PageLayout onBack={back}>
+      {showIntro ? (
         <PhaseIntroTemplate
-          title="Benchmarking & Testing"
-          subtitle="Testování a optimalizace výkonu"
-          description="V této fázi se zaměříme na systematické testování a benchmarking vašeho řešení. Naučíte se nastavit A/B testy, analyzovat marketingové kanály a sledovat klíčové metriky výkonu. Cílem je optimalizovat váš produkt a marketing na základě reálných dat a srovnání s konkurencí."
+          title="Marketing a testování"
+          subtitle="Kde najdete zákazníky a co se vyplatí"
+          description="Vyberete kanály seřazené podle vašeho projektu, nastavíte je podle instruktážních videí a otestujete s malým rozpočtem. Výsledek porovnáme s maximálním PNO z vašeho byznys case, takže víte, kam dát peníze."
           phaseNumber={5}
           icon={BarChart3}
           learningPoints={learningPoints}
-          estimatedTime="45 minut"
-          steps={8}
-          hasAiValidation={true}
-          onStart={handleStart}
-          onBack={handleBack}
+          estimatedTime="35 minut + 14 dní test"
+          steps={4}
+          onStart={() => setShowIntro(false)}
+          onBack={back}
           gradient="from-cyan-500/10 to-blue-500/10"
         />
-      </PageLayout>
-    );
-  }
-
-  return (
-    <PageLayout onBack={handleBack}>
-      <BenchmarkingTestingPhase 
-        onChannelSelect={handleChannelSelect} 
-      />
+      ) : (
+        <BenchmarkingTestingPhase onChannelSelect={(id) => navigate(`/marketing-channel/${id}`)} />
+      )}
     </PageLayout>
   );
 };

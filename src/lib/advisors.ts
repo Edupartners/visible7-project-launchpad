@@ -13,7 +13,7 @@ export interface Advisor {
   bio: string;
   /** Fáze VISIBLE7, ve kterých ho aplikace nabízí */
   phases: number[];
-  /** Marketingové kanály z fáze 5 (id z types/marketing.ts) */
+  /** Marketingové kanály z fáze 5 (id z lib/marketingPlans.ts) */
   channels: string[];
   /** Fotka (z edu-partners.cz/o-nas); bez ní se zobrazí iniciály */
   photo?: string;
@@ -70,7 +70,7 @@ export const ADVISORS: Advisor[] = [
     focus: "PPC, SEO a webová analytika",
     bio: "Zkušenosti z velkých digitálních agentur a Mall.cz. Poradí s GA4, SEO, PPC a nastavením Shoptetu.",
     phases: [4, 5, 6],
-    channels: ["ppc", "seo", "srovnavace"],
+    channels: ["google-ads", "sklik", "seo", "srovnavace"],
   },
   {
     id: "veronika-miklova",
@@ -79,7 +79,7 @@ export const ADVISORS: Advisor[] = [
     focus: "PPC kampaně",
     bio: "Přes 10 let v PPC a vlastní firma na výkonnostní marketing. Pomůže nastavit a řídit placené kampaně.",
     phases: [5],
-    channels: ["ppc", "srovnavace"],
+    channels: ["google-ads", "sklik", "chatgpt-ads", "srovnavace"],
   },
   {
     id: "renata-dimitrov",
@@ -88,7 +88,7 @@ export const ADVISORS: Advisor[] = [
     focus: "Reklama na Facebooku a Instagramu",
     bio: "Přes 10 let v reklamě na sociálních sítích a stovky spravovaných kampaní.",
     phases: [5],
-    channels: ["social-media"],
+    channels: ["meta"],
   },
   {
     id: "andrea-votrubova",
@@ -97,7 +97,7 @@ export const ADVISORS: Advisor[] = [
     focus: "Copywriting, SEO a PR",
     bio: "Téměř 20 let v médiích a PR, mimo jiné jako novinářka MF Dnes a iDNES.cz. Naučí psát texty, které prodávají.",
     phases: [5],
-    channels: ["copywriting", "pr-influencers", "seo"],
+    channels: ["seo", "influenceri", "linkedin"],
   },
   {
     id: "patrik-zapletal",
@@ -106,7 +106,7 @@ export const ADVISORS: Advisor[] = [
     focus: "Affiliate a výkonnostní kampaně",
     bio: "Přes 5 let v online marketingu pro agentury i na volné noze. Pomůže s affiliate programem a výkonnostními kampaněmi.",
     phases: [5],
-    channels: ["ppc", "marketplace"],
+    channels: ["google-ads", "katalogy"],
   },
   {
     id: "hana-antonova",
@@ -115,7 +115,7 @@ export const ADVISORS: Advisor[] = [
     focus: "Bannerová reklama a grafika pro web",
     bio: "Specialistka na online grafickou reklamu: bannery a webová grafika.",
     phases: [5],
-    channels: ["ppc", "social-media"],
+    channels: ["google-ads", "meta"],
   },
   {
     id: "terezie-onderkova",
@@ -124,7 +124,7 @@ export const ADVISORS: Advisor[] = [
     focus: "Grafika a UX e-shopu, e-mail marketing",
     bio: "Grafička se zkušenostmi z UX a online marketingu. Poradí s designem e-shopu, e-mailingem a identitou značky.",
     phases: [4, 5],
-    channels: ["email-marketing", "social-media"],
+    channels: ["email", "meta"],
   },
   {
     id: "simona-damkova",
