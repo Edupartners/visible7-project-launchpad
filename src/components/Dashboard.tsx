@@ -4,6 +4,7 @@ import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
 import { PhaseCards } from "./PhaseCards";
+import { GrowthBadge } from "./GrowthBadge";
 import { AdvisorAvatar } from "./AdvisorsInline";
 import { ADVISORS } from "@/lib/advisors";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
@@ -159,10 +160,15 @@ export const Dashboard = (_props: DashboardProps) => {
     <SidebarLayout>
       <main className="mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-8 sm:py-10">
         {/* Projekt */}
-        <header>
-          <p className="text-muted-foreground">Váš projekt</p>
-          <ProjectTitle />
-          <p className="mt-1 text-sm text-muted-foreground">Otevřeno {doneCount} ze 7 bran</p>
+        <header className="flex flex-col-reverse gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-muted-foreground">Váš projekt</p>
+            <ProjectTitle />
+            <p className="mt-1 text-sm text-muted-foreground">Otevřeno {doneCount} ze 7 bran</p>
+          </div>
+          <div className="self-end sm:self-auto">
+            <GrowthBadge currentCompleted={doneCount} />
+          </div>
         </header>
 
         {/* Co dělat teď – jedna jasná akce */}
