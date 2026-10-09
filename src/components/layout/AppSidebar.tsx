@@ -119,7 +119,7 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
               onClick={() => go("/poradci")}
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-foreground/80 hover:bg-muted"
             >
-              <Users className="h-4 w-4 text-muted-foreground" /> Senioroví poradci
+              <Users className="h-4 w-4 text-muted-foreground" /> Seniorní poradci
             </button>
           </li>
           <li>

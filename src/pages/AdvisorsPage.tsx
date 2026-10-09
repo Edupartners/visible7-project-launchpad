@@ -17,7 +17,7 @@ const AdvisorsPage = () => {
     <SidebarLayout>
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-8 sm:py-10">
         <header>
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Senioroví poradci</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Seniorní poradci</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             Podnikatelé a lektoři Edu Partners, kteří si vlastní byznys sami rozjeli. Konzultace {CONSULTATION.label}.
             Termín a platbu domluvíme e-mailem.

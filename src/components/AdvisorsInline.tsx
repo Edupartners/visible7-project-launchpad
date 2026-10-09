@@ -1,19 +1,40 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProject } from "@/contexts/ProjectContext";
-import { Advisor, CONSULTATION, advisorsForChannel, advisorsForPhase, consultationMailto, initials } from "@/lib/advisors";
+import {
+  Advisor,
+  CONSULTATION,
+  advisorsForChannel,
+  advisorsForPhase,
+  consultationMailto,
+  initials,
+} from "@/lib/advisors";
 
-export const AdvisorAvatar = ({ advisor, size = "md" }: { advisor: Advisor; size?: "md" | "lg" }) => (
-  <span
-    aria-hidden
-    className={`flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground ${
-      size === "lg" ? "h-14 w-14 text-lg" : "h-11 w-11 text-sm"
-    }`}
-  >
-    {initials(advisor.name)}
-  </span>
-);
+export const AdvisorAvatar = ({ advisor, size = "md" }: { advisor: Advisor; size?: "md" | "lg" }) => {
+  const [failed, setFailed] = useState(false);
+  const box = size === "lg" ? "h-20 w-20 text-xl" : "h-12 w-12 text-sm";
+  if (advisor.photo && !failed) {
+    return (
+      <img
+        src={advisor.photo}
+        alt={advisor.name}
+        loading="lazy"
+        onError={() => setFailed(true)}
+        className={`${box} shrink-0 rounded-full bg-muted object-cover object-top ring-2 ring-background shadow-sm`}
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      className={`${box} flex shrink-0 items-center justify-center rounded-full bg-primary font-semibold text-primary-foreground`}
+    >
+      {initials(advisor.name)}
+    </span>
+  );
+};
 
 /**
  * Nabídka seniorních poradců k dané fázi nebo marketingovému kanálu.

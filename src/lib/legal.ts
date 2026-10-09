@@ -66,7 +66,7 @@ export const TERMS: LegalDoc = {
       ],
     },
     {
-      title: "5. Senioroví poradci",
+      title: "5. Seniorní poradci",
       paragraphs: [
         "Konzultace se seniorními poradci se objednávají a platí zvlášť. Uvedená cena je orientační; konkrétní cena a termín se potvrzují před konzultací.",
         "Poradci poskytují konzultaci podle svých zkušeností. Odpovědnost za rozhodnutí přijatá na jejím základě nese uživatel.",
@@ -151,7 +151,7 @@ export const PRIVACY: LegalDoc = {
         "Cloudflare – provoz webu aplikace.",
         "Anthropic – zpracování textů projektu při použití AI funkcí. Podle smluvních podmínek poskytovatele se data zaslaná přes jeho rozhraní nepoužívají k trénování modelů.",
         "SimpleShop – objednávky, platby a faktury.",
-        "Senioroví poradci – při objednání konzultace obdrží údaje potřebné k jejímu poskytnutí.",
+        "Seniorní poradci – při objednání konzultace obdrží údaje potřebné k jejímu poskytnutí.",
         "Při předání mimo EU (např. do USA) jsou údaje chráněny standardními smluvními doložkami nebo rozhodnutím Evropské komise o odpovídající ochraně (EU–US Data Privacy Framework).",
       ],
     },

@@ -4,6 +4,8 @@ import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
 import { PhaseCards } from "./PhaseCards";
+import { AdvisorAvatar } from "./AdvisorsInline";
+import { ADVISORS } from "@/lib/advisors";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
@@ -21,7 +23,6 @@ import {
   Rocket,
   Target,
   TrendingUp,
-  Users,
   Wrench,
   BarChart3,
   X,
@@ -247,8 +248,14 @@ export const Dashboard = (_props: DashboardProps) => {
             </Button>
           </div>
           <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
-            <Users className="h-6 w-6 text-primary" />
-            <h2 className="mt-3 text-lg font-bold">Senioroví poradci</h2>
+            <div className="flex -space-x-3">
+              {ADVISORS.filter((a) => a.photo)
+                .slice(0, 5)
+                .map((a) => (
+                  <AdvisorAvatar key={a.id} advisor={a} />
+                ))}
+            </div>
+            <h2 className="mt-3 text-lg font-bold">Seniorní poradci</h2>
             <p className="mt-1 flex-1 text-sm text-muted-foreground">
               15 podnikatelů a lektorů Edu Partners. Konzultace 45 minut, orientačně 1 500 Kč.
             </p>
