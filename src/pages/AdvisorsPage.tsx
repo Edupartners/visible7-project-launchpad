@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
-import { UnifiedHeader } from "@/components/layout/UnifiedHeader";
-import { BackButton } from "@/components/ui/back-button";
+import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { AdvisorAvatar } from "@/components/AdvisorsInline";
 import { useProject } from "@/contexts/ProjectContext";
@@ -11,16 +9,13 @@ import { GATE_NAMES } from "@/lib/certificates";
 
 /** Přehled všech seniorních poradců s filtrem podle fáze. */
 const AdvisorsPage = () => {
-  const navigate = useNavigate();
   const { currentProject } = useProject();
   const [phase, setPhase] = useState<number | null>(null);
   const list = phase ? ADVISORS.filter((a) => a.phases.includes(phase)) : ADVISORS;
 
   return (
-    <div className="min-h-screen bg-background">
-      <UnifiedHeader />
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <BackButton onBack={() => navigate("/home")} />
+    <SidebarLayout>
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-8 sm:py-10">
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Senioroví poradci</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
@@ -69,7 +64,7 @@ const AdvisorsPage = () => {
           ))}
         </ul>
       </div>
-    </div>
+    </SidebarLayout>
   );
 };
 

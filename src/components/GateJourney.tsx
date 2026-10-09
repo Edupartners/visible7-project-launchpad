@@ -15,13 +15,15 @@ interface GateJourneyProps {
   gates: Gate[];
   completed: number[];
   onOpen: (route: string) => void;
+  /** Nadpis a tlačítko nad pásem (na přehledu je nahradí karta „Na řadě“). */
+  showHeader?: boolean;
 }
 
 /**
  * Cesta přes 7 bran. Zelená = hotovo, oranžová = na řadě, černá = otevřít.
  * Nahoře pás bran (každá brána je tlačítko), pod ním seznam fází se stavem.
  */
-export const GateJourney = ({ gates, completed, onOpen }: GateJourneyProps) => {
+export const GateJourney = ({ gates, completed, onOpen, showHeader = true }: GateJourneyProps) => {
   const done = new Set(completed);
   const current = gates.find((g) => !done.has(g.id)) ?? null;
   const count = gates.filter((g) => done.has(g.id)).length;
@@ -29,28 +31,30 @@ export const GateJourney = ({ gates, completed, onOpen }: GateJourneyProps) => {
   return (
     <section className="rounded-2xl border border-border bg-card">
       {/* Pás bran */}
-      <div className="border-b border-border px-6 pb-6 pt-7 sm:px-8">
-        <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-[1.75rem]">Cesta přes 7 bran</h2>
-            <p className="mt-1 text-muted-foreground">
-              {count === 0
-                ? "Klikněte na bránu 1 a začněte. Každá dokončená fáze bránu otevře."
-                : count === gates.length
-                  ? "Všech 7 bran je otevřených."
-                  : `Otevřeno ${count} ze ${gates.length} bran. Pokračujte oranžovou bránou.`}
-            </p>
+      <div className={`border-b border-border px-6 pb-6 sm:px-8 ${showHeader ? "pt-7" : "pt-6"}`}>
+        {showHeader && (
+          <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-[1.75rem]">Cesta přes 7 bran</h2>
+              <p className="mt-1 text-muted-foreground">
+                {count === 0
+                  ? "Klikněte na bránu 1 a začněte. Každá dokončená fáze bránu otevře."
+                  : count === gates.length
+                    ? "Všech 7 bran je otevřených."
+                    : `Otevřeno ${count} ze ${gates.length} bran. Pokračujte oranžovou bránou.`}
+              </p>
+            </div>
+            {current && (
+              <Button
+                className="self-start rounded-[10px] bg-orange-500 px-5 py-2.5 text-base font-semibold text-white hover:bg-orange-600 sm:self-auto"
+                onClick={() => onOpen(current.route)}
+              >
+                {count === 0 ? "Začít bránou 1" : `Pokračovat bránou ${current.id}`}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
-          {current && (
-            <Button
-              className="self-start rounded-[10px] bg-orange-500 px-5 py-2.5 text-base font-semibold text-white hover:bg-orange-600 sm:self-auto"
-              onClick={() => onOpen(current.route)}
-            >
-              {count === 0 ? "Začít bránou 1" : `Pokračovat bránou ${current.id}`}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
-        </div>
+        )}
 
         <div className="-mx-2 overflow-x-auto px-2 pb-2 pt-1">
           <ol className="flex min-w-[620px] items-start">
@@ -58,7 +62,9 @@ export const GateJourney = ({ gates, completed, onOpen }: GateJourneyProps) => {
               const isDone = done.has(gate.id);
               const isCurrent = current?.id === gate.id;
               const lineDone =
-                isDone && index < gates.length - 1 && (done.has(gates[index + 1].id) || gates[index + 1].id === current?.id);
+                isDone &&
+                index < gates.length - 1 &&
+                (done.has(gates[index + 1].id) || gates[index + 1].id === current?.id);
               return (
                 <li key={gate.id} className="relative flex flex-1 flex-col items-center text-center">
                   {index < gates.length - 1 && (
@@ -133,7 +139,9 @@ export const GateJourney = ({ gates, completed, onOpen }: GateJourneyProps) => {
                   {gate.description && <span className="block text-sm text-muted-foreground">{gate.description}</span>}
                 </span>
                 {gate.time && !isDone && (
-                  <span className="hidden shrink-0 text-sm tabular-nums text-muted-foreground sm:block">{gate.time}</span>
+                  <span className="hidden shrink-0 text-sm tabular-nums text-muted-foreground sm:block">
+                    {gate.time}
+                  </span>
                 )}
                 {isDone ? (
                   <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-emerald-700 sm:w-28 sm:justify-end">

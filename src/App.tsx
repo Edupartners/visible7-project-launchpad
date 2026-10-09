@@ -3,11 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthGate } from "@/components/AuthGate";
 import LauncherPage from "./pages/LauncherPage";
 import HomePage from "./pages/HomePage";
-import UserProfilePage from "./pages/UserProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 
 import VisionPage from "./pages/VisionPage";
@@ -32,7 +31,7 @@ const ProtectedRoutes = () => (
   <AuthGate>
     <Routes>
       <Route path="/home" element={<HomePage />} />
-      <Route path="/profile" element={<UserProfilePage />} />
+      <Route path="/profile" element={<Navigate to="/settings" replace />} />
       <Route path="/poradci" element={<AdvisorsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/vision" element={<VisionPage />} />

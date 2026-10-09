@@ -1,6 +1,5 @@
 
 import { Dashboard } from "@/components/Dashboard";
-import { Footer } from "@/components/layout/Footer";
 import { useAuth } from "@/components/AuthGate";
 
 const HomePage = () => {
@@ -14,7 +13,6 @@ const HomePage = () => {
         isAuthenticated={!!user}
       />
 
-      <Footer />
     </>
   );
 };

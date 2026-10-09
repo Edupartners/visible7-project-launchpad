@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, User, Users } from "lucide-react";
+import { LogOut, Settings, Users } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -46,38 +46,49 @@ export const UnifiedHeader = (_props: UnifiedHeaderProps) => {
           </button>
 
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                  <span className="hidden sm:inline text-sm text-foreground/80">{email}</span>
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-secondary text-foreground text-sm font-semibold">
-                      {initials(email || "?")}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <DropdownMenuLabel className="font-normal">
-                  <p className="text-xs text-muted-foreground">Přihlášen jako</p>
-                  <p className="truncate text-sm font-medium">{email}</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile")}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Můj účet</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/poradci")}>
-                  <Users className="mr-2 h-4 w-4" />
-                  <span>Senioroví poradci</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Odhlásit se</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => navigate("/settings")}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Nastavení"
+                title="Nastavení"
+              >
+                <Settings className="h-[18px] w-[18px]" />
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-3 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    <span className="hidden sm:inline text-sm text-foreground/80">{email}</span>
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-foreground text-sm font-semibold">
+                        {initials(email || "?")}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <p className="text-xs text-muted-foreground">Přihlášen jako</p>
+                    <p className="truncate text-sm font-medium">{email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Nastavení</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/poradci")}>
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Senioroví poradci</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Odhlásit se</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </div>
       </div>
