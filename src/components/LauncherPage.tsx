@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
+import { PLANS } from "@/lib/pricing";
+import { REFERENCES } from "@/lib/references";
+import { PublicHeader } from "@/components/marketing/PublicHeader";
 import {
   ArrowRight,
   BarChart3,
@@ -122,34 +125,6 @@ const OUTPUTS = [
   { icon: Linkedin, title: "Osvědčení za každou bránu", text: "S ověřovacím kódem, rovnou na LinkedIn." },
 ];
 
-const PLANS = [
-  {
-    name: "Zdarma",
-    price: "0 Kč",
-    note: "napořád",
-    items: ["Brána 1 a 2", "AI návrh Lean Canvasu", "Osvědčení za splněné brány"],
-  },
-  {
-    name: "1 měsíc",
-    price: "350 Kč",
-    note: "jednorázově",
-    items: ["Všech 7 bran", "AI byznys case a pitch", "Export do Excelu"],
-  },
-  {
-    name: "3 měsíce",
-    price: "499 Kč",
-    note: "jednorázově",
-    items: ["Všech 7 bran", "Čas dotáhnout projekt do spuštění", "AI byznys case a pitch"],
-    highlight: true,
-  },
-  {
-    name: "1 rok",
-    price: "990 Kč",
-    note: "jednorázově",
-    items: ["Všech 7 bran", "AI byznys case a pitch", "Celý rok na rozjezd i růst"],
-  },
-];
-
 const FAQ = [
   [
     "Musím umět programovat?",
@@ -262,48 +237,18 @@ const Cta = ({
 );
 
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
+  // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const t = setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 200);
+    return () => clearTimeout(t);
+  }, []);
   const photos = ADVISORS.filter((a) => a.photo).slice(0, 8);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Horní lišta */}
-      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <a href="#top" className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
-              V7
-            </span>
-            <span className="font-bold tracking-tight">
-              VISIBLE7 <span className="hidden font-normal text-muted-foreground sm:inline">MICEK™</span>
-            </span>
-          </a>
-          <nav className="flex items-center gap-1 text-sm font-semibold sm:gap-2">
-            <a href="#jak" className="hidden rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground md:block">
-              Jak to funguje
-            </a>
-            <a
-              href="#cenik"
-              className="hidden rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground md:block"
-            >
-              Ceník
-            </a>
-            <button
-              type="button"
-              onClick={onAccessGranted}
-              className="rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground"
-            >
-              Přihlásit
-            </button>
-            <button
-              type="button"
-              onClick={onAccessGranted}
-              className="whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-white hover:bg-[hsl(var(--primary-hover))]"
-            >
-              Začít zdarma
-            </button>
-          </nav>
-        </div>
-      </header>
+      <PublicHeader onStart={onAccessGranted} />
 
       <main id="top">
         {/* Hero */}
@@ -328,21 +273,23 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Důvěra */}
-        <section className="border-y border-border bg-muted/40">
-          <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-y-6 px-4 py-8 sm:px-6 md:grid-cols-4">
-            {[
-              ["1 000+", "absolventů kurzů podnikání"],
-              ["14 let", "praxe v e-commerce a vzdělávání"],
-              ["15", "seniorních poradců z praxe"],
-              ["MŠMT a MPO", "akreditace Edu Partners"],
-            ].map(([v, l]) => (
-              <div key={l}>
-                <dt className="sr-only">{l}</dt>
-                <dd className="text-2xl font-extrabold tracking-tight text-primary">{v}</dd>
-                <dd className="text-sm text-muted-foreground">{l}</dd>
-              </div>
-            ))}
-          </dl>
+        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
+            <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-y-6 px-4 py-8 sm:px-6 md:grid-cols-4">
+              {[
+                ["1 000+", "absolventů kurzů podnikání"],
+                ["14 let", "praxe v e-commerce a vzdělávání"],
+                ["15", "seniorních poradců z praxe"],
+                ["MŠMT a MPO", "akreditace Edu Partners"],
+              ].map(([v, l]) => (
+                <div key={l}>
+                  <dt className="sr-only">{l}</dt>
+                  <dd className="text-2xl font-extrabold tracking-tight text-primary">{v}</dd>
+                  <dd className="text-sm text-muted-foreground">{l}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </section>
 
         {/* Mýty */}
@@ -368,108 +315,112 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Čím je jiná */}
-        <section className="bg-muted/40 py-20 md:py-28">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Metodika, AI, videa a finanční plán v jedné aplikaci
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Kurz vám dá teorii, ChatGPT odpovědi bez souvislostí a konzultant drahé hodiny. VISIBLE7 spojuje všechno
-                do jedné cesty, která si pamatuje váš projekt.
-              </p>
-            </div>
-            <div className="mt-12 overflow-x-auto rounded-2xl border border-border bg-card">
-              <table className="w-full min-w-[640px] text-left">
-                <thead>
-                  <tr className="border-b border-border text-sm">
-                    <th className="w-[40%] p-4 font-semibold text-muted-foreground sm:p-5" scope="col">
-                      <span className="sr-only">Co dostanete</span>
-                    </th>
-                    <th className="bg-primary p-4 text-center font-bold text-white sm:p-5" scope="col">
-                      VISIBLE7
-                    </th>
-                    {["Online kurz", "ChatGPT", "Konzultant"].map((h) => (
-                      <th key={h} className="p-4 text-center font-semibold text-muted-foreground sm:p-5" scope="col">
-                        {h}
+        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-28">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+              <div className="max-w-2xl">
+                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Metodika, AI, videa a finanční plán v jedné aplikaci
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  Kurz vám dá teorii, ChatGPT odpovědi bez souvislostí a konzultant drahé hodiny. VISIBLE7 spojuje
+                  všechno do jedné cesty, která si pamatuje váš projekt.
+                </p>
+              </div>
+              <div className="mt-12 overflow-x-auto rounded-2xl border border-border bg-card">
+                <table className="w-full min-w-[640px] text-left">
+                  <thead>
+                    <tr className="border-b border-border text-sm">
+                      <th className="w-[40%] p-4 font-semibold text-muted-foreground sm:p-5" scope="col">
+                        <span className="sr-only">Co dostanete</span>
                       </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARE.map(({ row, values }) => (
-                    <tr key={row} className="border-b border-border last:border-0">
-                      <th scope="row" className="p-4 font-medium sm:p-5">
-                        {row}
+                      <th className="bg-primary p-4 text-center font-bold text-white sm:p-5" scope="col">
+                        VISIBLE7
                       </th>
-                      {values.map((v, i) => (
-                        <td key={i} className={`p-4 text-center sm:p-5 ${i === 0 ? "bg-primary/[0.04]" : ""}`}>
-                          {v === 1 ? (
-                            <Check
-                              className={`mx-auto h-5 w-5 ${i === 0 ? "text-emerald-600" : "text-muted-foreground"}`}
-                              strokeWidth={3}
-                              aria-label="ano"
-                            />
-                          ) : v > 0 ? (
-                            <span className="text-xs font-semibold text-muted-foreground">částečně</span>
-                          ) : (
-                            <Minus className="mx-auto h-5 w-5 text-border" aria-label="ne" />
-                          )}
-                        </td>
+                      {["Online kurz", "ChatGPT", "Konzultant"].map((h) => (
+                        <th key={h} className="p-4 text-center font-semibold text-muted-foreground sm:p-5" scope="col">
+                          {h}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {COMPARE.map(({ row, values }) => (
+                      <tr key={row} className="border-b border-border last:border-0">
+                        <th scope="row" className="p-4 font-medium sm:p-5">
+                          {row}
+                        </th>
+                        {values.map((v, i) => (
+                          <td key={i} className={`p-4 text-center sm:p-5 ${i === 0 ? "bg-primary/[0.04]" : ""}`}>
+                            {v === 1 ? (
+                              <Check
+                                className={`mx-auto h-5 w-5 ${i === 0 ? "text-emerald-600" : "text-muted-foreground"}`}
+                                strokeWidth={3}
+                                aria-label="ano"
+                              />
+                            ) : v > 0 ? (
+                              <span className="text-xs font-semibold text-muted-foreground">částečně</span>
+                            ) : (
+                              <Minus className="mx-auto h-5 w-5 text-border" aria-label="ne" />
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Proces: 7 bran */}
-        <section id="jak" className="scroll-mt-16 bg-primary py-20 text-white md:py-28">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-              <div className="max-w-2xl">
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
-                <p className="mt-4 text-lg text-white/70">
-                  Každá brána má jasný výstup. Další otevřete, až je ta předchozí hotová, takže nic důležitého
-                  nepřeskočíte.
-                </p>
+        <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary py-20 text-white md:py-28">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+              <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+                <div className="max-w-2xl">
+                  <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
+                  <p className="mt-4 text-lg text-white/70">
+                    Každá brána má jasný výstup. Další otevřete, až je ta předchozí hotová, takže nic důležitého
+                    nepřeskočíte.
+                  </p>
+                </div>
+                <ul className="flex gap-2 text-sm" aria-label="Legenda">
+                  {(Object.keys(TAG_STYLE) as Tag[]).map((t) => (
+                    <li key={t} className={`rounded-full px-3 py-1 font-semibold ${TAG_STYLE[t]}`}>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="flex gap-2 text-sm" aria-label="Legenda">
-                {(Object.keys(TAG_STYLE) as Tag[]).map((t) => (
-                  <li key={t} className={`rounded-full px-3 py-1 font-semibold ${TAG_STYLE[t]}`}>
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <ol className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
-              {GATES.map((g, i) => {
-                const Icon = g.icon;
-                return (
-                  <li key={g.name} className={`flex flex-col bg-primary p-6 ${i === 6 ? "lg:col-span-2" : ""}`}>
-                    <div className="flex items-center justify-between">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[hsl(var(--gate-copper))] text-lg font-bold">
-                        {i + 1}
-                      </span>
-                      <Icon className="h-5 w-5 text-white/50" aria-hidden="true" />
-                    </div>
-                    <h3 className="mt-5 text-xl font-bold">{g.name}</h3>
-                    <p className="mt-2 flex-1 text-white/70">{g.does}</p>
-                    <p className="mt-5 text-sm text-white/50">Výstup</p>
-                    <p className="font-semibold">{g.get}</p>
-                    <div className="mt-4 flex gap-1.5">
-                      {g.tags.map((t) => (
-                        <span key={t} className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${TAG_STYLE[t]}`}>
-                          {t}
+              <ol className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+                {GATES.map((g, i) => {
+                  const Icon = g.icon;
+                  return (
+                    <li key={g.name} className={`flex flex-col bg-primary p-6 ${i === 6 ? "lg:col-span-2" : ""}`}>
+                      <div className="flex items-center justify-between">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[hsl(var(--gate-copper))] text-lg font-bold">
+                          {i + 1}
                         </span>
-                      ))}
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
+                        <Icon className="h-5 w-5 text-white/50" aria-hidden="true" />
+                      </div>
+                      <h3 className="mt-5 text-xl font-bold">{g.name}</h3>
+                      <p className="mt-2 flex-1 text-white/70">{g.does}</p>
+                      <p className="mt-5 text-sm text-white/50">Výstup</p>
+                      <p className="font-semibold">{g.get}</p>
+                      <div className="mt-4 flex gap-1.5">
+                        {g.tags.map((t) => (
+                          <span key={t} className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${TAG_STYLE[t]}`}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
           </div>
         </section>
 
@@ -502,76 +453,112 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
-        {/* Poradci */}
-        <section className="bg-muted/40 py-20 md:py-24">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 md:grid-cols-[1fr_1.1fr]">
+        {/* Reference */}
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-24">
+          <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-start">
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Když se zaseknete, zavoláte člověku
-              </h2>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Metodiku učíme deset let</h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                15 seniorních poradců z Edu Partners, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
-                e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
-                {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+                VISIBLE7 je základem kurzu Specialista internetového obchodu v Edu Partners a firemních školení.
+                Aplikace z ní dělá postup, kterým projdete sami a svým tempem.
               </p>
             </div>
-            <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
-              {photos.map((a) => (
-                <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
-                  <img
-                    src={a.photo}
-                    alt=""
-                    loading="lazy"
-                    className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
-                  />
-                  <p className="mt-1.5 truncate text-xs font-semibold">
-                    {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
-                </li>
-              ))}
-            </ul>
+            {REFERENCES.length > 0 ? (
+              <ul className="grid gap-6">
+                {REFERENCES.slice(0, 3).map((r) => (
+                  <li key={r.name} className="border-l-4 border-[hsl(var(--gate-copper))] pl-5">
+                    <blockquote className="text-lg leading-relaxed">„{r.quote}“</blockquote>
+                    <p className="mt-3 flex items-center gap-3 text-sm">
+                      {r.photo && <img src={r.photo} alt="" className="h-9 w-9 rounded-full object-cover" />}
+                      <span>
+                        <span className="font-semibold">{r.name}</span>
+                        <span className="text-muted-foreground">, {r.role}</span>
+                      </span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <dl className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
+                {[
+                  [
+                    "Specialista internetového obchodu",
+                    "Rekvalifikační kurz Edu Partners postavený na metodice VISIBLE7",
+                  ],
+                  ["Firemní školení", "E-commerce, digitální marketing a AI pro týmy firem"],
+                  ["1 000+ absolventů", "Lidé, kteří prošli kurzy podnikání a e-commerce"],
+                  ["Od roku 2011", "Edu Partners s akreditací MŠMT a MPO"],
+                ].map(([t, d]) => (
+                  <div key={t} className="bg-card p-6">
+                    <dt className="font-bold">{t}</dt>
+                    <dd className="mt-1 text-sm text-muted-foreground">{d}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
           </div>
         </section>
 
-        {/* Ceník */}
-        <section id="cenik" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-20 sm:px-6 md:py-28">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Začněte zdarma, plaťte až za další brány
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Jednorázová platba za období. Nic se samo neobnovuje a vaše projekty zůstanou uložené.
-            </p>
+        {/* Poradci */}
+        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 md:grid-cols-[1fr_1.1fr]">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Když se zaseknete, zavoláte člověku
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  15 seniorních poradců z Edu Partners, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
+                  e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
+                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+                </p>
+              </div>
+              <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
+                {photos.map((a) => (
+                  <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
+                    <img
+                      src={a.photo}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
+                    />
+                    <p className="mt-1.5 truncate text-xs font-semibold">
+                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PLANS.map((p) => (
-              <li
-                key={p.name}
-                className={`flex flex-col rounded-2xl p-6 ${
-                  p.highlight ? "bg-primary text-white" : "border border-border bg-card"
-                }`}
-              >
-                <h3 className={`font-semibold ${p.highlight ? "text-white/80" : "text-muted-foreground"}`}>{p.name}</h3>
-                <p className="mt-3 text-4xl font-extrabold tracking-tight">{p.price}</p>
-                <p className={`text-sm ${p.highlight ? "text-white/60" : "text-muted-foreground"}`}>{p.note}</p>
-                <ul className="mt-6 flex-1 space-y-2.5 text-sm">
-                  {p.items.map((it) => (
-                    <li key={it} className="flex gap-2">
-                      <Check
-                        className={`mt-0.5 h-4 w-4 shrink-0 ${p.highlight ? "text-[hsl(var(--gate-copper))]" : "text-emerald-600"}`}
-                        strokeWidth={3}
-                      />
-                      {it}
-                    </li>
-                  ))}
-                </ul>
-                {p.highlight && <p className="mt-6 text-sm font-semibold text-[hsl(29_70%_70%)]">Doporučujeme</p>}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-10">
-            <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
+        </section>
+
+        {/* Ceník – krátce, celý ceník je na /cenik */}
+        <section id="cenik" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 md:py-28">
+          <div className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Začněte zdarma. Celá cesta od 350 Kč.
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Brána 1 a 2 jsou zdarma napořád. Za další brány platíte jednorázově za zvolené období, nic se samo
+                neobnovuje.
+              </p>
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
+                <Link to="/cenik" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
+                  Zobrazit celý ceník
+                </Link>
+              </div>
+            </div>
+            <dl className="divide-y divide-border rounded-2xl border border-border">
+              {PLANS.map((p) => (
+                <div key={p.name} className="flex items-baseline justify-between gap-4 px-5 py-4">
+                  <dt className="font-semibold">{p.name}</dt>
+                  <dd className="text-xl font-extrabold tracking-tight">{p.price}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </section>
 
@@ -606,46 +593,50 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Otázky */}
-        <section className="bg-muted/40 py-20 md:py-24">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Časté otázky</h2>
-            <div className="mt-10 divide-y divide-border border-y border-border">
-              {FAQ.map(([q, a]) => (
-                <details key={q} className="group py-5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold">
-                    {q}
-                    <span className="text-2xl font-normal text-muted-foreground transition-transform group-open:rotate-45">
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-3 text-muted-foreground">{a}</p>
-                </details>
-              ))}
+        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
+            <div className="mx-auto max-w-3xl px-4 sm:px-6">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Časté otázky</h2>
+              <div className="mt-10 divide-y divide-border border-y border-border">
+                {FAQ.map(([q, a]) => (
+                  <details key={q} className="group py-5">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold">
+                      {q}
+                      <span className="text-2xl font-normal text-muted-foreground transition-transform group-open:rotate-45">
+                        +
+                      </span>
+                    </summary>
+                    <p className="mt-3 text-muted-foreground">{a}</p>
+                  </details>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Závěr */}
-        <section className="bg-primary text-white">
-          <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 md:py-28">
-            <p className="text-lg text-white/60">Fortuna audaces iuvat</p>
-            <h2 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Štěstí přeje odvážným. A připraveným.
-            </h2>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-white/70">
-              Projděte první dvě brány zdarma a uvidíte, jestli má váš nápad místo na trhu.
-            </p>
-            <div className="mt-10">
-              <Cta onClick={onAccessGranted} light>
-                Začít zdarma
-              </Cta>
+        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary text-white">
+            <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 md:py-28">
+              <p className="text-lg text-white/60">Fortuna audaces iuvat</p>
+              <h2 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
+                Štěstí přeje odvážným. A připraveným.
+              </h2>
+              <p className="mx-auto mt-5 max-w-xl text-lg text-white/70">
+                Projděte první dvě brány zdarma a uvidíte, jestli má váš nápad místo na trhu.
+              </p>
+              <div className="mt-10">
+                <Cta onClick={onAccessGranted} light>
+                  Začít zdarma
+                </Cta>
+              </div>
+              <p className="mt-6 text-sm text-white/50">
+                Už máte účet?{" "}
+                <Link to="/home" className="font-semibold text-white underline-offset-4 hover:underline">
+                  Přihlaste se
+                </Link>
+              </p>
             </div>
-            <p className="mt-6 text-sm text-white/50">
-              Už máte účet?{" "}
-              <Link to="/home" className="font-semibold text-white underline-offset-4 hover:underline">
-                Přihlaste se
-              </Link>
-            </p>
           </div>
         </section>
       </main>

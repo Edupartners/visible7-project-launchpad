@@ -51,7 +51,7 @@ export const TERMS: LegalDoc = {
     {
       title: "3. Bezplatná a placená část",
       paragraphs: [
-        "Fáze 1 a 2 metodiky jsou dostupné zdarma. Fáze 3 až 7 jsou dostupné po zaplacení časového přístupu: 1 měsíc za 350 Kč, 3 měsíce za 499 Kč, 1 rok za 990 Kč. Ceny a jejich případné DPH jsou uvedeny při objednávce.",
+        "Fáze 1 a 2 metodiky jsou dostupné zdarma. Fáze 3 až 7 jsou dostupné po zaplacení časového přístupu: 1 měsíc za 350 Kč, 3 měsíce za 499 Kč, 1 rok za 990 Kč. Ceny jsou konečné, včetně DPH.",
         "Přístup se platí jednorázově a automaticky se neobnovuje. Platby a faktury zajišťuje provozovatel prostřednictvím služby SimpleShop.",
         "Po skončení placeného přístupu zůstávají data projektu uložena; placené fáze jsou do dalšího zaplacení jen pro čtení.",
         "Spotřebitel má u digitálního obsahu právo odstoupit od smlouvy do 14 dnů. Pokud výslovně požádá o zpřístupnění obsahu před uplynutím této lhůty a bere na vědomí, že tím právo na odstoupení ztrácí, právo odstoupit zaniká okamžikem zpřístupnění.",

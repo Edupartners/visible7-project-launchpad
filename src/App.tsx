@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +23,7 @@ import OAuthConsentPage from "./pages/OAuthConsentPage";
 import CertificatePage from "./pages/CertificatePage";
 import AdvisorsPage from "./pages/AdvisorsPage";
 import LegalPage from "./pages/LegalPage";
+import PricingPage from "./pages/PricingPage";
 import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
@@ -64,6 +64,7 @@ const App = () => (
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           {/* Veřejné ověření osvědčení – bez přihlášení */}
           <Route path="/osvedceni/:code" element={<CertificatePage />} />
+          <Route path="/cenik" element={<PricingPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />
           <Route path="/ochrana-osobnich-udaju" element={<LegalPage doc={PRIVACY} />} />
           {/* Vše ostatní vyžaduje přihlášení */}
