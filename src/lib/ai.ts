@@ -53,9 +53,17 @@ export async function loadAiUsage(projectId: string, phase: string): Promise<AiU
 
 export async function callAi<T>(
   projectId: string,
-  action: "canvas_suggest" | "canvas_evaluate" | "case_comment" | "case_assumptions" | "case_costs" | "case_autofill"
+  action:
+    | "canvas_suggest"
+    | "canvas_evaluate"
+    | "case_comment"
+    | "case_assumptions"
+    | "case_costs"
+    | "case_autofill"
+    | "pitch",
+  extra: Record<string, string> = {},
 ): Promise<{ output?: T; error?: string; code?: string }> {
-  const { data, error } = await supabase.functions.invoke("ai-assist", { body: { projectId, action } });
+  const { data, error } = await supabase.functions.invoke("ai-assist", { body: { ...extra, projectId, action } });
   if (error) {
     // Chybová odpověď funkce nese českou hlášku v těle.
     const ctx = (error as { context?: Response }).context;

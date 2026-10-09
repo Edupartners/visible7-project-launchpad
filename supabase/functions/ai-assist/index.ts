@@ -1,4 +1,5 @@
-// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: doporučené hodnoty, orientační náklady a komentář k byznys casu).
+// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: doporučené hodnoty, orientační náklady a komentář k byznys casu,
+// po fázi 3: pitch projektu na jednu stránku A4).
 //
 // Náklady drží na uzdě:
 //  - jen přihlášený vlastník projektu,
@@ -405,6 +406,73 @@ ${canvas}
 - nextSteps: 3 konkrétní kroky, co udělat teď (např. ověřit problém rozhovorem s 5 zákazníky).`;
 }
 
+const AUDIENCES: Record<string, string> = {
+  investor: "investor (business angel nebo fond) – zajímá ho růst, návratnost a proč právě tento tým",
+  banka: "banka nebo úvěr – zajímá ji schopnost splácet, stabilní příjmy, rizika a zajištění",
+  partner: "obchodní partner nebo spoluzakladatel – zajímá ho společná příležitost, role a co do toho kdo vloží",
+};
+
+const PITCH_TOOL = {
+  name: "pitch_na_jednu_stranku",
+  description: "Podklady pro pitch projektu na jednu stranu A4. Krátké, úderné texty bez opakování.",
+  input_schema: {
+    type: "object",
+    properties: {
+      oneLiner: { type: "string", description: "Jedna věta: co děláme, pro koho a čím se lišíme. Max 160 znaků." },
+      problem: { type: "string", description: "Problém zákazníka. 1–2 věty, max 280 znaků." },
+      solution: { type: "string", description: "Řešení – co přesně nabízíme. 1–2 věty, max 280 znaků." },
+      customer: { type: "string", description: "Kdo je zákazník a proč koupí. 1–2 věty, max 240 znaků." },
+      difference: {
+        type: "string",
+        description: "Čím jsme lepší než levná i prémiová konkurence (modrý oceán). 1–2 věty, max 280 znaků.",
+      },
+      businessModel: { type: "string", description: "Jak projekt vydělává. 1–2 věty, max 240 znaků." },
+      goToMarket: { type: "string", description: "Jak se dostaneme k zákazníkům (kanály). 1–2 věty, max 220 znaků." },
+      ask: {
+        type: "string",
+        description: "Co od příjemce chceme a na co to použijeme. Čísla jen z byznys casu. 1–2 věty, max 260 znaků.",
+      },
+      risk: { type: "string", description: "Hlavní riziko a jak ho snížíme. 1 věta, max 200 znaků." },
+      milestones: {
+        type: "array",
+        minItems: 3,
+        maxItems: 3,
+        items: { type: "string", description: "Konkrétní milník, max 80 znaků." },
+      },
+      elevatorPitch: { type: "string", description: "Mluvený pitch na 60 sekund, 5–7 vět, max 750 znaků." },
+    },
+    required: ["oneLiner", "problem", "solution", "customer", "difference", "businessModel", "goToMarket", "ask", "risk", "milestones", "elevatorPitch"],
+  },
+};
+
+const PITCH_LIMITS: Record<string, number> = {
+  oneLiner: 170, problem: 300, solution: 300, customer: 260, difference: 300, businessModel: 260,
+  goToMarket: 240, ask: 280, risk: 220, elevatorPitch: 800,
+};
+
+function pitchPrompt(vision: string, canvas: string, businessType: string, numbers: string, audience: string) {
+  return `Výstup fáze 1 (Modrý oceán):
+${vision}
+
+Lean Canvas:
+${canvas}
+
+Typ byznysu: ${BUSINESS_TYPES[businessType] ?? "neurčen"}
+
+Čísla z byznys casu (realistický scénář, 24 měsíců, Kč):
+${numbers}
+
+Příjemce pitche: ${AUDIENCES[audience] ?? AUDIENCES.investor}
+
+Úkol: připrav podklady pro pitch projektu na jednu stranu A4 pro tohoto příjemce.
+- Piš první osobou množného čísla („nabízíme“), sebevědomě, ale bez přehánění a bez prázdných frází typu „revoluční“ nebo „unikátní řešení“.
+- Každý text drž v zadané délce – stránka se musí vejít na jednu A4.
+- Čísla a částky smíš uvést JEN ty, které jsou výše v byznys casu. Žádné vymyšlené velikosti trhu, procenta ani reference.
+- Pole „ask“ přizpůsob příjemci: investor = kapitál za podíl, banka = úvěr a jak ho splatíme, partner = co společně uděláme a kdo co vloží. Vycházej z potřebného kapitálu.
+- Milníky: 3 konkrétní kroky na nejbližších 12 měsíců (např. „První platící zákazník do 3. měsíce“).
+- Elevator pitch je mluvený text pro osobní setkání.`;
+}
+
 async function callClaude(prompt: string, tool: { name: string; description: string; input_schema: unknown }, maxTokens: number) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -448,22 +516,23 @@ Deno.serve(async (req) => {
   const user = userData?.user;
   if (userErr || !user) return json({ error: "Přihlaste se prosím znovu." }, 401);
 
-  let body: { projectId?: string; action?: string };
+  let body: { projectId?: string; action?: string; audience?: string };
   try {
     body = await req.json();
   } catch {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const { projectId, action } = body;
-  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill"].includes(action ?? "")) {
+  const audience = body.audience && body.audience in AUDIENCES ? body.audience : "investor";
+  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill", "pitch"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const kind =
-    action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill"
+    action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill" || action === "pitch"
       ? "navrh"
       : "vyhodnoceni";
   // Odhady nákladů mají vlastní limit (fáze „3n“), aby nesdílely limit s doporučenými procenty.
-  const phase = action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
+  const phase = action === "pitch" ? "p" : action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -486,7 +555,7 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    const what = action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    const what = action === "pitch" ? "pitchů" : action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= LIMITS.userDaily) {
@@ -510,7 +579,7 @@ Deno.serve(async (req) => {
   const canvas = describeCanvas(canvasObj);
 
   const caseSummary = raw["business_case_summary"] as Record<string, unknown> | undefined;
-  if (action === "case_comment" && !caseSummary?.scenare) {
+  if ((action === "case_comment" || action === "pitch") && !caseSummary?.scenare) {
     return json({ error: "Nejdřív vyplňte příjmy a náklady byznys casu." }, 400);
   }
 
@@ -542,7 +611,19 @@ Deno.serve(async (req) => {
   let result: { output: Record<string, unknown>; usage: unknown };
   try {
     result =
-      action === "canvas_suggest"
+      action === "pitch"
+        ? await callClaude(
+            pitchPrompt(
+              vision,
+              canvas,
+              project.business_type ?? "",
+              JSON.stringify((caseSummary?.scenare as Record<string, unknown> | undefined)?.realisticky ?? {}).slice(0, 2000),
+              audience,
+            ),
+            PITCH_TOOL,
+            3000,
+          )
+        : action === "canvas_suggest"
         ? await callClaude(suggestPrompt(vision, canvas), SUGGEST_TOOL, 2400)
         : action === "canvas_evaluate"
           ? await callClaude(evaluatePrompt(vision, canvas, project.business_type ?? ""), EVALUATE_TOOL, 2500)
@@ -601,6 +682,11 @@ Deno.serve(async (req) => {
         why: String(i.why ?? "").slice(0, 400),
       }));
   };
+  if (action === "pitch") {
+    for (const [k, n] of Object.entries(PITCH_LIMITS)) output[k] = String(output[k] ?? "").trim().slice(0, n);
+    output.milestones = ((output.milestones as unknown[]) ?? []).slice(0, 3).map((m) => String(m).slice(0, 90));
+    output.audience = audience;
+  }
   if (action === "case_assumptions") output.items = cleanRevenue(output.items, assumptionFields);
   if (action === "case_autofill") output.revenue = cleanRevenue(output.revenue, autofillFields);
 

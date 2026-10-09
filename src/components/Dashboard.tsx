@@ -270,12 +270,14 @@ export const Dashboard = (_props: DashboardProps) => {
             <div className="flex items-start gap-4">
               <FileText className="mt-1 h-6 w-6 shrink-0 text-primary" />
               <div>
-                <h2 className="text-lg font-bold">Prezentace pro investory</h2>
-                <p className="text-sm text-muted-foreground">Z dat fází 1–3 sestavíme prezentaci vašeho projektu.</p>
+                <h2 className="text-lg font-bold">Pitch projektu na jednu stránku</h2>
+                <p className="text-sm text-muted-foreground">
+                  AI z fází 1–3 napíše pitch pro investora, banku nebo partnera. Stáhnete ho jako PDF na A4.
+                </p>
               </div>
             </div>
             <Button onClick={() => navigate("/investor-pitch")} variant="outline" className="shrink-0 rounded-[10px]">
-              Sestavit prezentaci
+              Vytvořit pitch
             </Button>
           </section>
         )}

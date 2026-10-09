@@ -251,12 +251,8 @@
     }
   }
 }
-/* Tisk osvědčení: jen samotný list, A4 na šířku */
+/* Tisk osvědčení a pitche: jen samotný list (orientaci stránky určuje každá stránka sama) */
 @media print {
-  @page {
-    size: A4 landscape;
-    margin: 0;
-  }
   html,
   body {
     -webkit-print-color-adjust: exact;

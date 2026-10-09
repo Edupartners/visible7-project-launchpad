@@ -23,7 +23,9 @@ const CertificatePage = () => {
 
   useEffect(() => {
     verifyCertificate(code).then(setCert);
-    QRCode.toDataURL(certificateUrl(code.toUpperCase()), { margin: 0, width: 220 }).then(setQr).catch(() => setQr(""));
+    QRCode.toDataURL(certificateUrl(code.toUpperCase()), { margin: 0, width: 220 })
+      .then(setQr)
+      .catch(() => setQr(""));
   }, [code]);
 
   // Odkaz „Stáhnout PDF“ z aplikace rovnou otevře okno pro uložení do PDF.
@@ -48,7 +50,8 @@ const CertificatePage = () => {
           <ShieldAlert className="mx-auto mb-4 h-12 w-12 text-red-500" />
           <h1 className="text-2xl font-bold">Osvědčení nenalezeno</h1>
           <p className="mt-2 text-muted-foreground">
-            Osvědčení s kódem <span className="font-mono">{code}</span> neexistuje. Zkontrolujte, zda je kód zadaný správně.
+            Osvědčení s kódem <span className="font-mono">{code}</span> neexistuje. Zkontrolujte, zda je kód zadaný
+            správně.
           </p>
         </div>
       </div>
@@ -56,10 +59,15 @@ const CertificatePage = () => {
   }
 
   const gold = cert.kind === "gold";
-  const issued = new Date(cert.issued_at).toLocaleDateString("cs-CZ", { day: "numeric", month: "long", year: "numeric" });
+  const issued = new Date(cert.issued_at).toLocaleDateString("cs-CZ", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div className="min-h-screen bg-muted/40 px-4 py-8 print:bg-white print:p-0">
+      <style>{"@media print { @page { size: A4 landscape; margin: 0; } }"}</style>
       <div className="mx-auto mb-6 flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between print:hidden">
         <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2 text-sm text-emerald-700">
           <BadgeCheck className="h-5 w-5" />
@@ -82,14 +90,12 @@ const CertificatePage = () => {
       </div>
 
       <div className="certificate-sheet mx-auto aspect-[297/210] w-full max-w-5xl bg-white text-slate-900 shadow-xl print:max-w-none print:shadow-none">
-        <div
-          className={`flex h-full flex-col p-[4%] ${
-            gold ? "bg-[#FFFCF6]" : "bg-white"
-          }`}
-        >
+        <div className={`flex h-full flex-col p-[4%] ${gold ? "bg-[#FFFCF6]" : "bg-white"}`}>
           <div
             className={`flex h-full flex-col rounded-lg border-[3px] px-[6%] py-[4%] ${
-              gold ? "border-[#9A5F29] ring-1 ring-[#9A5F29]/30 ring-offset-4" : "border-[#183A66] ring-1 ring-[#183A66]/20 ring-offset-4"
+              gold
+                ? "border-[#9A5F29] ring-1 ring-[#9A5F29]/30 ring-offset-4"
+                : "border-[#183A66] ring-1 ring-[#183A66]/20 ring-offset-4"
             }`}
           >
             <div className="flex items-start justify-between">
@@ -122,7 +128,9 @@ const CertificatePage = () => {
               <p className="mx-auto mt-3 max-w-2xl text-[clamp(0.85rem,1.6vw,1.05rem)] text-slate-600">
                 {certificateDescription(cert.kind, cert.phase)}
               </p>
-              <p className="mt-3 text-[clamp(1rem,2vw,1.35rem)] font-semibold">{certificateTitle(cert.kind, cert.phase)}</p>
+              <p className="mt-3 text-[clamp(1rem,2vw,1.35rem)] font-semibold">
+                {certificateTitle(cert.kind, cert.phase)}
+              </p>
               <p className="mt-2 text-sm text-slate-500">
                 Projekt: <span className="font-medium text-slate-700">{cert.project_name}</span>
                 {cert.launch_url && (
