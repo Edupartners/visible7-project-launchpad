@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/visible7/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { CertificatesPanel } from "@/components/CertificatesPanel";
+import { ConsentSettings, ProfileForm } from "@/components/settings/ProfileSettings";
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Zdarma (fáze 1 a 2)",
@@ -31,9 +32,10 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 const SECTIONS = [
-  { id: "ucet", label: "Účet" },
+  { id: "ucet", label: "Profil" },
   { id: "projekty", label: "Projekty" },
   { id: "osvedceni", label: "Osvědčení" },
+  { id: "souhlasy", label: "Souhlasy a GDPR" },
   { id: "zabezpeceni", label: "Zabezpečení" },
 ];
 
@@ -140,16 +142,13 @@ const ProjectRow = ({ project }: { project: Project }) => {
 const SettingsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const { projects } = useProject();
   const { toast } = useToast();
   const [access, setAccess] = useState<{ plan: string; access_until: string | null } | null>(null);
   const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [completed] = useSupabaseProgress<number[]>("completed_phases", []);
-
-  const meta = (user?.user_metadata ?? {}) as { first_name?: string; last_name?: string };
-  const fullName = [meta.first_name, meta.last_name].filter(Boolean).join(" ");
 
   useEffect(() => {
     supabase
@@ -206,26 +205,15 @@ const SettingsPage = () => {
           </nav>
         </header>
 
-        <Section id="ucet" title="Účet">
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            {fullName && (
-              <div>
-                <dt className="text-muted-foreground">Jméno</dt>
-                <dd className="font-semibold">{fullName}</dd>
-              </div>
-            )}
-            <div>
-              <dt className="text-muted-foreground">E-mail</dt>
-              <dd className="font-semibold">{user?.email}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground">Přístup</dt>
-              <dd className="font-semibold">
-                {access ? (PLAN_LABELS[access.plan] ?? access.plan) : "…"}
-                {until && ` (platí do ${until})`}
-              </dd>
-            </div>
-          </dl>
+        <Section id="ucet" title="Profil">
+          <ProfileForm />
+          <p className="mt-5 border-t border-border pt-4 text-sm">
+            <span className="text-muted-foreground">Přístup: </span>
+            <span className="font-semibold">
+              {access ? (PLAN_LABELS[access.plan] ?? access.plan) : "…"}
+              {until && ` (platí do ${until})`}
+            </span>
+          </p>
         </Section>
 
         <Section id="projekty" title={`Projekty (${projects.length})`}>
@@ -242,6 +230,10 @@ const SettingsPage = () => {
         <div id="osvedceni" className="scroll-mt-24">
           <CertificatesPanel completed={completed} />
         </div>
+
+        <Section id="souhlasy" title="Souhlasy a ochrana osobních údajů">
+          <ConsentSettings />
+        </Section>
 
         <Section id="zabezpeceni" title="Zabezpečení">
           <form onSubmit={changePassword} className="flex flex-col gap-3 sm:flex-row">

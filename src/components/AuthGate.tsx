@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/visible7/client";
 import { ProjectProvider } from "@/contexts/ProjectContext";
+import { ConsentGate } from "@/components/ConsentGate";
 import { LoginPage } from "@/components/LoginPage";
 import { SetNewPasswordPage } from "@/components/SetNewPasswordPage";
 
@@ -69,7 +70,9 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, signOut }}>
-      <ProjectProvider userId={user.id}>{children}</ProjectProvider>
+      <ConsentGate key={user.id}>
+        <ProjectProvider userId={user.id}>{children}</ProjectProvider>
+      </ConsentGate>
     </AuthContext.Provider>
   );
 };

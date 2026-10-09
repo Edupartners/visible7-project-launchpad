@@ -23,6 +23,8 @@ import NotFound from "./pages/NotFound";
 import OAuthConsentPage from "./pages/OAuthConsentPage";
 import CertificatePage from "./pages/CertificatePage";
 import AdvisorsPage from "./pages/AdvisorsPage";
+import LegalPage from "./pages/LegalPage";
+import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,8 @@ const App = () => (
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           {/* Veřejné ověření osvědčení – bez přihlášení */}
           <Route path="/osvedceni/:code" element={<CertificatePage />} />
+          <Route path="/podminky" element={<LegalPage doc={TERMS} />} />
+          <Route path="/ochrana-osobnich-udaju" element={<LegalPage doc={PRIVACY} />} />
           {/* Vše ostatní vyžaduje přihlášení */}
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>

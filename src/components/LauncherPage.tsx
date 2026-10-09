@@ -294,7 +294,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <h2 className="mt-1 text-2xl font-bold">Tohle je beta. Tvoje zpětná vazba nás posouvá dál.</h2>
               </div>
             </div>
-            <a href="mailto:michal.micek@edu-patners.cz?subject=Zpětná vazba k pilotu VISIBLE7" className="shrink-0 font-bold underline decoration-current/40 underline-offset-4 hover:decoration-current">
+            <a href="mailto:michal.micek@edu-partners.cz?subject=Zpětná vazba k pilotu VISIBLE7" className="shrink-0 font-bold underline decoration-current/40 underline-offset-4 hover:decoration-current">
               Poslat zpětnou vazbu
             </a>
           </div>

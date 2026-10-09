@@ -1,9 +1,12 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Mail, Eye, EyeOff, User, Users, Star, TrendingUp, Shield, Clock, Award } from "lucide-react";
 import { supabase } from "@/integrations/visible7/client";
+import { ConsentFields, ConsentValues } from "@/components/ConsentFields";
+import { LEGAL_VERSION } from "@/lib/legal";
 import { useToast } from "@/hooks/use-toast";
 
 interface LoginPageProps {
@@ -17,6 +20,8 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
   const returnUrl = redirectTo ?? window.location.origin;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [consents, setConsents] = useState<ConsentValues>({ terms: false, klub: false, marketing: false });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +31,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || (isLogin && !password) || (!isLogin && (!firstName || !lastName))) return;
+    if (!email || (isLogin && !password) || (!isLogin && (!firstName || !lastName || !consents.terms))) return;
 
     setIsSubmitting(true);
 
@@ -35,9 +40,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
       if (error) {
         toast({
           title: "Přihlášení se nezdařilo",
-          description: error.message === "Invalid login credentials"
-            ? "Nesprávný e-mail nebo heslo."
-            : error.message,
+          description: error.message === "Invalid login credentials" ? "Nesprávný e-mail nebo heslo." : error.message,
           variant: "destructive",
         });
         setIsSubmitting(false);
@@ -50,15 +53,28 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
         password,
         options: {
           emailRedirectTo: returnUrl,
-          data: { first_name: firstName, last_name: lastName },
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone.trim() || undefined,
+            // Souhlasy se při založení účtu zapíší do evidence souhlasů (trigger v databázi).
+            consents: {
+              version: LEGAL_VERSION,
+              podminky: consents.terms,
+              zasady: consents.terms,
+              klub: consents.klub,
+              marketing: consents.marketing,
+            },
+          },
         },
       });
       if (error) {
         toast({
           title: "Registrace se nezdařila",
-          description: error.message === "User already registered"
-            ? "Tento e-mail už je zaregistrovaný. Zkuste se přihlásit."
-            : error.message,
+          description:
+            error.message === "User already registered"
+              ? "Tento e-mail už je zaregistrovaný. Zkuste se přihlásit."
+              : error.message,
           variant: "destructive",
         });
         setIsSubmitting(false);
@@ -99,7 +115,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
     toast(
       error
         ? { title: "Odeslání se nezdařilo", description: error.message, variant: "destructive" }
-        : { title: "E-mail odeslán", description: "Pokud účet existuje, přijde vám odkaz pro nastavení nového hesla." }
+        : { title: "E-mail odeslán", description: "Pokud účet existuje, přijde vám odkaz pro nastavení nového hesla." },
     );
   };
 
@@ -126,7 +142,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                 <Button
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById('register')?.scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById("register")?.scrollIntoView({ behavior: "smooth" });
                   }}
                   className="btn-apple px-8 py-3 text-base relative z-50"
                 >
@@ -252,6 +268,25 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                 </div>
               </div>
 
+              {!isLogin && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground" htmlFor="reg-phone">
+                    Telefon <span className="font-normal text-muted-foreground">(nepovinné)</span>
+                  </label>
+                  <Input
+                    id="reg-phone"
+                    type="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+420 777 123 456"
+                    className="h-12 rounded-xl border-border/50 focus:border-primary"
+                  />
+                </div>
+              )}
+
+              {!isLogin && <ConsentFields value={consents} onChange={setConsents} />}
+
               {isLogin && (
                 <div className="text-right -mt-3">
                   <button
@@ -277,7 +312,12 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
               <Button
                 type="submit"
                 className="btn-apple w-full h-12 text-base"
-                disabled={isSubmitting || !email || (isLogin && !password) || (!isLogin && (!firstName || !lastName))}
+                disabled={
+                  isSubmitting ||
+                  !email ||
+                  (isLogin && !password) ||
+                  (!isLogin && (!firstName || !lastName || !consents.terms))
+                }
               >
                 {isSubmitting ? (
                   <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
@@ -288,7 +328,6 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                   </>
                 )}
               </Button>
-
             </form>
           </Card>
 
@@ -325,10 +364,13 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
               </div>
             </div>
             <p className="text-xs">
-              Pokračováním souhlasíte s našimi{" "}
-              <a href="#" className="text-primary hover:text-primary/80">Obchodními podmínkami</a>{" "}
-              a{" "}
-              <a href="#" className="text-primary hover:text-primary/80">Zásadami ochrany osobních údajů</a>
+              <Link to="/podminky" className="text-primary hover:text-primary/80">
+                Podmínky užívání
+              </Link>
+              {" · "}
+              <Link to="/ochrana-osobnich-udaju" className="text-primary hover:text-primary/80">
+                Ochrana osobních údajů
+              </Link>
             </p>
           </div>
         </div>
