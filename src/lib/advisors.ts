@@ -43,7 +43,7 @@ export const ADVISORS: Advisor[] = [
     name: "Monika Veselá",
     focus: "Základy podnikání a byznys plán",
     bio: "Bývalá top manažerka, která byla u zakládání Ericssonu. Učí základy podnikání, byznys plán a life hacking.",
-    phases: [1, 2, 3],
+    phases: [1, 2, 3, 6],
     channels: [],
   },
   {
@@ -52,7 +52,7 @@ export const ADVISORS: Advisor[] = [
     photo: `${EP}2026/05/jana-pincova-768x776.png`,
     focus: "Účetnictví a finance e-commerce",
     bio: "Účetní s více než 15 lety praxe. Poradí s účetnictvím e-shopu, DPH při prodeji do zahraničí a nastavením financí.",
-    phases: [3],
+    phases: [3, 6],
     channels: [],
   },
   {
@@ -60,7 +60,7 @@ export const ADVISORS: Advisor[] = [
     name: "Mgr. et Mgr. Michaela Stančová",
     focus: "Právo online podnikání a ochrana značky",
     bio: "Specialistka na ochranné známky, autorské právo a legislativu online projektů. Pomůže s názvem, značkou a podmínkami.",
-    phases: [1, 4],
+    phases: [1, 4, 6],
     channels: [],
   },
   {

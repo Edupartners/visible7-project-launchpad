@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
-import { supabase } from "@/integrations/visible7/client";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { BlockVideo } from "@/components/BlockVideo";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
@@ -22,7 +21,7 @@ import {
   stepId,
   typeStats,
 } from "@/lib/buildPlans";
-import { CostItem, newId } from "@/lib/businessCase";
+import { addCostsToCase } from "@/lib/caseCosts";
 
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
@@ -83,36 +82,15 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
 
   const addCosts = async (b: BuildBlock, costs: BuildCost[]) => {
     if (!currentProject) return;
-    const { data } = await supabase
-      .from("project_data")
-      .select("data_value")
-      .eq("project_id", currentProject.id)
-      .eq("data_key", "business_case")
-      .maybeSingle();
-    const bc = (data?.data_value as { costs?: CostItem[] } | null) ?? {};
-    const existing = bc.costs ?? [];
-    const names = new Set(existing.map((c) => c.name.toLowerCase()));
-    const fresh = costs
-      .filter((c) => !names.has(c.name.toLowerCase()))
-      .map((c) => ({ id: newId(), name: c.name, amount: c.amount, kind: c.kind }) as CostItem);
-    if (fresh.length) {
-      const { error } = await supabase.from("project_data").upsert(
-        {
-          project_id: currentProject.id,
-          data_key: "business_case",
-          data_value: { ...bc, costs: [...existing, ...fresh] },
-        },
-        { onConflict: "project_id,data_key" },
-      );
-      if (error) {
-        toast({ title: "Náklady se nepodařilo převzít", variant: "destructive" });
-        return;
-      }
+    const res = await addCostsToCase(currentProject.id, costs);
+    if (!res.ok) {
+      toast({ title: "Náklady se nepodařilo převzít", variant: "destructive" });
+      return;
     }
     setAddedCosts((a) => [...a, b.id]);
     toast({
-      title: fresh.length ? "Náklady jsou v byznys case" : "Tyto náklady už v byznys case máte",
-      description: fresh.some((c) => !c.amount) ? "U položek bez částky ji doplňte ve fázi 3." : undefined,
+      title: res.added ? "Náklady jsou v byznys case" : "Tyto náklady už v byznys case máte",
+      description: res.needsAmount ? "U položek bez částky ji doplňte ve fázi 3." : undefined,
     });
   };
 

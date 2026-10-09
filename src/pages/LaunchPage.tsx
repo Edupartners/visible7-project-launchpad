@@ -1,66 +1,40 @@
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Rocket } from "lucide-react";
 import { LaunchPhase } from "@/components/LaunchPhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
-import { useNavigate } from "react-router-dom";
-import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
-import { useState } from "react";
-import { Rocket } from "lucide-react";
+
+const learningPoints = [
+  { text: "Proč začít jedním produktem a úzkou skupinou zákazníků", color: "bg-orange-500" },
+  { text: "Milníky MVP, bod zvratu a návratnost z vašeho byznys case", color: "bg-violet-500" },
+  { text: "Živnost, úřady, datová schránka a odvody v roce 2026", color: "bg-emerald-500" },
+  { text: "Účetnictví od prvního dne a kdy (ne)zakládat s.r.o.", color: "bg-cyan-500" },
+];
 
 const LaunchPage = () => {
   const navigate = useNavigate();
-  const [completedPhases, setCompletedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const [showIntro, setShowIntro] = useState(true);
-
-  const handleComplete = () => {
-    setCompletedPhases(prev => {
-      if (!prev.includes(6)) {
-        return [...prev, 6];
-      }
-      return prev;
-    });
-    navigate('/home');
-  };
-
-  const handleBack = () => {
-    navigate('/home');
-  };
-
-  const handleStart = () => {
-    setShowIntro(false);
-  };
-
-  const learningPoints = [
-    { text: "Launch strategie a timeline planning", color: "bg-orange-500" },
-    { text: "PR a media relations pro launch", color: "bg-violet-500" },
-    { text: "Customer onboarding a retention", color: "bg-emerald-500" },
-    { text: "Monitoring a optimalizace po launchu", color: "bg-cyan-500" }
-  ];
-
-  if (showIntro) {
-    return (
-      <PageLayout onBack={handleBack}>
+  const back = () => navigate("/home");
+  return (
+    <PageLayout onBack={back}>
+      {showIntro ? (
         <PhaseIntroTemplate
           title="Launch"
-          subtitle="Úspěšné spuštění na trh"
-          description="Fáze Launch se zaměřuje na strategické spuštění vašeho produktu či služby na trh. Vytvoříte detailní launch plán, připravíte PR strategii a nastavíte systémy pro monitorování úspěchu. Naučíte se jak koordinovat všechny aspekty launchu, od technické přípravy až po customer onboarding a retention strategie."
+          subtitle="Start mikrobyznysu v Česku"
+          description="Spustíte jeden produkt pro jednu úzkou skupinu zákazníků, s rozpočtem, o který si můžete dovolit přijít. Projdete vše, co je potřeba vyřídit – živnost, úřady, datovou schránku, odvody a účetnictví – a nastavíte milníky MVP podle svého byznys case."
           phaseNumber={6}
           icon={Rocket}
           learningPoints={learningPoints}
-          estimatedTime="30 minut"
-          steps={5}
-          hasAiValidation={false}
-          onStart={handleStart}
-          onBack={handleBack}
+          estimatedTime="40 minut"
+          steps={3}
+          onStart={() => setShowIntro(false)}
+          onBack={back}
           gradient="from-orange-500/10 to-red-500/10"
         />
-      </PageLayout>
-    );
-  }
-
-  return (
-    <PageLayout onBack={handleBack}>
-      <LaunchPhase onComplete={handleComplete} onBack={handleBack} />
+      ) : (
+        <LaunchPhase />
+      )}
     </PageLayout>
   );
 };
