@@ -28,6 +28,17 @@ export interface BuildBlock {
 
 export type Difficulty = "Nízká" | "Střední" | "Vyšší";
 
+/** Fáze cesty zákazníka: odkud přijde → co na webu udělá → kde zaplatí nebo se ozve → co je potom. */
+export type FunnelStage = "zdroj" | "web" | "konverze" | "potom";
+
+export interface FunnelStep {
+  label: string;
+  hint: string;
+  stage: FunnelStage;
+}
+
+const F = (stage: FunnelStage, label: string, hint: string): FunnelStep => ({ stage, label, hint });
+
 export interface BuildType {
   id: string;
   name: string;
@@ -39,6 +50,8 @@ export interface BuildType {
   /** Nejčastější volba – zvýrazní se v přehledu */
   popular?: boolean;
   blocks: string[];
+  /** Cesta zákazníka (funnel) */
+  funnel: FunnelStep[];
 }
 
 const B = (b: BuildBlock) => b;
@@ -131,9 +144,9 @@ export const BLOCKS: Record<string, BuildBlock> = {
       "Vyplňte údaje o firmě a kontakty",
       "Napojte vlastní doménu",
     ],
-    tip: "Tarif zvolte podle počtu produktů. Na začátek stačí ten nejnižší.",
+    tip: "Do 10 produktů je Shoptet zdarma – na ověření zájmu ideální. Vyšší tarif řešte, až budete prodávat.",
     minutes: 60,
-    costs: [{ name: "Shoptet – tarif (doplňte podle ceníku)", amount: 0, kind: "mesicni" }],
+    costs: [{ name: "Shoptet (zdarma do 10 produktů)", amount: 0, kind: "mesicni" }],
   }),
   woo: B({
     id: "woo",
@@ -150,9 +163,9 @@ export const BLOCKS: Record<string, BuildBlock> = {
   produkty: B({
     id: "produkty",
     title: "Produkty",
-    goal: "Prvních 5–20 produktů je online a připravených k prodeji.",
+    goal: "Prvních 5–10 produktů je online a připravených k prodeji.",
     steps: [
-      "Začněte s 5–20 produkty, ne s celým katalogem",
+      "Začněte s 5–10 produkty, ne s celým katalogem",
       "Fotky z mobilu u okna na bílém pozadí na začátek stačí",
       "Popis: pro koho produkt je, co řeší a parametry",
       "Kategorie a ceny (u plátce DPH včetně DPH)",
@@ -405,6 +418,13 @@ export const BUILD_TYPES: BuildType[] = [
     platform: "WordPress",
     popular: true,
     blocks: ["domena", "hosting", "vzhled", "texty", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Google a doporučení", "Hledá službu ve svém okolí"),
+      F("web", "Úvodní stránka", "Do 5 vteřin pozná, že jste pro něj"),
+      F("web", "Služby a reference", "Přesvědčí ho ukázky a recenze"),
+      F("konverze", "Poptávka", "Zavolá nebo vyplní formulář"),
+      F("potom", "Schůzka a zakázka", "Domluvíte se osobně"),
+    ],
   },
   {
     id: "eshop",
@@ -415,6 +435,13 @@ export const BUILD_TYPES: BuildType[] = [
     platform: "Shoptet",
     popular: true,
     blocks: ["domena", "shoptet", "produkty", "platby", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Reklama a vyhledávání", "Google, Meta, srovnávače"),
+      F("web", "Produkt", "Fotky, popis, cena a doprava"),
+      F("konverze", "Košík a platba", "Kartou nebo převodem"),
+      F("potom", "Doručení", "Zásilkovna nebo kurýr"),
+      F("potom", "Recenze a další nákup", "E-mail po doručení"),
+    ],
   },
   {
     id: "squeeze-page",
@@ -425,6 +452,13 @@ export const BUILD_TYPES: BuildType[] = [
     platform: "Stránka + e-mailový nástroj",
     popular: true,
     blocks: ["domena", "landing", "darek", "emaily", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Reklama a sociální sítě", "Nabídka dárku zdarma"),
+      F("web", "Stránka s dárkem", "Jedna stránka, jeden cíl"),
+      F("konverze", "E-mail za dárek", "Kontakt máte ve své databázi"),
+      F("potom", "Uvítací e-maily", "Dárek, příběh, důvěra"),
+      F("konverze", "Nabídka", "Prodej produktu nebo služby"),
+    ],
   },
   {
     id: "web-eshop",
@@ -434,6 +468,13 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "14 dní",
     platform: "WordPress + WooCommerce",
     blocks: ["domena", "hosting", "vzhled", "texty", "woo", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Google a reklama", "Hledá řešení nebo produkt"),
+      F("web", "Obsah a prezentace", "Pozná vás a začne vám věřit"),
+      F("web", "Produkt", "Vybere si z nabídky"),
+      F("konverze", "Košík a platba", "Nákup přímo na webu"),
+      F("potom", "Další nákup", "Novinky e-mailem"),
+    ],
   },
   {
     id: "konverzni-web",
@@ -443,6 +484,12 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "7 dní",
     platform: "WordPress",
     blocks: ["domena", "hosting", "vzhled", "prodejni", "poptavka", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Reklama", "Míří přímo na jednu nabídku"),
+      F("web", "Prodejní stránka", "Problém, řešení, důkaz, cena"),
+      F("konverze", "Nákup nebo poptávka", "Jedno tlačítko, žádné odbočky"),
+      F("potom", "Hotovo", "Děkovací stránka a další krok"),
+    ],
   },
   {
     id: "lms",
@@ -452,6 +499,14 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "21 dní",
     platform: "Platforma pro kurzy + Vimeo",
     blocks: ["domena", "kurz", "obsahkurzu", "predplatne", "emaily", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Obsah zdarma a reklama", "Video, článek nebo podcast"),
+      F("web", "Ukázková lekce", "Ochutnávka výměnou za e-mail"),
+      F("potom", "E-maily", "Výsledky studentů, odpovědi na námitky"),
+      F("web", "Prodejní stránka kurzu", "Osnova, reference, cena"),
+      F("konverze", "Platba", "Jednorázově nebo ve splátkách"),
+      F("potom", "Studium a certifikát", "Hotový student = nejlepší reference"),
+    ],
   },
   {
     id: "members",
@@ -461,6 +516,13 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "14 dní",
     platform: "WordPress + členský plugin",
     blocks: ["domena", "hosting", "vzhled", "clenove", "predplatne", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Obsah zdarma", "Ukázka toho, co je uvnitř"),
+      F("web", "Registrace", "Zkušební období nebo ukázka"),
+      F("konverze", "Předplatné", "Automatická platba měsíčně nebo ročně"),
+      F("potom", "Nový obsah pro členy", "Důvod zůstat"),
+      F("potom", "Prodloužení", "Člen zůstává další měsíc"),
+    ],
   },
   {
     id: "blog",
@@ -470,6 +532,12 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "10 dní",
     platform: "WordPress",
     blocks: ["domena", "hosting", "vzhled", "clanky", "pravni", "mereni"],
+    funnel: [
+      F("zdroj", "Google", "Hledá odpověď na otázku"),
+      F("web", "Článek", "Najde odpověď u vás"),
+      F("konverze", "Odběr novinek", "Nechá vám e-mail"),
+      F("potom", "Doporučený produkt", "Váš nebo partnerský"),
+    ],
   },
   {
     id: "affiliate",
@@ -479,6 +547,12 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "14 dní",
     platform: "WordPress",
     blocks: ["domena", "hosting", "vzhled", "clanky", "affiliate", "pravni", "mereni"],
+    funnel: [
+      F("zdroj", "Google", "Hledá „nejlepší…“ nebo recenzi"),
+      F("web", "Srovnání a recenze", "Pomůžete mu vybrat"),
+      F("konverze", "Partnerský odkaz", "Klikne k prodejci"),
+      F("potom", "Nákup u partnera", "Vy dostanete provizi"),
+    ],
   },
   {
     id: "dropshipping",
@@ -488,6 +562,13 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "14 dní",
     platform: "Shoptet",
     blocks: ["domena", "dodavatel", "shoptet", "produkty", "platby", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Reklama", "Meta, Google, srovnávače"),
+      F("web", "Produkt", "Fotky a popis od dodavatele, vylepšené"),
+      F("konverze", "Košík a platba", "Platí vám"),
+      F("potom", "Objednávka u dodavatele", "Dodavatel zboží odešle"),
+      F("potom", "Doručení", "Zákazník dostane balík"),
+    ],
   },
   {
     id: "forum-komunita",
@@ -497,6 +578,12 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "10 dní",
     platform: "Hotová komunitní platforma",
     blocks: ["domena", "komunita", "pravidla", "predplatne", "pravni", "mereni"],
+    funnel: [
+      F("zdroj", "Obsah a doporučení", "Pozvánka od člena nebo z obsahu"),
+      F("web", "Vstup do komunity", "Uvítání a pravidla"),
+      F("potom", "Aktivita", "Otázky, odpovědi, akce"),
+      F("konverze", "Placené členství", "Prémiový obsah a setkání"),
+    ],
   },
   {
     id: "marketplace",
@@ -506,6 +593,13 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "30 dní",
     platform: "Nejdřív ručně, pak platforma",
     blocks: ["domena", "trziste", "pravidla", "platby", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Prodejci", "Nabídnou zboží nebo služby"),
+      F("zdroj", "Kupující", "Hledají nabídku"),
+      F("web", "Nabídka na tržišti", "Najdou se"),
+      F("konverze", "Obchod", "Platba přes tržiště"),
+      F("potom", "Provize", "Váš podíl z každého obchodu"),
+    ],
   },
   {
     id: "vlastni-napad-app",
@@ -515,6 +609,12 @@ export const BUILD_TYPES: BuildType[] = [
     duration: "14–30 dní",
     platform: "Vývoj s AI",
     blocks: ["prototyp", "aplikace", "domena", "pravni", "mereni", "kontrola"],
+    funnel: [
+      F("zdroj", "Web aplikace", "Ukáže, co aplikace vyřeší"),
+      F("web", "Registrace", "Zdarma, bez karty"),
+      F("potom", "První úspěch", "Uživatel vyřeší svůj problém"),
+      F("konverze", "Placený tarif", "Když chce víc"),
+    ],
   },
 ];
 

@@ -10,6 +10,7 @@ import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { supabase } from "@/integrations/visible7/client";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
+import { CustomerJourney } from "@/components/CustomerJourney";
 import {
   BuildBlock,
   BuildCost,
@@ -244,6 +245,8 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
           </div>
         )}
       </header>
+
+      <CustomerJourney steps={t.funnel} />
 
       {/* Bloky */}
       <ol className="space-y-3">

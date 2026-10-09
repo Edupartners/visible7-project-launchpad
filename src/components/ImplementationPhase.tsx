@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Blocks, Clock, ListChecks, PlayCircle, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { JourneyLine } from "@/components/CustomerJourney";
 import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import {
@@ -88,6 +89,9 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
               </span>
               <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">{mine.name}</h2>
               <p className="mt-2 text-lg text-white/75">{mine.description}</p>
+              <div className="mt-3">
+                <JourneyLine steps={mine.funnel} light />
+              </div>
               <TypeFacts t={mine} light />
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Button
@@ -169,7 +173,10 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-1 flex-1 text-sm text-muted-foreground">{t.description}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{t.description}</p>
+                  <div className="mt-3 flex-1 rounded-lg bg-muted/50 p-2.5">
+                    <JourneyLine steps={t.funnel} />
+                  </div>
                   <TypeFacts t={t} compact />
                   {pct > 0 && <Progress value={pct} className="mt-4 h-1.5" />}
                   <span className="mt-4 inline-flex items-center text-sm font-semibold text-primary group-hover:underline">
