@@ -17,13 +17,15 @@ interface GateJourneyProps {
   onOpen: (route: string) => void;
   /** Nadpis a tlačítko nad pásem (na přehledu je nahradí karta „Na řadě“). */
   showHeader?: boolean;
+  /** Seznam fází pod pásem (na přehledu ho nahrazují karty fází). */
+  showList?: boolean;
 }
 
 /**
  * Cesta přes 7 bran. Zelená = hotovo, oranžová = na řadě, černá = otevřít.
  * Nahoře pás bran (každá brána je tlačítko), pod ním seznam fází se stavem.
  */
-export const GateJourney = ({ gates, completed, onOpen, showHeader = true }: GateJourneyProps) => {
+export const GateJourney = ({ gates, completed, onOpen, showHeader = true, showList = true }: GateJourneyProps) => {
   const done = new Set(completed);
   const current = gates.find((g) => !done.has(g.id)) ?? null;
   const count = gates.filter((g) => done.has(g.id)).length;
@@ -31,7 +33,7 @@ export const GateJourney = ({ gates, completed, onOpen, showHeader = true }: Gat
   return (
     <section className="rounded-2xl border border-border bg-card">
       {/* Pás bran */}
-      <div className={`border-b border-border px-6 pb-6 sm:px-8 ${showHeader ? "pt-7" : "pt-6"}`}>
+      <div className={`px-6 pb-6 sm:px-8 ${showList ? "border-b border-border" : ""} ${showHeader ? "pt-7" : "pt-6"}`}>
         {showHeader && (
           <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -115,52 +117,56 @@ export const GateJourney = ({ gates, completed, onOpen, showHeader = true }: Gat
       </div>
 
       {/* Seznam fází */}
-      <ul>
-        {gates.map((gate) => {
-          const isDone = done.has(gate.id);
-          const isCurrent = current?.id === gate.id;
-          const Icon = gate.icon;
-          return (
-            <li key={gate.id} className="border-b border-border last:border-b-0">
-              <button
-                type="button"
-                onClick={() => onOpen(gate.route)}
-                className={`flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-muted/60 focus:outline-none focus-visible:bg-muted sm:gap-4 sm:px-8 ${
-                  isCurrent ? "bg-orange-50/70" : ""
-                }`}
-              >
-                <Icon
-                  className={`h-5 w-5 shrink-0 ${isDone ? "text-emerald-600" : isCurrent ? "text-orange-600" : "text-foreground"}`}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold">
-                    {gate.id}. {gate.name}
+      {showList && (
+        <ul>
+          {gates.map((gate) => {
+            const isDone = done.has(gate.id);
+            const isCurrent = current?.id === gate.id;
+            const Icon = gate.icon;
+            return (
+              <li key={gate.id} className="border-b border-border last:border-b-0">
+                <button
+                  type="button"
+                  onClick={() => onOpen(gate.route)}
+                  className={`flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-muted/60 focus:outline-none focus-visible:bg-muted sm:gap-4 sm:px-8 ${
+                    isCurrent ? "bg-orange-50/70" : ""
+                  }`}
+                >
+                  <Icon
+                    className={`h-5 w-5 shrink-0 ${isDone ? "text-emerald-600" : isCurrent ? "text-orange-600" : "text-foreground"}`}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-semibold">
+                      {gate.id}. {gate.name}
+                    </span>
+                    {gate.description && (
+                      <span className="block text-sm text-muted-foreground">{gate.description}</span>
+                    )}
                   </span>
-                  {gate.description && <span className="block text-sm text-muted-foreground">{gate.description}</span>}
-                </span>
-                {gate.time && !isDone && (
-                  <span className="hidden shrink-0 text-sm tabular-nums text-muted-foreground sm:block">
-                    {gate.time}
-                  </span>
-                )}
-                {isDone ? (
-                  <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-emerald-700 sm:w-28 sm:justify-end">
-                    <Check className="h-4 w-4" strokeWidth={3} /> Hotovo
-                  </span>
-                ) : isCurrent ? (
-                  <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-orange-500 px-3 py-1 text-sm font-semibold text-white">
-                    Na řadě <ChevronRight className="h-4 w-4" />
-                  </span>
-                ) : (
-                  <span className="flex shrink-0 items-center gap-0.5 text-sm font-semibold text-foreground sm:w-28 sm:justify-end">
-                    Otevřít <ChevronRight className="h-4 w-4" />
-                  </span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  {gate.time && !isDone && (
+                    <span className="hidden shrink-0 text-sm tabular-nums text-muted-foreground sm:block">
+                      {gate.time}
+                    </span>
+                  )}
+                  {isDone ? (
+                    <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-emerald-700 sm:w-28 sm:justify-end">
+                      <Check className="h-4 w-4" strokeWidth={3} /> Hotovo
+                    </span>
+                  ) : isCurrent ? (
+                    <span className="flex shrink-0 items-center gap-0.5 rounded-full bg-orange-500 px-3 py-1 text-sm font-semibold text-white">
+                      Na řadě <ChevronRight className="h-4 w-4" />
+                    </span>
+                  ) : (
+                    <span className="flex shrink-0 items-center gap-0.5 text-sm font-semibold text-foreground sm:w-28 sm:justify-end">
+                      Otevřít <ChevronRight className="h-4 w-4" />
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 };

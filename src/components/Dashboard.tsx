@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
+import { PhaseCards } from "./PhaseCards";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
@@ -134,10 +135,16 @@ export const Dashboard = (_props: DashboardProps) => {
   const navigate = useNavigate();
   const { currentProject } = useProject();
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
+  const [watched, setWatched] = useSupabaseProgress<number[]>("watched_videos", []);
   const [certCount, setCertCount] = useState<number | null>(null);
+  const [certified, setCertified] = useState<number[]>([]);
 
   useEffect(() => {
-    listMyCertificates().then((list) => setCertCount(list.filter((c) => c.project_id === currentProject?.id).length));
+    listMyCertificates().then((list) => {
+      const mine = list.filter((c) => c.project_id === currentProject?.id);
+      setCertCount(mine.length);
+      setCertified(mine.filter((c) => c.kind === "phase" && c.phase).map((c) => c.phase as number));
+    });
   }, [currentProject?.id]);
 
   const done = new Set(completedPhases);
@@ -197,8 +204,8 @@ export const Dashboard = (_props: DashboardProps) => {
         )}
 
         {/* Celá cesta */}
-        <section aria-labelledby="cesta">
-          <h2 id="cesta" className="mb-3 text-lg font-bold">
+        <section aria-labelledby="cesta" className="space-y-4">
+          <h2 id="cesta" className="text-lg font-bold">
             Celá cesta
           </h2>
           <GateJourney
@@ -206,6 +213,16 @@ export const Dashboard = (_props: DashboardProps) => {
             completed={completedPhases}
             onOpen={(route) => navigate(route)}
             showHeader={false}
+            showList={false}
+          />
+          <PhaseCards
+            phases={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
+            completed={completedPhases}
+            certified={certified}
+            watched={watched}
+            onOpen={(route) => navigate(route)}
+            onWatched={(id) => !watched.includes(id) && setWatched([...watched, id])}
+            onCertificate={() => navigate("/settings#osvedceni")}
           />
         </section>
 
