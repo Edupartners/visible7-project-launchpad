@@ -1,66 +1,40 @@
-
-import { ExpansionPhase } from "@/components/ExpansionPhase";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { TrendingUp } from "lucide-react";
+import { GrowthPhase } from "@/components/GrowthPhase";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
-import { useNavigate } from "react-router-dom";
-import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
-import { useState } from "react";
-import { TrendingUp } from "lucide-react";
+
+const learningPoints = [
+  { text: "Kdy jste připravení růst a kdy ještě ne", color: "bg-emerald-500" },
+  { text: "Která páka růstu vám přinese nejvíc: cena, věrnost, noví zákazníci", color: "bg-blue-500" },
+  { text: "Past růstu: proč víc zakázek může znamenat nedostatek peněz", color: "bg-orange-500" },
+  { text: "Kdy a za kolik najmout prvního člověka", color: "bg-violet-500" },
+];
 
 const ExpansionPage = () => {
   const navigate = useNavigate();
-  const [completedPhases, setCompletedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const [showIntro, setShowIntro] = useState(true);
-
-  const handleComplete = () => {
-    setCompletedPhases(prev => {
-      if (!prev.includes(7)) {
-        return [...prev, 7];
-      }
-      return prev;
-    });
-    navigate('/home');
-  };
-
-  const handleBack = () => {
-    navigate('/home');
-  };
-
-  const handleStart = () => {
-    setShowIntro(false);
-  };
-
-  const learningPoints = [
-    { text: "Scaling strategie a growth hacking", color: "bg-emerald-500" },
-    { text: "Expanze na nové trhy a segmenty", color: "bg-blue-500" },
-    { text: "Organizační růst a team building", color: "bg-violet-500" },
-    { text: "Financování růstu a investice", color: "bg-orange-500" }
-  ];
-
-  if (showIntro) {
-    return (
-      <PageLayout onBack={handleBack}>
+  const back = () => navigate("/home");
+  return (
+    <PageLayout onBack={back}>
+      {showIntro ? (
         <PhaseIntroTemplate
-          title="Expansion"
-          subtitle="Škálování a růst businness"
-          description="V závěrečné fázi Expansion se zaměříme na udržitelný růst a škálování vašeho businessu. Naučíte se growth hacking techniky, strategii expanze na nové trhy a jak řídit organizační růst. Probereme také možnosti financování růstu a jak připravit business na další fázi vývoje."
+          title="Růst"
+          subtitle="Rosťte podle marže, ne podle pocitu"
+          description="Projekt běží a chcete víc. Tady zjistíte, jestli jste na růst připravení, která páka vám přinese nejvíc zisku, kolik peněz růst spolkne dřív, než vám zákazníci zaplatí, a kdy si můžete dovolit prvního člověka. Bez zbytečných nákladů."
           phaseNumber={7}
           icon={TrendingUp}
           learningPoints={learningPoints}
-          estimatedTime="35 minut"
-          steps={6}
-          hasAiValidation={false}
-          onStart={handleStart}
-          onBack={handleBack}
+          estimatedTime="40 minut"
+          steps={5}
+          onStart={() => setShowIntro(false)}
+          onBack={back}
           gradient="from-emerald-500/10 to-teal-500/10"
         />
-      </PageLayout>
-    );
-  }
-
-  return (
-    <PageLayout onBack={handleBack}>
-      <ExpansionPhase onComplete={handleComplete} onBack={handleBack} />
+      ) : (
+        <GrowthPhase />
+      )}
     </PageLayout>
   );
 };
