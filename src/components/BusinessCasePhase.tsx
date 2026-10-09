@@ -46,7 +46,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, Loader2, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Loader2, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { downloadBusinessCaseExcel } from "@/lib/businessCaseExcel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface BusinessCasePhaseProps {
@@ -982,6 +983,24 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             <p className="text-sm text-muted-foreground">
               Přepněte scénář a uvidíte, co se stane, když prodeje půjdou hůř nebo lépe.
             </p>
+            {hasRevenue && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3 rounded-[10px]"
+                onClick={() =>
+                  downloadBusinessCaseExcel({
+                    projectName: currentProject?.name ?? "Projekt",
+                    typeName,
+                    group,
+                    data,
+                    results,
+                  }).catch(() => toast({ title: "Export se nepodařil", variant: "destructive" }))
+                }
+              >
+                <FileSpreadsheet className="mr-2 h-4 w-4" /> Stáhnout do Excelu
+              </Button>
+            )}
           </div>
           <div
             role="radiogroup"
