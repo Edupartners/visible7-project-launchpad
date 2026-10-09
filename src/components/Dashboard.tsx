@@ -7,6 +7,7 @@ import { PhaseCards } from "./PhaseCards";
 import { GrowthBadge } from "./GrowthBadge";
 import { AdvisorAvatar } from "./AdvisorsInline";
 import { ADVISORS } from "@/lib/advisors";
+import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
@@ -270,6 +271,24 @@ export const Dashboard = (_props: DashboardProps) => {
             </Button>
           </div>
         </section>
+
+        {done.has(NSK_QUALIFICATION.unlockGate) && (
+          <section className="flex flex-col gap-4 rounded-2xl bg-[hsl(var(--gate-copper))] p-6 text-white sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <Award className="mt-1 h-6 w-6 shrink-0" />
+              <div>
+                <h2 className="text-lg font-bold">Získejte státem uznanou profesní kvalifikaci</h2>
+                <p className="text-sm text-white/85">
+                  Prošli jste branou {NSK_QUALIFICATION.unlockGate}. Můžete se přihlásit ke zkoušce{" "}
+                  {NSK_QUALIFICATION.name} ({NSK_QUALIFICATION.code}) u Edu Partners.
+                </p>
+              </div>
+            </div>
+            <Button asChild variant="secondary" className="shrink-0 rounded-[10px]">
+              <a href={qualificationMailto(currentProject?.name)}>Mám zájem o zkoušku</a>
+            </Button>
+          </section>
+        )}
 
         {allCoreCompleted && (
           <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">

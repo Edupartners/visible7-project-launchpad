@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
 import { PLANS } from "@/lib/pricing";
 import { REFERENCES } from "@/lib/references";
+import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import {
   ArrowRight,
@@ -116,6 +117,7 @@ const COMPARE: { row: string; values: [number, number, number, number] }[] = [
   { row: "Živý poradce, když se zaseknete", values: [1, 0, 0, 1] },
   { row: "Pitch na A4 pro investora nebo banku", values: [1, 0, 0.5, 1] },
   { row: "Osvědčení za každý splněný krok", values: [1, 1, 0, 0] },
+  { row: "Cesta ke státem uznané profesní kvalifikaci", values: [1, 0.5, 0, 0] },
 ];
 
 const OUTPUTS = [
@@ -529,6 +531,46 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   </li>
                 ))}
               </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Profesní kvalifikace NSK */}
+        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-[hsl(var(--gate-copper))] text-white">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1.3fr_1fr] md:py-20">
+              <div>
+                <p className="font-semibold text-white/80">Navíc po bráně 4</p>
+                <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Z aplikace ke státem uznané kvalifikaci
+                </h2>
+                <p className="mt-4 text-lg text-white/85">
+                  Kdo projde branou 4, může se přihlásit ke zkoušce profesní kvalifikace{" "}
+                  <strong>{NSK_QUALIFICATION.name}</strong>. Zkoušku pořádá Edu Partners jako autorizovaná osoba.
+                  Osvědčení o profesní kvalifikaci je státem uznané.
+                </p>
+                <a
+                  href={NSK_QUALIFICATION.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-6 inline-block font-semibold underline underline-offset-4 hover:no-underline"
+                >
+                  Kvalifikace v Národní soustavě kvalifikací
+                </a>
+              </div>
+              <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/20">
+                {[
+                  ["Kód kvalifikace", NSK_QUALIFICATION.code],
+                  ["Úroveň", `EQF ${NSK_QUALIFICATION.eqf}`],
+                  ["Uznává", "Národní soustava kvalifikací"],
+                  ["Přihlášení", `po bráně ${NSK_QUALIFICATION.unlockGate}`],
+                ].map(([l, v]) => (
+                  <div key={l} className="bg-[hsl(28_58%_34%)] p-5">
+                    <dt className="text-sm text-white/70">{l}</dt>
+                    <dd className="mt-1 text-xl font-bold">{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
         </section>
