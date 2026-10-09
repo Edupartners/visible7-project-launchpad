@@ -1,20 +1,14 @@
-
-import { BusinessTypeRoadmap } from "@/components/BusinessTypeRoadmap";
 import { useNavigate, useParams } from "react-router-dom";
+import { BusinessTypeRoadmap } from "@/components/BusinessTypeRoadmap";
+import { PageLayout } from "@/components/layout/PageLayout";
 
 const BusinessTypeDetailPage = () => {
   const navigate = useNavigate();
-  const { businessTypeId } = useParams<{ businessTypeId: string }>();
-
-  const handleBack = () => {
-    navigate('/home');
-  };
-
+  const { businessTypeId = "" } = useParams<{ businessTypeId: string }>();
   return (
-    <BusinessTypeRoadmap 
-      businessTypeId={businessTypeId || ''} 
-      onBack={handleBack}
-    />
+    <PageLayout onBack={() => navigate("/implementation")}>
+      <BusinessTypeRoadmap key={businessTypeId} businessTypeId={businessTypeId} />
+    </PageLayout>
   );
 };
 

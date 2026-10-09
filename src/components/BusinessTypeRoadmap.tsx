@@ -1,287 +1,411 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Check, ChevronDown, Lightbulb, PlayCircle, Plus, Star, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
-import { BackButton } from "@/components/ui/back-button";
-import { Download, Play, CheckCircle2, ExternalLink, Clock, DollarSign, Settings } from "lucide-react";
-import { businessTypes, type RoadmapStep } from "@/types/implementation";
+import { useToast } from "@/hooks/use-toast";
+import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
-import { WordPressInstallForm } from "./WordPressInstallForm";
+import { supabase } from "@/integrations/visible7/client";
+import { AdvisorsInline } from "@/components/AdvisorsInline";
+import { PhaseCelebration } from "@/components/PhaseCelebration";
+import {
+  BuildBlock,
+  BuildCost,
+  BuildProgress,
+  EMPTY_PROGRESS,
+  blocksOf,
+  buildType,
+  stepId,
+  typeStats,
+} from "@/lib/buildPlans";
+import { CostItem, newId } from "@/lib/businessCase";
 
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
-  onBack: () => void;
 }
 
-export const BusinessTypeRoadmap = ({ businessTypeId, onBack }: BusinessTypeRoadmapProps) => {
-  const businessType = businessTypes.find(bt => bt.id === businessTypeId);
-  const [steps, setSteps] = useSupabaseProgress<RoadmapStep[]>(
-    `roadmap-${businessTypeId}`, 
-    businessType?.steps || []
-  );
-  const [showInstallForm, setShowInstallForm] = useState(false);
+const czk = (v: number) => `${v.toLocaleString("cs-CZ")} Kč`;
 
-  useEffect(() => {
-    if (businessType && steps.length === 0) {
-      setSteps(businessType.steps);
-    }
-  }, [businessType, steps.length, setSteps]);
-
-  if (!businessType) {
+/** Video k bloku z Vimea; dokud není, zobrazí se zástupná plocha. */
+const BlockVideo = ({ block }: { block: BuildBlock }) => {
+  const [play, setPlay] = useState(false);
+  if (!block.vimeoId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Typ podnikání nenalezen</p>
+      <div className="flex aspect-video w-full flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(216_45%_32%)] text-center text-white">
+        <Video className="h-8 w-8 text-white/60" />
+        <p className="mt-2 font-semibold">Video k bloku „{block.title}“</p>
+        <p className="text-sm text-white/60">připravujeme</p>
       </div>
     );
   }
+  const src = `https://player.vimeo.com/video/${block.vimeoId}?dnt=1${block.vimeoHash ? `&h=${block.vimeoHash}` : ""}${play ? "&autoplay=1" : ""}`;
+  return play ? (
+    <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
+      <iframe
+        src={src}
+        className="h-full w-full"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+        title={`Video: ${block.title}`}
+      />
+    </div>
+  ) : (
+    <button
+      type="button"
+      onClick={() => setPlay(true)}
+      className="group relative flex aspect-video w-full items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)]"
+      aria-label={`Přehrát video: ${block.title}`}
+    >
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg transition-transform group-hover:scale-110">
+        <PlayCircle className="h-9 w-9" />
+      </span>
+      {block.videoMinutes && (
+        <span className="absolute bottom-3 right-3 rounded-md bg-black/60 px-2 py-0.5 text-xs font-semibold text-white">
+          {block.videoMinutes} min
+        </span>
+      )}
+    </button>
+  );
+};
 
-  const completedSteps = steps.filter(step => step.completed).length;
-  const totalSteps = steps.length;
-  const progressPercentage = (completedSteps / totalSteps) * 100;
-  const totalCost = steps.filter(step => step.completed).reduce((sum, step) => sum + step.price, 0);
+/** Plán tvorby pro jeden typ byznysu: bloky s videem, kroky a náklady. */
+export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { currentProject, setBusinessType } = useProject();
+  const t = buildType(businessTypeId);
+  const [all, setAll] = useSupabaseProgress<Record<string, BuildProgress>>("build_progress", {});
+  const [completed, setCompleted] = useSupabaseProgress<number[]>("completed_phases", []);
+  const [open, setOpen] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
+  const [addedCosts, setAddedCosts] = useState<string[]>([]);
 
-  const handleStepToggle = (stepId: string) => {
-    setSteps(prevSteps => 
-      prevSteps.map(step => 
-        step.id === stepId 
-          ? { ...step, completed: !step.completed }
-          : step
-      )
-    );
+  if (!t) {
+    return <p className="mx-auto max-w-3xl px-4 py-10 text-muted-foreground">Tento typ byznysu neznáme.</p>;
+  }
+
+  const p = all[t.id] ?? EMPTY_PROGRESS;
+  const blocks = blocksOf(t);
+  const stats = typeStats(t);
+  const doneBlocks = blocks.filter((b) => p.blocks.includes(b.id)).length;
+  const pct = Math.round((doneBlocks / blocks.length) * 100);
+  const isMine = currentProject?.business_type === t.id;
+  const allDone = doneBlocks === blocks.length;
+  const phaseDone = completed.includes(4);
+  const current = open ?? blocks.find((b) => !p.blocks.includes(b.id))?.id ?? null;
+
+  const update = (patch: (prev: BuildProgress) => BuildProgress) =>
+    setAll((prev) => ({ ...prev, [t.id]: patch(prev[t.id] ?? EMPTY_PROGRESS) }));
+
+  const toggleStep = (b: BuildBlock, i: number) => {
+    // Rozpracovaný blok zůstane otevřený, i když se odškrtnutím posledního kroku dokončí.
+    setOpen(b.id);
+    update((prev) => {
+      const id = stepId(b.id, i);
+      const steps = prev.steps.includes(id) ? prev.steps.filter((s) => s !== id) : [...prev.steps, id];
+      const allSteps = b.steps.every((_, j) => steps.includes(stepId(b.id, j)));
+      const blocksDone = allSteps ? Array.from(new Set([...prev.blocks, b.id])) : prev.blocks.filter((x) => x !== b.id);
+      return { ...prev, steps, blocks: blocksDone };
+    });
   };
 
-  const handleTemplateDownload = () => {
-    window.open(businessType?.templateUrl || '#', '_blank');
+  const finishBlock = (b: BuildBlock) => {
+    update((prev) => ({
+      ...prev,
+      steps: Array.from(new Set([...prev.steps, ...b.steps.map((_, j) => stepId(b.id, j))])),
+      blocks: Array.from(new Set([...prev.blocks, b.id])),
+    }));
+    const next = blocks.find((x) => x.id !== b.id && !p.blocks.includes(x.id));
+    setOpen(next?.id ?? null);
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Nízká': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
-      case 'Střední': return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
-      case 'Vyšší': return 'bg-red-500/10 text-red-600 border-red-500/20';
-      default: return 'bg-muted text-muted-foreground';
+  const addCosts = async (b: BuildBlock, costs: BuildCost[]) => {
+    if (!currentProject) return;
+    const { data } = await supabase
+      .from("project_data")
+      .select("data_value")
+      .eq("project_id", currentProject.id)
+      .eq("data_key", "business_case")
+      .maybeSingle();
+    const bc = (data?.data_value as { costs?: CostItem[] } | null) ?? {};
+    const existing = bc.costs ?? [];
+    const names = new Set(existing.map((c) => c.name.toLowerCase()));
+    const fresh = costs
+      .filter((c) => !names.has(c.name.toLowerCase()))
+      .map((c) => ({ id: newId(), name: c.name, amount: c.amount, kind: c.kind }) as CostItem);
+    if (fresh.length) {
+      const { error } = await supabase.from("project_data").upsert(
+        {
+          project_id: currentProject.id,
+          data_key: "business_case",
+          data_value: { ...bc, costs: [...existing, ...fresh] },
+        },
+        { onConflict: "project_id,data_key" },
+      );
+      if (error) {
+        toast({ title: "Náklady se nepodařilo převzít", variant: "destructive" });
+        return;
+      }
     }
+    setAddedCosts((a) => [...a, b.id]);
+    toast({
+      title: fresh.length ? "Náklady jsou v byznys case" : "Tyto náklady už v byznys case máte",
+      description: fresh.some((c) => !c.amount) ? "U položek bez částky ji doplňte ve fázi 3." : undefined,
+    });
+  };
+
+  const finishPhase = () => {
+    setCompleted((prev) => (prev.includes(4) ? prev : [...prev, 4]));
+    setCelebrate(true);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <BackButton onBack={onBack} />
-            
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">V7</span>
-              </div>
-              <h1 className="text-xl font-semibold text-foreground">{businessType.name}</h1>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6">
+      {celebrate && (
+        <PhaseCelebration
+          gate={4}
+          title="Projekt má skutečnou podobu"
+          message="Další brána ukáže, kde vaše zákazníky najdete a kolik do marketingu dát."
+          nextLabel="Pokračovat na Marketing a testování"
+          onNext={() => navigate("/benchmarking-phase")}
+          onHome={() => navigate("/home")}
+        />
+      )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Business Type Header */}
-        <div className="mb-8">
-          <Card className="card-apple p-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <h2 className="text-apple-title">{businessType.name}</h2>
-                  <Badge className={getDifficultyColor(businessType.difficulty)}>
-                    {businessType.difficulty}
-                  </Badge>
-                </div>
-                <p className="text-apple-body mb-4">{businessType.description}</p>
-                
-                <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>{businessType.duration}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>{completedSteps} / {totalSteps} kroků</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4" />
-                    <span>{totalCost.toLocaleString()} Kč</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="lg:w-80">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Pokrok</span>
-                  <span className="text-sm text-muted-foreground">{Math.round(progressPercentage)}%</span>
-                </div>
-                <Progress value={progressPercentage} className="h-3" />
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Video and Template Section */}
-        <div className="grid gap-6 lg:grid-cols-2 mb-8">
-          {/* YouTube Video */}
-          <Card className="card-apple">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Play className="w-5 h-5 text-red-600" />
-                Instruktážní video
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center mb-4">
-                <iframe
-                  src={businessType.videoUrl}
-                  className="w-full h-full rounded-lg"
-                  allowFullScreen
-                  title={`${businessType.name} - Instruktážní video`}
-                />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Kompletní návod jak vytvořit {businessType.name.toLowerCase()} krok za krokem.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Template Download */}
-          {businessType.id !== 'vlastni-napad-app' && (
-          <Card className="card-apple">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Download className="w-5 h-5 text-primary" />
-                WordPress šablona
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg p-6 mb-4">
-                <h4 className="font-semibold mb-2">Připravená šablona pro {businessType.name}</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Stáhněte si hotovou WordPress šablonu optimalizovanou pro váš typ podnikání. 
-                  Použijte All in One Migration plugin pro rychlý import.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button 
-                    onClick={handleTemplateDownload}
-                    className="btn-apple flex-1"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Stáhnout šablonu
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex-1"
-                    onClick={() => setShowInstallForm(true)}
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Automatická instalace
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Návod na import
-                  </Button>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                <strong>Tip:</strong> Šablona obsahuje všechny potřebné pluginy a základní konfiguraci.
-              </p>
-            </CardContent>
-          </Card>
+      {/* Hlavička */}
+      <header className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-semibold text-primary">Fáze 4 · Plán tvorby</p>
+          {isMine && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+              <Star className="h-3 w-3 fill-current" /> Váš typ
+            </span>
           )}
         </div>
+        <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{t.name}</h1>
+        <p className="mt-1 text-muted-foreground">{t.description}</p>
+        <dl className="mt-5 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+          <div>
+            <dt className="text-muted-foreground">Platforma</dt>
+            <dd className="font-semibold">{t.platform}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Bloky</dt>
+            <dd className="font-semibold">
+              {stats.blocks} bloků, {stats.steps} kroků
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Čas</dt>
+            <dd className="font-semibold">
+              {t.duration} (asi {stats.hours} h práce)
+            </dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Náklady na start</dt>
+            <dd className="font-semibold">
+              od {czk(stats.oneOff)}
+              {stats.monthly > 0 && ` + ${czk(stats.monthly)}/měs.`}
+            </dd>
+          </div>
+        </dl>
+        <div className="mt-5">
+          <div className="mb-1.5 flex justify-between text-sm">
+            <span className="font-semibold">
+              Hotovo {doneBlocks} z {blocks.length} bloků
+            </span>
+            <span className="text-muted-foreground">{pct} %</span>
+          </div>
+          <Progress value={pct} className="h-2.5" />
+        </div>
+        {!isMine && currentProject && (
+          <div className="mt-5 flex flex-col gap-3 rounded-xl bg-muted/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm">
+              {currentProject.business_type
+                ? "Tohle není typ, který jste zvolili ve fázi 2. Plán si můžete prohlédnout, nebo typ změnit."
+                : "Zatím nemáte zvolený typ byznysu."}
+            </p>
+            <Button
+              variant="outline"
+              className="shrink-0 rounded-[10px]"
+              onClick={async () => {
+                const ok = await setBusinessType(currentProject.id, t.id);
+                toast(
+                  ok
+                    ? { title: `Váš typ je teď ${t.name}` }
+                    : { title: "Typ se nepodařilo změnit", variant: "destructive" },
+                );
+              }}
+            >
+              Nastavit jako můj typ
+            </Button>
+          </div>
+        )}
+      </header>
 
-        {/* Roadmap Checklist */}
-        <Card className="card-apple">
-          <CardHeader>
-            <CardTitle>Roadmapa - Gamifikované kroky</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border/50">
-                    <th className="text-left py-3 px-2 w-12"></th>
-                    <th className="text-left py-3 px-4 font-semibold">Co</th>
-                    <th className="text-left py-3 px-4 font-semibold">Kde</th>
-                    <th className="text-left py-3 px-4 font-semibold">Poznámka</th>
-                    <th className="text-right py-3 px-4 font-semibold">Cena</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {steps.map((step, index) => (
-                    <tr 
-                      key={step.id} 
-                      className={`border-b border-border/30 transition-colors ${
-                        step.completed ? 'bg-emerald-500/5' : 'hover:bg-muted/50'
-                      }`}
-                    >
-                      <td className="py-4 px-2">
-                        <Checkbox
-                          checked={step.completed}
-                          onCheckedChange={() => handleStepToggle(step.id)}
-                          className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                        />
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-md">
-                            {index + 1}
-                          </span>
-                          <span className={step.completed ? 'line-through text-muted-foreground' : ''}>
-                            {step.task}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <Badge variant="outline" className="text-xs">
-                          {step.platform}
-                        </Badge>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-muted-foreground">
-                        {step.note}
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <span className={`font-medium ${step.completed ? 'text-emerald-600' : ''}`}>
-                          {step.price > 0 ? `${step.price.toLocaleString()} Kč` : 'Zdarma'}
+      {/* Bloky */}
+      <ol className="space-y-3">
+        {blocks.map((b, i) => {
+          const done = p.blocks.includes(b.id);
+          const expanded = current === b.id;
+          const stepsDone = b.steps.filter((_, j) => p.steps.includes(stepId(b.id, j))).length;
+          return (
+            <li
+              key={b.id}
+              className={`overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
+            >
+              <button
+                type="button"
+                onClick={() => setOpen(expanded ? "" : b.id)}
+                aria-expanded={expanded}
+                className="flex w-full items-center gap-4 p-4 text-left sm:p-5"
+              >
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
+                    done
+                      ? "bg-emerald-600 text-white"
+                      : expanded
+                        ? "bg-orange-500 text-white"
+                        : "border-2 border-foreground"
+                  }`}
+                >
+                  {done ? <Check className="h-5 w-5" strokeWidth={3} /> : i + 1}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold">{b.title}</span>
+                  <span className="block truncate text-sm text-muted-foreground">{b.goal}</span>
+                </span>
+                <span className="hidden shrink-0 text-sm text-muted-foreground sm:block">
+                  {stepsDone}/{b.steps.length} ·{" "}
+                  {b.minutes >= 60 ? `${Math.round(b.minutes / 60)} h` : `${b.minutes} min`}
+                </span>
+                <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`} />
+              </button>
+
+              {expanded && (
+                <div className="grid gap-6 border-t border-border p-4 sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+                  <BlockVideo block={b} />
+                  <div className="space-y-4">
+                    <ul className="space-y-2">
+                      {b.steps.map((s, j) => {
+                        const checked = p.steps.includes(stepId(b.id, j));
+                        return (
+                          <li key={j}>
+                            <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 hover:bg-muted/60">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => toggleStep(b, j)}
+                                className="mt-0.5 h-5 w-5 shrink-0 accent-[hsl(var(--primary))]"
+                              />
+                              <span className={checked ? "text-muted-foreground line-through" : ""}>{s}</span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {b.tip && (
+                      <p className="flex gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                        <Lightbulb className="h-4 w-4 shrink-0" /> {b.tip}
+                      </p>
+                    )}
+                    {b.costs && (
+                      <div className="rounded-lg border border-border p-3 text-sm">
+                        <p className="font-semibold">Náklady</p>
+                        <ul className="mt-1 text-muted-foreground">
+                          {b.costs.map((c) => (
+                            <li key={c.name}>
+                              {c.name}
+                              {c.amount > 0 && `: ${czk(c.amount)}${c.kind === "mesicni" ? " měsíčně" : ""}`}
+                            </li>
+                          ))}
+                        </ul>
+                        <button
+                          type="button"
+                          onClick={() => addCosts(b, b.costs!)}
+                          disabled={addedCosts.includes(b.id)}
+                          className="mt-2 inline-flex items-center gap-1 font-semibold text-primary hover:underline disabled:text-muted-foreground disabled:no-underline"
+                        >
+                          {addedCosts.includes(b.id) ? (
+                            <>
+                              <Check className="h-4 w-4" /> Převzato do byznys case
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-4 w-4" /> Převzít do byznys case
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                    {!done ? (
+                      <Button className="rounded-[10px]" onClick={() => finishBlock(b)}>
+                        <Check className="mr-2 h-4 w-4" /> Blok hotový
+                      </Button>
+                    ) : (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700">
+                          <Check className="h-4 w-4" strokeWidth={3} /> Blok je hotový
                         </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Summary */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h4 className="font-semibold">Souhrn pokroku</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Dokončeno {completedSteps} z {totalSteps} kroků
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">
-                    {totalCost.toLocaleString()} Kč
+                        {blocks.some((x) => !p.blocks.includes(x.id)) && (
+                          <Button
+                            variant="outline"
+                            className="rounded-[10px]"
+                            onClick={() => setOpen(blocks.find((x) => !p.blocks.includes(x.id))?.id ?? null)}
+                          >
+                            Další blok
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="text-sm text-muted-foreground">Celkové náklady</div>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
 
-      {/* WordPress Install Form */}
-      <WordPressInstallForm
-        open={showInstallForm}
-        onOpenChange={setShowInstallForm}
-      />
+      <AdvisorsInline phase={4} title="Potřebujete s tvorbou pomoct?" />
+
+      {/* Dokončení fáze */}
+      <section className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <h2 className="text-xl font-bold">Adresa vašeho webu</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Uložíme ji k projektu. Použije se v dalších fázích a na osvědčení VISIBLE7 Gold.
+        </p>
+        <Input
+          className="mt-3"
+          type="url"
+          placeholder="https://www.vas-web.cz"
+          defaultValue={p.url ?? ""}
+          onBlur={(e) => {
+            const url = e.target.value.trim();
+            if (url !== (p.url ?? "")) update((prev) => ({ ...prev, url }));
+          }}
+          aria-label="Adresa webu"
+        />
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            {phaseDone
+              ? "Fáze Tvorba je hotová."
+              : !isMine
+                ? "Fázi dokončíte v plánu svého typu byznysu."
+                : allDone
+                  ? "Všechny bloky jsou hotové."
+                  : `Zbývá ${blocks.length - doneBlocks} ${blocks.length - doneBlocks === 1 ? "blok" : blocks.length - doneBlocks < 5 ? "bloky" : "bloků"}.`}
+          </p>
+          <Button
+            className="rounded-[10px] bg-emerald-600 text-white hover:bg-emerald-700"
+            disabled={!isMine || !allDone || phaseDone}
+            onClick={finishPhase}
+          >
+            Dokončit fázi Tvorba
+          </Button>
+        </div>
+      </section>
     </div>
   );
 };

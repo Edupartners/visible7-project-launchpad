@@ -1,175 +1,226 @@
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { ArrowRight, Blocks, Clock, ListChecks, PlayCircle, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock, BarChart3, MapPin, Filter, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { businessTypes } from "@/types/implementation";
+import { Progress } from "@/components/ui/progress";
+import { useProject } from "@/contexts/ProjectContext";
+import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import {
+  BLOCKS,
+  BUILD_TYPES,
+  BuildProgress,
+  BuildType,
+  Difficulty,
+  blocksOf,
+  buildType,
+  typeStats,
+} from "@/lib/buildPlans";
 
 interface ImplementationPhaseProps {
-  onComplete: () => void;
-  onBack: () => void;
   onSelectBusinessType: (businessTypeId: string) => void;
 }
 
-export const ImplementationPhase = ({ onComplete, onBack, onSelectBusinessType }: ImplementationPhaseProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+const DIFF_STYLE: Record<Difficulty, string> = {
+  Nízká: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  Střední: "bg-amber-50 text-amber-700 ring-amber-200",
+  Vyšší: "bg-red-50 text-red-700 ring-red-200",
+};
 
-  const filteredBusinessTypes = businessTypes.filter(type => {
-    const matchesSearch = type.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         type.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDifficulty = difficultyFilter === "all" || type.difficulty === difficultyFilter;
-    return matchesSearch && matchesDifficulty;
-  });
+const czk = (v: number) => `${v.toLocaleString("cs-CZ")} Kč`;
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Nízká': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
-      case 'Střední': return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
-      case 'Vyšší': return 'bg-red-500/10 text-red-600 border-red-500/20';
-      default: return 'bg-muted text-muted-foreground';
-    }
-  };
+const progressOf = (t: BuildType, all: Record<string, BuildProgress>) => {
+  const p = all[t.id];
+  if (!p) return 0;
+  return Math.round((p.blocks.filter((b) => t.blocks.includes(b)).length / t.blocks.length) * 100);
+};
+
+/** Fáze 4: přehled všech typů, typ z fáze 2 výrazně nahoře. */
+export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhaseProps) => {
+  const { currentProject } = useProject();
+  const [all] = useSupabaseProgress<Record<string, BuildProgress>>("build_progress", {});
+  const mine = buildType(currentProject?.business_type);
+  const sharedBlocks = new Set(BUILD_TYPES.flatMap((t) => t.blocks)).size;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Button 
-              onClick={onBack}
-              variant="ghost" 
-              className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Zpět na dashboard</span>
-            </Button>
-            
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">V7</span>
-              </div>
-              <h1 className="text-xl font-semibold text-foreground">Implementation</h1>
-            </div>
+    <div className="mx-auto max-w-6xl space-y-10 px-4 py-6 sm:px-6">
+      <header>
+        <p className="text-sm font-semibold text-primary">Fáze 4 ze 7</p>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Tvorba</h1>
+        <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
+          Postavíte web, e-shop nebo jiný typ projektu krok za krokem. Každý blok má instruktážní video, kroky k
+          odškrtnutí a náklady, které převezmete do byznys case.
+        </p>
+        <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+          <div className="flex items-center gap-2">
+            <Blocks className="h-4 w-4 text-primary" />
+            <dt className="sr-only">Typů</dt>
+            <dd>
+              <span className="font-bold">{BUILD_TYPES.length}</span> typů online byznysu
+            </dd>
           </div>
-        </div>
+          <div className="flex items-center gap-2">
+            <PlayCircle className="h-4 w-4 text-primary" />
+            <dt className="sr-only">Bloků</dt>
+            <dd>
+              <span className="font-bold">{sharedBlocks}</span> bloků s videem
+            </dd>
+          </div>
+          <div className="flex items-center gap-2">
+            <ListChecks className="h-4 w-4 text-primary" />
+            <dt className="sr-only">Kroků</dt>
+            <dd>
+              <span className="font-bold">{Object.values(BLOCKS).reduce((s, b) => s + b.steps.length, 0)}</span>{" "}
+              konkrétních kroků
+            </dd>
+          </div>
+        </dl>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Phase Header */}
-        <div className="mb-8">
-          <Card className="card-apple p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-apple-title">Fáze 4: Implementation</h2>
-                <p className="text-apple-subtitle mt-1">
-                  Výběr typu byznysu
-                </p>
-              </div>
-              <Badge className="bg-primary/10 text-primary border-primary/20">
-                12 typů online podnikání
-              </Badge>
-            </div>
-            <p className="text-apple-body">
-              Vyberte si typ online podnikání, který nejlépe odpovídá vaší vizi a možnostem. 
-              Každý typ obsahuje detailní roadmapu s gamifikovanými kroky a připravenou WordPress šablonu.
-            </p>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Hledat typ podnikání..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-            <SelectTrigger className="w-[180px]">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Náročnost" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Vše</SelectItem>
-              <SelectItem value="Nízká">Nízká</SelectItem>
-              <SelectItem value="Střední">Střední</SelectItem>
-              <SelectItem value="Vyšší">Vyšší</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Business Types Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBusinessTypes.map((businessType) => (
-            <Card key={businessType.id} className="card-apple-hover">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-2">
-                  <CardTitle className="text-lg">{businessType.name}</CardTitle>
-                  <Badge className={getDifficultyColor(businessType.difficulty)}>
-                    {businessType.difficulty}
-                  </Badge>
-                </div>
-                <CardDescription className="text-sm">
-                  {businessType.description}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span>{businessType.duration}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                      <BarChart3 className="w-4 h-4" />
-                      <span>{businessType.steps.length} kroků</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <Button 
-                  onClick={() => onSelectBusinessType(businessType.id)}
-                  className="w-full btn-apple"
+      {/* Váš plán */}
+      {mine ? (
+        <section
+          aria-label="Váš plán tvorby"
+          className="overflow-hidden rounded-3xl bg-primary text-white shadow-[0_30px_60px_-35px_hsl(216_62%_24%/0.7)]"
+        >
+          <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1 text-sm font-semibold">
+                <Star className="h-3.5 w-3.5 fill-current" /> Váš typ z fáze 2
+              </span>
+              <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">{mine.name}</h2>
+              <p className="mt-2 text-lg text-white/75">{mine.description}</p>
+              <TypeFacts t={mine} light />
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <Button
+                  onClick={() => onSelectBusinessType(mine.id)}
+                  className="h-12 rounded-xl bg-orange-500 px-6 text-base font-semibold text-white hover:bg-orange-600"
                 >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Roadmapa
+                  {progressOf(mine, all) > 0 ? "Pokračovat v plánu" : "Otevřít plán tvorby"}
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredBusinessTypes.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              Nenalezeny žádné typy podnikání odpovídající vašim kritériím.
-            </p>
+                <span className="text-sm text-white/60">Hotovo {progressOf(mine, all)} %</span>
+              </div>
+            </div>
+            <ol className="space-y-1.5 self-center rounded-2xl bg-white/[0.06] p-3">
+              {blocksOf(mine).map((b, i) => {
+                const done = all[mine.id]?.blocks.includes(b.id);
+                return (
+                  <li key={b.id} className="flex items-center gap-3 rounded-lg px-2 py-1.5">
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                        done ? "bg-emerald-500 text-white" : "border border-white/30 text-white/70"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-semibold">{b.title}</span>
+                    <PlayCircle className="h-4 w-4 shrink-0 text-white/40" aria-label="Instruktážní video" />
+                  </li>
+                );
+              })}
+            </ol>
           </div>
-        )}
+        </section>
+      ) : (
+        <section className="rounded-3xl border-2 border-dashed border-orange-300 bg-orange-50 p-6 sm:p-8">
+          <h2 className="text-xl font-bold">Ještě nemáte zvolený typ byznysu</h2>
+          <p className="mt-1 text-muted-foreground">
+            Zvolte ho ve{" "}
+            <Link to="/ideation" className="font-semibold text-primary underline">
+              fázi 2 Lean Canvas
+            </Link>{" "}
+            (AI ho umí doporučit), nebo otevřete plán kteréhokoli typu níže a nastavte ho jako svůj.
+          </p>
+        </section>
+      )}
 
-        {/* Complete Phase Button */}
-        <div className="mt-8 text-center">
-          <Card className="card-apple p-6 bg-gradient-to-r from-emerald-500/5 via-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-            <p className="text-apple-body mb-4">
-              Prozkoumali jste typy online podnikání a jste připraveni pokračovat?
-            </p>
-            <Button 
-              onClick={onComplete}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
-            >
-              Dokončit fázi Implementation
-            </Button>
-          </Card>
+      {/* Všechny typy */}
+      <section aria-labelledby="vsechny">
+        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+          <h2 id="vsechny" className="text-2xl font-bold tracking-tight">
+            Všechny typy online byznysu
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            <Sparkles className="mr-1 inline h-4 w-4 text-orange-500" />
+            Nejčastěji začínají lidé webem, e-shopem nebo squeeze page.
+          </p>
         </div>
-      </div>
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {BUILD_TYPES.map((t) => {
+            const isMine = t.id === mine?.id;
+            const pct = progressOf(t, all);
+            return (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelectBusinessType(t.id)}
+                  className={`group flex h-full w-full flex-col rounded-2xl border bg-card p-5 text-left transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    isMine ? "border-orange-300 ring-2 ring-orange-200" : "border-border"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-lg font-bold leading-tight">{t.name}</h3>
+                    {isMine ? (
+                      <span className="shrink-0 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+                        Váš typ
+                      </span>
+                    ) : t.popular ? (
+                      <span className="shrink-0 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                        Nejčastější
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-1 flex-1 text-sm text-muted-foreground">{t.description}</p>
+                  <TypeFacts t={t} compact />
+                  {pct > 0 && <Progress value={pct} className="mt-4 h-1.5" />}
+                  <span className="mt-4 inline-flex items-center text-sm font-semibold text-primary group-hover:underline">
+                    {pct > 0 ? `Hotovo ${pct} % · pokračovat` : "Zobrazit plán"}
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     </div>
+  );
+};
+
+/** Čísla o typu: platforma, čas, bloky, náklady. */
+const TypeFacts = ({ t, light = false, compact = false }: { t: BuildType; light?: boolean; compact?: boolean }) => {
+  const s = typeStats(t);
+  const muted = light ? "text-white/60" : "text-muted-foreground";
+  return (
+    <dl className={`mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm ${compact ? "" : "sm:grid-cols-4"}`}>
+      <div>
+        <dt className={muted}>Platforma</dt>
+        <dd className="font-semibold">{t.platform}</dd>
+      </div>
+      <div>
+        <dt className={muted}>Náročnost</dt>
+        <dd>
+          <span
+            className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${
+              light ? "bg-white/10 text-white ring-white/20" : DIFF_STYLE[t.difficulty]
+            }`}
+          >
+            {t.difficulty}
+          </span>
+        </dd>
+      </div>
+      <div>
+        <dt className={muted}>Bloky a kroky</dt>
+        <dd className="font-semibold">
+          {s.blocks} bloků, {s.steps} kroků
+        </dd>
+      </div>
+      <div>
+        <dt className={muted}>Čas a start</dt>
+        <dd className="flex items-center gap-1 font-semibold">
+          <Clock className="h-3.5 w-3.5" /> {t.duration}
+          {s.oneOff > 0 && <span className={`font-normal ${muted}`}>· od {czk(s.oneOff)}</span>}
+        </dd>
+      </div>
+    </dl>
   );
 };

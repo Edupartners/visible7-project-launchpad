@@ -1,36 +1,13 @@
-import { ImplementationPhase } from "@/components/ImplementationPhase";
 import { useNavigate } from "react-router-dom";
-import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import { ImplementationPhase } from "@/components/ImplementationPhase";
+import { PageLayout } from "@/components/layout/PageLayout";
 
 const ImplementationPage = () => {
   const navigate = useNavigate();
-  const [completedPhases, setCompletedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
-
-  const handleComplete = () => {
-    // Mark phase 4 as completed
-    setCompletedPhases(prev => {
-      if (!prev.includes(4)) {
-        return [...prev, 4];
-      }
-      return prev;
-    });
-    navigate('/home');
-  };
-
-  const handleBack = () => {
-    navigate('/home');
-  };
-
-  const handleSelectBusinessType = (businessTypeId: string) => {
-    navigate(`/business-type/${businessTypeId}`);
-  };
-
   return (
-    <ImplementationPhase 
-      onComplete={handleComplete} 
-      onBack={handleBack} 
-      onSelectBusinessType={handleSelectBusinessType} 
-    />
+    <PageLayout onBack={() => navigate("/home")}>
+      <ImplementationPhase onSelectBusinessType={(id) => navigate(`/business-type/${id}`)} />
+    </PageLayout>
   );
 };
 
