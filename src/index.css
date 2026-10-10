@@ -277,13 +277,3 @@
 @media (max-width: 767px) {
   .lean-grid > * { grid-area: auto !important; }
 }
-
-/* Úvodní stránka: „rentgenový“ pruh přejíždějící přes ukázku výsledku */
-@keyframes scan {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(520%);
-  }
-}
