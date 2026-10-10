@@ -122,6 +122,29 @@ const INSIDE = [
   { icon: Layers, value: "13", label: "typů online byznysu s hotovým postupem" },
 ];
 
+const SHOWCASE = [
+  {
+    eyebrow: "Byznys case s AI",
+    title: "Finanční plán na 24 měsíců hotový za odpoledne",
+    text: "AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy jen potvrdíte nebo přepíšete. Spočítáme potřebný kapitál, bod zvratu i maximální cenu za zákazníka.",
+    cta: "Vyzkoušet zdarma",
+    image: "/landing/ukazka-byznys-case.webp",
+    alt: "Byznys case: AI doporučuje marži a odchodovost s vysvětlením",
+    width: 985,
+    height: 310,
+  },
+  {
+    eyebrow: "Mapa cesty A → D",
+    title: "Zjistěte, kdy můžete dát výpověď",
+    text: "Aplikace z vašich čísel spočítá, kdy přijdou první zákazníci, kdy vás projekt uživí a kdy unese prvního spolupracovníka. S každou úpravou plánu se mapa zpřesní.",
+    cta: "Spočítat moji cestu",
+    image: "/landing/ukazka-mapa-cesty.webp",
+    alt: "Mapa cesty: dnes, první zákazníci, živí mě to, roste to beze mě",
+    width: 1037,
+    height: 430,
+  },
+];
+
 const MYTHS = [
   [
     "Potřebuji na začátek hodně peněz.",
@@ -351,6 +374,48 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </p>
             </div>
           </div>
+        </section>
+
+        {/* Ukázky z aplikace */}
+        <section className="mx-auto max-w-6xl px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Podnikatelský plán, kterému můžete věřit. Bez Excelu a bez teorie.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">Každý krok je hotový výstup, ne lekce.</p>
+          </div>
+          {SHOWCASE.map((b, i) => (
+            <div
+              key={b.title}
+              className="mt-16 grid grid-cols-1 items-center gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16"
+            >
+              <div className={i % 2 ? "lg:order-2" : ""}>
+                <p className="text-sm font-bold uppercase tracking-[0.08em] text-orange-700">{b.eyebrow}</p>
+                <h3 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
+                  {b.title}
+                </h3>
+                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{b.text}</p>
+                <button
+                  type="button"
+                  onClick={onAccessGranted}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 font-semibold text-primary hover:bg-primary hover:text-white"
+                >
+                  {b.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+              <figure className={i % 2 ? "lg:order-1" : ""}>
+                <img
+                  src={b.image}
+                  alt={b.alt}
+                  width={b.width}
+                  height={b.height}
+                  loading="lazy"
+                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(216_62%_24%/0.5)]"
+                />
+                <figcaption className="mt-2 text-center text-xs text-muted-foreground">Ukázka z aplikace</figcaption>
+              </figure>
+            </div>
+          ))}
         </section>
 
         {/* Mýty */}
