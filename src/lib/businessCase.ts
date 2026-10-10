@@ -125,7 +125,7 @@ export interface MonthRow {
 
 const pct = (v: number) => (Number.isFinite(v) ? v : 0) / 100;
 
-export function simulate(group: RevenueGroup, data: BusinessCaseData, factor = 1): MonthRow[] {
+export function simulate(group: RevenueGroup, data: BusinessCaseData, factor = 1, horizon = HORIZON): MonthRow[] {
   const r = data.revenue;
   const oneOff = data.costs.filter((c) => c.kind === "jednorazove").reduce((s, c) => s + (c.amount || 0), 0);
   const fixed = data.costs.filter((c) => c.kind === "mesicni").reduce((s, c) => s + (c.amount || 0), 0);
@@ -137,7 +137,7 @@ export function simulate(group: RevenueGroup, data: BusinessCaseData, factor = 1
   ];
   let active = 0;
   let cumulative = -oneOff;
-  for (let m = 1; m <= HORIZON; m++) {
+  for (let m = 1; m <= horizon; m++) {
     const volume = (r.volume12 || 0) * factor * rampFactor(m, r.growthYear2 || 0);
     let revenue = 0;
     let newCustomers = 0;

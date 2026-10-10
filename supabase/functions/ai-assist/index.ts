@@ -1,4 +1,4 @@
-// VISIBLE7 – AI asistent (fáze 2: Lean Canvas, fáze 3: doporučené hodnoty, orientační náklady a komentář k byznys casu,
+// VISIBLE7 – AI asistent (fáze 0: Rentgen nápadu, fáze 2: Lean Canvas, fáze 3: doporučené hodnoty, orientační náklady a komentář k byznys casu,
 // po fázi 3: pitch projektu na jednu stránku A4).
 //
 // Náklady drží na uzdě:
@@ -473,6 +473,132 @@ Příjemce pitche: ${AUDIENCES[audience] ?? AUDIENCES.investor}
 - Elevator pitch je mluvený text pro osobní setkání.`;
 }
 
+
+// Fáze 0: Rentgen nápadu – z odpovědí na 4 otázky celý první návrh projektu jedním voláním.
+const REVENUE_ALL = ["price", "volume12", "grossMargin", "repeatRate", "churn", "conversion", "rpm", "commission", "growthYear2"];
+const DIAGNOSE_TOOL = {
+  name: "rentgen_napadu",
+  description: "Upřímná diagnóza podnikatelského nápadu a první návrh projektu.",
+  input_schema: {
+    type: "object",
+    properties: {
+      projectName: { type: "string", description: "Krátký pracovní název projektu, max 40 znaků." },
+      slogan: { type: "string", description: "Slogan, max 90 znaků." },
+      verdict: {
+        type: "object",
+        properties: {
+          color: { type: "string", enum: ["zelena", "oranzova", "cervena"] },
+          headline: { type: "string", description: "Verdikt jednou větou, max 90 znaků." },
+          why: { type: "string", description: "2–3 věty proč, max 320 znaků." },
+        },
+        required: ["color", "headline", "why"],
+      },
+      businessType: { type: "string", enum: Object.keys(BUSINESS_TYPES) },
+      businessTypeReason: { type: "string", description: "Jedna věta, proč tento typ." },
+      vision: {
+        type: "object",
+        properties: {
+          customer: { type: "string", description: "Konkrétní zákazník, 1 věta." },
+          problem: { type: "string", description: "Problém zákazníka, 1–2 věty." },
+          offering: { type: "string", description: "Co přesně prodáváme, 1 věta." },
+          lowCostName: { type: "string", description: "Typ levné konkurence nebo alternativy (např. YouTube návody)." },
+          premiumName: { type: "string", description: "Typ prémiové konkurence (např. agentura na míru)." },
+        },
+        required: ["customer", "problem", "offering", "lowCostName", "premiumName"],
+      },
+      canvas: SUGGEST_TOOL.input_schema.properties.fields,
+      revenue: {
+        type: "object",
+        properties: Object.fromEntries(REVENUE_ALL.map((f) => [f, { type: "number", description: REVENUE_LABELS[f] }])),
+        required: REVENUE_ALL,
+      },
+      costs: {
+        type: "array",
+        minItems: 3,
+        maxItems: 10,
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            kind: { type: "string", enum: ["jednorazove", "mesicni", "marketing"] },
+            amount: { type: "number", description: "Kč bez DPH; u jednorázových celkem, jinak za měsíc." },
+          },
+          required: ["name", "kind", "amount"],
+        },
+      },
+      risks: {
+        type: "array",
+        minItems: 3,
+        maxItems: 3,
+        items: {
+          type: "object",
+          properties: {
+            risk: { type: "string", description: "Riziko, 1 věta." },
+            test: { type: "string", description: "Jak ho levně ověřit do 14 dnů, 1 věta." },
+          },
+          required: ["risk", "test"],
+        },
+      },
+      strengths: { type: "array", minItems: 1, maxItems: 3, items: { type: "string", description: "Silná stránka, 1 věta." } },
+    },
+    required: ["projectName", "slogan", "verdict", "businessType", "businessTypeReason", "vision", "canvas", "revenue", "costs", "risks", "strengths"],
+  },
+};
+
+const GOAL_LABELS: Record<string, string> = {
+  privydelek: "přivýdělek vedle práce",
+  mzda: "nahradit mzdu, aby ho projekt živil",
+  firma: "vybudovat větší firmu s týmem",
+};
+const SKILL_LABELS: Record<string, string> = {
+  prodej: "umí prodávat",
+  marketing: "rozumí marketingu",
+  technika: "zvládne web a techniku",
+  obor: "zná obor zevnitř",
+  finance: "rozumí číslům",
+  zadna: "zatím nemá žádnou z těchto dovedností",
+};
+
+type DiagnoseAnswers = { idea: string; customer: string; problem: string; hours: number; budget: number; income: number | null; goal: string; skills: string[] };
+
+function cleanAnswers(raw: unknown): DiagnoseAnswers | null {
+  const a = (raw ?? {}) as Record<string, unknown>;
+  const idea = cut(a.idea, 600);
+  if (idea.length < 8) return null;
+  const num = (v: unknown, max: number) => Math.min(Math.max(Math.round(Number(v) || 0), 0), max);
+  return {
+    idea,
+    customer: cut(a.customer, 400),
+    problem: cut(a.problem, 400),
+    hours: num(a.hours, 80) || 10,
+    budget: num(a.budget, 50_000_000),
+    income: a.income === null || a.income === undefined || a.income === "" ? null : num(a.income, 10_000_000),
+    goal: String(a.goal) in GOAL_LABELS ? String(a.goal) : "mzda",
+    skills: (Array.isArray(a.skills) ? a.skills : []).map(String).filter((k) => k in SKILL_LABELS).slice(0, 6),
+  };
+}
+
+function diagnosePrompt(a: DiagnoseAnswers) {
+  return `Nápad uživatele: ${a.idea}
+Pro koho: ${a.customer || "(neuvedeno – odhadni)"}
+Jaký problém řeší: ${a.problem || "(neuvedeno – odhadni)"}
+Čas na projekt: ${a.hours} hodin týdně
+Kolik peněz může riskovat: ${a.budget.toLocaleString("cs-CZ")} Kč
+Dnešní čistý měsíční příjem: ${a.income ? a.income.toLocaleString("cs-CZ") + " Kč" : "neuvedeno"}
+Cíl: ${GOAL_LABELS[a.goal]}
+Dovednosti: ${a.skills.length ? a.skills.map((k) => SKILL_LABELS[k]).join(", ") : "neuvedeno"}
+
+Úkol: udělej „rentgen nápadu“ – první upřímný pohled zkušeného mentora a první návrh projektu pro český online trh v roce 2026.
+- verdict: zelena = dává smysl začít hned; oranzova = dává smysl, ale je potřeba něco upravit nebo nejdřív ověřit; cervena = v této podobě nedoporučuješ (řekni proč a co by to změnilo). Buď upřímný, nelichoť. Zohledni čas, rozpočet a dovednosti.
+- businessType: nejvhodnější typ z povoleného seznamu: ${Object.entries(BUSINESS_TYPES).map(([id, n]) => `${id} = ${n}`).join(", ")}.
+- vision a canvas: konkrétně k tomuto nápadu, 1–3 krátké věty na pole. Náklady a příjmy v canvasu jako výčet položek bez částek.
+- revenue: realistická čísla pro typ byznysu, který jsi zvolil. Pole, která se pro tento typ nepoužívají, nastav na 0. Objem ve 12. měsíci odhadni opatrně a s ohledem na ${a.hours} hodin týdně. growthYear2 obvykle 10–40.
+- costs: 3–10 položek podle podnikatelského minimalismu, celková jednorázová investice by měla odpovídat rozpočtu, pokud to jde. Nezahrnuj vlastní odměnu podnikatele – tu porovnáváme zvlášť.
+- risks: 3 největší rizika, každé s levným testem do 14 dnů.
+- strengths: 1–3 silné stránky nápadu nebo podnikatele.
+Zde výjimečně čísla a částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
+}
+
 async function callClaude(prompt: string, tool: { name: string; description: string; input_schema: unknown }, maxTokens: number) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -516,7 +642,7 @@ Deno.serve(async (req) => {
   const user = userData?.user;
   if (userErr || !user) return json({ error: "Přihlaste se prosím znovu." }, 401);
 
-  let body: { projectId?: string; action?: string; audience?: string };
+  let body: { projectId?: string; action?: string; audience?: string; answers?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -524,15 +650,17 @@ Deno.serve(async (req) => {
   }
   const { projectId, action } = body;
   const audience = body.audience && body.audience in AUDIENCES ? body.audience : "investor";
-  if (!projectId || !["canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill", "pitch"].includes(action ?? "")) {
+  if (!projectId || !["diagnose", "canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill", "pitch"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
+  const answers = action === "diagnose" ? cleanAnswers(body.answers) : null;
+  if (action === "diagnose" && !answers) return json({ error: "Popište nápad aspoň jednou větou." }, 400);
   const kind =
-    action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill" || action === "pitch"
+    action === "diagnose" || action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill" || action === "pitch"
       ? "navrh"
       : "vyhodnoceni";
   // Odhady nákladů mají vlastní limit (fáze „3n“), aby nesdílely limit s doporučenými procenty.
-  const phase = action === "pitch" ? "p" : action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
+  const phase = action === "diagnose" ? "0" : action === "pitch" ? "p" : action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -555,7 +683,7 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    const what = action === "pitch" ? "pitchů" : action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    const what = action === "diagnose" ? "rentgenů" : action === "pitch" ? "pitchů" : action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= LIMITS.userDaily) {
@@ -611,7 +739,9 @@ Deno.serve(async (req) => {
   let result: { output: Record<string, unknown>; usage: unknown };
   try {
     result =
-      action === "pitch"
+      action === "diagnose"
+        ? await callClaude(diagnosePrompt(answers!), DIAGNOSE_TOOL, 5000)
+        : action === "pitch"
         ? await callClaude(
             pitchPrompt(
               vision,
@@ -686,6 +816,34 @@ Deno.serve(async (req) => {
     for (const [k, n] of Object.entries(PITCH_LIMITS)) output[k] = String(output[k] ?? "").trim().slice(0, n);
     output.milestones = ((output.milestones as unknown[]) ?? []).slice(0, 3).map((m) => String(m).slice(0, 90));
     output.audience = audience;
+  }
+  if (action === "diagnose") {
+    const str = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
+    const v = (output.verdict ?? {}) as Record<string, unknown>;
+    output.projectName = str(output.projectName, 60) || "Můj projekt";
+    output.slogan = str(output.slogan, 120);
+    output.verdict = {
+      color: ["zelena", "oranzova", "cervena"].includes(String(v.color)) ? String(v.color) : "oranzova",
+      headline: str(v.headline, 120),
+      why: str(v.why, 400),
+    };
+    if (!(String(output.businessType) in BUSINESS_TYPES)) output.businessType = "vlastni-napad-app";
+    output.businessTypeReason = str(output.businessTypeReason, 300);
+    const vis = (output.vision ?? {}) as Record<string, unknown>;
+    output.vision = Object.fromEntries(["customer", "problem", "offering", "lowCostName", "premiumName"].map((k) => [k, str(vis[k], 400)]));
+    const cv = (output.canvas ?? {}) as Record<string, unknown>;
+    output.canvas = Object.fromEntries(CANVAS_KEYS.map((k) => [k, str(cv[k], 1200)]));
+    const rv = (output.revenue ?? {}) as Record<string, unknown>;
+    const max: Record<string, number> = { ...FIELD_MAX, price: 10_000_000, volume12: 10_000_000 };
+    output.revenue = Object.fromEntries(
+      REVENUE_ALL.map((f) => [f, Math.round(Math.min(Math.max(Number(rv[f]) || 0, 0), max[f] ?? 100) * 10) / 10]),
+    );
+    output.costs = ((output.costs as Record<string, unknown>[]) ?? [])
+      .filter((c) => ["jednorazove", "mesicni", "marketing"].includes(String(c.kind)) && str(c.name, 70))
+      .slice(0, 10)
+      .map((c) => ({ name: str(c.name, 70), kind: String(c.kind), amount: Math.round(Math.min(Math.max(Number(c.amount) || 0, 0), 10_000_000)) }));
+    output.risks = ((output.risks as Record<string, unknown>[]) ?? []).slice(0, 3).map((r) => ({ risk: str(r.risk, 240), test: str(r.test, 240) }));
+    output.strengths = ((output.strengths as unknown[]) ?? []).slice(0, 3).map((x) => str(x, 240)).filter(Boolean);
   }
   if (action === "case_assumptions") output.items = cleanRevenue(output.items, assumptionFields);
   if (action === "case_autofill") output.revenue = cleanRevenue(output.revenue, autofillFields);

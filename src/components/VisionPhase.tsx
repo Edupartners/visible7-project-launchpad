@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import {
@@ -245,6 +246,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
+      <DiagnosisDraftNote part="vision" gate={1} />
       {celebrate && (
         <PhaseCelebration
           gate={1}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
@@ -589,6 +590,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
+      <DiagnosisDraftNote part="case" gate={3} />
       {celebrate && (
         <PhaseCelebration
           gate={3}

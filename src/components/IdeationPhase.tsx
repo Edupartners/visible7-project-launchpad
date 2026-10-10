@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
@@ -241,6 +242,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
+      <DiagnosisDraftNote part="canvas" gate={2} />
       {celebrate && (
         <PhaseCelebration
           gate={2}

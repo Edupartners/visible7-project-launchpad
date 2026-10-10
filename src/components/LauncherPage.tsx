@@ -308,12 +308,14 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               ))}
             </ul>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
+              <Cta onClick={onAccessGranted}>Udělat rentgen nápadu</Cta>
               <a href="#jak" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
                 Jak to funguje
               </a>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">Brána 1 a 2 zdarma, bez platební karty.</p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Za 10 minut zjistíte, jestli nápad obstojí a kdy vás může uživit. Zdarma, bez platební karty.
+            </p>
           </div>
           <HeroJourney />
         </section>

@@ -5,6 +5,8 @@ import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
 import { PhaseCards } from "./PhaseCards";
 import { GrowthBadge } from "./GrowthBadge";
+import { DashboardJourney } from "./diagnosis/DashboardJourney";
+import { DIAGNOSIS_KEY } from "@/lib/diagnosis";
 import { AdvisorAvatar } from "./AdvisorsInline";
 import { ADVISORS } from "@/lib/advisors";
 import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
@@ -139,6 +141,7 @@ export const Dashboard = (_props: DashboardProps) => {
   const { currentProject } = useProject();
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const [watched, setWatched] = useSupabaseProgress<number[]>("watched_videos", []);
+  const [diagnosis, , { loading: diagnosisLoading }] = useSupabaseProgress<unknown>(DIAGNOSIS_KEY, null);
   const [certCount, setCertCount] = useState<number | null>(null);
   const [certified, setCertified] = useState<number[]>([]);
 
@@ -172,6 +175,9 @@ export const Dashboard = (_props: DashboardProps) => {
           </div>
         </header>
 
+        {/* Bez rentgenu na začátku cesty: rentgen je první krok */}
+        {!diagnosisLoading && !diagnosis && doneCount === 0 && <DashboardJourney prominent />}
+
         {/* Co dělat teď – jedna jasná akce */}
         {next && NextIcon ? (
           <section
@@ -183,7 +189,9 @@ export const Dashboard = (_props: DashboardProps) => {
                 {next.id}
               </span>
               <div>
-                <p className="text-sm font-semibold text-orange-700">{doneCount === 0 ? "Začněte tady" : "Na řadě"}</p>
+                <p className="text-sm font-semibold text-orange-700">
+                  {doneCount === 0 ? (diagnosis ? "Začněte tady" : "Potom") : "Na řadě"}
+                </p>
                 <h2 className="text-2xl font-bold tracking-tight">
                   Brána {next.id}: {GATE_NAMES[next.id]}
                 </h2>
@@ -210,6 +218,8 @@ export const Dashboard = (_props: DashboardProps) => {
             </div>
           </section>
         )}
+
+        {!diagnosisLoading && (diagnosis || doneCount > 0) && <DashboardJourney prominent={false} />}
 
         {/* Celá cesta */}
         <section aria-labelledby="cesta" className="space-y-4">
