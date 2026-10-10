@@ -116,7 +116,7 @@ const BENEFITS = [
 ];
 
 const INSIDE = [
-  { icon: PlayCircle, value: "62", label: "návodů krok za krokem s videem" },
+  { icon: PlayCircle, value: "50+", label: "videonávodů, kde je vidět každé kliknutí" },
   { icon: Sparkles, value: "7", label: "AI asistentů napojených na vaše čísla" },
   { icon: Calculator, value: "5", label: "kalkulaček: finanční plán, daně, PNO, cash-flow, nábor" },
   { icon: Layers, value: "13", label: "typů online byznysu s hotovým postupem" },
