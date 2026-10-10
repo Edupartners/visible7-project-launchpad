@@ -8,6 +8,7 @@ import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import {
   ArrowRight,
+  Award,
   BarChart3,
   Calculator,
   Check,
@@ -22,6 +23,7 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  Users,
   Wrench,
 } from "lucide-react";
 
@@ -88,6 +90,36 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     tags: ["Výpočet"],
     sample: "Osvědčení VISIBLE7 Gold",
   },
+];
+
+const BENEFITS = [
+  {
+    icon: Rocket,
+    title: "Vlastní fungující projekt",
+    text: "Web nebo e-shop, finanční plán a první zákazníci. Ne jen teorie.",
+  },
+  {
+    icon: Award,
+    title: "7 osvědčení a cesta ke státní kvalifikaci",
+    text: "Osvědčení za každou bránu. Po bráně 4 zkouška NSK Specialista internetového obchodu.",
+  },
+  {
+    icon: Users,
+    title: "Podpora profesionálů",
+    text: `${ADVISORS.length} seniorních poradců z praxe, když se zaseknete.`,
+  },
+  {
+    icon: Sparkles,
+    title: "AI, která zná váš projekt",
+    text: "Navrhne texty, čísla i pitch z vašich vlastních dat.",
+  },
+];
+
+const INSIDE = [
+  { icon: PlayCircle, value: "62", label: "návodů krok za krokem s videem" },
+  { icon: Sparkles, value: "7", label: "AI asistentů napojených na vaše čísla" },
+  { icon: Calculator, value: "5", label: "kalkulaček: finanční plán, daně, PNO, cash-flow, nábor" },
+  { icon: Layers, value: "13", label: "typů online byznysu s hotovým postupem" },
 ];
 
 const MYTHS = [
@@ -260,9 +292,21 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Postavte online byznys podle plánu, ne&nbsp;podle pocitu.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Aplikace vás provede sedmi branami od nápadu po první zákazníky. AI navrhne texty a čísla, videa ukážou,
-              kam kliknout, a finanční plán spočítá, kolik potřebujete a kdy začnete vydělávat.
+              Sedm bran od nápadu po první zákazníky. S AI, videonávody a poradci z praxe.
             </p>
+            <ul className="mt-7 grid max-w-xl grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+              {BENEFITS.map(({ icon: Icon, title, text }) => (
+                <li key={title} className="flex gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-bold leading-snug">{title}</span>
+                    <span className="block text-sm leading-snug text-muted-foreground">{text}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
               <a href="#jak" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
@@ -274,23 +318,27 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <HeroJourney />
         </section>
 
-        {/* Důvěra */}
+        {/* Co je uvnitř */}
         <section className="scroll-mt-20 px-3 py-2 sm:px-5">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
-            <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-y-6 px-4 py-8 sm:px-6 md:grid-cols-4">
-              {[
-                ["1 000+", "absolventů kurzů podnikání"],
-                ["14 let", "praxe v e-commerce a vzdělávání"],
-                ["15", "seniorních poradců z praxe"],
-                ["MŠMT a MPO", "akreditace Edu Partners"],
-              ].map(([v, l]) => (
-                <div key={l}>
-                  <dt className="sr-only">{l}</dt>
-                  <dd className="text-2xl font-extrabold tracking-tight text-primary">{v}</dd>
-                  <dd className="text-sm text-muted-foreground">{l}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
+                {INSIDE.map(({ icon: Icon, value, label }) => (
+                  <div key={label} className="flex items-start gap-3">
+                    <Icon className="mt-1 h-6 w-6 shrink-0 text-orange-600" aria-hidden="true" />
+                    <div>
+                      <dt className="sr-only">{label}</dt>
+                      <dd className="text-2xl font-extrabold tracking-tight text-primary">{value}</dd>
+                      <dd className="text-sm leading-snug text-muted-foreground">{label}</dd>
+                    </div>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">
+                Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, 14 let praxe v e-commerce a
+                vzdělávání, akreditace MŠMT a MPO.
+              </p>
+            </div>
           </div>
         </section>
 
