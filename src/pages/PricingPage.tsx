@@ -39,7 +39,7 @@ const PricingPage = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PublicHeader onStart={start} />
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 md:pt-20">
+        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
           <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
             Začněte zdarma. Plaťte, až budete chtít dál.
           </h1>
@@ -97,9 +97,9 @@ const PricingPage = () => {
           </p>
         </section>
 
-        <section className="px-3 py-2 sm:px-5">
+        <section className="px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-muted/50 py-16 md:py-20">
-            <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            <div className="mx-auto max-w-4xl px-4 sm:px-8 lg:px-12">
               <h2 className="text-3xl font-extrabold tracking-tight">Co je zdarma a co v placeném přístupu</h2>
               <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
                 <table className="w-full min-w-[520px] text-left">
@@ -143,7 +143,7 @@ const PricingPage = () => {
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:py-24">
+        <section className="mx-auto max-w-3xl px-4 py-16 sm:px-8 lg:px-12 md:py-24">
           <h2 className="text-3xl font-extrabold tracking-tight">Otázky k platbě</h2>
           <div className="mt-8 divide-y divide-border border-y border-border">
             {QA.map(([q, a]) => (

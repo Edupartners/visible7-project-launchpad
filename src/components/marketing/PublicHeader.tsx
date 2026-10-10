@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 /** Horní lišta veřejných stránek (úvod, ceník). */
 export const PublicHeader = ({ onStart }: { onStart: () => void }) => (
   <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
-    <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+    <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8 lg:px-12">
       <Link to="/" className="flex items-center gap-2.5">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white">
           V7

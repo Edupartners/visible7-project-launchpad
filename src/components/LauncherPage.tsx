@@ -294,7 +294,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
       <main id="top">
         {/* Hero */}
-        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-14 sm:px-6 md:pt-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
+        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-14 sm:px-8 lg:px-12 md:pt-20 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] xl:gap-16">
           <div>
             <h1 className="text-[2.6rem] font-extrabold leading-[1.05] tracking-[-0.035em] sm:text-6xl">
               Otestujte svůj podnikatelský nápad za&nbsp;10&nbsp;minut.
@@ -324,13 +324,15 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
             <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty.</p>
           </div>
-          <HeroJourney />
+          <div className="w-full max-w-xl xl:max-w-none">
+            <HeroJourney />
+          </div>
         </section>
 
         {/* Co je uvnitř */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
-            <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+            <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 lg:px-12">
               <dl className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
                 {INSIDE.map(({ icon: Icon, value, label }) => (
                   <div key={label} className="flex items-start gap-3">
@@ -352,7 +354,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Mýty */}
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28">
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-28">
           <div className="max-w-2xl">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
               Většinu nápadů nezabije trh, ale strach
@@ -374,9 +376,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Čím je jiná */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-28">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
               <div className="max-w-2xl">
                 <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
                   Metodika, AI, videa a finanční plán v jedné aplikaci
@@ -434,9 +436,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Proces: 7 bran */}
-        <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary py-20 text-white md:py-28">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
               <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
@@ -484,7 +486,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Výstupy */}
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28">
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-28">
           <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
             Na konci máte v ruce věci, které můžete ukázat
           </h2>
@@ -513,7 +515,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Reference */}
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-24">
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-24">
           <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-start">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Metodiku učíme deset let</h2>
@@ -559,9 +561,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Poradci */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 md:grid-cols-[1fr_1.1fr]">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
               <div>
                 <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
                   Když se zaseknete, zavoláte člověku
@@ -593,9 +595,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Profesní kvalifikace NSK */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-[hsl(var(--gate-copper))] text-white">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1.3fr_1fr] md:py-20">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.3fr_1fr] md:py-20">
               <div>
                 <p className="font-semibold text-white/80">Navíc po bráně 4</p>
                 <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -633,7 +635,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Ceník – krátce, celý ceník je na /cenik */}
-        <section id="cenik" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 md:py-28">
+        <section id="cenik" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 lg:px-12 md:py-28">
           <div className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -663,7 +665,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
         {/* Autor */}
         <section className="border-t border-border">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-6 md:grid-cols-[0.8fr_1.2fr] md:py-24">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-8 lg:px-12 md:grid-cols-[0.8fr_1.2fr] md:py-24">
             <img
               src="https://www.edu-partners.cz/wp-content/uploads/2026/05/michal_micek_edu-scaled-1-1024x766.jpeg"
               alt="Michal Míček"
@@ -692,9 +694,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Otázky */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
-            <div className="mx-auto max-w-3xl px-4 sm:px-6">
+            <div className="mx-auto max-w-3xl px-4 sm:px-8 lg:px-12">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Časté otázky</h2>
               <div className="mt-10 divide-y divide-border border-y border-border">
                 {FAQ.map(([q, a]) => (
@@ -714,9 +716,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Závěr */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary text-white">
-            <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 md:py-28">
+            <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-8 lg:px-12 md:py-28">
               <p className="text-lg text-white/60">Fortuna audaces iuvat</p>
               <h2 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
                 Štěstí přeje odvážným. A připraveným.
