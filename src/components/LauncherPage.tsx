@@ -8,6 +8,7 @@ import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import {
   ArrowRight,
+  AlertTriangle,
   Award,
   BarChart3,
   Calculator,
@@ -17,9 +18,11 @@ import {
   Layers,
   Lightbulb,
   Linkedin,
+  MessageSquareText,
   Minus,
   PlayCircle,
   Rocket,
+  ScanLine,
   Sparkles,
   Target,
   TrendingUp,
@@ -161,6 +164,14 @@ const OUTPUTS = [
 
 const FAQ = [
   [
+    "Je rentgen nápadu opravdu zdarma?",
+    "Ano. Stačí registrace e-mailem, platební kartu nezadáváte. Zdarma jsou i brány 1 a 2.",
+  ],
+  [
+    "Jak přesný je výsledek rentgenu?",
+    "Je to první odhad z vašich odpovědí a obvyklých čísel v oboru, ne záruka. Ukáže, kde je nápad silný a co ověřit jako první. Se skutečnými čísly v bráně 3 se zpřesní.",
+  ],
+  [
     "Musím umět programovat?",
     "Ne. Aplikace počítá s tím, že web nebo e-shop postavíte v hotovém nástroji. Videa ukazují každé kliknutí.",
   ],
@@ -181,6 +192,119 @@ const TAG_STYLE: Record<Tag, string> = {
   Video: "bg-sky-100 text-sky-800",
   Výpočet: "bg-emerald-100 text-emerald-800",
 };
+
+const RENTGEN_DEMO = {
+  name: "Keramika z Beskyd",
+  verdict: "Dává smysl. Nejdřív ověřte cenu a zájem.",
+  stats: [
+    ["Potřebný kapitál", "35 000 Kč"],
+    ["Bod zvratu", "3. měsíc"],
+    ["Tržby na výplatu", "78 000 Kč/měs."],
+  ],
+  map: [
+    ["A", "Dnes", "nápad"],
+    ["B", "10 zákazníků", "4. měsíc"],
+    ["C", "Živí mě to", "16.–24. měs."],
+    ["D", "Roste to", "3. rok"],
+  ],
+  risk: "Cena nepokryje čas výroby. Ověřte: 10 hrnků přes Instagram za plnou cenu.",
+};
+
+/** Ukázka výsledku rentgenu: části se po načtení postupně „prosvítí“. */
+const HeroRentgen = () => {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setShown(4);
+      return;
+    }
+    const timers = [1, 2, 3, 4].map((n) => setTimeout(() => setShown(n), 400 + n * 650));
+    return () => timers.forEach(clearTimeout);
+  }, []);
+  const reveal = (n: number) =>
+    `transition-all duration-700 ${shown >= n ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`;
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-[28px] bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-7"
+      aria-label="Ukázka výsledku rentgenu nápadu"
+    >
+      {shown < 4 && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-24 animate-[scan_2.6s_ease-in-out_infinite] bg-gradient-to-b from-transparent via-orange-400/20 to-transparent"
+        />
+      )}
+      <div className="flex items-center justify-between gap-3">
+        <p className="flex items-center gap-2 text-sm font-semibold text-white/70">
+          <ScanLine className="h-4 w-4 text-orange-300" /> Rentgen nápadu
+        </p>
+        <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-white/70">ukázka</span>
+      </div>
+      <p className="mt-3 text-2xl font-extrabold tracking-tight">{RENTGEN_DEMO.name}</p>
+
+      <div className={`mt-4 ${reveal(1)}`}>
+        <span className="inline-flex items-center gap-2 rounded-full bg-orange-400/15 px-3 py-1 text-sm font-semibold text-orange-200 ring-1 ring-orange-400/40">
+          <span className="h-2.5 w-2.5 rounded-full bg-orange-400" /> Oranžová: nejdřív ověřit
+        </span>
+        <p className="mt-2 font-semibold">{RENTGEN_DEMO.verdict}</p>
+      </div>
+
+      <dl className={`mt-5 grid grid-cols-3 gap-2 ${reveal(2)}`}>
+        {RENTGEN_DEMO.stats.map(([l, v]) => (
+          <div key={l} className="rounded-xl bg-white/[0.07] p-3">
+            <dt className="text-[11px] leading-tight text-white/60">{l}</dt>
+            <dd className="mt-1 text-sm font-extrabold sm:text-base">{v}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <ol className={`relative mt-5 grid grid-cols-4 gap-1 ${reveal(3)}`} aria-label="Mapa cesty A až D">
+        <span aria-hidden="true" className="absolute left-[12.5%] right-[12.5%] top-4 h-0.5 bg-white/20" />
+        {RENTGEN_DEMO.map.map(([id, t, m]) => (
+          <li key={id} className="relative flex flex-col items-center text-center">
+            <span
+              className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-extrabold ${
+                id === "A"
+                  ? "bg-emerald-500"
+                  : id === "C"
+                    ? "bg-orange-500 ring-4 ring-orange-500/30"
+                    : "border-2 border-white/40 bg-primary"
+              }`}
+            >
+              {id}
+            </span>
+            <span className="mt-1.5 text-xs font-semibold leading-tight">{t}</span>
+            <span className={`text-[11px] ${id === "C" ? "font-semibold text-orange-300" : "text-white/60"}`}>{m}</span>
+          </li>
+        ))}
+      </ol>
+
+      <p className={`mt-5 flex gap-2 rounded-xl bg-white/[0.07] p-3 text-sm text-white/80 ${reveal(4)}`}>
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-300" /> {RENTGEN_DEMO.risk}
+      </p>
+    </div>
+  );
+};
+
+const STEPS = [
+  {
+    icon: MessageSquareText,
+    title: "Popíšete nápad",
+    text: "Čtyři otázky: co, pro koho, kolik času a peněz do toho dáte a co umíte. Stačí pár vět.",
+  },
+  {
+    icon: ScanLine,
+    title: "AI udělá rentgen",
+    text: "Upřímný verdikt, potřebný kapitál, bod zvratu, 3 největší rizika a mapa: kdy první zákazníci a kdy vás projekt uživí.",
+  },
+  {
+    icon: Rocket,
+    title: "Postavíte ho v 7 branách",
+    text: "Výsledek se propíše do aplikace. Projdete brány krok za krokem s videi, kalkulačkami a poradci.",
+  },
+];
 
 /** Živá ukázka cesty: brány se po načtení postupně otevírají. */
 const HeroJourney = () => {
@@ -288,36 +412,69 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         {/* Hero */}
         <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-14 sm:px-6 md:pt-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
           <div>
-            <h1 className="text-[2.6rem] font-extrabold leading-[1.05] tracking-[-0.035em] sm:text-6xl">
-              Postavte online byznys podle plánu, ne&nbsp;podle pocitu.
+            <p className="inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-800">
+              <ScanLine className="h-4 w-4" /> Rentgen nápadu · zdarma · 10 minut
+            </p>
+            <h1 className="mt-5 text-[2.6rem] font-extrabold leading-[1.05] tracking-[-0.035em] sm:text-6xl">
+              Otestujte svůj podnikatelský nápad za&nbsp;10&nbsp;minut.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Sedm bran od nápadu po první zákazníky. S AI, videonávody a poradci z praxe.
+              Odpovíte na 4 otázky a AI vám řekne, jestli nápad obstojí, kolik bude stát a kdy vás může uživit. Pak ho s
+              vámi postavíme krok za krokem.
             </p>
-            <ul className="mt-7 grid max-w-xl grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-              {BENEFITS.map(({ icon: Icon, title, text }) => (
-                <li key={title} className="flex gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700">
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block font-bold leading-snug">{title}</span>
-                    <span className="block text-sm leading-snug text-muted-foreground">{text}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Cta onClick={onAccessGranted}>Udělat rentgen nápadu</Cta>
+              <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
               <a href="#jak" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
                 Jak to funguje
               </a>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Za 10 minut zjistíte, jestli nápad obstojí a kdy vás může uživit. Zdarma, bez platební karty.
-            </p>
+            <p className="mt-4 text-sm text-muted-foreground">Bez platební karty. Upřímný verdikt, žádné lichocení.</p>
           </div>
-          <HeroJourney />
+          <HeroRentgen />
+        </section>
+
+        {/* Jak to funguje */}
+        <section id="jak" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-20 sm:px-6">
+          <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Od nápadu k plánu ve třech krocích
+          </h2>
+          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+            {STEPS.map(({ icon: Icon, title, text }, i) => (
+              <li key={title} className="rounded-3xl border border-border bg-card p-6">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <Icon className="h-6 w-6 text-orange-600" aria-hidden="true" />
+                </div>
+                <h3 className="mt-4 text-xl font-bold">{title}</h3>
+                <p className="mt-2 leading-relaxed text-muted-foreground">{text}</p>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-16 grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+            <div>
+              <h3 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Když budete pokračovat, získáte</h3>
+              <ul className="mt-6 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                {BENEFITS.map(({ icon: Icon, title, text }) => (
+                  <li key={title} className="flex gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-bold leading-snug">{title}</span>
+                      <span className="block text-sm leading-snug text-muted-foreground">{text}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8">
+                <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
+              </div>
+            </div>
+            <HeroJourney />
+          </div>
         </section>
 
         {/* Co je uvnitř */}
@@ -427,7 +584,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Proces: 7 bran */}
-        <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-5">
+        <section id="brany" className="scroll-mt-20 px-3 py-2 sm:px-5">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary py-20 text-white md:py-28">
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
               <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
@@ -715,11 +872,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Štěstí přeje odvážným. A připraveným.
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-lg text-white/70">
-                Projděte první dvě brány zdarma a uvidíte, jestli má váš nápad místo na trhu.
+                Za 10 minut zjistíte, jestli má váš nápad místo na trhu. Zdarma.
               </p>
               <div className="mt-10">
                 <Cta onClick={onAccessGranted} light>
-                  Začít zdarma
+                  Otestovat nápad zdarma
                 </Cta>
               </div>
               <p className="mt-6 text-sm text-white/50">

@@ -31,7 +31,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => (
           onClick={onStart}
           className="whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-white hover:bg-[hsl(var(--primary-hover))]"
         >
-          Začít zdarma
+          Otestovat nápad
         </button>
       </nav>
     </div>
