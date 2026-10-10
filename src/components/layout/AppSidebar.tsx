@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Award, Check, FolderOpen, LogOut, Menu, Plus, Settings, Users, X } from "lucide-react";
+import { Award, Check, FolderOpen, LogOut, Menu, Plus, Settings, ShieldCheck, Users, X } from "lucide-react";
+import { useIsAdmin } from "@/lib/admin";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/AuthGate";
@@ -16,6 +17,7 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
   const email = user?.email ?? "";
+  const isAdmin = useIsAdmin();
 
   const go = (path: string) => {
     navigate(path);
@@ -131,6 +133,17 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
               <Award className="h-4 w-4 text-muted-foreground" /> Moje osvědčení
             </button>
           </li>
+          {isAdmin && (
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/admin")}
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-foreground/80 hover:bg-muted"
+              >
+                <ShieldCheck className="h-4 w-4 text-muted-foreground" /> Administrace
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
 

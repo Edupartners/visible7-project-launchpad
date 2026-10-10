@@ -24,6 +24,7 @@ import CertificatePage from "./pages/CertificatePage";
 import AdvisorsPage from "./pages/AdvisorsPage";
 import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
+import AdminPage from "./pages/AdminPage";
 import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const ProtectedRoutes = () => (
       <Route path="/profile" element={<Navigate to="/settings" replace />} />
       <Route path="/poradci" element={<AdvisorsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/admin" element={<AdminPage />} />
       <Route path="/vision" element={<VisionPage />} />
       <Route path="/ideation" element={<IdeationPage />} />
       <Route path="/strategy" element={<StrategyPage />} />
