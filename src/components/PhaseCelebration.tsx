@@ -1,3 +1,4 @@
+import { QuizRepeatLink } from "@/components/quiz/QuizCards";
 import { useEffect, useState } from "react";
 import { CertificateIssueDialog } from "@/components/CertificateIssueDialog";
 import confetti from "canvas-confetti";
@@ -50,6 +51,7 @@ export const PhaseCelebration = ({ gate, title, message, nextLabel, onNext, onHo
             <Award className="mr-2 h-4 w-4" />
             Získat osvědčení za fázi {gate}
           </Button>
+          <QuizRepeatLink gate={gate} />
           <Button variant="ghost" className="h-12 rounded-[10px]" onClick={onHome}>
             Zpět na přehled
           </Button>

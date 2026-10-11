@@ -26,6 +26,7 @@ import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
 import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
+import QuizPage from "./pages/QuizPage";
 import { GateLock, PremiumGate } from "@/components/access/Locks";
 import { PRIVACY, TERMS } from "./lib/legal";
 
@@ -41,6 +42,7 @@ const ProtectedRoutes = () => (
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/rentgen" element={<RentgenPage />} />
+      <Route path="/kviz" element={<QuizPage />} />
       <Route path="/vision" element={<VisionPage />} />
       <Route path="/ideation" element={<IdeationPage />} />
       <Route

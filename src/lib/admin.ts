@@ -169,3 +169,61 @@ export const EVENT_LABELS: Record<string, string> = {
   advisor_click: "Kontakt na poradce",
   nsk_interest: "Zájem o zkoušku NSK",
 };
+
+/** Kdo jsou uživatelé – rozložení odpovědí z kvízu (poslední vstupní pokus každého uživatele). */
+export interface QuizStats {
+  respondents: number;
+  research_consents: number;
+  repeated: number;
+  dims: Record<string, { value: string; count: number }[]>;
+}
+
+export const loadQuizStats = async (): Promise<QuizStats> => {
+  const { data, error } = await supabase.rpc("admin_quiz_stats");
+  if (error) throw error;
+  return data as QuizStats;
+};
+
+interface ResearchRow {
+  respondent: string;
+  stage: string;
+  day: string;
+  version: string;
+  answers: Record<string, string | number> | null;
+  result: { type?: string; barrier?: string; barrierScore?: number; scores?: Record<string, number> } | null;
+  gates_done: number[] | null;
+}
+
+/** Pseudonymizovaný export pro výzkum – jen uživatelé se souhlasem, bez jmen a e-mailů. */
+export async function researchCsv() {
+  const { data, error } = await supabase.rpc("admin_research_export");
+  if (error) throw error;
+  const rows = (data ?? []) as ResearchRow[];
+  const answerKeys = Array.from(new Set(rows.flatMap((r) => Object.keys(r.answers ?? {})))).sort();
+  const scoreKeys = Array.from(new Set(rows.flatMap((r) => Object.keys(r.result?.scores ?? {})))).sort();
+  const head = [
+    "respondent",
+    "etapa",
+    "datum",
+    "verze",
+    ...answerKeys,
+    "typ",
+    "bariera",
+    ...scoreKeys.map((k) => `skore_${k}`),
+    "splnene_brany",
+    "pocet_bran",
+  ];
+  const lines = rows.map((r) => [
+    r.respondent,
+    r.stage,
+    r.day,
+    r.version,
+    ...answerKeys.map((k) => r.answers?.[k]),
+    r.result?.type,
+    r.result?.barrier,
+    ...scoreKeys.map((k) => r.result?.scores?.[k]),
+    (r.gates_done ?? []).sort((a, b) => a - b).join(" "),
+    (r.gates_done ?? []).length,
+  ]);
+  return { csv: "﻿" + [head, ...lines].map((l) => l.map(csvCell).join(";")).join("\r\n"), count: rows.length };
+}

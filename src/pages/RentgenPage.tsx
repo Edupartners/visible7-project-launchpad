@@ -1,3 +1,4 @@
+import { QuizBonusCard } from "@/components/quiz/QuizCards";
 import { track } from "@/lib/track";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -237,6 +238,8 @@ export const DiagnosisResult = ({
           </div>
         </div>
       </section>
+
+      <QuizBonusCard />
 
       <section className="flex flex-col items-start gap-5 rounded-3xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>

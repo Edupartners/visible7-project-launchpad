@@ -15,10 +15,14 @@ import {
   adminStats,
   daysAgo,
   loadAdminOverview,
+  QuizStats,
   loadEventStats,
+  loadQuizStats,
+  researchCsv,
   useIsAdmin,
   usersCsv,
 } from "@/lib/admin";
+import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
 
 type Filter = "vse" | "aktivni" | "platici" | "klub";
 const FILTERS: { id: Filter; label: string }[] = [
@@ -100,6 +104,7 @@ const AdminPage = () => {
   const isAdmin = useIsAdmin();
   const [data, setData] = useState<AdminOverview | null>(null);
   const [events, setEvents] = useState<EventStats | null>(null);
+  const [quiz, setQuiz] = useState<QuizStats | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
@@ -110,9 +115,14 @@ const AdminPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const [overview, ev] = await Promise.all([loadAdminOverview(), loadEventStats(30).catch(() => null)]);
+      const [overview, ev, qs] = await Promise.all([
+        loadAdminOverview(),
+        loadEventStats(30).catch(() => null),
+        loadQuizStats().catch(() => null),
+      ]);
       setData(overview);
       setEvents(ev);
+      setQuiz(qs);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Načtení se nepodařilo.");
     } finally {
@@ -245,6 +255,8 @@ const AdminPage = () => {
                 )}
               </section>
             )}
+
+            {quiz && <AudienceSection quiz={quiz} />}
 
             <section className="space-y-3">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -418,3 +430,103 @@ const AdminPage = () => {
 };
 
 export default AdminPage;
+
+const DIMS: { id: string; title: string }[] = [
+  { id: "gender", title: "Pohlaví" },
+  { id: "age", title: "Věk" },
+  { id: "region", title: "Kraj" },
+  { id: "education", title: "Vzdělání" },
+  { id: "status", title: "Co teď dělají" },
+  { id: "type", title: "Typ podnikatele" },
+  { id: "barrier", title: "Hlavní brzda" },
+];
+
+const optionLabel = (dim: string, value: string) => {
+  if (dim === "type") return TYPES[value as keyof typeof TYPES]?.name ?? value;
+  if (dim === "barrier") return BARRIERS[value as keyof typeof BARRIERS]?.name ?? value;
+  const q = ROUNDS[0].questions.find((x) => x.id === dim);
+  return q?.options?.find((o) => o.value === value)?.label ?? value;
+};
+
+function AudienceSection({ quiz }: { quiz: QuizStats }) {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const exportResearch = async () => {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { csv, count } = await researchCsv();
+      if (!count) {
+        setMsg("Zatím nikdo nedal souhlas s použitím odpovědí pro výzkum.");
+        return;
+      }
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `visible7-vyzkum-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "Export se nepodařil.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold">Kdo jsou uživatelé</h2>
+          <p className="text-sm text-muted-foreground">
+            Z kvízu „Jaký jste typ podnikatele“: {quiz.respondents} vyplnilo, {quiz.research_consents} souhlasí s
+            výzkumem, {quiz.repeated} zopakovalo po bráně.
+          </p>
+        </div>
+        <Button variant="outline" className="rounded-[10px]" onClick={exportResearch} disabled={busy}>
+          <Download className="mr-2 h-4 w-4" /> Export pro výzkum (CSV)
+        </Button>
+      </div>
+      {msg && <p className="mt-3 text-sm text-muted-foreground">{msg}</p>}
+      {quiz.respondents === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">Kvíz zatím nikdo nevyplnil.</p>
+      ) : (
+        <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {DIMS.map((d) => {
+            const vals = quiz.dims[d.id] ?? [];
+            const total = vals.reduce((s, v) => s + v.count, 0) || 1;
+            return (
+              <div key={d.id}>
+                <h3 className="text-sm font-semibold">{d.title}</h3>
+                <ul className="mt-2 space-y-1.5">
+                  {vals.map((v) => (
+                    <li
+                      key={v.value}
+                      className="grid grid-cols-[minmax(0,8rem)_minmax(0,1fr)_4.5rem] items-center gap-2 text-xs"
+                    >
+                      <span className="truncate">{optionLabel(d.id, v.value)}</span>
+                      <span className="h-2 overflow-hidden rounded-full bg-muted">
+                        <span
+                          className="block h-full rounded-full bg-primary"
+                          style={{ width: `${(v.count / total) * 100}%` }}
+                        />
+                      </span>
+                      <span className="whitespace-nowrap text-right tabular-nums">
+                        {v.count}{" "}
+                        <span className="text-muted-foreground">({Math.round((v.count / total) * 100)} %)</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <p className="mt-4 text-xs text-muted-foreground">
+        Export obsahuje jen lidi se souhlasem, místo jména pseudonym. Přehled nahoře počítá všechny vyplněné kvízy.
+      </p>
+    </section>
+  );
+}

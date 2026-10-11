@@ -1,3 +1,4 @@
+import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -221,6 +222,7 @@ export const Dashboard = (_props: DashboardProps) => {
         )}
 
         {!diagnosisLoading && (diagnosis || doneCount > 0) && <DashboardJourney prominent={false} />}
+        {!diagnosisLoading && (diagnosis || doneCount > 0) && <QuizDashboardCard />}
 
         {/* Celá cesta */}
         <section aria-labelledby="cesta" className="space-y-4">

@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/visible7/client";
 import { LEGAL_VERSION } from "@/lib/legal";
 
-export type ConsentKind = "podminky" | "zasady" | "klub" | "marketing";
+export type ConsentKind = "podminky" | "zasady" | "klub" | "marketing" | "vyzkum";
 
 export interface ConsentState {
   kind: ConsentKind;
