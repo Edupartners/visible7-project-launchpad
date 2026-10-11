@@ -2,8 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { ArrowRight, Mail, Eye, EyeOff, User, Users, Star, TrendingUp, Shield, Clock, Award } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Mail, User } from "lucide-react";
 import { supabase } from "@/integrations/visible7/client";
 import { ConsentFields, ConsentValues } from "@/components/ConsentFields";
 import { LEGAL_VERSION } from "@/lib/legal";
@@ -25,7 +24,8 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  // Z výzev „Otestovat nápad“ přichází nový uživatel (?novy) – rovnou registrace.
+  const [isLogin, setIsLogin] = useState(() => !new URLSearchParams(window.location.search).has("novy"));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -119,262 +119,218 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
     );
   };
 
+  const tab = (login: boolean, label: string) => (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={isLogin === login}
+      onClick={() => setIsLogin(login)}
+      className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+        isLogin === login ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16 animate-fade-in">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-primary mb-6">
-                <span className="text-3xl font-bold text-primary-foreground">V7</span>
-              </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                7 kroků k úspěšnému <br />
-                <span className="text-primary">online podnikání</span>
-              </h1>
-              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Projděte si ověřenou metodiku VISIBLE7 a vybudujte prosperující online byznys
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById("register")?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="btn-apple px-8 py-3 text-base relative z-50"
-                >
-                  Začít zdarma
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6 mb-12">
-                <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-semibold text-sm">Strukturovaný postup</h3>
-                    <p className="text-xs text-muted-foreground">7 kroků od vize k expanzi</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-semibold text-sm">Úspora času</h3>
-                    <p className="text-xs text-muted-foreground">Vše na jednom místě</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-semibold text-sm">Ověřená metodika</h3>
-                    <p className="text-xs text-muted-foreground">VISIBLE7 MICEK</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="grid min-h-screen bg-background lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      {/* Levý panel: proč se registrovat (na mobilu skrytý, formulář je hned nahoře) */}
+      <aside className="hidden flex-col justify-between bg-primary p-10 text-white lg:flex xl:p-14">
+        <Link to="/" className="flex items-center gap-2.5 self-start font-bold">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-sm text-primary">V7</span>
+          VISIBLE7 <span className="font-normal text-white/70">MICEK™</span>
+        </Link>
+        <div className="max-w-md">
+          <h1 className="text-4xl font-extrabold leading-tight tracking-tight">
+            {isLogin ? "Vítejte zpátky." : "Otestujte svůj nápad za 10 minut."}
+          </h1>
+          <p className="mt-4 text-lg text-white/75">
+            {isLogin
+              ? "Pokračujte tam, kde jste skončili. Váš projekt i všechna čísla na vás čekají."
+              : "Po registraci vás čeká Rentgen nápadu: 4 otázky, upřímný verdikt AI a mapa cesty k prvním zákazníkům."}
+          </p>
+          {!isLogin && (
+            <ul className="mt-8 space-y-3">
+              {[
+                "Rentgen nápadu a brány 1 a 2 zdarma",
+                "Bez platební karty",
+                "Data uložená v EU",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </div>
+        <p className="text-sm text-white/50">Metodika VISIBLE7 MICEK™ · Edu Partners s.r.o.</p>
+      </aside>
 
-      {/* Registration / Login Form */}
-      <div className="flex items-center justify-center p-4" id="register">
-        <div className="w-full max-w-md animate-fade-in">
-          <Card className="card-apple p-8">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">
-                {isLogin ? "Přihlaste se" : "Začněte svou cestu"}
-              </h2>
-              <p className="text-muted-foreground">
-                {isLogin ? "Vstupte do své VISIBLE7 aplikace" : "Zaregistrujte se a získejte plný přístup zdarma"}
-              </p>
-            </div>
+      {/* Formulář */}
+      <main className="flex flex-col px-5 py-6 sm:px-8 lg:justify-center lg:px-12">
+        <div className="flex items-center justify-between lg:hidden">
+          <Link to="/" className="flex items-center gap-2 font-bold">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs text-white">
+              V7
+            </span>
+            VISIBLE7
+          </Link>
+        </div>
+        <div className="mx-auto w-full max-w-md py-8 lg:py-0">
+          <Link
+            to="/"
+            className="mb-8 hidden items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground lg:inline-flex"
+          >
+            <ArrowLeft className="h-4 w-4" /> Zpět na úvodní stránku
+          </Link>
+          <div role="tablist" aria-label="Přihlášení nebo registrace" className="flex gap-1 rounded-xl bg-muted p-1">
+            {tab(false, "Jsem tu poprvé")}
+            {tab(true, "Mám účet")}
+          </div>
+          <h2 className="mt-8 text-2xl font-extrabold tracking-tight">
+            {isLogin ? "Přihlaste se" : "Vytvořte si účet zdarma"}
+          </h2>
+          <p className="mt-1 text-muted-foreground">
+            {isLogin
+              ? "E-mail a heslo, které jste zadali při registraci."
+              : "Zabere to minutu. Pak hned začnete rentgen nápadu."}
+          </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {!isLogin && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Křestní jméno</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input
-                        type="text"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Jan"
-                        className="pl-10 h-12 rounded-xl border-border/50 focus:border-primary"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Příjmení</label>
+          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            {!isLogin && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Křestní jméno</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
                       type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Novák"
-                      className="h-12 rounded-xl border-border/50 focus:border-primary"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="Jan"
+                      className="pl-10 h-12 rounded-xl border-border/50 focus:border-primary"
                       required
                     />
                   </div>
                 </div>
-              )}
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">E-mailová adresa</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="vas-email@example.com"
-                    className="pl-10 h-12 rounded-xl border-border/50 focus:border-primary"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Heslo</label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={isLogin ? "Zadejte heslo" : "Minimálně 6 znaků"}
-                    className="h-12 rounded-xl border-border/50 focus:border-primary pr-10"
-                    required
-                    minLength={isLogin ? undefined : 6}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {!isLogin && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground" htmlFor="reg-phone">
-                    Telefon <span className="font-normal text-muted-foreground">(nepovinné)</span>
-                  </label>
+                  <label className="text-sm font-medium text-foreground">Příjmení</label>
                   <Input
-                    id="reg-phone"
-                    type="tel"
-                    autoComplete="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+420 777 123 456"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Novák"
                     className="h-12 rounded-xl border-border/50 focus:border-primary"
+                    required
                   />
                 </div>
-              )}
+              </div>
+            )}
 
-              {!isLogin && <ConsentFields value={consents} onChange={setConsents} />}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">E-mailová adresa</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="vas-email@example.com"
+                  className="pl-10 h-12 rounded-xl border-border/50 focus:border-primary"
+                  required
+                />
+              </div>
+            </div>
 
-              {isLogin && (
-                <div className="text-right -mt-3">
-                  <button
-                    type="button"
-                    onClick={handleForgotPassword}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Zapomněli jste heslo?
-                  </button>
-                </div>
-              )}
-
-              <div className="text-center">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Heslo</label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={isLogin ? "Zadejte heslo" : "Minimálně 6 znaků"}
+                  className="h-12 rounded-xl border-border/50 focus:border-primary pr-10"
+                  required
+                  minLength={isLogin ? undefined : 6}
+                />
                 <button
                   type="button"
-                  onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {isLogin ? "Nemáte účet? Zaregistrujte se" : "Už máte účet? Přihlaste se"}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-
-              <Button
-                type="submit"
-                className="btn-apple w-full h-12 text-base"
-                disabled={
-                  isSubmitting ||
-                  !email ||
-                  (isLogin && !password) ||
-                  (!isLogin && (!firstName || !lastName || !consents.terms))
-                }
-              >
-                {isSubmitting ? (
-                  <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
-                ) : (
-                  <>
-                    {isLogin ? "Přihlásit se" : "Pokračovat"}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </>
-                )}
-              </Button>
-            </form>
-          </Card>
-
-          {isLogin && (
-            <div className="mt-8">
-              <Card className="p-6 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground italic">
-                    "VISIBLE7 mi pomohla strukturovat celé podnikání od nuly."
-                  </p>
-                </div>
-              </Card>
             </div>
-          )}
 
-          <div className="text-center mt-8 text-apple-body">
-            <div className="flex items-center justify-center gap-6 mb-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Users className="w-3 h-3" />
-                <span>Komunita podnikatelů</span>
+            {!isLogin && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground" htmlFor="reg-phone">
+                  Telefon <span className="font-normal text-muted-foreground">(nepovinné)</span>
+                </label>
+                <Input
+                  id="reg-phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+420 777 123 456"
+                  className="h-12 rounded-xl border-border/50 focus:border-primary"
+                />
               </div>
-              <div className="flex items-center gap-1">
-                <Award className="w-3 h-3" />
-                <span>Ověřená metoda</span>
+            )}
+
+            {!isLogin && <ConsentFields value={consents} onChange={setConsents} />}
+
+            {isLogin && (
+              <div className="text-right -mt-3">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Zapomněli jste heslo?
+                </button>
               </div>
-              <div className="flex items-center gap-1">
-                <Shield className="w-3 h-3" />
-                <span>100% bezpečné</span>
-              </div>
-            </div>
-            <p className="text-xs">
-              <Link to="/podminky" className="text-primary hover:text-primary/80">
-                Podmínky užívání
-              </Link>
-              {" · "}
-              <Link to="/ochrana-osobnich-udaju" className="text-primary hover:text-primary/80">
-                Ochrana osobních údajů
-              </Link>
-            </p>
-          </div>
+            )}
+
+            <Button
+              type="submit"
+              className="btn-apple w-full h-12 text-base"
+              disabled={
+                isSubmitting ||
+                !email ||
+                (isLogin && !password) ||
+                (!isLogin && (!firstName || !lastName || !consents.terms))
+              }
+            >
+              {isSubmitting ? (
+                <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+              ) : (
+                <>
+                  {isLogin ? "Přihlásit se" : "Vytvořit účet zdarma"}
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </>
+              )}
+            </Button>
+          </form>
+
+          <p className="mt-8 text-center text-xs text-muted-foreground">
+            <Link to="/podminky" className="hover:text-foreground hover:underline">
+              Podmínky užívání
+            </Link>
+            {" · "}
+            <Link to="/ochrana-osobnich-udaju" className="hover:text-foreground hover:underline">
+              Ochrana osobních údajů
+            </Link>
+          </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

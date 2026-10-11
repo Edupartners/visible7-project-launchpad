@@ -19,13 +19,9 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => (
         <Link to="/cenik" className="hidden rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground md:block">
           Ceník
         </Link>
-        <button
-          type="button"
-          onClick={onStart}
-          className="rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground"
-        >
+        <Link to="/home" className="rounded-lg px-3 py-2 text-muted-foreground hover:text-foreground">
           Přihlásit
-        </button>
+        </Link>
         <button
           type="button"
           onClick={onStart}

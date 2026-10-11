@@ -30,7 +30,7 @@ const QA = [
 /** Veřejná stránka s ceníkem. */
 const PricingPage = () => {
   const navigate = useNavigate();
-  const start = () => navigate("/home");
+  const start = () => navigate("/home?novy");
   useEffect(() => {
     document.title = "Ceník | VISIBLE7 MICEK";
   }, []);
