@@ -132,3 +132,33 @@ export function usersCsv(users: AdminUser[]) {
   ]);
   return "﻿" + [head, ...rows].map((r) => r.map(csvCell).join(";")).join("\r\n");
 }
+
+export interface EventStats {
+  days: number;
+  events: { name: string; count: number; users: number }[];
+  daily: { day: string; users: number }[];
+}
+
+export const loadEventStats = async (days = 30): Promise<EventStats> => {
+  const { data, error } = await supabase.rpc("admin_event_stats", { p_days: days });
+  if (error) throw error;
+  return data as EventStats;
+};
+
+/** Srozumitelné názvy událostí pro přehled. */
+export const EVENT_LABELS: Record<string, string> = {
+  signup: "Registrace",
+  session_start: "Návštěva aplikace",
+  rentgen_start: "Rentgen spuštěn",
+  rentgen_done: "Rentgen dokončen",
+  rentgen_error: "Rentgen selhal",
+  gate_start: "Brána otevřena",
+  gate_complete: "Brána dokončena",
+  ai_call: "Volání AI",
+  video_play: "Přehrání videa",
+  excel_export: "Export do Excelu",
+  pitch_pdf: "Pitch stažen do PDF",
+  certificate_issued: "Osvědčení vydáno",
+  advisor_click: "Kontakt na poradce",
+  nsk_interest: "Zájem o zkoušku NSK",
+};

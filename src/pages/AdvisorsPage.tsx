@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
@@ -55,7 +56,10 @@ const AdvisorsPage = () => {
                 Pomůže ve fázích: {a.phases.map((p) => `${p}. ${GATE_NAMES[p]}`).join(", ")}
               </p>
               <Button asChild className="btn-apple mt-4 self-start py-2.5">
-                <a href={consultationMailto(a, { project: currentProject?.name })}>
+                <a
+                  href={consultationMailto(a, { project: currentProject?.name })}
+                  onClick={() => track("advisor_click", { advisor: a.id, where: "page" }, currentProject?.id)}
+                >
                   <Mail className="mr-2 h-4 w-4" />
                   Objednat konzultaci
                 </a>

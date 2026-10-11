@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Award, Check, ChevronRight, Clock, PencilLine, Play } from "lucide-react";
@@ -118,7 +119,12 @@ export const PhaseCards = ({
                 {/* Náhled */}
                 <button
                   type="button"
-                  onClick={() => (withVideo ? setPlaying(phase) : onOpen(phase.route))}
+                  onClick={() => {
+                    if (withVideo) {
+                      track("video_play", { where: "phase_card", phase: phase.id });
+                      setPlaying(phase);
+                    } else onOpen(phase.route);
+                  }}
                   className="group relative aspect-video w-full shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:aspect-auto sm:min-h-[11rem] sm:w-72"
                   aria-label={
                     withVideo ? `Přehrát úvodní video k fázi ${phase.name}` : `Otevřít fázi ${phase.id}: ${phase.name}`

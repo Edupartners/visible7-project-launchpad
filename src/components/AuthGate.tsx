@@ -1,3 +1,4 @@
+import { trackSessionStart } from "@/lib/track";
 import { useState, useEffect, createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/visible7/client";
@@ -34,12 +35,14 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
       if (!active) return;
       setUser(data.session?.user ?? null);
       setLoading(false);
+      if (data.session) trackSessionStart();
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") setRecovering(true);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (event === "SIGNED_IN") trackSessionStart();
     });
 
     return () => {
@@ -65,7 +68,13 @@ export const AuthGate = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    return <LoginPage onLogin={() => { /* stav se aktualizuje přes onAuthStateChange výše */ }} />;
+    return (
+      <LoginPage
+        onLogin={() => {
+          /* stav se aktualizuje přes onAuthStateChange výše */
+        }}
+      />
+    );
   }
 
   return (

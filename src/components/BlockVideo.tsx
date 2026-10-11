@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useState } from "react";
 import { PlayCircle, Video } from "lucide-react";
 import type { BuildBlock } from "@/lib/buildPlans";
@@ -28,7 +29,10 @@ export const BlockVideo = ({ block }: { block: BuildBlock }) => {
   ) : (
     <button
       type="button"
-      onClick={() => setPlay(true)}
+      onClick={() => {
+        track("video_play", { where: "block", block: block.id });
+        setPlay(true);
+      }}
       className="group relative flex aspect-video w-full items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)]"
       aria-label={`Přehrát video: ${block.title}`}
     >

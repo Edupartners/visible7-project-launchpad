@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -293,6 +294,7 @@ const RentgenPage = () => {
     if (!currentProject) return;
     setBusy(true);
     setError(null);
+    track("rentgen_start", { hours: a.hours, goal: a.goal, budget: a.budget }, currentProject.id);
     try {
       const ai = await runDiagnosis(currentProject.id, a);
       const d: Diagnosis = { answers: a, ai, createdAt: new Date().toISOString() };
@@ -304,6 +306,7 @@ const RentgenPage = () => {
       window.scrollTo({ top: 0 });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Rentgen se nepodařil.");
+      track("rentgen_error", {}, currentProject.id);
     } finally {
       setBusy(false);
     }

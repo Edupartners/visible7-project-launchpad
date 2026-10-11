@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import React, { useState } from "react";
 import { ArrowRight, Award, Check, Clock, ListChecks, Play, Sparkles, Video } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -70,6 +71,11 @@ export const PhaseIntroTemplate = ({
   const video = PHASE_VIDEOS[phaseNumber];
   const withVideo = hasVideo(phaseNumber);
 
+  const start = () => {
+    track("gate_start", { gate: phaseNumber, again: thisDone });
+    onStart();
+  };
+
   const ctaLabel = thisDone
     ? `Otevřít bránu ${phaseNumber}`
     : doneCount === 0 && phaseNumber === 1
@@ -120,7 +126,7 @@ export const PhaseIntroTemplate = ({
               <p className="mt-5 max-w-xl text-lg font-medium leading-snug">{HOOK[phaseNumber]}</p>
               <button
                 type="button"
-                onClick={onStart}
+                onClick={start}
                 className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-8 text-lg font-semibold text-white shadow-lg shadow-orange-900/20 hover:bg-orange-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300"
               >
                 {ctaLabel}
@@ -183,7 +189,10 @@ export const PhaseIntroTemplate = ({
         {withVideo ? (
           <button
             type="button"
-            onClick={() => setPlaying(true)}
+            onClick={() => {
+              track("video_play", { where: "phase_intro", phase: phaseNumber });
+              setPlaying(true);
+            }}
             className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[hsl(216_62%_20%)] to-[hsl(28_58%_38%)]"
             aria-label={`Přehrát úvodní video k bráně ${name}`}
           >
@@ -229,7 +238,7 @@ export const PhaseIntroTemplate = ({
       <div className="flex flex-col items-center gap-3 py-4 text-center">
         <button
           type="button"
-          onClick={onStart}
+          onClick={start}
           className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-8 text-lg font-semibold text-white hover:bg-orange-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300"
         >
           {ctaLabel}

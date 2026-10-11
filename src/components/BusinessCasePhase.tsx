@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useEffect, useMemo, useState } from "react";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
@@ -990,15 +991,16 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                 variant="outline"
                 size="sm"
                 className="mt-3 rounded-[10px]"
-                onClick={() =>
-                  downloadBusinessCaseExcel({
+                onClick={() => {
+                  track("excel_export", {}, currentProject?.id);
+                  return downloadBusinessCaseExcel({
                     projectName: currentProject?.name ?? "Projekt",
                     typeName,
                     group,
                     data,
                     results,
-                  }).catch(() => toast({ title: "Export se nepodařil", variant: "destructive" }))
-                }
+                  }).catch(() => toast({ title: "Export se nepodařil", variant: "destructive" }));
+                }}
               >
                 <FileSpreadsheet className="mr-2 h-4 w-4" /> Stáhnout do Excelu
               </Button>

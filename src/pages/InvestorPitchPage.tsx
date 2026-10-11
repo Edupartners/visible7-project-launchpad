@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Check, Copy, Download, Loader2, Sparkles } from "lucide-react";
@@ -253,7 +254,14 @@ const InvestorPitchPage = () => {
                   {busy ? "Píšu pitch…" : pitch ? "Napsat znovu s AI" : "Vytvořit pitch s AI"}
                 </Button>
                 {pitch && (
-                  <Button variant="outline" className="rounded-[10px]" onClick={() => window.print()}>
+                  <Button
+                    variant="outline"
+                    className="rounded-[10px]"
+                    onClick={() => {
+                      track("pitch_pdf", { audience: pitch.audience });
+                      window.print();
+                    }}
+                  >
                     <Download className="mr-2 h-4 w-4" /> Stáhnout PDF
                   </Button>
                 )}

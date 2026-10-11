@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
@@ -84,7 +85,10 @@ export const AdvisorsInline = ({
               </div>
             </div>
             <Button asChild variant="outline" className="shrink-0 rounded-[10px]">
-              <a href={consultationMailto(a, { project: currentProject?.name, topic, lines })}>
+              <a
+                href={consultationMailto(a, { project: currentProject?.name, topic, lines })}
+                onClick={() => track("advisor_click", { advisor: a.id, where: "inline" }, currentProject?.id)}
+              >
                 <Mail className="mr-2 h-4 w-4" />
                 Objednat konzultaci
               </a>

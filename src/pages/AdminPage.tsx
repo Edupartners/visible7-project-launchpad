@@ -10,9 +10,12 @@ import {
   AdminOverview,
   AdminProject,
   AdminUser,
+  EVENT_LABELS,
+  EventStats,
   adminStats,
   daysAgo,
   loadAdminOverview,
+  loadEventStats,
   useIsAdmin,
   usersCsv,
 } from "@/lib/admin";
@@ -95,6 +98,7 @@ const ProjectList = ({ projects }: { projects: AdminProject[] }) =>
 const AdminPage = () => {
   const isAdmin = useIsAdmin();
   const [data, setData] = useState<AdminOverview | null>(null);
+  const [events, setEvents] = useState<EventStats | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
@@ -105,7 +109,9 @@ const AdminPage = () => {
     setLoading(true);
     setError(null);
     try {
-      setData(await loadAdminOverview());
+      const [overview, ev] = await Promise.all([loadAdminOverview(), loadEventStats(30).catch(() => null)]);
+      setData(overview);
+      setEvents(ev);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Načtení se nepodařilo.");
     } finally {
@@ -209,6 +215,35 @@ const AdminPage = () => {
                 ))}
               </ol>
             </section>
+
+            {events && (
+              <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
+                <h2 className="text-lg font-bold">Co lidé dělají (posledních {events.days} dní)</h2>
+                <p className="text-sm text-muted-foreground">Počet událostí a kolik různých uživatelů je udělalo.</p>
+                {events.events.length === 0 ? (
+                  <p className="mt-4 text-sm text-muted-foreground">Zatím žádné události.</p>
+                ) : (
+                  <table className="mt-4 w-full text-sm">
+                    <thead className="text-left text-xs text-muted-foreground">
+                      <tr>
+                        <th className="py-2 font-semibold">Událost</th>
+                        <th className="py-2 text-right font-semibold">Počet</th>
+                        <th className="py-2 text-right font-semibold">Uživatelů</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {events.events.map((e) => (
+                        <tr key={e.name} className="border-t border-border">
+                          <td className="py-2">{EVENT_LABELS[e.name] ?? e.name}</td>
+                          <td className="py-2 text-right tabular-nums">{e.count}</td>
+                          <td className="py-2 text-right font-semibold tabular-nums">{e.users}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </section>
+            )}
 
             <section className="space-y-3">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

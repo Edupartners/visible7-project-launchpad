@@ -1,3 +1,4 @@
+import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarLayout } from "./layout/AppSidebar";
@@ -295,7 +296,12 @@ export const Dashboard = (_props: DashboardProps) => {
               </div>
             </div>
             <Button asChild variant="secondary" className="shrink-0 rounded-[10px]">
-              <a href={qualificationMailto(currentProject?.name)}>Mám zájem o zkoušku</a>
+              <a
+                href={qualificationMailto(currentProject?.name)}
+                onClick={() => track("nsk_interest", {}, currentProject?.id)}
+              >
+                Mám zájem o zkoušku
+              </a>
             </Button>
           </section>
         )}
