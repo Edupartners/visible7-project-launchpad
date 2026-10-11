@@ -23,6 +23,7 @@ import {
   usersCsv,
 } from "@/lib/admin";
 import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
+import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmin";
 
 type Filter = "vse" | "aktivni" | "platici" | "klub";
 const FILTERS: { id: Filter; label: string }[] = [
@@ -255,6 +256,8 @@ const AdminPage = () => {
                 )}
               </section>
             )}
+
+            <AnnouncementsAdmin users={stats.users} />
 
             {quiz && <AudienceSection quiz={quiz} />}
 

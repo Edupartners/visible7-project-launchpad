@@ -4,6 +4,7 @@ import { Award, Check, FolderOpen, LogOut, Menu, Plus, Settings, ShieldCheck, Us
 import { useIsAdmin } from "@/lib/admin";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import { NotificationBell } from "@/components/announcements/NotificationBell";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
 
@@ -35,19 +36,22 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
 
   return (
     <div className="flex h-full flex-col">
-      <button
-        type="button"
-        onClick={() => go("/home")}
-        className="flex items-center gap-2.5 px-4 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label="VISIBLE7 MICEK – přehled"
-      >
-        <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-foreground text-[13px] font-bold text-white">
-          V7
-        </span>
-        <span className="text-[17px] font-semibold tracking-tight">
-          VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
-        </span>
-      </button>
+      <div className="flex items-center justify-between pr-3">
+        <button
+          type="button"
+          onClick={() => go("/home")}
+          className="flex items-center gap-2.5 px-4 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label="VISIBLE7 MICEK – přehled"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-foreground text-[13px] font-bold text-white">
+            V7
+          </span>
+          <span className="text-[17px] font-semibold tracking-tight">
+            VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
+          </span>
+        </button>
+        {!onNavigate && <NotificationBell />}
+      </div>
 
       <div className="px-3">
         {creating ? (
@@ -211,14 +215,17 @@ export const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
         <span className="text-[17px] font-semibold tracking-tight">
           VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
         </span>
-        <button
-          type="button"
-          onClick={() => navigate("/settings")}
-          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted"
-          aria-label="Nastavení"
-        >
-          <Settings className="h-5 w-5" />
-        </button>
+        <div className="flex items-center">
+          <NotificationBell className="h-10 w-10" />
+          <button
+            type="button"
+            onClick={() => navigate("/settings")}
+            className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted"
+            aria-label="Nastavení"
+          >
+            <Settings className="h-5 w-5" />
+          </button>
+        </div>
       </div>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-72 p-0">

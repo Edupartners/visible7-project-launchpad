@@ -1,4 +1,5 @@
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
+import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
 import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -176,6 +177,8 @@ export const Dashboard = (_props: DashboardProps) => {
             <GrowthBadge currentCompleted={doneCount} />
           </div>
         </header>
+
+        <DashboardAnnouncements />
 
         {/* Bez rentgenu na začátku cesty: rentgen je první krok */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 && <DashboardJourney prominent />}
