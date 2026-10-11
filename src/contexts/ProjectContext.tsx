@@ -1,3 +1,4 @@
+import { useToast } from "@/hooks/use-toast";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/visible7/client";
 
@@ -60,6 +61,7 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
   const [projects, setProjects] = useState<Project[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     let active = true;
@@ -114,13 +116,23 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
         .insert({ user_id: userId, name: name.trim() || "Nový projekt" })
         .select("id, name, business_type, created_at, updated_at")
         .single();
-      if (error || !data) return null;
+      if (error || !data) {
+        if (error?.message?.includes("limit_projektu")) {
+          toast({
+            title: "Máte maximální počet aktivních projektů",
+            description:
+              "Ve verzi zdarma a ve zkušebním přístupu můžete mít jeden aktivní projekt. Nový založíte, když starý smažete v Nastavení → Projekty.",
+            variant: "destructive",
+          });
+        }
+        return null;
+      }
       const project = data as Project;
       setProjects((prev) => [...prev, project]);
       switchProject(project.id);
       return project;
     },
-    [userId, switchProject]
+    [userId, switchProject, toast]
   );
 
   const renameProject = useCallback(async (id: string, name: string) => {

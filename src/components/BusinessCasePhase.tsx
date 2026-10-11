@@ -1,4 +1,5 @@
 import { track } from "@/lib/track";
+import { useAccess } from "@/lib/access";
 import { useEffect, useMemo, useState } from "react";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
@@ -48,7 +49,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, FileSpreadsheet, Loader2, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Loader2, Lock, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 import { downloadBusinessCaseExcel } from "@/lib/businessCaseExcel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -256,6 +257,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { currentProject, setBusinessType } = useProject();
+  const access = useAccess();
   const projectId = currentProject?.id;
   const [data, setData, { loading }] = useSupabaseProgress<BusinessCaseData>("business_case", EMPTY_CASE);
   const [context, setContext] = useState<{
@@ -992,6 +994,15 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                 size="sm"
                 className="mt-3 rounded-[10px]"
                 onClick={() => {
+                  if (!access.premium) {
+                    track("premium_blocked", { feature: "excel" }, currentProject?.id);
+                    toast({
+                      title: "Export do Excelu je v placeném přístupu",
+                      description: "Vaše čísla jsou uložená. Po odemčení si tabulku stáhnete hned.",
+                    });
+                    navigate("/cenik");
+                    return;
+                  }
                   track("excel_export", {}, currentProject?.id);
                   return downloadBusinessCaseExcel({
                     projectName: currentProject?.name ?? "Projekt",
@@ -1002,7 +1013,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                   }).catch(() => toast({ title: "Export se nepodařil", variant: "destructive" }));
                 }}
               >
-                <FileSpreadsheet className="mr-2 h-4 w-4" /> Stáhnout do Excelu
+                {access.premium ? <FileSpreadsheet className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}{" "}
+                Stáhnout do Excelu
               </Button>
             )}
           </div>

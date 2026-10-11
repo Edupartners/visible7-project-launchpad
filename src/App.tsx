@@ -26,6 +26,7 @@ import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
 import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
+import { GateLock, PremiumGate } from "@/components/access/Locks";
 import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
@@ -42,14 +43,70 @@ const ProtectedRoutes = () => (
       <Route path="/rentgen" element={<RentgenPage />} />
       <Route path="/vision" element={<VisionPage />} />
       <Route path="/ideation" element={<IdeationPage />} />
-      <Route path="/strategy" element={<StrategyPage />} />
-      <Route path="/implementation" element={<ImplementationPage />} />
-      <Route path="/benchmarking-phase" element={<BenchmarkingPage />} />
-      <Route path="/launch" element={<LaunchPage />} />
-      <Route path="/expansion" element={<ExpansionPage />} />
-      <Route path="/business-type/:businessTypeId" element={<BusinessTypeDetailPage />} />
-      <Route path="/marketing-channel/:channelId" element={<MarketingChannelDetailPage />} />
-      <Route path="/investor-pitch" element={<InvestorPitchPage />} />
+      <Route
+        path="/strategy"
+        element={
+          <GateLock gate={3}>
+            <StrategyPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/implementation"
+        element={
+          <GateLock gate={4}>
+            <ImplementationPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/benchmarking-phase"
+        element={
+          <GateLock gate={5}>
+            <BenchmarkingPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/launch"
+        element={
+          <GateLock gate={6}>
+            <LaunchPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/expansion"
+        element={
+          <GateLock gate={7}>
+            <ExpansionPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/business-type/:businessTypeId"
+        element={
+          <GateLock gate={4}>
+            <BusinessTypeDetailPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/marketing-channel/:channelId"
+        element={
+          <GateLock gate={5}>
+            <MarketingChannelDetailPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/investor-pitch"
+        element={
+          <PremiumGate feature="pitch">
+            <InvestorPitchPage />
+          </PremiumGate>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </AuthGate>

@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
 import { CertificateKind, certificateTitle, issueCertificate } from "@/lib/certificates";
 import { useToast } from "@/hooks/use-toast";
+import { useAccess } from "@/lib/access";
+import { PremiumLock } from "@/components/access/Locks";
 
 interface CertificateIssueDialogProps {
   open: boolean;
@@ -25,6 +34,8 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
   const [name, setName] = useState([meta.first_name, meta.last_name].filter(Boolean).join(" "));
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
+  const access = useAccess();
+  const locked = !access.premium && (kind !== "phase" || (phase ?? 0) >= 3);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,50 +60,70 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <form onSubmit={submit}>
-          <DialogHeader>
-            <DialogTitle>{certificateTitle(kind, phase)}</DialogTitle>
-            <DialogDescription>
-              Zkontrolujte jméno – na osvědčení bude přesně takhle a později ho už nepůjde změnit.
-              {currentProject && ` Projekt: ${currentProject.name}.`}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="my-5 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium" htmlFor="cert-name">
-                Jméno a příjmení
-              </label>
-              <Input id="cert-name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 rounded-[10px]" autoFocus />
+        {locked ? (
+          <div>
+            <DialogHeader>
+              <DialogTitle>{certificateTitle(kind, phase)}</DialogTitle>
+              <DialogDescription>Bránu máte hotovou. Osvědčení vás čeká.</DialogDescription>
+            </DialogHeader>
+            <div className="mt-5">
+              <PremiumLock feature="certificate" compact />
             </div>
-            {kind === "gold" && (
+          </div>
+        ) : (
+          <form onSubmit={submit}>
+            <DialogHeader>
+              <DialogTitle>{certificateTitle(kind, phase)}</DialogTitle>
+              <DialogDescription>
+                Zkontrolujte jméno – na osvědčení bude přesně takhle a později ho už nepůjde změnit.
+                {currentProject && ` Projekt: ${currentProject.name}.`}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="my-5 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium" htmlFor="cert-url">
-                  Odkaz na spuštěný projekt
+                <label className="text-sm font-medium" htmlFor="cert-name">
+                  Jméno a příjmení
                 </label>
                 <Input
-                  id="cert-url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://"
+                  id="cert-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="h-11 rounded-[10px]"
+                  autoFocus
                 />
-                <p className="text-xs text-muted-foreground">Bude uvedený na osvědčení jako důkaz spuštění.</p>
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" className="rounded-[10px]" onClick={() => onOpenChange(false)}>
-              Zrušit
-            </Button>
-            <Button
-              type="submit"
-              className="rounded-[10px]"
-              disabled={busy || name.trim().length < 3 || (kind === "gold" && !/^https?:\/\/\S+\.\S+/.test(url.trim()))}
-            >
-              {busy ? "Vystavuji…" : "Získat osvědčení"}
-            </Button>
-          </DialogFooter>
-        </form>
+              {kind === "gold" && (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium" htmlFor="cert-url">
+                    Odkaz na spuštěný projekt
+                  </label>
+                  <Input
+                    id="cert-url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://"
+                    className="h-11 rounded-[10px]"
+                  />
+                  <p className="text-xs text-muted-foreground">Bude uvedený na osvědčení jako důkaz spuštění.</p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" className="rounded-[10px]" onClick={() => onOpenChange(false)}>
+                Zrušit
+              </Button>
+              <Button
+                type="submit"
+                className="rounded-[10px]"
+                disabled={
+                  busy || name.trim().length < 3 || (kind === "gold" && !/^https?:\/\/\S+\.\S+/.test(url.trim()))
+                }
+              >
+                {busy ? "Vystavuji…" : "Získat osvědčení"}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

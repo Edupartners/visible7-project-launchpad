@@ -3,7 +3,8 @@
 //
 // Náklady drží na uzdě:
 //  - jen přihlášený vlastník projektu,
-//  - limity: 3 návrhy + 3 vyhodnocení/komentáře na fázi a projekt, 20 volání AI denně na uživatele,
+//  - limity: 3 návrhy + 3 vyhodnocení/komentáře na fázi a projekt, 20 volání AI denně na uživatele
+//    (při zapnutém paywallu 5 pro uživatele zdarma a ve zkušebním přístupu; pitch jen placený),
 //    celkový denní strop pro celou aplikaci (AI_GLOBAL_DAILY_LIMIT, výchozí 300),
 //  - levný model (AI_MODEL, výchozí claude-haiku-5-5), pevný strop max_tokens,
 //  - vstupy se zkracují, všechna pole canvasu v jednom volání.
@@ -19,7 +20,7 @@ const API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const MODEL = Deno.env.get("AI_MODEL") ?? "claude-haiku-5-5";
 const GLOBAL_DAILY = Number(Deno.env.get("AI_GLOBAL_DAILY_LIMIT") ?? "300");
 
-const LIMITS = { navrh: 3, vyhodnoceni: 3, userDaily: 20 };
+const LIMITS = { navrh: 3, vyhodnoceni: 3, userDaily: 20, userDailyFree: 5 };
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -672,7 +673,21 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!project || project.user_id !== user.id) return json({ error: "Projekt nenalezen" }, 404);
 
-  // 3) Limity
+  // 3) Přístup a limity. Když je zapnutý paywall: pitch jen v placeném přístupu,
+  //    uživatelé zdarma a ve zkušebním přístupu mají nižší denní limit AI.
+  const [{ data: pwRow }, { data: accRow }] = await Promise.all([
+    admin.from("app_settings").select("value").eq("key", "paywall_enabled").maybeSingle(),
+    admin.from("user_access").select("plan, access_until").eq("user_id", user.id).maybeSingle(),
+  ]);
+  const paywall = pwRow?.value === true;
+  const paid =
+    ["mesic", "ctvrtleti", "rok", "kod"].includes(accRow?.plan ?? "") &&
+    (!accRow?.access_until || new Date(accRow.access_until).getTime() > Date.now());
+  if (paywall && action === "pitch" && !paid) {
+    return json({ error: "Pitch je součástí placeného přístupu.", code: "premium" }, 402);
+  }
+  const dailyLimit = paywall && !paid ? LIMITS.userDailyFree : LIMITS.userDaily;
+
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const [perProject, perUser, global] = await Promise.all([
     admin.from("ai_outputs").select("id", { count: "exact", head: true }).eq("project_id", projectId).eq("phase", phase).eq("kind", kind),
@@ -686,7 +701,7 @@ Deno.serve(async (req) => {
     const what = action === "diagnose" ? "rentgenů" : action === "pitch" ? "pitchů" : action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
-  if (usedDaily >= LIMITS.userDaily) {
+  if (usedDaily >= dailyLimit) {
     return json({ error: "Dnešní limit AI je vyčerpán. Zkuste to zítra.", code: "limit_daily" }, 429);
   }
   if ((global.count ?? 0) >= GLOBAL_DAILY) {
@@ -876,7 +891,7 @@ Deno.serve(async (req) => {
     output,
     remaining: {
       [kind]: limit - usedProject - 1,
-      daily: LIMITS.userDaily - usedDaily - 1,
+      daily: dailyLimit - usedDaily - 1,
     },
   });
 });

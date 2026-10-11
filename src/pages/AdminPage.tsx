@@ -30,6 +30,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 
 const PLAN: Record<string, string> = {
   free: "Zdarma",
+  trial: "Zkušební",
   mesic: "Měsíc",
   ctvrtleti: "Čtvrtletí",
   rok: "Rok",

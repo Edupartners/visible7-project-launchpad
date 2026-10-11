@@ -61,7 +61,10 @@ export const useIsAdmin = () => {
 export const loadAdminOverview = async (): Promise<AdminOverview> => {
   const { data, error } = await supabase.rpc("admin_overview");
   if (error) throw error;
-  return data as AdminOverview;
+  const overview = data as AdminOverview;
+  // Zkušební přístup není platba.
+  overview.users = overview.users.map((u) => ({ ...u, paid: u.paid && u.plan !== "trial" }));
+  return overview;
 };
 
 const DAY = 86_400_000;
@@ -148,6 +151,10 @@ export const loadEventStats = async (days = 30): Promise<EventStats> => {
 /** Srozumitelné názvy událostí pro přehled. */
 export const EVENT_LABELS: Record<string, string> = {
   signup: "Registrace",
+  trial_started: "Zkušební přístup zahájen",
+  premium_blocked: "Narazil na placenou funkci",
+  quiz_start: "Kvíz spuštěn",
+  quiz_done: "Kvíz dokončen",
   session_start: "Návštěva aplikace",
   rentgen_start: "Rentgen spuštěn",
   rentgen_done: "Rentgen dokončen",
