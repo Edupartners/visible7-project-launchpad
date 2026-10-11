@@ -41,7 +41,7 @@ export const UnifiedHeader = (_props: UnifiedHeaderProps) => {
               <span className="text-[13px] font-bold tracking-tight text-white">V7</span>
             </span>
             <span className="text-[19px] font-semibold tracking-tight text-foreground">
-              VISIBLE7 <span className="font-normal text-muted-foreground">MICEK™</span>
+              VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
             </span>
           </button>
 

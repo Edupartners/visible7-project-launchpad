@@ -381,7 +381,7 @@ const InvestorPitchPage = () => {
                 <p>{[user?.email, meta.phone].filter(Boolean).join(" · ")}</p>
               </div>
               <p className="text-right">
-                Připraveno metodikou VISIBLE7 MICEK™
+                Připraveno metodikou VISIBLE7 MICEK®
                 <br />
                 Čísla jsou orientační plán, ne záruka výsledku.
               </p>

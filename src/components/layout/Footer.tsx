@@ -26,7 +26,7 @@ export const Footer = () => {
           </nav>
 
           <div className="space-y-2 border-t border-border pt-4">
-            <div className="text-sm font-medium text-foreground">© 2026 MICEK™ – Všechna práva vyhrazena</div>
+            <div className="text-sm font-medium text-foreground">© 2026 MICEK® – Všechna práva vyhrazena</div>
             <div className="mx-auto max-w-2xl text-xs text-muted-foreground">
               Provozovatel: {OPERATOR.name}, IČO {OPERATOR.ico}, {OPERATOR.address}. Toto dílo je chráněno autorským
               zákonem. Jakékoli neoprávněné užití, kopírování nebo šíření je zakázáno.

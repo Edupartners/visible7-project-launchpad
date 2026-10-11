@@ -9,7 +9,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => (
           V7
         </span>
         <span className="font-bold tracking-tight">
-          VISIBLE7 <span className="hidden font-normal text-muted-foreground sm:inline">MICEK™</span>
+          VISIBLE7 <span className="hidden font-normal text-muted-foreground sm:inline">MICEK®</span>
         </span>
       </Link>
       <nav className="flex items-center gap-1 text-sm font-semibold sm:gap-2">

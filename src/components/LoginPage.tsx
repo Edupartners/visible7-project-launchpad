@@ -137,7 +137,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
       <aside className="hidden flex-col justify-between bg-primary p-10 text-white lg:flex xl:p-14">
         <Link to="/" className="flex items-center gap-2.5 self-start font-bold">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-sm text-primary">V7</span>
-          VISIBLE7 <span className="font-normal text-white/70">MICEK™</span>
+          VISIBLE7 <span className="font-normal text-white/70">MICEK®</span>
         </Link>
         <div className="max-w-md">
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight">
@@ -165,7 +165,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
             </ul>
           )}
         </div>
-        <p className="text-sm text-white/50">Metodika VISIBLE7 MICEK™ · Edu Partners s.r.o.</p>
+        <p className="text-sm text-white/50">Metodika VISIBLE7 MICEK® · Edu Partners s.r.o.</p>
       </aside>
 
       {/* Formulář */}

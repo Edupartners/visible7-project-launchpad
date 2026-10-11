@@ -108,7 +108,7 @@ const CertificatePage = () => {
                   V7
                 </div>
                 <div className="leading-tight">
-                  <p className="text-sm font-semibold tracking-wide">VISIBLE7 MICEK™</p>
+                  <p className="text-sm font-semibold tracking-wide">VISIBLE7 MICEK®</p>
                   <p className="text-xs text-slate-500">Metodika rozjezdu online podnikání</p>
                 </div>
               </div>
@@ -147,7 +147,7 @@ const CertificatePage = () => {
                 <p>Datum vydání: {issued}</p>
                 <div className="mt-6 w-56 border-t border-slate-400 pt-1">
                   <p className="font-medium text-slate-800">Mgr. Michal Míček, LL.M.</p>
-                  <p>autor metodiky VISIBLE7 MICEK™</p>
+                  <p>autor metodiky VISIBLE7 MICEK®</p>
                 </div>
               </div>
               <div className="flex items-end gap-3 text-right">

@@ -179,7 +179,7 @@ export const GrowthPhase = () => {
         <PhaseCelebration
           gate={7}
           title="Všech 7 bran je otevřených"
-          message="Prošli jste celou metodiku VISIBLE7 MICEK™. Získejte osvědčení VISIBLE7 Gold."
+          message="Prošli jste celou metodiku VISIBLE7 MICEK®. Získejte osvědčení VISIBLE7 Gold."
           nextLabel="Získat osvědčení Gold"
           onNext={() => navigate("/settings#osvedceni")}
           onHome={() => navigate("/home")}

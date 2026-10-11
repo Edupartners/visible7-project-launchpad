@@ -45,7 +45,7 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
           V7
         </span>
         <span className="text-[17px] font-semibold tracking-tight">
-          VISIBLE7 <span className="font-normal text-muted-foreground">MICEK™</span>
+          VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
         </span>
       </button>
 
@@ -209,7 +209,7 @@ export const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
           <Menu className="h-5 w-5" />
         </button>
         <span className="text-[17px] font-semibold tracking-tight">
-          VISIBLE7 <span className="font-normal text-muted-foreground">MICEK™</span>
+          VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
         </span>
         <button
           type="button"

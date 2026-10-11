@@ -70,7 +70,7 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
   const pRows: Cell[][] = [
     [`Byznys case – ${input.projectName}`],
     [
-      `Typ byznysu: ${input.typeName ?? copy.title}. Exportováno z aplikace VISIBLE7 MICEK™ ${new Date().toLocaleDateString("cs-CZ")}.`,
+      `Typ byznysu: ${input.typeName ?? copy.title}. Exportováno z aplikace VISIBLE7 MICEK® ${new Date().toLocaleDateString("cs-CZ")}.`,
     ],
     ["Měňte čísla ve sloupci „Hodnota“ – plán po měsících i souhrn se přepočítají samy."],
     [],
@@ -244,7 +244,7 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
   scen("Bod zvratu (měsíc)", (m) => m.breakEvenMonth, NUM);
   sRows.push(
     [],
-    ["Orientační model, nejde o daňové ani investiční poradenství. VISIBLE7 MICEK™ · Edu Partners s.r.o."],
+    ["Orientační model, nejde o daňové ani investiční poradenství. VISIBLE7 MICEK® · Edu Partners s.r.o."],
   );
 
   const wb = XLSX.utils.book_new();

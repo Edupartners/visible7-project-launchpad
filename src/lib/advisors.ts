@@ -34,7 +34,7 @@ export const ADVISORS: Advisor[] = [
     name: "Mgr. Michal Míček, LL.M.",
     photo: `${EP}2026/05/michal-768x775.jpeg`,
     focus: "Strategie, e-commerce a fintech",
-    bio: "Autor metodiky VISIBLE7 MICEK™, téměř 20 let v e-commerce a fintechu. Pomůže s modrým oceánem, byznys modelem a růstem.",
+    bio: "Autor metodiky VISIBLE7 MICEK®, téměř 20 let v e-commerce a fintechu. Pomůže s modrým oceánem, byznys modelem a růstem.",
     phases: [1, 2, 3, 7],
     channels: [],
   },

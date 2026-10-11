@@ -114,7 +114,7 @@ export default function OAuthConsentPage() {
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
             <span className="text-sm font-bold text-primary-foreground">V7</span>
           </div>
-          <span className="font-semibold">VISIBLE7 MICEK™</span>
+          <span className="font-semibold">VISIBLE7 MICEK®</span>
         </div>
 
         {error ? (

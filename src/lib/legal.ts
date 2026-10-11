@@ -1,5 +1,5 @@
 /**
- * Právní dokumenty aplikace VISIBLE7 MICEK™.
+ * Právní dokumenty aplikace VISIBLE7 MICEK®.
  * NÁVRH k právní kontrole – verze se mění při každé věcné změně; uživatelé ji pak potvrdí znovu.
  */
 
@@ -29,8 +29,8 @@ export interface LegalDoc {
 const op = `${OPERATOR.name}, IČO ${OPERATOR.ico}, se sídlem ${OPERATOR.address}, ${OPERATOR.register}`;
 
 export const TERMS: LegalDoc = {
-  title: "Podmínky užívání aplikace VISIBLE7 MICEK™",
-  intro: `Tyto podmínky upravují používání webové aplikace VISIBLE7 MICEK™ (dále „aplikace“), kterou provozuje ${op} (dále „provozovatel“). Registrací a zaškrtnutím souhlasu s podmínkami s nimi uživatel souhlasí.`,
+  title: "Podmínky užívání aplikace VISIBLE7 MICEK®",
+  intro: `Tyto podmínky upravují používání webové aplikace VISIBLE7 MICEK® (dále „aplikace“), kterou provozuje ${op} (dále „provozovatel“). Registrací a zaškrtnutím souhlasu s podmínkami s nimi uživatel souhlasí.`,
   sections: [
     {
       title: "1. Účet a registrace",
@@ -90,7 +90,7 @@ export const TERMS: LegalDoc = {
     {
       title: "8. Duševní vlastnictví",
       paragraphs: [
-        "Metodika VISIBLE7 MICEK™, aplikace, její obsah, videa a texty jsou chráněny autorským právem a právem k ochranné známce. Uživatel je smí používat jen pro vlastní potřebu v rámci aplikace.",
+        "Metodika VISIBLE7 MICEK®, aplikace, její obsah, videa a texty jsou chráněny autorským právem a právem k ochranné známce. Uživatel je smí používat jen pro vlastní potřebu v rámci aplikace.",
         "Data a texty, které uživatel do aplikace vloží, zůstávají jeho. Provozovateli uděluje oprávnění je zpracovávat v rozsahu nutném k poskytování aplikace.",
       ],
     },

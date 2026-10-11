@@ -743,7 +743,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </blockquote>
               <p className="mt-6 font-semibold">Mgr. Michal Míček, LL.M.</p>
               <p className="text-muted-foreground">
-                Autor metodiky VISIBLE7 MICEK™, zakladatel Edu Partners. Přes 14 let v e-commerce, fintechu a
+                Autor metodiky VISIBLE7 MICEK®, zakladatel Edu Partners. Přes 14 let v e-commerce, fintechu a
                 vzdělávání.
               </p>
               <a

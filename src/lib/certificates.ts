@@ -23,22 +23,22 @@ export const GATE_NAMES: Record<number, string> = {
   7: "Růst",
 };
 
-export const ISSUER_LINE = "Edu Partners s.r.o. | Partner: World eCommerce Business School | VISIBLE7 MICEK™";
+export const ISSUER_LINE = "Edu Partners s.r.o. | Partner: World eCommerce Business School | VISIBLE7 MICEK®";
 export const ISSUER_ORG = "Edu Partners s.r.o.";
 
 /** Název osvědčení tak, jak se zobrazí na osvědčení a na LinkedInu. */
 export const certificateTitle = (kind: CertificateKind, phase: number | null) => {
   if (kind === "gold") return "VISIBLE7 Gold – Spuštěný projekt";
-  if (kind === "zamer") return "VISIBLE7 MICEK™ – Podnikatelský záměr";
-  return `VISIBLE7 MICEK™ – Fáze ${phase}: ${GATE_NAMES[phase ?? 0] ?? ""}`;
+  if (kind === "zamer") return "VISIBLE7 MICEK® – Podnikatelský záměr";
+  return `VISIBLE7 MICEK® – Fáze ${phase}: ${GATE_NAMES[phase ?? 0] ?? ""}`;
 };
 
 export const certificateDescription = (kind: CertificateKind, phase: number | null) => {
   if (kind === "gold")
-    return "za projití všech sedmi bran metodiky VISIBLE7 MICEK™ a spuštění vlastního projektu na trh";
+    return "za projití všech sedmi bran metodiky VISIBLE7 MICEK® a spuštění vlastního projektu na trh";
   if (kind === "zamer")
-    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK™: modrý oceán, Lean Canvas, byznys case a tvorba";
-  return `za absolvování fáze ${phase} – ${GATE_NAMES[phase ?? 0] ?? ""} – metodiky VISIBLE7 MICEK™`;
+    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK®: modrý oceán, Lean Canvas, byznys case a tvorba";
+  return `za absolvování fáze ${phase} – ${GATE_NAMES[phase ?? 0] ?? ""} – metodiky VISIBLE7 MICEK®`;
 };
 
 export const certificateUrl = (code: string) => `${window.location.origin}/osvedceni/${code}`;
