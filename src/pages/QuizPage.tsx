@@ -323,6 +323,9 @@ const QuizPage = () => {
             <p className="text-sm text-muted-foreground">
               Otázka {i + 1} z {total}
             </p>
+            {q.kind === "scale" && (
+              <p className="mt-1 text-sm font-semibold text-orange-700">Jak moc to o vás platí?</p>
+            )}
             <h2 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">{q.text}</h2>
             {q.kind === "choice" ? (
               <div className={`mt-6 grid gap-2 ${(q.options?.length ?? 0) > 6 ? "grid-cols-2" : "grid-cols-1"}`}>

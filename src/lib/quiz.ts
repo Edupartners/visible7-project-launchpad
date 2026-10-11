@@ -136,11 +136,31 @@ export const ROUNDS: Round[] = [
     title: "Co vás brzdí",
     intro: "Poslední kolo. Upřímnost se vyplatí – podle toho vám ukážeme, kde vám pomůžeme nejvíc.",
     questions: [
-      { id: "b_penize", kind: "scale", target: "penize", text: "Bojím se, že přijdu o peníze." },
-      { id: "b_technika", kind: "scale", target: "technika", text: "Nevím si rady s technikou, webem a nástroji." },
-      { id: "b_urady", kind: "scale", target: "urady", text: "Mám strach z úřadů, daní a pokut." },
-      { id: "b_cas", kind: "scale", target: "cas", text: "Nemám na to dost času." },
-      { id: "b_dokoncovani", kind: "scale", target: "dokoncovani", text: "Často něco začnu a nedokončím." },
+      {
+        id: "b_penize",
+        kind: "scale",
+        target: "penize",
+        text: "Bojím se, že do podnikání vložím peníze a přijdu o ně.",
+      },
+      {
+        id: "b_technika",
+        kind: "scale",
+        target: "technika",
+        text: "Nevím si rady s webem, e-shopem a online nástroji.",
+      },
+      { id: "b_urady", kind: "scale", target: "urady", text: "Odrazují mě úřady, daně a strach z pokut." },
+      {
+        id: "b_cas",
+        kind: "scale",
+        target: "cas",
+        text: "Vedle práce a rodiny mi na vlastní podnikání nezbývá dost času.",
+      },
+      {
+        id: "b_dokoncovani",
+        kind: "scale",
+        target: "dokoncovani",
+        text: "Často něco nadšeně začnu, ale nedotáhnu to do konce.",
+      },
     ],
   },
 ];
