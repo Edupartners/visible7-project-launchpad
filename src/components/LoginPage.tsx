@@ -19,7 +19,6 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
   const returnUrl = redirectTo ?? window.location.origin;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
   const [consents, setConsents] = useState<ConsentValues>({ terms: false, klub: false, marketing: false });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,7 +55,6 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           data: {
             first_name: firstName,
             last_name: lastName,
-            phone: phone.trim() || undefined,
             // Souhlasy se při založení účtu zapíší do evidence souhlasů (trigger v databázi).
             consents: {
               version: LEGAL_VERSION,
@@ -267,23 +265,6 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                 </button>
               </div>
             </div>
-
-            {!isLogin && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground" htmlFor="reg-phone">
-                  Telefon <span className="font-normal text-muted-foreground">(nepovinné)</span>
-                </label>
-                <Input
-                  id="reg-phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+420 777 123 456"
-                  className="h-12 rounded-xl border-border/50 focus:border-primary"
-                />
-              </div>
-            )}
 
             {!isLogin && <ConsentFields value={consents} onChange={setConsents} />}
 
