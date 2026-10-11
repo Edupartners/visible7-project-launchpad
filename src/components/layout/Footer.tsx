@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { OPERATOR } from "@/lib/legal";
+import { openCookieSettings } from "@/lib/cookieConsent";
 
 export const Footer = () => {
   return (
@@ -23,6 +24,13 @@ export const Footer = () => {
             <Link to="/ochrana-osobnich-udaju" className="text-muted-foreground hover:text-foreground hover:underline">
               Ochrana osobních údajů
             </Link>
+            <button
+              type="button"
+              onClick={openCookieSettings}
+              className="text-muted-foreground hover:text-foreground hover:underline"
+            >
+              Nastavení cookies
+            </button>
           </nav>
 
           <div className="space-y-2 border-t border-border pt-4">

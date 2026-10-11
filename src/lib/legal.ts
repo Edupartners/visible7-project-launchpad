@@ -151,21 +151,41 @@ export const PRIVACY: LegalDoc = {
         "Cloudflare – provoz webu aplikace.",
         "Anthropic – zpracování textů projektu při použití AI funkcí. Podle smluvních podmínek poskytovatele se data zaslaná přes jeho rozhraní nepoužívají k trénování modelů.",
         "SimpleShop – objednávky, platby a faktury.",
+        "Google (Google Analytics, Google Tag Manager) – měření návštěvnosti a reklam, jen pokud jste s tím souhlasili v liště cookies.",
         "Seniorní poradci – při objednání konzultace obdrží údaje potřebné k jejímu poskytnutí.",
         "Při předání mimo EU (např. do USA) jsou údaje chráněny standardními smluvními doložkami nebo rozhodnutím Evropské komise o odpovídající ochraně (EU–US Data Privacy Framework).",
       ],
     },
     {
-      title: "4. Jak dlouho údaje uchováváme",
+      title: "4. Cookies a měření návštěvnosti",
+      paragraphs: [
+        "Nezbytné cookies a místní úložiště prohlížeče drží přihlášení, bezpečnost a vaši volbu cookies. Bez nich aplikace nefunguje, souhlas k nim není potřeba.",
+        "Analytické cookies (Google Analytics 4) a marketingové cookies (měření reklam přes Google Tag Manager) používáme jen s vaším souhlasem (čl. 6 odst. 1 písm. a) GDPR). Do Google Analytics neposíláme jméno, e-mail ani obsah projektů.",
+        "Bez souhlasu nastavujeme Google režim souhlasu (Consent Mode) tak, že se cookies neukládají. Volbu můžete kdykoli změnit odkazem „Nastavení cookies“ v patičce stránky.",
+        "Pro zlepšování aplikace evidujeme ve vlastní databázi, které funkce používáte (např. dokončení brány, přehrání videa) – oprávněný zájem (čl. 6 odst. 1 písm. f) GDPR).",
+      ],
+    },
+    {
+      title: "5. Výzkum motivace dospělých ke vzdělávání",
+      paragraphs: [
+        "Pokud v kvízu „Jaký jste typ podnikatele“ zaškrtnete souhlas s výzkumem, použijeme vaše odpovědi a postup v aplikaci pro výzkum motivace dospělých ke vzdělávání (čl. 6 odst. 1 písm. a) GDPR).",
+        "Pro výzkum údaje předáváme jen pseudonymizované – bez jména a e-mailu. Výsledky se zveřejňují jen souhrnně.",
+        "Souhlas je dobrovolný, na odměnu za kvíz nemá vliv a můžete ho kdykoli odvolat v nastavení účtu nebo e-mailem.",
+      ],
+    },
+    {
+      title: "6. Jak dlouho údaje uchováváme",
       paragraphs: [
         "Údaje účtu a projektů po dobu existence účtu; po jeho zrušení je smažeme do 30 dnů, pokud je nemusíme uchovat ze zákona.",
         "Daňové doklady 10 let podle zákona o DPH.",
         "Údaje pro ověření vydaných osvědčení po dobu jejich platnosti, aby šly ověřit; osvědčení můžete požádat zneplatnit.",
         "Souhlas s marketingem do jeho odvolání.",
+        "Data Google Analytics 14 měsíců; volba cookies v prohlížeči do jejího smazání nebo změny.",
+        "Pseudonymizované odpovědi pro výzkum do odvolání souhlasu, nejdéle do ukončení výzkumu.",
       ],
     },
     {
-      title: "5. Vaše práva",
+      title: "7. Vaše práva",
       paragraphs: [
         "Máte právo na přístup k údajům, jejich opravu, výmaz, omezení zpracování, přenositelnost a právo vznést námitku proti zpracování na základě oprávněného zájmu.",
         "Souhlas s marketingem a členství v klubu můžete kdykoli odvolat v nastavení účtu, aniž by tím byla dotčena zákonnost předchozího zpracování.",

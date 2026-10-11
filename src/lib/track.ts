@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/visible7/client";
+import { gaEvent } from "@/lib/cookieConsent";
 
 /**
  * Záznam události do vlastní databáze (tabulka events). Nikdy neblokuje ani nehází chybu –
@@ -6,6 +7,8 @@ import { supabase } from "@/integrations/visible7/client";
  * Milníky (registrace, brány, rentgen, osvědčení, AI) zapisuje databáze sama.
  */
 export function track(name: string, props: Record<string, unknown> = {}, projectId?: string | null) {
+  // Kopie do Google Analytics (bez osobních údajů; s cookies jen po souhlasu).
+  if (name !== "session_start") gaEvent(name, props);
   void (async () => {
     try {
       const { data } = await supabase.auth.getSession();
