@@ -24,6 +24,9 @@ import {
 } from "@/lib/admin";
 import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
 import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmin";
+import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
+import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
+import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
 type Filter = "vse" | "aktivni" | "platici" | "klub";
 const FILTERS: { id: Filter; label: string }[] = [
@@ -111,6 +114,38 @@ const AdminPage = () => {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("vse");
   const [open, setOpen] = useState<string | null>(null);
+  const [tags, setTags] = useState<UserTag[]>([]);
+  const [tagLinks, setTagLinks] = useState<Record<string, string[]>>({});
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
+
+  const reloadTags = useCallback(() => {
+    loadTags()
+      .then(({ tags, links }) => {
+        setTags(tags);
+        setTagLinks(links);
+      })
+      .catch(() => undefined);
+  }, []);
+  useEffect(() => {
+    if (isAdmin) reloadTags();
+  }, [isAdmin, reloadTags]);
+
+  const toggleTag = async (userId: string, tagId: string, on: boolean) => {
+    setTagLinks((m) => ({
+      ...m,
+      [userId]: on ? [...(m[userId] ?? []), tagId] : (m[userId] ?? []).filter((t) => t !== tagId),
+    }));
+    try {
+      await setUserTag(userId, tagId, on);
+    } catch {
+      reloadTags();
+    }
+  };
+  const addNewTag = async (userId: string, name: string, color: TagColor) => {
+    const t = await createTag(name, color);
+    setTags((l) => [...l, t].sort((a, b) => a.name.localeCompare(b.name, "cs")));
+    await toggleTag(userId, t.id, true);
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -143,15 +178,18 @@ const AdminPage = () => {
       if (filter === "aktivni" && daysAgo(u.last_sign_in_at) > 7) return false;
       if (filter === "platici" && !u.paid) return false;
       if (filter === "klub" && !u.klub) return false;
+      if (tagFilter && !(tagLinks[u.id] ?? []).includes(tagFilter)) return false;
       if (!q) return true;
       return [u.name, u.email, u.phone, ...u.projects.map((p) => p.name)].some((v) => v?.toLowerCase().includes(q));
     });
-  }, [users, query, filter]);
+  }, [users, query, filter, tagFilter, tagLinks]);
 
   if (isAdmin === false) return <Navigate to="/home" replace />;
 
   const exportCsv = () => {
-    const blob = new Blob([usersCsv(shown)], { type: "text/csv;charset=utf-8" });
+    const tagNames = (id: string) =>
+      (tagLinks[id] ?? []).map((t) => tags.find((x) => x.id === t)?.name).filter(Boolean) as string[];
+    const blob = new Blob([usersCsv(shown, tagNames)], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `visible7-uzivatele-${new Date().toISOString().slice(0, 10)}.csv`;
@@ -261,6 +299,8 @@ const AdminPage = () => {
 
             {quiz && <AudienceSection quiz={quiz} />}
 
+            <PromoCodesAdmin emails={Object.fromEntries(users.map((u) => [u.id, u.email]))} />
+
             <section className="space-y-3">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
@@ -291,6 +331,27 @@ const AdminPage = () => {
                   ))}
                 </div>
               </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filtr podle štítku">
+                  <span className="text-sm text-muted-foreground">Štítek:</span>
+                  {tags.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTagFilter(tagFilter === t.id ? null : t.id)}
+                      aria-pressed={tagFilter === t.id}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${
+                        tagFilter === t.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-foreground/80 hover:bg-muted/70"
+                      }`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${TAG_DOT[t.color]}`} /> {t.name} (
+                      {Object.values(tagLinks).filter((l) => l.includes(t.id)).length})
+                    </button>
+                  ))}
+                </div>
+              )}
               <p className="text-sm text-muted-foreground">
                 Zobrazeno {shown.length} z {users.length}
               </p>
@@ -330,6 +391,15 @@ const AdminPage = () => {
                               </p>
                               <p className="break-all text-muted-foreground">{u.email}</p>
                               {!u.confirmed && <p className="text-xs text-amber-700">e-mail nepotvrzen</p>}
+                              {(tagLinks[u.id] ?? []).length > 0 && (
+                                <span className="mt-1 flex flex-wrap gap-1">
+                                  {tags
+                                    .filter((t) => tagLinks[u.id]?.includes(t.id))
+                                    .map((t) => (
+                                      <TagChip key={t.id} tag={t} />
+                                    ))}
+                                </span>
+                              )}
                             </td>
                             <td className="p-3 max-md:p-0">
                               <span className="text-xs text-muted-foreground md:hidden">Registrace </span>
@@ -404,6 +474,12 @@ const AdminPage = () => {
                                     <span className="text-muted-foreground">promo kód: {u.promo_code_used}</span>
                                   )}
                                 </div>
+                                <UserTagEditor
+                                  tags={tags}
+                                  selected={tagLinks[u.id] ?? []}
+                                  onToggle={(tagId, on) => toggleTag(u.id, tagId, on)}
+                                  onCreate={(name, color) => addNewTag(u.id, name, color)}
+                                />
                                 <ProjectList projects={u.projects} />
                               </td>
                             </tr>

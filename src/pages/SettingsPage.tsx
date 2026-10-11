@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PromoRedeem } from "@/components/access/PromoRedeem";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Check, LogOut, Pencil, Trash2, X } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
@@ -151,13 +152,14 @@ const SettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [completed] = useSupabaseProgress<number[]>("completed_phases", []);
 
+  const [accessTick, setAccessTick] = useState(0);
   useEffect(() => {
     supabase
       .from("user_access")
       .select("plan, access_until")
       .maybeSingle()
       .then(({ data }) => setAccess((data as { plan: string; access_until: string | null } | null) ?? null));
-  }, []);
+  }, [accessTick]);
 
   // Odkaz s #kotvou (např. z přehledu na osvědčení) posune stránku na sekci.
   useEffect(() => {
@@ -215,6 +217,10 @@ const SettingsPage = () => {
               {until && ` (platí do ${until})`}
             </span>
           </p>
+          <div className="mt-4">
+            <p className="mb-2 text-sm font-semibold">Máte promo kód?</p>
+            <PromoRedeem onDone={() => setAccessTick((t) => t + 1)} />
+          </div>
         </Section>
 
         <Section id="projekty" title={`Projekty (${projects.length})`}>

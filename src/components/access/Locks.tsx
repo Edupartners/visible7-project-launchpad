@@ -4,6 +4,8 @@ import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { GATE_NAMES } from "@/lib/certificates";
 import { FREE_GATES, useAccess } from "@/lib/access";
+import { PromoRedeem } from "./PromoRedeem";
+import { useState } from "react";
 
 /** Co nabídnout uživateli bez přístupu: kvíz za 7 dní zdarma (jednou) a ceník. */
 const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
@@ -29,6 +31,24 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
         Zobrazit ceník
       </Link>
     </div>
+  );
+};
+
+/** Odkaz „Mám promo kód“, který rozbalí pole pro zadání kódu. */
+const PromoToggle = ({ dark = false, onDone }: { dark?: boolean; onDone: () => void }) => {
+  const [open, setOpen] = useState(false);
+  return open ? (
+    <div className="mt-5">
+      <PromoRedeem dark={dark} onDone={onDone} />
+    </div>
+  ) : (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className={`mt-4 text-sm font-semibold underline-offset-4 hover:underline ${dark ? "text-white/80" : "text-primary"}`}
+    >
+      Mám promo kód
+    </button>
   );
 };
 
@@ -70,6 +90,7 @@ export const GateLock = ({ gate, children }: { gate: number; children: React.Rea
             ))}
           </ul>
           <UnlockOptions trialUsed={access.trialUsed} />
+          <PromoToggle dark onDone={access.refresh} />
         </div>
       </main>
     </SidebarLayout>
@@ -107,6 +128,7 @@ export const PremiumLock = ({
           <Button asChild size="sm" className="mt-3 rounded-[10px]">
             <Link to="/cenik">Odemknout plný přístup</Link>
           </Button>
+          <PromoToggle onDone={() => window.location.reload()} />
         </div>
       </div>
     </div>

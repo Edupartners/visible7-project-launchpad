@@ -103,7 +103,7 @@ const csvCell = (v: unknown) => {
   return `"${safe.replace(/"/g, '""')}"`;
 };
 
-export function usersCsv(users: AdminUser[]) {
+export function usersCsv(users: AdminUser[], tagNames: (userId: string) => string[] = () => []) {
   const head = [
     "Jméno",
     "E-mail",
@@ -116,6 +116,7 @@ export function usersCsv(users: AdminUser[]) {
     "Marketing",
     "Projekty",
     "Splněné brány (max)",
+    "Štítky",
   ];
   const rows = users.map((u) => [
     u.name,
@@ -132,6 +133,7 @@ export function usersCsv(users: AdminUser[]) {
       .map((p) => p.name)
       .join("; "),
     Math.max(0, ...u.projects.map((p) => p.gates.length)),
+    tagNames(u.id).join(", "),
   ]);
   return "﻿" + [head, ...rows].map((r) => r.map(csvCell).join(";")).join("\r\n");
 }
@@ -162,6 +164,8 @@ export const EVENT_LABELS: Record<string, string> = {
   gate_start: "Brána otevřena",
   gate_complete: "Brána dokončena",
   ai_call: "Volání AI",
+  promo_redeemed: "Promo kód uplatněn",
+  promo_failed: "Neplatný promo kód",
   video_play: "Přehrání videa",
   excel_export: "Export do Excelu",
   pitch_pdf: "Pitch stažen do PDF",

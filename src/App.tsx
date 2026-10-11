@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PromoAutoRedeem } from "@/components/access/PromoRedeem";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthGate } from "@/components/AuthGate";
@@ -36,6 +37,7 @@ const queryClient = new QueryClient();
 // Vnitřní (chráněné) routy - přístupné jen po přihlášení, AuthGate je obaluje společně.
 const ProtectedRoutes = () => (
   <AuthGate>
+    <PromoAutoRedeem />
     <Routes>
       <Route path="/home" element={<HomePage />} />
       <Route path="/profile" element={<Navigate to="/settings" replace />} />
