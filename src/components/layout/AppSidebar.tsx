@@ -4,6 +4,7 @@ import { Award, Check, FolderOpen, LogOut, Menu, Plus, Settings, ShieldCheck, Us
 import { useIsAdmin } from "@/lib/admin";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import { SidebarMembership } from "@/components/access/MembershipCta";
 import { NotificationBell } from "@/components/announcements/NotificationBell";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
@@ -150,6 +151,10 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
           )}
         </ul>
       </nav>
+
+      <div className="px-3 pb-2">
+        <SidebarMembership onNavigate={onNavigate} />
+      </div>
 
       {/* Účet dole – jako v ChatGPT/Claude */}
       <div className="border-t border-border p-2">

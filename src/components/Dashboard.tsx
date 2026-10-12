@@ -1,4 +1,5 @@
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
+import { MembershipCard } from "@/components/access/MembershipCta";
 import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
 import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
@@ -180,6 +181,8 @@ export const Dashboard = (_props: DashboardProps) => {
 
         <DashboardAnnouncements />
 
+        <MembershipCard placement="top" />
+
         {/* Bez rentgenu na začátku cesty: rentgen je první krok */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 && <DashboardJourney prominent />}
 
@@ -223,6 +226,8 @@ export const Dashboard = (_props: DashboardProps) => {
             </div>
           </section>
         )}
+
+        <MembershipCard placement="below" hasProgress={!diagnosisLoading && (!!diagnosis || doneCount > 0)} />
 
         {!diagnosisLoading && (diagnosis || doneCount > 0) && <DashboardJourney prominent={false} />}
         {!diagnosisLoading && (diagnosis || doneCount > 0) && <QuizDashboardCard />}
