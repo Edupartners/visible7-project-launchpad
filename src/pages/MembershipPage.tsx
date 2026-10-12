@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Check, ShieldCheck } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
@@ -15,46 +15,26 @@ const ITEMS = [
   "Osvědčení za každou bránu",
 ];
 
-declare global {
-  interface Window {
-    sss?: (cmd: string, id: string) => void;
-  }
-}
-
-const SCRIPT_SRC = "https://form.simpleshop.cz/prj/js/SimpleShopService.js";
-
-/** Vložený objednávkový formulář SimpleShopu (oficiální kód pro vložení). */
-function SimpleShopForm({ formId }: { formId: string }) {
-  const box = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = box.current;
-    if (!el || !formId) return;
-    el.innerHTML = "";
-    const holder = document.createElement("div");
-    holder.setAttribute("data-SimpleShopForm", formId);
-    holder.textContent = "Načítám objednávkový formulář…";
-    el.appendChild(holder);
-
-    // Stejný zavaděč jako v kódu ze SimpleShopu: fronta příkazů, dokud se skript nenačte.
-    const w = window as Window & { sss?: ((...a: unknown[]) => void) & { q?: unknown[][]; l?: number } };
-    if (!w.sss) {
-      const q = function (...args: unknown[]) {
-        (q.q = q.q || []).push(args);
-      } as ((...a: unknown[]) => void) & { q?: unknown[][]; l?: number };
-      q.l = Date.now();
-      w.sss = q;
-    }
-    if (!document.querySelector(`script[src="${SCRIPT_SRC}"]`)) {
-      const s = document.createElement("script");
-      s.async = true;
-      s.src = SCRIPT_SRC;
-      document.head.appendChild(s);
-    }
-    w.sss!("createForm", formId);
-  }, [formId]);
-
-  return <div ref={box} className="min-h-[420px]" />;
+/** Objednávkový formulář SimpleShopu v iframu.
+ *  Jejich zavaděč (SimpleShopService.js) v React aplikaci padal („Načítám objednávkový formulář…“ beze změny),
+ *  hostovaný formulář v iframu funguje spolehlivě. */
+function SimpleShopForm({ formId, url }: { formId: string; url?: string }) {
+  const src = url || `https://form.simpleshop.cz/${encodeURIComponent(formId)}/buy/`;
+  return (
+    <div>
+      <iframe
+        src={src}
+        title="Objednávka členství VISIBLE7"
+        className="h-[820px] w-full rounded-xl border-0 bg-white"
+      />
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        Formulář se nezobrazuje?{" "}
+        <a href={src} target="_blank" rel="noopener noreferrer" className="underline">
+          Otevřít objednávku v novém okně
+        </a>
+      </p>
+    </div>
+  );
 }
 
 /** Stránka s nákupem členství – zákazník zůstává na visible7.io. */
@@ -117,7 +97,7 @@ const MembershipPage = () => {
             </p>
           </div>
           {shop.form_id ? (
-            <SimpleShopForm formId={shop.form_id} />
+            <SimpleShopForm formId={shop.form_id} url={shop.checkout_url} />
           ) : shop.checkout_url ? (
             <a
               href={shop.checkout_url}
