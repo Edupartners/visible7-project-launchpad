@@ -26,6 +26,7 @@ import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
 import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmin";
 import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
 import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
+import { ShopAdmin } from "@/components/admin/ShopAdmin";
 import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
 import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
@@ -44,6 +45,7 @@ const PLAN: Record<string, string> = {
   ctvrtleti: "Čtvrtletí",
   rok: "Rok",
   kod: "Kód",
+  clenstvi: "Členství",
 };
 
 const fmtDate = (iso: string | null | undefined) =>
@@ -301,6 +303,8 @@ const AdminPage = () => {
             <RemindersAdmin />
 
             {quiz && <AudienceSection quiz={quiz} />}
+
+            <ShopAdmin />
 
             <PromoCodesAdmin emails={Object.fromEntries(users.map((u) => [u.id, u.email]))} />
 

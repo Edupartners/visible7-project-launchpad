@@ -31,6 +31,7 @@ const PLAN_LABELS: Record<string, string> = {
   ctvrtleti: "Placený přístup – 3 měsíce",
   rok: "Placený přístup – 1 rok",
   kod: "Přístup přes kód",
+  clenstvi: "Členství VISIBLE7",
 };
 
 const SECTIONS = [

@@ -25,7 +25,7 @@ export interface Access {
   refresh: () => void;
 }
 
-const PAID_PLANS = ["mesic", "ctvrtleti", "rok", "kod"];
+const PAID_PLANS = ["mesic", "ctvrtleti", "rok", "kod", "clenstvi"];
 
 export function useAccess(): Access {
   const { user } = useAuth();

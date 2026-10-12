@@ -4,3 +4,6 @@ verify_jwt = false
 
 [functions.reminders]
 verify_jwt = false
+
+[functions.simpleshop]
+verify_jwt = false

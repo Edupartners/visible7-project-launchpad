@@ -1,99 +1,150 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
-import { PLANS, VAT_NOTE } from "@/lib/pricing";
+import { kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
+import { supabase } from "@/integrations/visible7/client";
+import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
 
 const INCLUDED: { row: string; free: boolean }[] = [
-  { row: "Brána 1 Modrý oceán a brána 2 Lean Canvas", free: true },
-  { row: "AI návrh a hodnocení Lean Canvasu", free: true },
-  { row: "Osvědčení za splněné brány", free: true },
+  { row: "Rentgen nápadu: verdikt AI, čísla a mapa cesty", free: true },
+  { row: "Brána 1 Modrý oceán a brána 2 Lean Canvas s AI", free: true },
+  { row: "Osvědčení za brány 1 a 2", free: true },
   { row: "Brána 3 Byznys case: kapitál, bod zvratu, PNO", free: false },
-  { row: "AI odhad čísel a komentář k plánu", free: false },
+  { row: "Brány 4–7 s videonávody krok za krokem", free: false },
   { row: "Export byznys case do Excelu", free: false },
   { row: "Pitch na jednu A4 pro investora, banku nebo partnera", free: false },
-  { row: "Brány 4–7 s videonávody", free: false },
+  { row: "Osvědčení za brány 3–7 a záměr", free: false },
 ];
 
-const QA = [
-  ["Obnovuje se platba sama?", "Ne. Platíte jednou za zvolené období a pak se rozhodnete, jestli prodloužíte."],
-  [
-    "Co se stane, když přístup skončí?",
-    "Vaše projekty i data zůstanou. Placené brány uvidíte, ale do dalšího zaplacení jen pro čtení.",
-  ],
-  ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu partners s.r.o."],
-  ["Mohu nejdřív vyzkoušet?", "Ano. Brány 1 a 2 jsou zdarma a bez platební karty."],
+const MEMBER_ITEMS = [
+  "Všech 7 bran a přes 50 videonávodů",
+  "AI asistent u každé brány",
+  "Byznys case, Excel a pitch na A4",
+  "Osvědčení za každou bránu",
 ];
 
-/** Veřejná stránka s ceníkem. */
+/** Veřejná stránka s ceníkem. Cenu a odkaz na objednávku nastavuje správce (Administrace → Platby). */
 const PricingPage = () => {
   const navigate = useNavigate();
+  const shop = useShop();
+  const [email, setEmail] = useState<string | null>(null);
   const start = () => navigate("/home?novy");
   useEffect(() => {
     document.title = "Ceník | VISIBLE7 MICEK";
+    supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
   }, []);
+
+  const QA = [
+    [
+      "Obnovuje se platba sama?",
+      `Ne. Zaplatíte jednou na ${monthsLabel(shop.months)} a pak se rozhodnete, jestli prodloužíte.`,
+    ],
+    [
+      "Co se stane, když členství skončí?",
+      "Vaše projekty i data zůstanou uložené. Placené brány a výstupy se zamknou do dalšího zaplacení.",
+    ],
+    ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
+    [
+      "Mohu nejdřív vyzkoušet?",
+      "Ano. Rentgen nápadu a brány 1 a 2 jsou zdarma bez platební karty. Za vyplnění krátkého kvízu získáte navíc 7 dní plného přístupu.",
+    ],
+    [
+      "Jak se členství aktivuje?",
+      "Automaticky po zaplacení. Při objednávce použijte stejný e-mail, kterým se přihlašujete do aplikace.",
+    ],
+  ];
+
+  const buy = shop.checkout_url;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PublicHeader onStart={start} />
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
+        <section className="mx-auto max-w-5xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
           <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
             Začněte zdarma. Plaťte, až budete chtít dál.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Jednorázová platba za období, žádné předplatné, které by se samo obnovovalo. {VAT_NOTE}
+            Jedno členství, žádné předplatné, které by se samo obnovovalo. Ceny jsou konečné, včetně DPH.
           </p>
 
-          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PLANS.map((p) => (
-              <li
-                key={p.id}
-                className={`flex flex-col rounded-2xl p-6 ${p.highlight ? "bg-primary text-white" : "border border-border bg-card"}`}
+          <div className="mt-12 grid gap-4 md:grid-cols-[1fr_1.3fr]">
+            <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
+              <h2 className="font-semibold text-muted-foreground">Zdarma</h2>
+              <p className="mt-3 text-4xl font-extrabold tracking-tight">0 Kč</p>
+              <p className="text-sm text-muted-foreground">napořád, bez platební karty</p>
+              <ul className="mt-6 flex-1 space-y-2.5 text-sm">
+                {[
+                  "Rentgen nápadu za 10 minut",
+                  "Brána 1 Modrý oceán",
+                  "Brána 2 Lean Canvas s AI",
+                  "7 dní plného přístupu za kvíz",
+                ].map((it) => (
+                  <li key={it} className="flex gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={start}
+                className="mt-6 h-11 rounded-xl border border-border text-sm font-semibold hover:border-primary hover:text-primary"
               >
-                <div className="flex items-center justify-between">
-                  <h2 className={`font-semibold ${p.highlight ? "text-white/80" : "text-muted-foreground"}`}>
-                    {p.name}
-                  </h2>
-                  {p.highlight && (
-                    <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold">Doporučujeme</span>
-                  )}
-                </div>
-                <p className="mt-3 text-4xl font-extrabold tracking-tight">{p.price}</p>
-                <p className={`text-sm ${p.highlight ? "text-white/60" : "text-muted-foreground"}`}>
-                  {p.note}
-                  {p.perMonth && `, vychází na ${p.perMonth}`}
-                </p>
-                <ul className="mt-6 flex-1 space-y-2.5 text-sm">
-                  {p.items.map((it) => (
-                    <li key={it} className="flex gap-2">
-                      <Check
-                        className={`mt-0.5 h-4 w-4 shrink-0 ${p.highlight ? "text-[hsl(var(--gate-copper))]" : "text-emerald-600"}`}
-                        strokeWidth={3}
-                      />
-                      {it}
-                    </li>
-                  ))}
-                </ul>
+                Začít zdarma
+              </button>
+            </div>
+
+            <div className="flex flex-col rounded-2xl bg-primary p-6 text-white">
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-white/80">Členství na {monthsLabel(shop.months)}</h2>
+                <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold">Celá cesta</span>
+              </div>
+              <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(shop.price)}</p>
+              <p className="text-sm text-white/70">jednorázově, vychází na {perMonth(shop)} měsíčně</p>
+              {shop.anchor && <p className="mt-3 text-sm text-white/80">{shop.anchor}</p>}
+              <ul className="mt-6 flex-1 space-y-2.5 text-sm">
+                {MEMBER_ITEMS.map((it) => (
+                  <li key={it} className="flex gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--gate-copper))]" strokeWidth={3} />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+              {buy ? (
+                <a
+                  href={buy}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track("checkout_click", { price: shop.price })}
+                  className="mt-6 flex h-12 items-center justify-center rounded-xl bg-orange-500 text-base font-semibold text-white hover:bg-orange-600"
+                >
+                  Koupit členství
+                </a>
+              ) : (
                 <button
                   type="button"
                   onClick={start}
-                  className={`mt-6 h-11 rounded-xl text-sm font-semibold transition-colors ${
-                    p.highlight
-                      ? "bg-orange-500 text-white hover:bg-orange-600"
-                      : "border border-border hover:border-primary hover:text-primary"
-                  }`}
+                  className="mt-6 h-12 rounded-xl bg-orange-500 text-base font-semibold text-white hover:bg-orange-600"
                 >
-                  {p.id === "free" ? "Začít zdarma" : `Vybrat ${p.name}`}
+                  Začít zdarma
                 </button>
-              </li>
-            ))}
-          </ul>
+              )}
+              {buy && (
+                <p className="mt-3 text-xs text-white/70">
+                  {email
+                    ? `Při objednávce použijte e-mail ${email} – členství se vám pak zapne samo.`
+                    : "Při objednávce použijte e-mail, kterým se přihlašujete do aplikace – členství se zapne samo."}
+                </p>
+              )}
+            </div>
+          </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Placený přístup si aktivujete po registraci v aplikaci. Konzultace se seniorním poradcem se platí zvlášť:{" "}
-            {CONSULTATION.minutes} minut, orientačně {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+            Konzultace se seniorním poradcem se platí zvlášť: {CONSULTATION.minutes} minut, orientačně{" "}
+            {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
           </p>
         </section>
 
@@ -112,7 +163,7 @@ const PricingPage = () => {
                         Zdarma
                       </th>
                       <th scope="col" className="w-28 bg-primary p-4 text-center font-bold text-white">
-                        Placený
+                        Členství
                       </th>
                     </tr>
                   </thead>

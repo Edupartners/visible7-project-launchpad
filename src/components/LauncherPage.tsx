@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
-import { PLANS } from "@/lib/pricing";
+import { kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
 import { REFERENCES } from "@/lib/references";
 import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
@@ -302,6 +302,7 @@ const Cta = ({
 );
 
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
+  const shop = useShop();
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
     const id = window.location.hash.slice(1);
@@ -704,11 +705,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <div className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Začněte zdarma. Celá cesta od 350 Kč.
+                Začněte zdarma. Celá cesta za {kc(shop.price)}.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Brána 1 a 2 jsou zdarma napořád. Za další brány platíte jednorázově za zvolené období, nic se samo
-                neobnovuje.
+                Rentgen nápadu a brány 1 a 2 jsou zdarma napořád. Členství platíte jednou na {monthsLabel(shop.months)},
+                nic se samo neobnovuje. {shop.anchor}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
@@ -718,12 +719,17 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </div>
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
-              {PLANS.map((p) => (
-                <div key={p.name} className="flex items-baseline justify-between gap-4 px-5 py-4">
-                  <dt className="font-semibold">{p.name}</dt>
-                  <dd className="text-xl font-extrabold tracking-tight">{p.price}</dd>
+              {[
+                ["Zdarma napořád", "0 Kč"],
+                ["7 dní plného přístupu za kvíz", "0 Kč"],
+                [`Členství na ${monthsLabel(shop.months)}`, `${kc(shop.price)}`],
+              ].map(([name, price]) => (
+                <div key={name} className="flex items-baseline justify-between gap-4 px-5 py-4">
+                  <dt className="font-semibold">{name}</dt>
+                  <dd className="text-xl font-extrabold tracking-tight">{price}</dd>
                 </div>
               ))}
+              <p className="px-5 py-3 text-sm text-muted-foreground">vychází na {perMonth(shop)} měsíčně, včetně DPH</p>
             </dl>
           </div>
         </section>

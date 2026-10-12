@@ -681,7 +681,7 @@ Deno.serve(async (req) => {
   ]);
   const paywall = pwRow?.value === true;
   const paid =
-    ["mesic", "ctvrtleti", "rok", "kod"].includes(accRow?.plan ?? "") &&
+    ["mesic", "ctvrtleti", "rok", "kod", "clenstvi"].includes(accRow?.plan ?? "") &&
     (!accRow?.access_until || new Date(accRow.access_until).getTime() > Date.now());
   if (paywall && action === "pitch" && !paid) {
     return json({ error: "Pitch je součástí placeného přístupu.", code: "premium" }, 402);

@@ -19,6 +19,7 @@ const PLAN_LABELS: Record<string, string> = {
   ctvrtleti: "Placený přístup – 3 měsíce",
   rok: "Placený přístup – 1 rok",
   kod: "Přístup přes kód",
+  clenstvi: "Členství VISIBLE7",
 };
 
 interface Access {
@@ -96,7 +97,7 @@ const UserProfilePage = () => {
             </p>
             <p>
               <span className="text-muted-foreground">Přístup: </span>
-              {access ? PLAN_LABELS[access.plan] ?? access.plan : "…"}
+              {access ? (PLAN_LABELS[access.plan] ?? access.plan) : "…"}
               {until && ` (platí do ${until})`}
             </p>
           </CardContent>
@@ -111,7 +112,8 @@ const UserProfilePage = () => {
           </CardHeader>
           <CardContent className="text-sm">
             <p className="mb-3 text-muted-foreground">
-              Máte {projects.length} {projects.length === 1 ? "projekt" : projects.length < 5 ? "projekty" : "projektů"}. Přepínat a zakládat je můžete na přehledu.
+              Máte {projects.length} {projects.length === 1 ? "projekt" : projects.length < 5 ? "projekty" : "projektů"}
+              . Přepínat a zakládat je můžete na přehledu.
             </p>
             <Button variant="outline" className="rounded-xl" onClick={() => navigate("/home")}>
               Přejít na přehled
