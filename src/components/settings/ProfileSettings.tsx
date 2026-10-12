@@ -141,10 +141,36 @@ export const ConsentSettings = () => {
   const [consents, setConsents] = useState<Partial<Record<ConsentKind, ConsentState>>>({});
   const [busy, setBusy] = useState<ConsentKind | null>(null);
 
+  const { user } = useAuth();
+  const [reminders, setReminders] = useState<boolean | null>(null);
   const reload = () => loadConsents().then(setConsents);
   useEffect(() => {
     reload();
-  }, []);
+    if (!user) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from("email_prefs")
+      .select("reminders")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }: { data: { reminders: boolean } | null }) => setReminders(data ? data.reminders : true));
+  }, [user]);
+
+  const toggleReminders = async () => {
+    if (!user || reminders === null) return;
+    const next = !reminders;
+    setReminders(next);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("email_prefs")
+      .upsert({ user_id: user.id, reminders: next, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+    if (error) {
+      setReminders(!next);
+      toast({ title: "Změnu se nepodařilo uložit", variant: "destructive" });
+      return;
+    }
+    toast({ title: next ? "Připomínky jsou zapnuté" : "Připomínky jsme vypnuli" });
+  };
 
   const toggle = async (kind: "klub" | "marketing", granted: boolean) => {
     setBusy(kind);
@@ -199,6 +225,23 @@ export const ConsentSettings = () => {
           "Bezplatné členství pro rozvoj digitálního a AI podnikání: akce, novinky a zvýhodněné nabídky.",
         )}
         {row("marketing", "Novinky e-mailem", "Novinky a nabídky Edu partners s.r.o.")}
+        <div className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold">Připomínky e-mailem</p>
+            <p className="text-sm text-muted-foreground">
+              Občas vám připomeneme rozdělaný projekt nebo konec zkušebního přístupu. Nejvýš jednou za 3 dny, bez
+              nabídek.
+            </p>
+          </div>
+          <Button
+            variant={reminders ? "outline" : "default"}
+            className="shrink-0 rounded-[10px]"
+            disabled={reminders === null}
+            onClick={toggleReminders}
+          >
+            {reminders ? "Vypnout připomínky" : "Zapnout připomínky"}
+          </Button>
+        </div>
       </div>
       <p className="mt-4 text-sm text-muted-foreground">
         {consents.podminky?.granted

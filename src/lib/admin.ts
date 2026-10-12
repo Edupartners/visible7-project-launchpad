@@ -165,6 +165,7 @@ export const EVENT_LABELS: Record<string, string> = {
   gate_complete: "Brána dokončena",
   ai_call: "Volání AI",
   promo_redeemed: "Promo kód uplatněn",
+  reminder_sent: "Připomínka e-mailem odeslána",
   promo_failed: "Neplatný promo kód",
   video_play: "Přehrání videa",
   excel_export: "Export do Excelu",

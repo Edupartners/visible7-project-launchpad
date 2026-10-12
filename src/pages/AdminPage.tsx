@@ -25,6 +25,7 @@ import {
 import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
 import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmin";
 import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
+import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
 import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
 import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
@@ -296,6 +297,8 @@ const AdminPage = () => {
             )}
 
             <AnnouncementsAdmin users={stats.users} />
+
+            <RemindersAdmin />
 
             {quiz && <AudienceSection quiz={quiz} />}
 
