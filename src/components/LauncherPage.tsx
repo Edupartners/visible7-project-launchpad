@@ -721,7 +721,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
                 ["Zdarma napořád", "0 Kč"],
-                ["7 dní plného přístupu za kvíz", "0 Kč"],
+                ["Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma", "0 Kč"],
                 [`Členství na ${monthsLabel(shop.months)}`, `${kc(shop.price)}`],
               ].map(([name, price]) => (
                 <div key={name} className="flex items-baseline justify-between gap-4 px-5 py-4">

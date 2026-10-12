@@ -49,7 +49,7 @@ const PricingPage = () => {
     ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
     [
       "Mohu nejdřív vyzkoušet?",
-      "Ano. Rentgen nápadu a brány 1 a 2 jsou zdarma bez platební karty. Za vyplnění krátkého kvízu získáte navíc 7 dní plného přístupu.",
+      "Ano. Rentgen nápadu a brány 1 a 2 jsou zdarma bez platební karty. Když zjistíte, jaký jste typ podnikatele (krátký kvíz), získáte navíc 7 dní plného přístupu zdarma.",
     ],
     [
       "Jak se členství aktivuje?",
@@ -81,7 +81,7 @@ const PricingPage = () => {
                   "Rentgen nápadu za 10 minut",
                   "Brána 1 Modrý oceán",
                   "Brána 2 Lean Canvas s AI",
-                  "7 dní plného přístupu za kvíz",
+                  "Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma",
                 ].map((it) => (
                   <li key={it} className="flex gap-2">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />
@@ -125,13 +125,10 @@ const PricingPage = () => {
                   Koupit členství
                 </a>
               ) : (
-                <button
-                  type="button"
-                  onClick={start}
-                  className="mt-6 h-12 rounded-xl bg-orange-500 text-base font-semibold text-white hover:bg-orange-600"
-                >
-                  Začít zdarma
-                </button>
+                <div className="mt-6 rounded-xl bg-white/10 p-3 text-center text-sm">
+                  <p className="font-semibold">Prodej členství spouštíme brzy.</p>
+                  <p className="mt-0.5 text-white/70">Do té doby máte v pilotním provozu vše odemčené zdarma.</p>
+                </div>
               )}
               {buy && (
                 <p className="mt-3 text-xs text-white/70">

@@ -17,7 +17,7 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
           onClick={() => navigate("/kviz")}
           className="h-12 rounded-[10px] bg-orange-500 px-6 text-base font-semibold text-white hover:bg-orange-600"
         >
-          <Gift className="mr-2 h-5 w-5" /> Kvíz a 7 dní zdarma
+          <Gift className="mr-2 h-5 w-5" /> Jaký jste typ podnikatele? 7 dní zdarma
         </Button>
       )}
       <Link
