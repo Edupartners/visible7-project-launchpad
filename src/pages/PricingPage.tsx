@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
-import { kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
+import { canBuy, nbsp, kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
 import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
@@ -57,7 +57,7 @@ const PricingPage = () => {
     ],
   ];
 
-  const buy = shop.checkout_url;
+  const buy = canBuy(shop);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -105,7 +105,7 @@ const PricingPage = () => {
               </div>
               <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(shop.price)}</p>
               <p className="text-sm text-white/70">jednorázově, vychází na {perMonth(shop)} měsíčně</p>
-              {shop.anchor && <p className="mt-3 text-sm text-white/80">{shop.anchor}</p>}
+              {shop.anchor && <p className="mt-3 text-sm text-white/80">{nbsp(shop.anchor)}</p>}
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {MEMBER_ITEMS.map((it) => (
                   <li key={it} className="flex gap-2">
@@ -115,15 +115,13 @@ const PricingPage = () => {
                 ))}
               </ul>
               {buy ? (
-                <a
-                  href={buy}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => track("checkout_click", { price: shop.price })}
+                <Link
+                  to="/clenstvi"
+                  onClick={() => track("checkout_click", { source: "cenik", price: shop.price })}
                   className="mt-6 flex h-12 items-center justify-center rounded-xl bg-orange-500 text-base font-semibold text-white hover:bg-orange-600"
                 >
                   Koupit členství
-                </a>
+                </Link>
               ) : (
                 <div className="mt-6 rounded-xl bg-white/10 p-3 text-center text-sm">
                   <p className="font-semibold">Prodej členství spouštíme brzy.</p>

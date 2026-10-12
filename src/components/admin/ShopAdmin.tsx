@@ -52,7 +52,12 @@ export function ShopAdmin() {
     setBusy(true);
     setMsg(null);
     try {
-      await saveShop({ ...shop, checkout_url: url, product_id: shop.product_id?.trim() || undefined });
+      await saveShop({
+        ...shop,
+        checkout_url: url,
+        product_id: shop.product_id?.trim() || undefined,
+        form_id: shop.form_id?.trim() ?? "",
+      });
       setMsg("Uloženo. Ceník se změní během pár minut.");
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "Uložení se nepodařilo.");
@@ -101,8 +106,16 @@ export function ShopAdmin() {
             placeholder="jen tento produkt dá členství"
           />
         </label>
-        <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">
-          <span className="font-semibold">Odkaz na objednávkový formulář SimpleShopu</span>
+        <label className="space-y-1 text-sm sm:col-span-2">
+          <span className="font-semibold">ID formuláře pro vložení (stránka /clenstvi)</span>
+          <Input
+            value={shop.form_id ?? ""}
+            onChange={(e) => set("form_id", e.target.value)}
+            placeholder='z kódu: data-SimpleShopForm="…"'
+          />
+        </label>
+        <label className="space-y-1 text-sm sm:col-span-2">
+          <span className="font-semibold">Odkaz na objednávkový formulář (záloha)</span>
           <Input
             value={shop.checkout_url}
             onChange={(e) => set("checkout_url", e.target.value)}

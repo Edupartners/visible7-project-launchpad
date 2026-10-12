@@ -3,31 +3,23 @@ import { Crown, Gift, Lock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthGate";
 import { daysLeft, useAccess } from "@/lib/access";
-import { kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
+import { canBuy, kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
-/** Tlačítko na koupi členství: rovnou do objednávky v SimpleShopu, jinak na ceník. */
+/** Tlačítko na koupi členství: na stránku /clenstvi s objednávkou, jinak na ceník. */
 function BuyButton({ source, className = "", label }: { source: string; className?: string; label?: string }) {
   const shop = useShop();
   const navigate = useNavigate();
   const text = label ?? `Získat členství na ${monthsLabel(shop.months)}`;
-  const cls = `h-11 rounded-[10px] bg-orange-500 px-5 font-semibold text-white hover:bg-orange-600 ${className}`;
-  if (!shop.checkout_url)
-    return (
-      <Button className={cls} onClick={() => navigate("/cenik")}>
-        {text}
-      </Button>
-    );
   return (
-    <Button asChild className={cls}>
-      <a
-        href={shop.checkout_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => track("checkout_click", { source, price: shop.price })}
-      >
-        {text}
-      </a>
+    <Button
+      className={`h-11 rounded-[10px] bg-orange-500 px-5 font-semibold text-white hover:bg-orange-600 ${className}`}
+      onClick={() => {
+        track("checkout_click", { source, price: shop.price });
+        navigate(canBuy(shop) ? "/clenstvi" : "/cenik");
+      }}
+    >
+      {text}
     </Button>
   );
 }
@@ -97,7 +89,7 @@ export function MembershipCard({
               na {monthsLabel(shop.months)} · vychází na {perMonth(shop)} měsíčně
             </span>
           </p>
-          {shop.checkout_url && user?.email && (
+          {canBuy(shop) && user?.email && (
             <p className="mt-1 text-xs text-muted-foreground">Při objednávce použijte e-mail {user.email}.</p>
           )}
         </div>
@@ -117,6 +109,7 @@ export function MembershipCard({
 /** Malé tlačítko v postranním panelu: pro neplatící „Získat členství“, pro členy datum platnosti. */
 export function SidebarMembership({ onNavigate }: { onNavigate?: () => void }) {
   const access = useAccess();
+  const shop = useShop();
   const navigate = useNavigate();
   if (access.loading) return null;
   if (access.paid)
@@ -131,7 +124,7 @@ export function SidebarMembership({ onNavigate }: { onNavigate?: () => void }) {
       type="button"
       onClick={() => {
         track("checkout_click", { source: "sidebar" });
-        navigate("/cenik");
+        navigate(canBuy(shop) ? "/clenstvi" : "/cenik");
         onNavigate?.();
       }}
       className="flex w-full items-center gap-2 rounded-lg bg-orange-50 px-2.5 py-2 text-left text-sm font-semibold text-orange-800 hover:bg-orange-100"

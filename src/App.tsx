@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import MembershipPage from "./pages/MembershipPage";
 import UnsubscribePage from "./pages/UnsubscribePage";
 import { PromoAutoRedeem } from "@/components/access/PromoRedeem";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
@@ -136,6 +137,7 @@ const App = () => (
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />
           <Route path="/ochrana-osobnich-udaju" element={<LegalPage doc={PRIVACY} />} />
           <Route path="/odhlasit" element={<UnsubscribePage />} />
+          <Route path="/clenstvi" element={<MembershipPage />} />
           {/* Vše ostatní vyžaduje přihlášení */}
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>

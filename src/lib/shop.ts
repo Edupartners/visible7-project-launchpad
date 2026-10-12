@@ -9,6 +9,8 @@ export interface ShopSettings {
   checkout_url: string;
   anchor: string;
   product_id?: string;
+  /** ID formuláře SimpleShopu pro vložení do stránky /clenstvi (z kódu: data-SimpleShopForm="…") */
+  form_id?: string;
 }
 
 export const SHOP_DEFAULT: ShopSettings = {
@@ -17,6 +19,7 @@ export const SHOP_DEFAULT: ShopSettings = {
   days: 183,
   checkout_url: "",
   anchor: "Kurz Specialista internetového obchodu s lektorem stojí 49 000 Kč.",
+  form_id: "",
 };
 
 export const kc = (n: number) => `${Math.round(n).toLocaleString("cs-CZ")} Kč`;
@@ -39,5 +42,8 @@ export async function saveShop(s: ShopSettings) {
   if (error) throw error;
 }
 
-/** Odkaz na objednávku; e-mail předvyplníme, pokud to formulář SimpleShopu podporuje. */
-export const checkoutHref = (s: ShopSettings) => s.checkout_url || "";
+/** Kam vede „Koupit členství“: vložený formulář na /clenstvi, jinak odkaz na SimpleShop, jinak ceník. */
+export const canBuy = (s: ShopSettings) => !!(s.form_id || s.checkout_url);
+
+/** Čísla s mezerou (49 000 Kč) se nesmí zalomit na dva řádky. */
+export const nbsp = (t: string) => t.replace(/(\d) (\d)/g, "$1\u00a0$2").replace(/ Kč/g, "\u00a0Kč");
