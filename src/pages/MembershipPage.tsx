@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Check, ShieldCheck } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Check, PartyPopper, ShieldCheck } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/integrations/visible7/client";
@@ -42,13 +42,57 @@ const MembershipPage = () => {
   const shop = useShop();
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
+  const [params] = useSearchParams();
+  const paid = params.has("zaplaceno");
+  const paidMail = params.get("mail");
 
   useEffect(() => {
     document.title = "Členství | VISIBLE7 MICEK";
     supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
-    track("membership_page", { price: shop.price });
+    track(paid ? "membership_paid_return" : "membership_page", { price: shop.price });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (paid) {
+    const mail = email ?? (paidMail && !paidMail.includes("{") ? paidMail : null);
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <PublicHeader onStart={() => navigate("/home?novy")} />
+        <main className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-8 lg:py-24">
+          <PartyPopper className="mx-auto h-12 w-12 text-orange-500" />
+          <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Děkujeme, platba je přijatá</h1>
+          <p className="mt-5 text-lg text-muted-foreground">
+            Členství VISIBLE7 se vám zapne do pár minut
+            {mail ? (
+              <>
+                {" "}
+                na účtu <strong className="break-all text-foreground">{mail}</strong>
+              </>
+            ) : null}
+            . Pokud s tímto e-mailem ještě účet nemáte, zaregistrujte se – členství se zapne hned po registraci.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">Daňový doklad vám přijde e-mailem od Edu Partners s.r.o.</p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => navigate(email ? "/home" : "/home?novy")}
+              className="flex h-12 items-center justify-center rounded-xl bg-orange-500 px-7 font-semibold text-white hover:bg-orange-600"
+            >
+              {email ? "Pokračovat v projektu" : "Přihlásit se nebo zaregistrovat"}
+            </button>
+          </div>
+          <p className="mt-8 text-sm text-muted-foreground">
+            Něco nefunguje? Napište nám na{" "}
+            <a href="mailto:info@visible7.io" className="underline">
+              info@visible7.io
+            </a>
+            .
+          </p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
