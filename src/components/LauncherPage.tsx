@@ -407,8 +407,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 ))}
               </dl>
               <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">
-                Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, 14 let praxe v e-commerce a
-                vzdělávání, akreditace MŠMT a MPO.
+                Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, vzděláváme od roku 2011, akreditace
+                MŠMT a MPO.
               </p>
             </div>
           </div>
@@ -463,7 +463,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Většinu nápadů nezabije trh, ale strach
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Za deset let kurzů jsme slyšeli pořád stejné důvody, proč lidé nezačnou. Žádný z nich neobstojí.
+              Na kurzech od roku 2011 slýcháme pořád stejné důvody, proč lidé nezačnou. Žádný z nich neobstojí.
             </p>
           </div>
           <dl className="mt-12 divide-y divide-border border-y border-border">
@@ -621,10 +621,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-24">
           <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-start">
             <div>
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Metodiku učíme deset let</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Vyrostla z kurzů, ne od stolu</h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                VISIBLE7 je základem kurzu Specialista internetového obchodu v Edu Partners a firemních školení.
-                Aplikace z ní dělá postup, kterým projdete sami a svým tempem.
+                Edu Partners učí podnikání od roku 2011. Z té praxe vznikla metodika VISIBLE7 a dnes je základem kurzu
+                Specialista internetového obchodu i firemních školení. Aplikace z ní dělá postup, kterým projdete sami a
+                svým tempem.
               </p>
             </div>
             {REFERENCES.length > 0 ? (
