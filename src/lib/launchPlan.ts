@@ -16,7 +16,8 @@ export const ODVODY_2026 = {
   healthMain: 3306,
   sideIncomeLimit: 117_521,
   vatLimit: 2_000_000,
-  tradeFee: 1000,
+  /** Ohlášení živnosti online (listinně 1 000 Kč) */
+  tradeFee: 800,
 };
 
 const czk = (v: number) => `${v.toLocaleString("cs-CZ")} Kč`;
@@ -34,32 +35,6 @@ export const LAUNCH_BLOCKS: (BuildBlock & { optional?: boolean })[] = [
       "Porovnejte paušální daň s běžným režimem – kalkulačka je ve fázi 3",
     ],
     tip: `Vedlejší činnost je nejbezpečnější start: zaměstnavatel za vás dál platí pojištění a sociální pojištění se do zisku ${czk(ODVODY_2026.sideIncomeLimit)} za rok ${LAUNCH_YEAR} neplatí.`,
-    minutes: 30,
-  }),
-  B({
-    id: "zivnost",
-    title: "Živnostenský list",
-    goal: "Máte oprávnění podnikat.",
-    steps: [
-      "Vyberte obory volné živnosti – pro online prodej a většinu služeb stačí",
-      "Vyplňte Jednotný registrační formulář – online, na živnostenském úřadě nebo na Czech POINTu",
-      `Zaplaťte správní poplatek ${czk(ODVODY_2026.tradeFee)} (na Czech POINTu navíc 50 Kč)`,
-      "Úřad vás zapíše do 5 pracovních dnů – zkontrolujte výpis z živnostenského rejstříku",
-    ],
-    tip: "Některé činnosti potřebují řemeslnou nebo vázanou živnost s praxí či vzděláním. Ověřte si to předem.",
-    minutes: 45,
-    costs: [{ name: "Živnostenský list (správní poplatek)", amount: ODVODY_2026.tradeFee, kind: "jednorazove" }],
-  }),
-  B({
-    id: "urady",
-    title: "Finanční úřad, ČSSZ a zdravotní pojišťovna",
-    goal: "Jste přihlášení všude, kde máte být.",
-    steps: [
-      "V Jednotném registračním formuláři zaškrtněte i přihlášku na ČSSZ a zdravotní pojišťovnu",
-      "K dani z příjmů se registrujte do 15 dnů (jde to také přes formulář)",
-      "Pokud jste se nepřihlásili přes formulář, oznamte zahájení ČSSZ a pojišťovně do 8 dnů",
-      "Rozhodněte o paušální dani – jedna měsíční platba místo daně a obou pojištění",
-    ],
     minutes: 30,
   }),
   B({

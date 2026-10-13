@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -16,6 +16,7 @@ import { CertificateKind, certificateTitle, issueCertificate } from "@/lib/certi
 import { useToast } from "@/hooks/use-toast";
 import { useAccess } from "@/lib/access";
 import { PremiumLock } from "@/components/access/Locks";
+import { BusinessVerification, loadVerification } from "@/lib/tradeLicense";
 
 interface CertificateIssueDialogProps {
   open: boolean;
@@ -36,6 +37,17 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
   const [busy, setBusy] = useState(false);
   const access = useAccess();
   const locked = !access.premium && (kind !== "phase" || (phase ?? 0) >= 3);
+  const [business, setBusiness] = useState<BusinessVerification | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (!open || kind !== "gold" || !currentProject) return;
+    let active = true;
+    loadVerification(currentProject.id).then((v) => active && setBusiness(v));
+    return () => {
+      active = false;
+    };
+  }, [open, kind, currentProject]);
+  const needsIco = kind === "gold" && business === null;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +81,34 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
             <div className="mt-5">
               <PremiumLock feature="certificate" compact />
             </div>
+          </div>
+        ) : needsIco ? (
+          <div>
+            <DialogHeader>
+              <DialogTitle>{certificateTitle(kind, phase)}</DialogTitle>
+              <DialogDescription>
+                Gold dokládá, že projekt opravdu podniká. Proto potřebuje IČO ověřené v registru ARES.
+              </DialogDescription>
+            </DialogHeader>
+            <p className="my-5 text-sm text-muted-foreground">
+              Na kartě „Založte živnost online“ v bráně 5 nebo 6 zadáte IČO – nové i to, pod kterým už podnikáte.
+              Ověření trvá pár vteřin.
+            </p>
+            <DialogFooter>
+              <Button type="button" variant="outline" className="rounded-[10px]" onClick={() => onOpenChange(false)}>
+                Zavřít
+              </Button>
+              <Button
+                type="button"
+                className="rounded-[10px]"
+                onClick={() => {
+                  onOpenChange(false);
+                  navigate("/launch");
+                }}
+              >
+                Ověřit IČO
+              </Button>
+            </DialogFooter>
           </div>
         ) : (
           <form onSubmit={submit}>
@@ -107,6 +147,11 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
                   <p className="text-xs text-muted-foreground">Bude uvedený na osvědčení jako důkaz spuštění.</p>
                 </div>
               )}
+              {kind === "gold" && business && (
+                <p className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900">
+                  Na osvědčení bude i ověřené IČO {business.ico} ({business.name}).
+                </p>
+              )}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" className="rounded-[10px]" onClick={() => onOpenChange(false)}>
@@ -116,7 +161,10 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
                 type="submit"
                 className="rounded-[10px]"
                 disabled={
-                  busy || name.trim().length < 3 || (kind === "gold" && !/^https?:\/\/\S+\.\S+/.test(url.trim()))
+                  busy ||
+                  name.trim().length < 3 ||
+                  (kind === "gold" && !business) ||
+                  (kind === "gold" && !/^https?:\/\/\S+\.\S+/.test(url.trim()))
                 }
               >
                 {busy ? "Vystavuji…" : "Získat osvědčení"}

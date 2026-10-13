@@ -9,6 +9,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { BlockList } from "@/components/BlockList";
+import { TradeLicenseCard } from "@/components/TradeLicenseCard";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
 import { loadProjectKeys } from "@/lib/projectData";
 import { addCostsToCase } from "@/lib/caseCosts";
@@ -305,6 +306,7 @@ export const LaunchPhase = () => {
             Živnost, úřady, datová schránka, odvody a účetnictví. Ke každému bloku bude instruktážní video.
           </p>
         </div>
+        <TradeLicenseCard placement="gate6" launchDate={s.date || undefined} />
         <BlockList
           blocks={LAUNCH_BLOCKS}
           steps={s.steps}

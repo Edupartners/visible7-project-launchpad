@@ -11,6 +11,8 @@ export interface Certificate {
   project_name: string;
   launch_url: string | null;
   issued_at: string;
+  /** Ověřené IČO (jen Gold) */
+  ico?: string | null;
 }
 
 export const GATE_NAMES: Record<number, string> = {
@@ -67,7 +69,7 @@ export async function issueCertificate(args: {
   const { data, error } = await supabase.rpc("issue_certificate", {
     p_project_id: args.projectId,
     p_kind: args.kind,
-    p_phase: args.kind === "phase" ? args.phase ?? null : null,
+    p_phase: args.kind === "phase" ? (args.phase ?? null) : null,
     p_holder_name: args.holderName,
     p_launch_url: args.launchUrl ?? null,
   });
@@ -84,7 +86,7 @@ export async function verifyCertificate(code: string): Promise<Certificate | nul
 export async function listMyCertificates(): Promise<Certificate[]> {
   const { data, error } = await supabase
     .from("certificates")
-    .select("code, project_id, kind, phase, holder_name, project_name, launch_url, issued_at")
+    .select("code, project_id, kind, phase, holder_name, project_name, launch_url, issued_at, ico")
     .order("issued_at", { ascending: false });
   if (error || !data) return [];
   return data as Certificate[];

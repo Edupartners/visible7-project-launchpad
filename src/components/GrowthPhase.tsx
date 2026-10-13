@@ -514,6 +514,9 @@ export const GrowthPhase = () => {
                 ? "Plán růstu je připravený."
                 : "Fázi dokončíte, až projdete povinné bloky „Jak růst krok za krokem“."}
           </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            K osvědčení Gold budete potřebovat odkaz na spuštěný projekt a IČO ověřené v registru ARES.
+          </p>
         </div>
         <Button
           className="shrink-0 rounded-[10px] bg-emerald-600 text-white hover:bg-emerald-700"

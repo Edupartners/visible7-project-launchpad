@@ -139,6 +139,11 @@ const CertificatePage = () => {
                     <span className="font-medium text-slate-700">{cert.launch_url.replace(/^https?:\/\//, "")}</span>
                   </>
                 )}
+                {cert.ico && (
+                  <>
+                    {" · "}IČO <span className="font-medium text-slate-700">{cert.ico}</span>
+                  </>
+                )}
               </p>
             </div>
 

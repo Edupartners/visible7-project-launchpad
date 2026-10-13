@@ -7,3 +7,6 @@ verify_jwt = false
 
 [functions.simpleshop]
 verify_jwt = false
+
+[functions.ares]
+verify_jwt = false

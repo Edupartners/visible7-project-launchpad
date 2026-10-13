@@ -1,3 +1,4 @@
+import { TradeLicenseCard } from "@/components/TradeLicenseCard";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Check, Compass, Gauge, Loader2, PiggyBank, Star, Target } from "lucide-react";
@@ -111,6 +112,8 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
           ))}
         </dl>
       </header>
+
+      <TradeLicenseCard placement="gate5" />
 
       {/* Doporučené kanály */}
       <section aria-labelledby="zacnete" className="rounded-3xl bg-primary p-6 text-white sm:p-8">
