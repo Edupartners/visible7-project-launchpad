@@ -12,6 +12,7 @@ import {
   BarChart3,
   Calculator,
   Check,
+  Download,
   FileSpreadsheet,
   FileText,
   Layers,
@@ -48,7 +49,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     does: "Celý byznys na jedné stránce. AI navrhne texty a ohodnotí je.",
     get: "Lean Canvas a typ byznysu",
     tags: ["AI"],
-    sample: "AI: doporučený typ – online kurz",
+    sample: "AI: typ byznysu – e-shop",
   },
   {
     name: "Byznys case",
@@ -276,6 +277,24 @@ const HeroJourney = () => {
           );
         })}
       </ol>
+      <div
+        className={`mt-4 flex items-center gap-3 rounded-xl border border-amber-300/40 bg-amber-400/10 px-3 py-2.5 transition-all duration-700 ${
+          open >= 3 ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+        }`}
+        aria-hidden={open < 3}
+      >
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400 text-primary">
+          <Award className="h-4 w-4" strokeWidth={2.5} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block whitespace-nowrap text-sm font-semibold">Osvědčení za 3 brány</span>
+          <span className="block truncate text-xs text-white/60">Do CV i na LinkedIn</span>
+        </span>
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold">
+          <Download className="h-3.5 w-3.5" />
+          PDF
+        </span>
+      </div>
     </div>
   );
 };
