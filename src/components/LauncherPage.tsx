@@ -183,6 +183,14 @@ const OUTPUTS = [
   { icon: Linkedin, title: "Osvědčení za každou bránu", text: "S ověřovacím kódem, rovnou na LinkedIn." },
 ];
 
+const PYRAMID = [
+  { name: "Víra", text: "v sebe a ve svůj projekt" },
+  { name: "Vize", text: "jak má projekt vypadat" },
+  { name: "Strategie", text: "cesta od dneška k vizi" },
+  { name: "Cíle", text: "milníky, které postupně zdoláte" },
+  { name: "Prostředky", text: "nástroje, technologie, marketing" },
+];
+
 const FAQ = [
   [
     "Je rentgen nápadu opravdu zdarma?",
@@ -645,6 +653,61 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
+        {/* Mise */}
+        <section className="border-t border-border">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-8 lg:px-12 md:grid-cols-[1.1fr_0.9fr] md:py-24">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wider text-orange-700">Naše mise</p>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl">
+                Jistota, kterou vám nikdo nevezme.
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+                Firma zavře, majitel prodá, AI zruší celé oddělení. Jediná skutečná jistota jste vy sami. Proto jsme
+                vytvořili VISIBLE7: aby každý, kdo chce, měl vlastní příjem ve svých rukou. Ať hledáte práci, chcete si
+                přivydělat, nebo rozjet vlastní firmu.
+              </p>
+              <figure className="mt-8 flex items-center gap-4">
+                <img
+                  src="https://www.edu-partners.cz/wp-content/uploads/2026/05/michal_micek_edu-scaled-1-1024x766.jpeg"
+                  alt="Michal Míček"
+                  loading="lazy"
+                  className="h-16 w-16 shrink-0 rounded-full bg-muted object-cover"
+                />
+                <figcaption>
+                  <blockquote className="font-semibold">„Nezačínáte od nuly. Začínáte od sebe.“</blockquote>
+                  <p className="text-sm text-muted-foreground">
+                    Mgr. Michal Míček, LL.M. · autor metodiky VISIBLE7 MICEK®
+                  </p>
+                </figcaption>
+              </figure>
+            </div>
+            <div>
+              <ol
+                className="flex flex-col items-center gap-2"
+                aria-label="Pyramida: víra, vize, strategie, cíle, prostředky"
+              >
+                {PYRAMID.map((l, i) => (
+                  <li
+                    key={l.name}
+                    style={{ width: `${52 + i * 12}%` }}
+                    className={`rounded-xl px-3 py-2.5 text-center ${i === 0 ? "bg-orange-500 text-white" : "bg-primary text-white"}`}
+                  >
+                    <span className="block font-bold">{l.name}</span>
+                    <span className={`block text-xs ${i === 0 ? "text-white/85" : "text-white/65"}`}>{l.text}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-5 text-center text-sm text-muted-foreground">
+                Většina lidí začíná od konce – nástroji. To je nejdražší chyba.
+                <br />
+                <strong className="text-foreground">
+                  VISIBLE7 vás vede shora: od víry v sebe k prvním zákazníkům.
+                </strong>
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Poradci */}
         <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
@@ -750,36 +813,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               ))}
               <p className="px-5 py-3 text-sm text-muted-foreground">vychází na {perMonth(shop)} měsíčně, včetně DPH</p>
             </dl>
-          </div>
-        </section>
-
-        {/* Autor */}
-        <section className="border-t border-border">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-8 lg:px-12 md:grid-cols-[0.8fr_1.2fr] md:py-24">
-            <img
-              src="https://www.edu-partners.cz/wp-content/uploads/2026/05/michal_micek_edu-scaled-1-1024x766.jpeg"
-              alt="Michal Míček"
-              loading="lazy"
-              className="aspect-[4/3] w-full rounded-3xl bg-muted object-cover"
-            />
-            <div>
-              <blockquote className="text-2xl font-semibold leading-snug tracking-tight sm:text-3xl">
-                „Podnikat se dá s málem. Nejdřív se dívejte, kolik můžete ztratit, ne kolik vyděláte.“
-              </blockquote>
-              <p className="mt-6 font-semibold">Mgr. Michal Míček, LL.M.</p>
-              <p className="text-muted-foreground">
-                Autor metodiky VISIBLE7 MICEK®, zakladatel Edu Partners. Přes 14 let v e-commerce, fintechu a
-                vzdělávání.
-              </p>
-              <a
-                href="https://visible7.cz"
-                target="_blank"
-                rel="noreferrer"
-                className="mt-5 inline-block font-semibold text-primary underline-offset-4 hover:underline"
-              >
-                Více o metodice na visible7.cz
-              </a>
-            </div>
           </div>
         </section>
 
