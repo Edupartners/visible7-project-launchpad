@@ -343,8 +343,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Otestujte svůj podnikatelský nápad za&nbsp;10&nbsp;minut.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              AI vám řekne, jestli nápad obstojí, kolik bude stát a kdy vás může uživit. Pak ho postavíte v sedmi
-              branách.
+              AI vám řekne, jestli obstojí a kdy vás může uživit. Pak ho postavíte v sedmi branách a s poradci z praxe
+              konzultujete, kdykoli se zaseknete.
             </p>
             <ul className="mt-7 grid max-w-xl grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
               {BENEFITS.map(({ icon: Icon, title, text }) => (
