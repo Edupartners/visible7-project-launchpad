@@ -144,6 +144,16 @@ const SHOWCASE = [
     width: 1037,
     height: 430,
   },
+  {
+    eyebrow: "Osvědčení a profesní zkouška",
+    title: "Doložte, co umíte. V CV, na LinkedIn i u státní zkoušky",
+    text: "Za každou splněnou bránu získáte osvědčení s ověřovacím kódem. Na LinkedIn ho přidáte jedním klikem a zaměstnavatel si pravost ověří přes QR kód. Po bráně 4 můžete složit zkoušku profesní kvalifikace Specialista internetového obchodu, zapsanou v Národní soustavě kvalifikací.",
+    cta: "Získat první osvědčení",
+    image: "/landing/ukazka-osvedceni.webp",
+    alt: "Osvědčení VISIBLE7 za fázi 1 Modrý oceán s ověřovacím kódem a QR kódem",
+    width: 1100,
+    height: 782,
+  },
 ];
 
 const MYTHS = [
