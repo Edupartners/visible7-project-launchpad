@@ -21,6 +21,7 @@ const INCLUDED: { row: string; free: boolean }[] = [
 
 const MEMBER_ITEMS = [
   "Všech 7 bran a přes 50 videonávodů",
+  "Živé online semináře každých 14 dní a jejich záznamy",
   "AI asistent u každé brány",
   "Byznys case, Excel a pitch na A4",
   "Osvědčení za každou bránu",
@@ -75,7 +76,7 @@ const PricingPage = () => {
             <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
               <h2 className="font-semibold text-muted-foreground">Zdarma</h2>
               <p className="mt-3 text-4xl font-extrabold tracking-tight">0 Kč</p>
-              <p className="text-sm text-muted-foreground">napořád, bez platební karty</p>
+              <p className="text-sm text-muted-foreground">bez platební karty</p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {[
                   "Rentgen nápadu za 10 minut",

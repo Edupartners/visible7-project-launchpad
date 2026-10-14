@@ -229,6 +229,10 @@ const FAQ = [
     "Jak pracuje AI s mými daty?",
     "AI vidí jen to, co do projektu napíšete, a jen když ji sami zavoláte. Data jsou uložena v EU.",
   ],
+  [
+    "Co jsou živé semináře?",
+    "Každých 14 dní 90 minut online s lektory Edu Partners: AI, SEO, reklama, WordPress, affiliate a další. Výklad, práce na projektech účastníků a otázky. Jsou součástí členství, záznamy najdete v aplikaci.",
+  ],
   ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
 ];
@@ -860,8 +864,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Začněte zdarma. Celá cesta za {kc(shop.price)}.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Rentgen nápadu a brány 1 a 2 jsou zdarma napořád. Členství platíte jednou na {monthsLabel(shop.months)},
-                nic se samo neobnovuje. {shop.anchor}
+                Rentgen nápadu a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
+                semináře každých 14 dní. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
+                {shop.anchor}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
@@ -872,9 +877,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
-                ["Zdarma napořád", "0 Kč"],
+                ["Rentgen nápadu a brány 1–2", "0 Kč"],
                 ["Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma", "0 Kč"],
-                [`Členství na ${monthsLabel(shop.months)}`, `${kc(shop.price)}`],
+                [`Členství na ${monthsLabel(shop.months)}: 7 bran a živé semináře`, `${kc(shop.price)}`],
               ].map(([name, price]) => (
                 <div key={name} className="flex items-baseline justify-between gap-4 px-5 py-4">
                   <dt className="font-semibold">{name}</dt>
