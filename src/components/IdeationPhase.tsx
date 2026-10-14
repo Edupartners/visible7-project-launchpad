@@ -274,7 +274,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
         <div className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 text-sm">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
-            Z fáze 1 (Modrý oceán) jsme předvyplnili {preFilled.length}{" "}
+            Z fáze 1 (Strategie modrého oceánu) jsme předvyplnili {preFilled.length}{" "}
             {preFilled.length === 1 ? "pole" : preFilled.length < 5 ? "pole" : "polí"}. Klidně je upravte.
           </p>
         </div>

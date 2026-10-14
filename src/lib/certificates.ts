@@ -16,7 +16,7 @@ export interface Certificate {
 }
 
 export const GATE_NAMES: Record<number, string> = {
-  1: "Modrý oceán",
+  1: "Strategie modrého oceánu",
   2: "Lean Canvas",
   3: "Byznys case",
   4: "Tvorba",
@@ -39,7 +39,7 @@ export const certificateDescription = (kind: CertificateKind, phase: number | nu
   if (kind === "gold")
     return "za projití všech sedmi bran metodiky VISIBLE7 MICEK® a spuštění vlastního projektu na trh";
   if (kind === "zamer")
-    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK®: modrý oceán, Lean Canvas, byznys case a tvorba";
+    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK®: strategie modrého oceánu, Lean Canvas, byznys case a tvorba";
   return `za absolvování fáze ${phase} – ${GATE_NAMES[phase ?? 0] ?? ""} – metodiky VISIBLE7 MICEK®`;
 };
 

@@ -244,7 +244,7 @@ export const DiagnosisResult = ({
       <section className="flex flex-col items-start gap-5 rounded-3xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <p className="text-sm font-semibold text-orange-700">Teď to uděláme pořádně</p>
-          <h2 className="text-2xl font-bold tracking-tight">Brána 1: Modrý oceán</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Brána 1: Strategie modrého oceánu</h2>
           <p className="mt-1 max-w-xl text-muted-foreground">
             Brány 1–3 jsou předvyplněné z rentgenu jako návrh. Projdete je, opravíte a doplníte vlastními čísly.
           </p>

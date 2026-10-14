@@ -228,7 +228,7 @@ export const TYPES: Record<TypeId, TypeInfo> = {
     strength: "Jste rychlí a rozhodní, rychle poznáte příležitost.",
     trap: "Skáčete z nápadu na nápad a žádný nedotáhnete.",
     gate: 1,
-    gateWhy: "Modrý oceán vám pomůže vybrat jednu příležitost, která stojí za to.",
+    gateWhy: "Strategie modrého oceánu vám pomůže vybrat jednu příležitost, která stojí za to.",
     advisorId: "monika-vesela",
     motto: "Jedna dotažená příležitost je víc než deset rozjetých.",
   },

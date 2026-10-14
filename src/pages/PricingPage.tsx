@@ -10,7 +10,7 @@ import { CONSULTATION } from "@/lib/advisors";
 
 const INCLUDED: { row: string; free: boolean }[] = [
   { row: "Rentgen nápadu: verdikt AI, čísla a mapa cesty", free: true },
-  { row: "Brána 1 Modrý oceán a brána 2 Lean Canvas s AI", free: true },
+  { row: "Brána 1 Strategie modrého oceánu a brána 2 Lean Canvas s AI", free: true },
   { row: "Osvědčení za brány 1 a 2", free: true },
   { row: "Brána 3 Byznys case: kapitál, bod zvratu, PNO", free: false },
   { row: "Brány 4–7 s videonávody krok za krokem", free: false },
@@ -79,7 +79,7 @@ const PricingPage = () => {
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {[
                   "Rentgen nápadu za 10 minut",
-                  "Brána 1 Modrý oceán",
+                  "Brána 1 Strategie modrého oceánu",
                   "Brána 2 Lean Canvas s AI",
                   "Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma",
                 ].map((it) => (

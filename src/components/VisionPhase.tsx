@@ -103,7 +103,17 @@ const defaultsFor = (q: ErrcQuadrant): Omit<ErrcItem, "id" | "text"> => {
 const isLocked = (q: ErrcQuadrant, field: "lowCost" | "premium" | "mine") =>
   (q === "eliminate" && field === "mine") || (q === "create" && field !== "mine");
 
-const SectionHeader = ({ icon: Icon, step, title, subtitle }: { icon: typeof Users; step: number; title: string; subtitle: string }) => (
+const SectionHeader = ({
+  icon: Icon,
+  step,
+  title,
+  subtitle,
+}: {
+  icon: typeof Users;
+  step: number;
+  title: string;
+  subtitle: string;
+}) => (
   <div className="mb-5 flex items-start gap-3">
     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
       <Icon className="h-5 w-5" />
@@ -138,7 +148,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
   const [errc, setErrc, { loading: errcLoading }] = useSupabaseProgress<ErrcMatrix>(VISION_KEYS.errc, EMPTY_ERRC);
   const [legacyErrc, , { loading: legacyLoading }] = useSupabaseProgress<Record<ErrcQuadrant, string[]> | null>(
     "vision_errc_data",
-    null
+    null,
   );
   const [usp, setUsp] = useSupabaseProgress<string>(VISION_KEYS.usp, "");
   const [celebrate, setCelebrate] = useState(false);
@@ -157,7 +167,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         (legacyErrc[q.key] ?? [])
           .filter((t) => typeof t === "string" && t.trim())
           .map((t) => ({ id: newId(), text: t.trim(), ...defaultsFor(q.key) })),
-      ])
+      ]),
     ) as ErrcMatrix;
     if (QUADRANTS.some((q) => converted[q.key].length > 0)) setErrc(converted);
   }, [errcLoading, legacyLoading, legacyErrc, errc, setErrc]);
@@ -184,9 +194,9 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
             "Low-cost konkurence": q.key === "create" ? 0 : i.lowCost,
             "Prémiová konkurence": q.key === "create" ? 0 : i.premium,
             "Můj projekt": q.key === "eliminate" ? 0 : i.mine,
-          }))
+          })),
       ),
-    [errc]
+    [errc],
   );
 
   const suggestUsp = () => {
@@ -250,7 +260,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
       {celebrate && (
         <PhaseCelebration
           gate={1}
-          title="Modrý oceán je hotový"
+          title="Strategie modrého oceánu je hotová"
           message="Váš zákazník, ERRC matice a USP se propíšou do Lean Canvasu."
           nextLabel="Pokračovat na Lean Canvas"
           onNext={() => navigate("/ideation")}
@@ -262,7 +272,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-primary">Fáze 1 ze 7</p>
-            <h2 className="text-2xl font-bold text-foreground">Modrý oceán</h2>
+            <h2 className="text-2xl font-bold text-foreground">Strategie modrého oceánu</h2>
             <p className="text-sm text-muted-foreground">Najděte místo na trhu mezi levnou a prémiovou konkurencí.</p>
           </div>
           <div className="text-right">
@@ -284,13 +294,15 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         </div>
         <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
           <p>
-            Modrý oceán není o tom být levnější. Je o tom <strong className="text-foreground">přidat zákazníkovi tolik
-            hodnoty</strong>, že vás přestane srovnávat s konkurencí. Kdo soutěží cenou, prohrává s tím, kdo je ochotný
-            prodělávat víc.
+            Modrý oceán není o tom být levnější. Je o tom{" "}
+            <strong className="text-foreground">přidat zákazníkovi tolik hodnoty</strong>, že vás přestane srovnávat s
+            konkurencí. Kdo soutěží cenou, prohrává s tím, kdo je ochotný prodělávat víc.
           </p>
 
           <div>
-            <p className="mb-2 font-medium text-foreground">Kde hodnota vzniká (rovnice hodnoty podle Alexe Hormoziho)</p>
+            <p className="mb-2 font-medium text-foreground">
+              Kde hodnota vzniká (rovnice hodnoty podle Alexe Hormoziho)
+            </p>
             <div className="rounded-xl border border-border/60 p-4">
               <div className="flex flex-col items-center gap-1 text-center text-foreground">
                 <span className="font-semibold">Vysněný výsledek × Jistota, že ho dosáhnu</span>
@@ -298,10 +310,19 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 <span className="font-semibold">Čas do výsledku × Úsilí a oběti</span>
               </div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                <li><strong className="text-foreground">↑ Výsledek:</strong> co přesně zákazník získá, ne co dostane do ruky.</li>
-                <li><strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit – postup, záruka, důkazy.</li>
-                <li><strong className="text-foreground">↓ Čas:</strong> jak rychle uvidí první výsledek.</li>
-                <li><strong className="text-foreground">↓ Úsilí:</strong> co za něj uděláte vy, aby nemusel on.</li>
+                <li>
+                  <strong className="text-foreground">↑ Výsledek:</strong> co přesně zákazník získá, ne co dostane do
+                  ruky.
+                </li>
+                <li>
+                  <strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit – postup, záruka, důkazy.
+                </li>
+                <li>
+                  <strong className="text-foreground">↓ Čas:</strong> jak rychle uvidí první výsledek.
+                </li>
+                <li>
+                  <strong className="text-foreground">↓ Úsilí:</strong> co za něj uděláte vy, aby nemusel on.
+                </li>
               </ul>
             </div>
             <p className="mt-2">
@@ -312,8 +333,8 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           </div>
 
           <p>
-            <strong className="text-foreground">USP</strong> je pak jedna věta, ze které je jasné, jakou hodnotu zákazník
-            dostane: jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Ne seznam vlastností.
+            <strong className="text-foreground">USP</strong> je pak jedna věta, ze které je jasné, jakou hodnotu
+            zákazník dostane: jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Ne seznam vlastností.
           </p>
 
           <div className="rounded-xl bg-muted/60 p-4">
@@ -453,9 +474,21 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 {items.length > 0 && (
                   <div className="mb-1 grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] gap-1.5 text-[11px] text-muted-foreground">
                     <span />
-                    <span className="text-center" title={`Levná konkurence${basics.lowCostName ? `: ${basics.lowCostName}` : ""}`}>Levná</span>
-                    <span className="text-center" title={`Prémiová konkurence${basics.premiumName ? `: ${basics.premiumName}` : ""}`}>Prém.</span>
-                    <span className="text-center font-medium text-primary" title="Váš projekt">Já</span>
+                    <span
+                      className="text-center"
+                      title={`Levná konkurence${basics.lowCostName ? `: ${basics.lowCostName}` : ""}`}
+                    >
+                      Levná
+                    </span>
+                    <span
+                      className="text-center"
+                      title={`Prémiová konkurence${basics.premiumName ? `: ${basics.premiumName}` : ""}`}
+                    >
+                      Prém.
+                    </span>
+                    <span className="text-center font-medium text-primary" title="Váš projekt">
+                      Já
+                    </span>
                     <span />
                   </div>
                 )}
@@ -537,11 +570,36 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                   height={70}
                   tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 />
-                <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                <YAxis
+                  domain={[0, 100]}
+                  ticks={[0, 25, 50, 75, 100]}
+                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                />
                 <Tooltip labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string })?.full ?? ""} />
                 <Legend verticalAlign="top" height={32} wrapperStyle={{ fontSize: 13 }} />
-                <Line type="linear" dataKey="Low-cost konkurence" name={basics.lowCostName?.trim() ? `Levná: ${shorten(basics.lowCostName.trim(), 28)}` : "Levná konkurence"} stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
-                <Line type="linear" dataKey="Prémiová konkurence" name={basics.premiumName?.trim() ? `Prémiová: ${shorten(basics.premiumName.trim(), 28)}` : "Prémiová konkurence"} stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />
+                <Line
+                  type="linear"
+                  dataKey="Low-cost konkurence"
+                  name={
+                    basics.lowCostName?.trim() ? `Levná: ${shorten(basics.lowCostName.trim(), 28)}` : "Levná konkurence"
+                  }
+                  stroke="#94a3b8"
+                  strokeWidth={2}
+                  strokeDasharray="5 4"
+                  dot={{ r: 3 }}
+                />
+                <Line
+                  type="linear"
+                  dataKey="Prémiová konkurence"
+                  name={
+                    basics.premiumName?.trim()
+                      ? `Prémiová: ${shorten(basics.premiumName.trim(), 28)}`
+                      : "Prémiová konkurence"
+                  }
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
                 <Line type="linear" dataKey="Můj projekt" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
@@ -572,14 +630,14 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         </div>
       </Card>
 
-      <AdvisorsInline phase={1} title="Probrat modrý oceán s poradcem" topic="Fáze 1 – Modrý oceán" />
+      <AdvisorsInline phase={1} title="Probrat modrý oceán s poradcem" topic="Fáze 1 – Strategie modrého oceánu" />
 
       {/* Kontrola a dokončení */}
       <Card className="card-apple p-6">
         <h3 className="mb-1 text-lg font-semibold">Kontrola</h3>
         <p className="mb-4 text-sm text-muted-foreground">
-          Povinné body odemknou další bránu. Doporučené body hlídají, aby šlo opravdu o modrý oceán. Vyhodnocení pomocí AI
-          přibude v další verzi.
+          Povinné body odemknou další bránu. Doporučené body hlídají, aby šlo opravdu o modrý oceán. Vyhodnocení pomocí
+          AI přibude v další verzi.
         </p>
         <ul className="space-y-2">
           {checks.map((c) => (

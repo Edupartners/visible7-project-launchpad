@@ -41,7 +41,7 @@ const VisionPage = () => {
       <PageLayout onBack={handleBack}>
         <PhaseIntroTemplate
           title="Vision"
-          subtitle="Strategie modrého oceánu"
+          subtitle="Vitamín, nebo lék? Najděte, kde můžete inovovat"
           description="Blue Ocean Strategy vám pomůže najít neobsazený prostor na trhu, kde můžete vytvořit novou poptávku místo konkurování v přeplněném 'červeném oceánu'. ERRC matice (Eliminate-Reduce-Raise-Create) je srdcem této strategie a pomůže vám identifikovat co odstranit z trhu, co zlevnit, co vylepšit a co úplně nového vytvořit. Výsledkem je jedinečná hodnotová propozice, která vás odliší od konkurence."
           phaseNumber={1}
           icon={Eye}

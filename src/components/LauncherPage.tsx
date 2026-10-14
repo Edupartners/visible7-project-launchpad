@@ -36,7 +36,7 @@ type Tag = "AI" | "Video" | "Výpočet";
 
 const GATES: { name: string; icon: typeof Target; does: string; get: string; tags: Tag[]; sample: string }[] = [
   {
-    name: "Modrý oceán",
+    name: "Strategie modrého oceánu",
     icon: Target,
     does: "Najdete místo mezi levnou a prémiovou konkurencí.",
     get: "Křivka hodnoty a USP",
@@ -150,7 +150,7 @@ const SHOWCASE = [
     text: "Za každou splněnou bránu získáte osvědčení s ověřovacím kódem. Na LinkedIn ho přidáte jedním klikem a zaměstnavatel si pravost ověří přes QR kód. Po bráně 4 můžete složit zkoušku profesní kvalifikace Specialista internetového obchodu, zapsanou v Národní soustavě kvalifikací.",
     cta: "Získat první osvědčení",
     image: "/landing/ukazka-osvedceni.webp",
-    alt: "Osvědčení VISIBLE7 za fázi 1 Modrý oceán s ověřovacím kódem a QR kódem",
+    alt: "Osvědčení VISIBLE7 za fázi 1 Strategie modrého oceánu s ověřovacím kódem a QR kódem",
     width: 1100,
     height: 782,
   },
@@ -216,7 +216,7 @@ const FAQ = [
   ],
   [
     "Co když ještě nemám nápad?",
-    "Začněte bránou 1. Modrý oceán je přesně nástroj na to, jak najít místo, kde nebudete jen další z mnoha.",
+    "Začněte bránou 1. Strategie modrého oceánu je přesně nástroj na to, jak najít místo, kde nebudete jen další z mnoha.",
   ],
   [
     "Jak pracuje AI s mými daty?",

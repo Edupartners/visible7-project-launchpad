@@ -21,7 +21,7 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
 const GATE_NAMES: Record<number, string> = {
-  1: "Modrý oceán",
+  1: "Strategie modrého oceánu",
   2: "Lean Canvas",
   3: "Byznys case",
   4: "Tvorba",

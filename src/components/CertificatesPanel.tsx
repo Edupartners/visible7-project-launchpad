@@ -60,7 +60,7 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
 
       {certs.length === 0 && offers.length === 0 && (
         <p className="border-t border-border px-6 py-4 text-sm text-muted-foreground sm:px-8">
-          Zatím tu nic není. První osvědčení získáte po dokončení brány 1 – Modrý oceán.
+          Zatím tu nic není. První osvědčení získáte po dokončení brány 1 – Strategie modrého oceánu.
         </p>
       )}
 
