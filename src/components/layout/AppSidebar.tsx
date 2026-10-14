@@ -1,6 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Award, Check, FolderOpen, LogOut, Menu, Plus, Settings, ShieldCheck, Users, X } from "lucide-react";
+import {
+  Award,
+  Check,
+  FolderOpen,
+  LogOut,
+  Menu,
+  Plus,
+  Presentation,
+  Settings,
+  ShieldCheck,
+  Users,
+  X,
+} from "lucide-react";
+import { loadSeminars, sortSeminars } from "@/lib/seminars";
 import { useIsAdmin } from "@/lib/admin";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
@@ -10,6 +23,30 @@ import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
 
 const initials = (email: string) => email.split("@")[0].slice(0, 2).toUpperCase();
+
+/** Odkaz na živé semináře s datem nejbližšího termínu. */
+const SidebarSeminars = ({ onClick }: { onClick: () => void }) => {
+  const [next, setNext] = useState<string | null>(null);
+  useEffect(() => {
+    loadSeminars()
+      .then((list) => {
+        const s = sortSeminars(list).up.find((x) => x.starts_at);
+        if (s?.starts_at)
+          setNext(new Date(s.starts_at).toLocaleDateString("cs-CZ", { day: "numeric", month: "numeric" }));
+      })
+      .catch(() => undefined);
+  }, []);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mb-1.5 flex w-full items-center gap-2 rounded-lg bg-primary/5 px-2.5 py-2 text-left text-sm font-semibold text-primary hover:bg-primary/10"
+    >
+      <Presentation className="h-4 w-4" /> Živé semináře
+      {next && <span className="ml-auto text-xs font-normal text-muted-foreground">{next}</span>}
+    </button>
+  );
+};
 
 /** Obsah postranního panelu – projekty nahoře, odkazy a účet s ozubeným kolem dole (jako ChatGPT/Claude). */
 const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
@@ -153,6 +190,7 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
       </nav>
 
       <div className="px-3 pb-2">
+        <SidebarSeminars onClick={() => go("/seminare")} />
         <SidebarMembership onNavigate={onNavigate} />
       </div>
 

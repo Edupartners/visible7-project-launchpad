@@ -27,6 +27,7 @@ import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmi
 import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
 import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
 import { ShopAdmin } from "@/components/admin/ShopAdmin";
+import { SeminarsAdmin } from "@/components/admin/SeminarsAdmin";
 import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
 import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
@@ -297,6 +298,8 @@ const AdminPage = () => {
                 )}
               </section>
             )}
+
+            <SeminarsAdmin />
 
             <AnnouncementsAdmin users={stats.users} />
 
