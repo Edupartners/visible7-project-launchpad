@@ -66,7 +66,7 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
       return;
     }
     onOpenChange(false);
-    navigate(`/osvedceni/${code}`);
+    navigate(`/osvedceni/${code}`, { state: { fresh: true } });
   };
 
   return (

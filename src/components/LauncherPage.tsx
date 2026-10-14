@@ -495,20 +495,22 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 ))}
               </ul>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <a
-                  href={`mailto:info@visible7.io?subject=${encodeURIComponent("Podnikám offline a chci online")}`}
+                <Link
+                  to="/rentgen?rezim=podnik&novy"
                   className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-base font-semibold text-white hover:bg-orange-600"
                 >
-                  Domluvit úvodní konzultaci <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                </a>
-                <button
-                  type="button"
-                  onClick={onAccessGranted}
+                  Udělat rentgen podniku zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                </Link>
+                <a
+                  href={`mailto:info@visible7.io?subject=${encodeURIComponent("Podnikám offline a chci online")}`}
                   className="px-2 text-left font-semibold text-primary underline-offset-4 hover:underline"
                 >
-                  Nebo začněte zdarma v aplikaci
-                </button>
+                  Nebo si domluvte úvodní konzultaci
+                </a>
               </div>
+              <p className="mt-3 text-sm text-muted-foreground">
+                4 krátké otázky. Dostanete 3 online příležitosti s odhadem tržeb a první krok na tento týden.
+              </p>
             </div>
           </div>
         </section>

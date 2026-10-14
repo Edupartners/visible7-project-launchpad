@@ -22,6 +22,7 @@ import {
   validIco,
   verifyIco,
 } from "@/lib/tradeLicense";
+import { celebrate } from "@/lib/celebrate";
 
 const fmt = (iso: string) =>
   new Date(iso).toLocaleDateString("cs-CZ", { day: "numeric", month: "long", year: "numeric" });
@@ -100,6 +101,7 @@ export const TradeLicenseCard = ({ placement, launchDate }: TradeLicenseCardProp
       return;
     }
     setVerified(result);
+    celebrate("big");
     setChanging(false);
     track("business_verified_ui", { legal_form: result.legal_form, placement }, currentProject.id);
     toast({ title: "IČO je ověřené", description: `${result.name} je v registru ARES.` });

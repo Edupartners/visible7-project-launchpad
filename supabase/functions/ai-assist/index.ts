@@ -546,6 +546,63 @@ const DIAGNOSE_TOOL = {
   },
 };
 
+// „Už podnikám“: stejný návrh projektu (brány 1–3) + úzké hrdlo a 3 online příležitosti.
+const { verdict: _verdict, ...DIAGNOSE_BASE_PROPS } = DIAGNOSE_TOOL.input_schema.properties;
+const DIAGNOSE_BUSINESS_TOOL = {
+  name: "rentgen_podniku",
+  description: "Kde existujícímu podniku online přinese nové zákazníky a peníze, a první návrh online projektu.",
+  input_schema: {
+    type: "object",
+    properties: {
+      ...DIAGNOSE_BASE_PROPS,
+      bottleneck: { type: "string", description: "Hlavní úzké hrdlo podniku jednou větou, max 140 znaků." },
+      opportunities: {
+        type: "array",
+        minItems: 3,
+        maxItems: 3,
+        items: {
+          type: "object",
+          properties: {
+            title: { type: "string", description: "Příležitost, max 60 znaků (např. Dárkové poukazy online)." },
+            why: { type: "string", description: "Proč právě pro tento podnik, 1–2 věty, max 240 znaků." },
+            revenueFrom: { type: "number", description: "Opatrný odhad měsíčních tržeb navíc v Kč." },
+            revenueTo: { type: "number", description: "Realistický odhad měsíčních tržeb navíc v Kč." },
+            calc: { type: "string", description: "Jak jsi to spočítal, max 120 znaků (např. 15–30 poukazů × 800 Kč)." },
+            effort: { type: "string", enum: ["nizka", "stredni", "vysoka"] },
+            firstStep: { type: "string", description: "Konkrétní první krok, který zvládne tento týden, 1 věta, max 200 znaků." },
+          },
+          required: ["title", "why", "revenueFrom", "revenueTo", "calc", "effort", "firstStep"],
+        },
+      },
+    },
+    required: [
+      "projectName", "slogan", "bottleneck", "opportunities", "businessType", "businessTypeReason",
+      "vision", "canvas", "revenue", "costs", "risks", "strengths",
+    ],
+  },
+};
+
+const WANT_LABELS: Record<string, string> = {
+  zakaznici: "víc zákazníků",
+  prijem: "nový příjem (poukazy, e-shop, předplatné…)",
+  mene_prace: "méně práce s objednávkami a rezervacemi",
+  nevim: "neví, chce poradit",
+};
+const BAND_LABELS: Record<string, string> = {
+  do50: "do 50 000 Kč",
+  "50-150": "50 000–150 000 Kč",
+  "150-500": "150 000–500 000 Kč",
+  vic: "víc než 500 000 Kč",
+};
+const ONLINE_LABELS: Record<string, string> = {
+  web: "web",
+  google: "Google profil firmy",
+  social: "Facebook / Instagram",
+  rezervace: "online rezervace",
+  eshop: "e-shop",
+  nic: "zatím nic",
+};
+
 const GOAL_LABELS: Record<string, string> = {
   privydelek: "přivýdělek vedle práce",
   mzda: "nahradit mzdu, aby ho projekt živil",
@@ -560,14 +617,37 @@ const SKILL_LABELS: Record<string, string> = {
   zadna: "zatím nemá žádnou z těchto dovedností",
 };
 
-type DiagnoseAnswers = { idea: string; customer: string; problem: string; hours: number; budget: number; income: number | null; goal: string; skills: string[] };
+type DiagnoseAnswers = {
+  mode: "start" | "business";
+  idea: string;
+  customer: string;
+  problem: string;
+  hours: number;
+  budget: number;
+  income: number | null;
+  goal: string;
+  skills: string[];
+  wants: string[];
+  advantage: string;
+  revenueBand: string;
+  avgSpend: number | null;
+  online: string[];
+};
 
 function cleanAnswers(raw: unknown): DiagnoseAnswers | null {
   const a = (raw ?? {}) as Record<string, unknown>;
   const idea = cut(a.idea, 600);
   if (idea.length < 8) return null;
   const num = (v: unknown, max: number) => Math.min(Math.max(Math.round(Number(v) || 0), 0), max);
+  const pick = (v: unknown, labels: Record<string, string>) =>
+    [...new Set((Array.isArray(v) ? v : []).map(String).filter((k) => k in labels))].slice(0, 8);
   return {
+    mode: a.mode === "business" ? "business" : "start",
+    wants: pick(a.wants, WANT_LABELS),
+    advantage: cut(a.advantage, 400),
+    revenueBand: String(a.revenueBand) in BAND_LABELS ? String(a.revenueBand) : "",
+    avgSpend: a.avgSpend === null || a.avgSpend === undefined || a.avgSpend === "" ? null : num(a.avgSpend, 10_000_000) || null,
+    online: pick(a.online, ONLINE_LABELS),
     idea,
     customer: cut(a.customer, 400),
     problem: cut(a.problem, 400),
@@ -597,6 +677,31 @@ Dovednosti: ${a.skills.length ? a.skills.map((k) => SKILL_LABELS[k]).join(", ") 
 - costs: 3–10 položek podle podnikatelského minimalismu, celková jednorázová investice by měla odpovídat rozpočtu, pokud to jde. Nezahrnuj vlastní odměnu podnikatele – tu porovnáváme zvlášť.
 - risks: 3 největší rizika, každé s levným testem do 14 dnů.
 - strengths: 1–3 silné stránky nápadu nebo podnikatele.
+Zde výjimečně čísla a částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
+}
+
+function diagnoseBusinessPrompt(a: DiagnoseAnswers) {
+  return `Podnikatel už podniká (zatím hlavně offline) a chce zjistit, kde mu online přinese nové zákazníky a peníze.
+Čím se živí: ${a.idea}
+Co chce od online: ${a.wants.length ? a.wants.map((k) => WANT_LABELS[k]).join(", ") : "neuvedeno"}
+Zákazníci dnes: ${a.customer || "(neuvedeno – odhadni podle oboru)"}
+Proč chodí právě k němu: ${a.advantage || "(neuvedeno)"}
+Měsíční tržby: ${a.revenueBand ? BAND_LABELS[a.revenueBand] : "neuvedeno"}
+Průměrná útrata zákazníka: ${a.avgSpend ? a.avgSpend.toLocaleString("cs-CZ") + " Kč" : "neuvedeno – odhadni podle oboru"}
+Online dnes má: ${a.online.length ? a.online.map((k) => ONLINE_LABELS[k]).join(", ") : "neuvedeno"}
+Čas na online: ${a.hours} hodin týdně
+Kolik může investovat: ${a.budget.toLocaleString("cs-CZ")} Kč
+Dovednosti: ${a.skills.length ? a.skills.map((k) => SKILL_LABELS[k]).join(", ") : "neuvedeno"}
+
+Úkol: udělej „rentgen podniku“ – upřímný pohled zkušeného mentora pro malý český podnik v roce 2026. Podnikatel se to má naučit řídit sám, ne si to koupit od agentury.
+- bottleneck: co ho dnes nejvíc brzdí v růstu (např. závislost na doporučení, plná kapacita bez vyšších cen, žádná viditelnost na Googlu). Jedna věta, bez obecných frází.
+- opportunities: přesně 3 online příležitosti seřazené od nejrychlejšího přínosu. Vycházej z toho, co už má (nenavrhuj web, když ho má; Google profil je u lokálních služeb často nejrychlejší krok). Myšlenka modrého oceánu: hledej novou hodnotu pro jeho zákazníky (poukazy, předplatné, online produkt, rezervace, doplňkový prodej), ne jen „víc reklamy“. Tržby navíc počítej z jeho průměrné útraty a realistického počtu zákazníků při ${a.hours} hodinách týdně; revenueFrom ≤ revenueTo; calc ukáže výpočet. firstStep je konkrétní úkol na tento týden zdarma nebo levně.
+- projectName: název online projektu podniku (např. „Masérna Poruba online“), slogan pro zákazníky.
+- vision, canvas, revenue, costs: popiš NEJSILNĚJŠÍ online příležitost jako projekt podniku. vision.customer = jeho zákazníci, problem = proč by online službu chtěli, offering = co online nabídne, lowCostName a premiumName = místní a online konkurence. Náklady a příjmy v canvasu jako výčet položek bez částek.
+- businessType: nejbližší typ z povoleného seznamu: ${Object.entries(BUSINESS_TYPES).map(([id, n]) => `${id} = ${n}`).join(", ")}.
+- revenue: realistická čísla jen pro online část (ne celé tržby podniku). Pole, která se nepoužívají, nastav na 0. growthYear2 obvykle 10–40.
+- costs: 3–8 položek podle podnikatelského minimalismu, jednorázové náklady v rozpočtu.
+- risks: 3 rizika, každé s levným testem do 14 dnů. strengths: 1–3 silné stránky podniku, na kterých online stavět.
 Zde výjimečně čísla a částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
 }
 
@@ -655,7 +760,7 @@ Deno.serve(async (req) => {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const answers = action === "diagnose" ? cleanAnswers(body.answers) : null;
-  if (action === "diagnose" && !answers) return json({ error: "Popište nápad aspoň jednou větou." }, 400);
+  if (action === "diagnose" && !answers) return json({ error: "Popište nápad nebo podnik aspoň jednou větou." }, 400);
   const kind =
     action === "diagnose" || action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill" || action === "pitch"
       ? "navrh"
@@ -755,7 +860,9 @@ Deno.serve(async (req) => {
   try {
     result =
       action === "diagnose"
-        ? await callClaude(diagnosePrompt(answers!), DIAGNOSE_TOOL, 5000)
+        ? answers!.mode === "business"
+          ? await callClaude(diagnoseBusinessPrompt(answers!), DIAGNOSE_BUSINESS_TOOL, 6000)
+          : await callClaude(diagnosePrompt(answers!), DIAGNOSE_TOOL, 5000)
         : action === "pitch"
         ? await callClaude(
             pitchPrompt(
@@ -859,6 +966,23 @@ Deno.serve(async (req) => {
       .map((c) => ({ name: str(c.name, 70), kind: String(c.kind), amount: Math.round(Math.min(Math.max(Number(c.amount) || 0, 0), 10_000_000)) }));
     output.risks = ((output.risks as Record<string, unknown>[]) ?? []).slice(0, 3).map((r) => ({ risk: str(r.risk, 240), test: str(r.test, 240) }));
     output.strengths = ((output.strengths as unknown[]) ?? []).slice(0, 3).map((x) => str(x, 240)).filter(Boolean);
+    if (answers!.mode === "business") {
+      const money = (x: unknown) => Math.round(Math.min(Math.max(Number(x) || 0, 0), 100_000_000));
+      output.bottleneck = str(output.bottleneck, 200);
+      output.opportunities = ((output.opportunities as Record<string, unknown>[]) ?? []).slice(0, 3).map((o) => {
+        const [from, to] = [money(o.revenueFrom), money(o.revenueTo)].sort((x, y) => x - y);
+        return {
+          title: str(o.title, 80),
+          why: str(o.why, 300),
+          revenueFrom: from,
+          revenueTo: to,
+          calc: str(o.calc, 160),
+          effort: ["nizka", "stredni", "vysoka"].includes(String(o.effort)) ? String(o.effort) : "stredni",
+          firstStep: str(o.firstStep, 240),
+        };
+      }).filter((o) => o.title);
+      output.verdict = { color: "zelena", headline: output.bottleneck, why: "" };
+    }
   }
   if (action === "case_assumptions") output.items = cleanRevenue(output.items, assumptionFields);
   if (action === "case_autofill") output.revenue = cleanRevenue(output.revenue, autofillFields);

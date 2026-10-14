@@ -21,8 +21,12 @@ import type { VisionBasics } from "@/lib/projectData";
 export const DIAGNOSIS_KEY = "diagnosis";
 
 export type Goal = "privydelek" | "mzda" | "firma";
+/** start = začínám podnikat (nápad), business = už podnikám (hledám online příležitosti) */
+export type RentgenMode = "start" | "business";
 
 export interface DiagnosisAnswers {
+  mode?: RentgenMode;
+  /** U „Už podnikám“: čím se dnes živí (obor a kde) */
   idea: string;
   customer: string;
   problem: string;
@@ -32,6 +36,12 @@ export interface DiagnosisAnswers {
   income: number | null;
   goal: Goal;
   skills: string[];
+  /** Jen „Už podnikám“ */
+  wants?: string[];
+  advantage?: string;
+  revenueBand?: string;
+  avgSpend?: number | null;
+  online?: string[];
 }
 
 export const EMPTY_ANSWERS: DiagnosisAnswers = {
@@ -61,6 +71,40 @@ export const SKILLS = [
 ];
 
 export const HOURS = [5, 10, 20, 40];
+
+/** „Už podnikám“ – volby otázek. */
+export const WANTS = [
+  { id: "zakaznici", label: "Víc zákazníků" },
+  { id: "prijem", label: "Nový příjem", text: "poukazy, e-shop, předplatné…" },
+  { id: "mene_prace", label: "Méně práce s objednávkami a rezervacemi" },
+  { id: "nevim", label: "Nevím, poraďte" },
+];
+export const REVENUE_BANDS = [
+  { id: "do50", label: "do 50 tis." },
+  { id: "50-150", label: "50–150 tis." },
+  { id: "150-500", label: "150–500 tis." },
+  { id: "vic", label: "víc" },
+  { id: "", label: "nechci uvádět" },
+];
+export const ONLINE_NOW = [
+  { id: "web", label: "Web" },
+  { id: "google", label: "Google profil" },
+  { id: "social", label: "Facebook / Instagram" },
+  { id: "rezervace", label: "Online rezervace" },
+  { id: "eshop", label: "E-shop" },
+  { id: "nic", label: "Nic z toho" },
+];
+
+export type Effort = "nizka" | "stredni" | "vysoka";
+export interface Opportunity {
+  title: string;
+  why: string;
+  revenueFrom: number;
+  revenueTo: number;
+  calc: string;
+  effort: Effort;
+  firstStep: string;
+}
 export const BUDGETS = [0, 10_000, 30_000, 100_000, 250_000];
 
 export type Verdict = "zelena" | "oranzova" | "cervena";
@@ -77,6 +121,9 @@ export interface DiagnosisAi {
   costs: { name: string; kind: CostKind; amount: number }[];
   risks: { risk: string; test: string }[];
   strengths: string[];
+  /** Jen „Už podnikám“ */
+  bottleneck?: string;
+  opportunities?: Opportunity[];
 }
 
 export interface Diagnosis {
@@ -85,6 +132,8 @@ export interface Diagnosis {
   createdAt: string;
   /** Které brány rentgen předvyplnil: vision, canvas, case */
   prefilled?: string[];
+  /** „Už podnikám“: odškrtnuté první kroky příležitostí (indexy) */
+  stepsDone?: number[];
 }
 
 /** Měsíční zisk, který znamená bod C („živí mě to“). */

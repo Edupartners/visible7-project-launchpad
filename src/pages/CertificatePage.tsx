@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { celebrate } from "@/lib/celebrate";
 import QRCode from "qrcode";
 import { BadgeCheck, Linkedin, Printer, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,12 @@ const CertificatePage = () => {
       .then(setQr)
       .catch(() => setQr(""));
   }, [code]);
+
+  // Čerstvě vydané osvědčení: konfety.
+  const fresh = (useLocation().state as { fresh?: boolean } | null)?.fresh;
+  useEffect(() => {
+    if (cert && fresh && !autoDownload) celebrate("big");
+  }, [cert, fresh, autoDownload]);
 
   // Odkaz „Stáhnout PDF“ z aplikace rovnou otevře okno pro uložení do PDF.
   useEffect(() => {
