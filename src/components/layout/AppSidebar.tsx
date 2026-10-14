@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Award,
   Check,
+  FlaskConical,
   FolderOpen,
   LogOut,
   Menu,
@@ -164,6 +165,15 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-foreground/80 hover:bg-muted"
             >
               <Users className="h-4 w-4 text-muted-foreground" /> Seniorní poradci
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              onClick={() => go("/testovaci-stranka")}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-foreground/80 hover:bg-muted"
+            >
+              <FlaskConical className="h-4 w-4 text-muted-foreground" /> Testovací stránka
             </button>
           </li>
           <li>

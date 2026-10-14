@@ -705,6 +705,112 @@ Dovednosti: ${a.skills.length ? a.skills.map((k) => SKILL_LABELS[k]).join(", ") 
 Zde výjimečně čísla a částky uvádět smíš – jsou to orientační odhady, uživatel je přepíše.`;
 }
 
+// Testovací stránka: prodejní texty konverzní stránky z bran 1–3.
+const sd = (d: string) => ({ type: "string", description: d });
+const LANDING_TOOL = {
+  name: "texty_testovaci_stranky",
+  description: "Texty jednoduché konverzní stránky pro ověření zájmu (smoke test) před stavbou produktu.",
+  input_schema: {
+    type: "object",
+    properties: {
+      hero: {
+        type: "object",
+        properties: {
+          title: sd("Nadpis: konkrétní výsledek pro zákazníka, max 70 znaků, bez klišé."),
+          subtitle: sd("Podnadpis: co to je a pro koho, 1–2 věty, max 200 znaků."),
+          cta: sd("Text tlačítka, max 30 znaků, např. Chci vědět jako první."),
+        },
+        required: ["title", "subtitle", "cta"],
+      },
+      problem: {
+        type: "object",
+        properties: {
+          title: sd("Nadpis bloku, max 40 znaků, např. Znáte to?"),
+          items: { type: "array", minItems: 3, maxItems: 3, items: sd("Problém slovy zákazníka, 1 věta, max 120 znaků.") },
+        },
+        required: ["title", "items"],
+      },
+      solution: {
+        type: "object",
+        properties: { title: sd("Nadpis, max 70 znaků."), text: sd("2–4 věty, jak to funguje a čím se to liší, max 500 znaků.") },
+        required: ["title", "text"],
+      },
+      benefits: {
+        type: "object",
+        properties: {
+          title: sd("Nadpis, max 40 znaků."),
+          items: {
+            type: "array",
+            minItems: 3,
+            maxItems: 3,
+            items: {
+              type: "object",
+              properties: { title: sd("Výhoda, max 50 znaků."), text: sd("1 věta, max 140 znaků.") },
+              required: ["title", "text"],
+            },
+          },
+        },
+        required: ["title", "items"],
+      },
+      audience: {
+        type: "object",
+        properties: {
+          title: sd("Nadpis, max 40 znaků."),
+          yes: { type: "array", minItems: 2, maxItems: 3, items: sd("Pro koho to je, max 90 znaků.") },
+          no: { type: "array", minItems: 1, maxItems: 2, items: sd("Pro koho to není, max 90 znaků.") },
+        },
+        required: ["title", "yes", "no"],
+      },
+      faq: {
+        type: "object",
+        properties: {
+          title: sd("Nadpis, max 40 znaků."),
+          items: {
+            type: "array",
+            minItems: 3,
+            maxItems: 4,
+            items: {
+              type: "object",
+              properties: { q: sd("Otázka zákazníka, max 90 znaků."), a: sd("Odpověď, 1–2 věty, max 240 znaků.") },
+              required: ["q", "a"],
+            },
+          },
+        },
+        required: ["title", "items"],
+      },
+      form: {
+        type: "object",
+        properties: {
+          title: sd("Nadpis formuláře, max 50 znaků."),
+          text: sd("1 věta, co zápisem získá, max 160 znaků."),
+          button: sd("Tlačítko, max 25 znaků."),
+          success: sd("Poděkování po zápisu, max 120 znaků."),
+        },
+        required: ["title", "text", "button", "success"],
+      },
+    },
+    required: ["hero", "problem", "solution", "benefits", "audience", "faq", "form"],
+  },
+};
+
+function landingPrompt(vision: string, canvas: string, businessType: string, price: number) {
+  return `Výstup fáze 1 (Modrý oceán):
+${vision}
+
+Lean Canvas:
+${canvas}
+
+Typ byznysu: ${BUSINESS_TYPES[businessType] ?? "neurčen"}
+Plánovaná cena: ${price ? `${price.toLocaleString("cs-CZ")} Kč` : "neuvedena"}
+
+Úkol: napiš česky texty jednoduché konverzní stránky. Je to test zájmu před spuštěním: produkt ještě není hotový, návštěvník se jen zapisuje, že chce vědět jako první. Nic neslibuj jako hotové, neuváděj vymyšlené reference, recenze, počty zákazníků ani čísla.
+- Piš konkrétně slovy zákazníka z brány 1, krátce, bez marketingových frází (revoluční, unikátní, špičkový).
+- Nadpis = výsledek, který zákazník chce. Problémy = jak to zákazník sám prožívá.
+- Odlišení z modrého oceánu (ERRC, USP) promítni do řešení a výhod.
+- FAQ: kdy to bude, zda se platí, pro koho to je, případně čím se to liší od běžné alternativy.
+- Oslovuj vykáním.`;
+}
+
 async function callClaude(prompt: string, tool: { name: string; description: string; input_schema: unknown }, maxTokens: number) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -756,17 +862,17 @@ Deno.serve(async (req) => {
   }
   const { projectId, action } = body;
   const audience = body.audience && body.audience in AUDIENCES ? body.audience : "investor";
-  if (!projectId || !["diagnose", "canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill", "pitch"].includes(action ?? "")) {
+  if (!projectId || !["diagnose", "landing", "canvas_suggest", "canvas_evaluate", "case_comment", "case_assumptions", "case_costs", "case_autofill", "pitch"].includes(action ?? "")) {
     return json({ error: "Neplatný požadavek" }, 400);
   }
   const answers = action === "diagnose" ? cleanAnswers(body.answers) : null;
   if (action === "diagnose" && !answers) return json({ error: "Popište nápad nebo podnik aspoň jednou větou." }, 400);
   const kind =
-    action === "diagnose" || action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill" || action === "pitch"
+    action === "diagnose" || action === "landing" || action === "canvas_suggest" || action === "case_assumptions" || action === "case_costs" || action === "case_autofill" || action === "pitch"
       ? "navrh"
       : "vyhodnoceni";
   // Odhady nákladů mají vlastní limit (fáze „3n“), aby nesdílely limit s doporučenými procenty.
-  const phase = action === "diagnose" ? "0" : action === "pitch" ? "p" : action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
+  const phase = action === "diagnose" ? "0" : action === "landing" ? "t" : action === "pitch" ? "p" : action === "case_autofill" ? "3a" : action === "case_costs" ? "3n" : action === "case_comment" || action === "case_assumptions" ? "3" : "2";
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
@@ -803,7 +909,7 @@ Deno.serve(async (req) => {
   const usedDaily = perUser.count ?? 0;
   const limit = LIMITS[kind];
   if (usedProject >= limit) {
-    const what = action === "diagnose" ? "rentgenů" : action === "pitch" ? "pitchů" : action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
+    const what = action === "diagnose" ? "rentgenů" : action === "landing" ? "návrhů textů stránky" : action === "pitch" ? "pitchů" : action === "case_autofill" ? "vyplnění s AI" : action === "case_costs" ? "odhadů nákladů" : action === "case_assumptions" ? "doporučení" : kind === "navrh" ? "návrhů" : phase === "3" ? "komentářů" : "vyhodnocení";
     return json({ error: `Limit ${limit} ${what} pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
   if (usedDaily >= dailyLimit) {
@@ -863,6 +969,17 @@ Deno.serve(async (req) => {
         ? answers!.mode === "business"
           ? await callClaude(diagnoseBusinessPrompt(answers!), DIAGNOSE_BUSINESS_TOOL, 6000)
           : await callClaude(diagnosePrompt(answers!), DIAGNOSE_TOOL, 5000)
+        : action === "landing"
+        ? await callClaude(
+            landingPrompt(
+              vision,
+              canvas,
+              project.business_type ?? "",
+              Number(((raw["business_case"] as Record<string, unknown> | undefined)?.revenue as Record<string, unknown> | undefined)?.price) || 0,
+            ),
+            LANDING_TOOL,
+            3000,
+          )
         : action === "pitch"
         ? await callClaude(
             pitchPrompt(
@@ -983,6 +1100,25 @@ Deno.serve(async (req) => {
       }).filter((o) => o.title);
       output.verdict = { color: "zelena", headline: output.bottleneck, why: "" };
     }
+  }
+  if (action === "landing") {
+    // Jen texty, rozumné délky.
+    const clip = (v: unknown, n: number) => String(v ?? "").trim().slice(0, n);
+    const o = output as Record<string, Record<string, unknown>>;
+    const list = (v: unknown, n: number, max: number) => ((v as unknown[]) ?? []).slice(0, max).map((x) => clip(x, n)).filter(Boolean);
+    output.hero = { title: clip(o.hero?.title, 120), subtitle: clip(o.hero?.subtitle, 260), cta: clip(o.hero?.cta, 40) };
+    output.problem = { title: clip(o.problem?.title, 80), items: list(o.problem?.items, 200, 5) };
+    output.solution = { title: clip(o.solution?.title, 100), text: clip(o.solution?.text, 900) };
+    output.benefits = {
+      title: clip(o.benefits?.title, 80),
+      items: ((o.benefits?.items as Record<string, unknown>[]) ?? []).slice(0, 6).map((b) => ({ title: clip(b.title, 80), text: clip(b.text, 240) })),
+    };
+    output.audience = { title: clip(o.audience?.title, 80), yes: list(o.audience?.yes, 200, 5), no: list(o.audience?.no, 200, 5) };
+    output.faq = {
+      title: clip(o.faq?.title, 80),
+      items: ((o.faq?.items as Record<string, unknown>[]) ?? []).slice(0, 8).map((f) => ({ q: clip(f.q, 140), a: clip(f.a, 500) })),
+    };
+    output.form = { title: clip(o.form?.title, 80), text: clip(o.form?.text, 240), button: clip(o.form?.button, 40), success: clip(o.form?.success, 160) };
   }
   if (action === "case_assumptions") output.items = cleanRevenue(output.items, assumptionFields);
   if (action === "case_autofill") output.revenue = cleanRevenue(output.revenue, autofillFields);

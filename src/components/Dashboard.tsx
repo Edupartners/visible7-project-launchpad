@@ -25,6 +25,7 @@ import {
   Check,
   Clock,
   FileText,
+  FlaskConical,
   Layers,
   Lightbulb,
   Pencil,
@@ -224,6 +225,26 @@ export const Dashboard = (_props: DashboardProps) => {
               <h2 className="text-2xl font-bold">Všech 7 bran je otevřených</h2>
               <p className="text-muted-foreground">Gratulujeme. Získejte osvědčení VISIBLE7 Gold.</p>
             </div>
+          </section>
+        )}
+
+        {done.has(3) && !done.has(5) && (
+          <section className="flex flex-col items-start gap-4 rounded-2xl bg-primary p-6 text-white sm:flex-row sm:items-center sm:justify-between sm:p-8">
+            <div>
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-orange-300">
+                <FlaskConical className="h-4 w-4" /> Než začnete stavět
+              </p>
+              <h2 className="mt-1 text-xl font-bold">Otestujte zájem jednoduchou stránkou</h2>
+              <p className="mt-1 max-w-xl text-white/75">
+                Složíme ji z vašich bran 1–3. Přiveďte na ni 100 lidí a za pár dní víte, jestli o nabídku někdo stojí.
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate("/testovaci-stranka")}
+              className="h-11 shrink-0 rounded-[10px] bg-orange-500 px-5 font-semibold text-white hover:bg-orange-600"
+            >
+              Otevřít testovací stránku
+            </Button>
           </section>
         )}
 

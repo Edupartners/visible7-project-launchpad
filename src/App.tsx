@@ -6,7 +6,7 @@ import MembershipPage from "./pages/MembershipPage";
 import UnsubscribePage from "./pages/UnsubscribePage";
 import { PromoAutoRedeem } from "@/components/access/PromoRedeem";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthGate } from "@/components/AuthGate";
 import LauncherPage from "./pages/LauncherPage";
 import HomePage from "./pages/HomePage";
@@ -32,10 +32,15 @@ import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
 import QuizPage from "./pages/QuizPage";
 import SeminarsPage from "./pages/SeminarsPage";
+import TestPageEditor from "./pages/TestPageEditor";
+import TestPagePublic from "./pages/TestPagePublic";
 import { GateLock, PremiumGate } from "@/components/access/Locks";
 import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
+
+// Testovací stránky uživatelů (/t/…) mají vlastní lištu souhlasu pro svůj Pixel a GA4.
+const AppCookieBanner = () => (useLocation().pathname.startsWith("/t/") ? null : <CookieBanner />);
 
 // Vnitřní (chráněné) routy - přístupné jen po přihlášení, AuthGate je obaluje společně.
 const ProtectedRoutes = () => (
@@ -50,6 +55,14 @@ const ProtectedRoutes = () => (
       <Route path="/rentgen" element={<RentgenPage />} />
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />
+      <Route
+        path="/testovaci-stranka"
+        element={
+          <GateLock gate={3}>
+            <TestPageEditor />
+          </GateLock>
+        }
+      />
       <Route path="/vision" element={<VisionPage />} />
       <Route path="/ideation" element={<IdeationPage />} />
       <Route
@@ -127,7 +140,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <CookieBanner />
+        <AppCookieBanner />
         <Routes>
           {/* Veřejná marketingová landing page - bez přihlášení */}
           <Route path="/" element={<LauncherPage />} />
@@ -140,6 +153,8 @@ const App = () => (
           <Route path="/ochrana-osobnich-udaju" element={<LegalPage doc={PRIVACY} />} />
           <Route path="/odhlasit" element={<UnsubscribePage />} />
           <Route path="/clenstvi" element={<MembershipPage />} />
+          {/* Veřejná testovací stránka uživatele (smoke test) */}
+          <Route path="/t/:slug" element={<TestPagePublic />} />
           {/* Vše ostatní vyžaduje přihlášení */}
           <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>

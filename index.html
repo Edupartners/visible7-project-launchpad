@@ -22,7 +22,10 @@
         wait_for_update: 500
       });
       gtag('set', 'ads_data_redaction', true);
+      // Testovací stránky uživatelů (/t/…) neměří VISIBLE7 – mají vlastní Pixel/GA4 a vlastní souhlas.
+      window.V7_TEST_PAGE = location.pathname.indexOf('/t/') === 0;
       try {
+        if (window.V7_TEST_PAGE) throw 0;
         var c = JSON.parse(localStorage.getItem('v7_cookie_consent') || 'null');
         if (c) {
           gtag('consent', 'update', {
@@ -34,18 +37,24 @@
         }
       } catch (e) {}
     </script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H9Z1T5ZKJ2"></script>
+    <!-- Google tag (gtag.js) + Google Tag Manager – jen pro VISIBLE7, ne na testovacích stránkách -->
     <script>
-      gtag('js', new Date());
-      gtag('config', 'G-H9Z1T5ZKJ2');
+      if (!window.V7_TEST_PAGE) {
+        (function (d) {
+          var g = d.createElement('script');
+          g.async = true;
+          g.src = 'https://www.googletagmanager.com/gtag/js?id=G-H9Z1T5ZKJ2';
+          d.head.appendChild(g);
+        })(document);
+        gtag('js', new Date());
+        gtag('config', 'G-H9Z1T5ZKJ2');
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MMTPJZ5P');
+      }
     </script>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-MMTPJZ5P');</script>
     <!-- End Google Tag Manager -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

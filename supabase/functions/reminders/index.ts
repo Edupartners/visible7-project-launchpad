@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
   if (!BREVO_KEY) return json({ error: "Chybí BREVO_API_KEY" }, 503);
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
-  const body = (await req.json().catch(() => ({}))) as { test?: boolean; dry?: boolean };
+  const body = (await req.json().catch(() => ({}))) as { test?: boolean; dry?: boolean; lead?: string };
 
   // A) Ukázky pro správce
   if (body.test) {
@@ -162,10 +162,67 @@ Deno.serve(async (req) => {
     return json({ sent: kinds.length, to: user.email });
   }
 
-  // B) Denní rozeslání (jen s klíčem z Vault)
+  // B) Denní rozeslání a upozornění na zájemce (jen s klíčem z Vault)
   const key = req.headers.get("x-cron-key") ?? "";
   const { data: ok } = await admin.rpc("check_cron_key", { p_key: key });
   if (!ok) return json({ error: "Nepovoleno" }, 401);
+
+  // C) Nový zájemce na testovací stránce → e-mail vlastníkovi (nejvýš 20 denně na stránku)
+  const leadId = (body as { lead?: string }).lead;
+  if (leadId) {
+    const { data: lead } = await admin.from("test_page_leads").select("page_id, source").eq("id", leadId).maybeSingle();
+    if (!lead) return json({ skipped: "lead" });
+    const { data: page } = await admin
+      .from("test_pages")
+      .select("id, user_id, slug, project_id, notify_leads")
+      .eq("id", lead.page_id)
+      .maybeSingle();
+    if (!page?.notify_leads) return json({ skipped: "off" });
+    const today = new Date().toISOString().slice(0, 10);
+    const { count: sentToday } = await admin
+      .from("email_log")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", page.user_id)
+      .eq("kind", "lead")
+      .gte("sent_at", today);
+    if ((sentToday ?? 0) >= 20) return json({ skipped: "limit" });
+    const [{ data: owner }, { count: total }, { data: project }] = await Promise.all([
+      admin.auth.admin.getUserById(page.user_id),
+      admin.from("test_page_leads").select("id", { count: "exact", head: true }).eq("page_id", page.id),
+      admin.from("projects").select("name").eq("id", page.project_id).maybeSingle(),
+    ]);
+    const to = owner?.user?.email;
+    if (!to) return json({ skipped: "email" });
+    const n = total ?? 1;
+    const name = project?.name ? `„${esc(project.name)}“` : "vašem projektu";
+    const html = layout(
+      n === 1 ? "Máte prvního zájemce!" : `Máte ${n}. zájemce`,
+      [
+        "Dobrý den,",
+        `na testovací stránce k ${name} se právě zapsal nový zájemce${lead.source && lead.source !== "primo" ? ` (zdroj: ${esc(lead.source)})` : ""}.`,
+        n === 1
+          ? "Tohle je první důkaz, že o vaši nabídku někdo stojí. Podívejte se, odkud přišel, a pokračujte v testu."
+          : `Celkem se zapsalo ${n} lidí. V aplikaci uvidíte konverzi a vyhodnocení testu.`,
+      ],
+      "Zobrazit výsledky testu",
+      `${APP_URL}/testovaci-stranka`,
+      `${APP_URL}/testovaci-stranka#upozorneni`,
+    );
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": BREVO_KEY!, "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({
+        sender: SENDER,
+        to: [{ email: to }],
+        subject: n === 1 ? "První zájemce na vaší testovací stránce" : `Nový zájemce (celkem ${n})`,
+        htmlContent: html,
+        tags: ["zajemce"],
+      }),
+    });
+    if (!res.ok) return json({ error: `Brevo ${res.status}` }, 502);
+    await admin.from("email_log").insert({ user_id: page.user_id, kind: "lead", meta: { page: page.id, total: n } });
+    return json({ sent: 1 });
+  }
 
   const { data: rows, error } = await admin.rpc("reminder_candidates", { p_limit: 200 });
   if (error) return json({ error: error.message }, 500);
