@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { TestPageView } from "@/components/testpage/TestPageView";
+import { PAGE_FONT, TestPageView } from "@/components/testpage/TestPageView";
 import { celebrate } from "@/lib/celebrate";
 import { PublicPage, hit, loadPublicPage, submitLead } from "@/lib/testPage";
 
@@ -170,25 +170,30 @@ const TestPagePublic = () => {
         }
       />
       {trackers && consent === null && (
-        <div role="dialog" aria-label="Cookies" className="fixed inset-x-0 bottom-0 z-50 p-3">
-          <div className="mx-auto flex max-w-2xl flex-col gap-3 rounded-2xl bg-white p-4 text-sm text-slate-700 shadow-2xl ring-1 ring-slate-200 sm:flex-row sm:items-center">
-            <p className="flex-1">
+        <div
+          role="dialog"
+          aria-label="Cookies"
+          className="fixed inset-x-0 bottom-0 z-50 p-3"
+          style={{ fontFamily: PAGE_FONT }}
+        >
+          <div className="mx-auto flex max-w-[680px] flex-col gap-3 rounded-[20px] bg-white/90 p-4 text-[13px] leading-relaxed text-[#1d1d1f] shadow-[0_8px_40px_rgba(0,0,0,0.12)] ring-1 ring-black/5 backdrop-blur-xl sm:flex-row sm:items-center sm:gap-5 sm:pl-6">
+            <p className="flex-1 text-[#6e6e73]">
               Se souhlasem použijeme měřicí a reklamní cookies (
               {[page.ga4_id && "Google Analytics", page.meta_pixel_id && "Meta"].filter(Boolean).join(", ")}), abychom
               věděli, odkud návštěvníci přicházejí.
             </p>
-            <div className="flex gap-2">
+            <div className="flex shrink-0 gap-2">
               <button
                 type="button"
                 onClick={() => choose(false)}
-                className="h-10 rounded-lg px-4 font-semibold text-slate-700 ring-1 ring-slate-300"
+                className="h-9 flex-1 rounded-full px-4 font-semibold text-[#1d1d1f] ring-1 ring-black/15 sm:flex-none"
               >
                 Odmítnout
               </button>
               <button
                 type="button"
                 onClick={() => choose(true)}
-                className="h-10 rounded-lg px-4 font-semibold text-white"
+                className="h-9 flex-1 rounded-full px-4 font-semibold text-white sm:flex-none"
                 style={{ background: page.accent }}
               >
                 Souhlasím

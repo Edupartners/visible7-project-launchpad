@@ -9,7 +9,7 @@ import { ErrcMatrix, VISION_KEYS, VisionBasics, errcTexts, loadProjectKeys } fro
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
-export type BlockId = "hero" | "problem" | "solution" | "benefits" | "audience" | "price" | "faq" | "form";
+export type BlockId = "hero" | "problem" | "solution" | "benefits" | "audience" | "about" | "price" | "faq" | "form";
 export type Template = "svetla" | "tmava" | "tepla";
 
 export interface PageContent {
@@ -20,6 +20,8 @@ export interface PageContent {
   solution: { title: string; text: string };
   benefits: { title: string; items: { title: string; text: string }[] };
   audience: { title: string; yes: string[]; no: string[] };
+  /** Kdo za tím stojí – důvěra. */
+  about: { title: string; name: string; text: string; photo: string | null };
   price: { title: string; amount: string; note: string };
   faq: { title: string; items: { q: string; a: string }[] };
   form: { title: string; text: string; button: string; success: string; askName: boolean };
@@ -67,15 +69,16 @@ export const BLOCK_LABELS: Record<BlockId, string> = {
   solution: "Řešení",
   benefits: "Výhody",
   audience: "Pro koho to je",
+  about: "Kdo za tím stojí",
   price: "Cena",
   faq: "Časté otázky",
   form: "Formulář",
 };
 
 export const TEMPLATES: { id: Template; label: string; text: string }[] = [
-  { id: "svetla", label: "Světlá", text: "Čistá a vzdušná" },
-  { id: "tmava", label: "Tmavá", text: "Výrazný tmavý úvod" },
-  { id: "tepla", label: "Teplá", text: "Krémová, přívětivá" },
+  { id: "svetla", label: "Světlá", text: "Bílá a vzdušná" },
+  { id: "tmava", label: "Černá", text: "Produktová, výrazná" },
+  { id: "tepla", label: "Teplá", text: "Jemně teplé tóny" },
 ];
 
 export const ACCENTS = ["#f97316", "#2563eb", "#059669", "#db2777", "#7c3aed", "#173663"];
@@ -119,8 +122,8 @@ export function draftContent(input: {
   const gains = errc ? [...errcTexts(errc, "create"), ...errcTexts(errc, "raise")].slice(0, 3) : [];
   const title = usp.trim() || basics.slogan?.trim() || projectName;
   return {
-    order: ["hero", "problem", "solution", "benefits", "audience", "price", "faq", "form"],
-    off: [],
+    order: ["hero", "problem", "solution", "benefits", "audience", "about", "price", "faq", "form"],
+    off: ["about"],
     hero: {
       title: title.slice(0, 120),
       subtitle: [offering, customer && `Pro ${customer.charAt(0).toLowerCase()}${customer.slice(1)}`]
@@ -149,6 +152,12 @@ export function draftContent(input: {
       yes: customer ? [customer] : ["Pro koho to je"],
       no: ["Pro koho to není"],
     },
+    about: {
+      title: "Kdo za tím stojí",
+      name: "",
+      text: "",
+      photo: null,
+    },
     price: {
       title: "Kolik to bude stát",
       amount: price ? czk(price) : "",
@@ -171,8 +180,24 @@ export function draftContent(input: {
   };
 }
 
+const ABOUT_DEFAULT: PageContent["about"] = { title: "Kdo za tím stojí", name: "", text: "", photo: null };
+
+/** Doplní bloky, které starší stránky ještě nemají. */
+export function normalizeContent(c: PageContent): PageContent {
+  if (c.about && c.order.includes("about")) return c;
+  const order: BlockId[] = c.order.filter((b) => b !== "about");
+  const at = order.indexOf("price") >= 0 ? order.indexOf("price") : order.length - 1;
+  order.splice(at, 0, "about");
+  return {
+    ...c,
+    about: c.about ?? ABOUT_DEFAULT,
+    order,
+    off: c.about ? c.off : [...c.off.filter((b) => b !== "about"), "about"],
+  };
+}
+
 export const consentText = (p: Pick<PublicPage, "operator_name" | "operator_email">, project: string) =>
-  `Souhlasím, aby ${p.operator_name || "provozovatel stránky"} zpracoval můj e-mail za účelem informování o projektu ${project}. Souhlas mohu kdykoli odvolat na ${p.operator_email || "kontaktním e-mailu provozovatele"}.`;
+  `Souhlasím se zpracováním svého e-mailu: ${p.operator_name || "provozovatel stránky"} mi bude posílat informace o projektu ${project}. Souhlas mohu kdykoli odvolat na ${p.operator_email || "kontaktním e-mailu provozovatele"}.`;
 
 export const slugify = (s: string) =>
   s
@@ -190,7 +215,8 @@ export const pageUrl = (slug: string, source?: string) =>
 // ---- Vlastník ----
 export async function loadMyPage(projectId: string): Promise<TestPage | null> {
   const { data } = await db.from("test_pages").select("*").eq("project_id", projectId).maybeSingle();
-  return (data as TestPage | null) ?? null;
+  const p = (data as TestPage | null) ?? null;
+  return p ? { ...p, content: normalizeContent(p.content) } : null;
 }
 
 export async function createPage(projectId: string, projectName: string, userEmail: string): Promise<TestPage> {
@@ -233,7 +259,7 @@ export async function savePage(id: string, patch: PagePatch) {
   }
 }
 
-export async function uploadImage(userId: string, pageId: string, kind: "logo" | "hero", file: File) {
+export async function uploadImage(userId: string, pageId: string, kind: "logo" | "hero" | "about", file: File) {
   if (file.size > 3 * 1024 * 1024) throw new Error("Obrázek je větší než 3 MB.");
   const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
   const path = `${userId}/${pageId}/${kind}-${Date.now()}.${ext}`;
@@ -298,7 +324,8 @@ export function leadsCsv(leads: Lead[]) {
 // ---- Veřejná stránka ----
 export async function loadPublicPage(slug: string): Promise<PublicPage | null> {
   const { data } = await db.rpc("test_page_public", { p_slug: slug });
-  return (data as PublicPage | null) ?? null;
+  const p = (data as PublicPage | null) ?? null;
+  return p ? { ...p, content: normalizeContent(p.content) } : null;
 }
 
 export async function hit(slug: string, source: string, kind: "visit" | "click" = "visit") {
@@ -347,6 +374,7 @@ export async function generateCopy(projectId: string, current: PageContent): Pro
     problem: { ...current.problem, ...o.problem },
     solution: { ...current.solution, ...o.solution },
     benefits: { ...current.benefits, ...o.benefits },
+    about: current.about,
     audience: { ...current.audience, ...o.audience },
     faq: { ...current.faq, ...o.faq },
     form: { ...current.form, ...o.form, askName: current.form.askName },

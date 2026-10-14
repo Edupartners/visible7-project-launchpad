@@ -273,11 +273,12 @@ const TestPageEditor = () => {
     }
   };
 
-  const upload = async (kind: "logo" | "hero", file?: File) => {
+  const upload = async (kind: "logo" | "hero" | "about", file?: File) => {
     if (!file || !page || !user) return;
     try {
       const url = await uploadImage(user.id, page.id, kind, file);
-      update(kind === "logo" ? { logo_url: url } : { hero_url: url });
+      if (kind === "about") update({ content: { ...page.content, about: { ...page.content.about, photo: url } } });
+      else update(kind === "logo" ? { logo_url: url } : { hero_url: url });
     } catch (e) {
       toast({ title: "Obrázek", description: e instanceof Error ? e.message : "", variant: "destructive" });
     }
@@ -529,6 +530,53 @@ const TestPageEditor = () => {
             </Field>
           </>
         );
+      case "about":
+        return (
+          <>
+            <p className="rounded-xl bg-muted/60 p-3 text-xs text-muted-foreground">
+              Lidé kupují od lidí. Dvě tři věty o tom, proč to děláte a co umíte, zvednou důvěru víc než jakýkoli
+              slogan. Blok se na stránce ukáže, až ho zapnete a napíšete text.
+            </p>
+            <Field label="Nadpis">
+              <Input
+                value={c.about.title}
+                maxLength={60}
+                onChange={(e) => setContent("about", { ...c.about, title: e.target.value })}
+              />
+            </Field>
+            <Field
+              label="Váš příběh"
+              hint="Např. Masíruji 12 let a pořád vidím, že klientkám bez cviků doma bolest za týden vrátí."
+            >
+              <Textarea
+                value={c.about.text}
+                maxLength={400}
+                rows={4}
+                onChange={(e) => setContent("about", { ...c.about, text: e.target.value })}
+              />
+            </Field>
+            <Field label="Jméno a role">
+              <Input
+                value={c.about.name}
+                maxLength={80}
+                placeholder="Jana Nováková, masérka"
+                onChange={(e) => setContent("about", { ...c.about, name: e.target.value })}
+              />
+            </Field>
+            <div className="flex items-center gap-3">
+              {c.about.photo && <img src={c.about.photo} alt="" className="h-12 w-12 rounded-full object-cover" />}
+              <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:bg-muted">
+                <ImagePlus className="h-4 w-4" /> {c.about.photo ? "Změnit fotku" : "Nahrát fotku"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="sr-only"
+                  onChange={(e) => upload("about", e.target.files?.[0])}
+                />
+              </label>
+            </div>
+          </>
+        );
       case "price":
         return (
           <>
@@ -751,7 +799,7 @@ const TestPageEditor = () => {
                   <span
                     className="mb-2 block h-10 rounded-lg"
                     style={{
-                      background: t.id === "tmava" ? "#0b1220" : t.id === "tepla" ? "#f3e9dc" : "#f1f5f9",
+                      background: t.id === "tmava" ? "#000000" : t.id === "tepla" ? "#f1ede7" : "#f5f5f7",
                       borderBottom: `6px solid ${page.accent}`,
                     }}
                   />
