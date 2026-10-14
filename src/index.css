@@ -151,12 +151,17 @@
   /* Základní velikost písma 17 px jako v systémech Apple – vše v rem se úměrně zvětší */
   html {
     font-size: 106.25%;
+    /* iOS nezvětšuje písmo sám od sebe; nic nesmí vytvořit vodorovné posouvání */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: clip;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "Poppins", -apple-system, "Segoe UI", system-ui, sans-serif;
     font-feature-settings: "tnum" 0;
+    overflow-x: clip;
   }
 
   h1, h2, h3 {
