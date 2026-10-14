@@ -22,6 +22,7 @@ import {
   PlayCircle,
   Rocket,
   Sparkles,
+  Store,
   Target,
   TrendingUp,
   Users,
@@ -154,6 +155,12 @@ const SHOWCASE = [
     width: 1100,
     height: 782,
   },
+];
+
+const OFFLINE_EXAMPLES = [
+  { who: "Masérna", ideas: "Online rezervace, dárkové poukazy na Vánoce a Valentýna, permanentky." },
+  { who: "Pekárna", ideas: "Objednávky dortů online, předplatné pečiva s rozvozem, catering pro firmy." },
+  { who: "Kosmetické studio", ideas: "E-shop s produkty, které už prodáváte na pultu, poukazy a rezervace." },
 ];
 
 const MYTHS = [
@@ -351,6 +358,15 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <a
+        href="#podnikatele"
+        className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary/90"
+      >
+        <Store className="hidden h-4 w-4 shrink-0 text-orange-300 sm:block" aria-hidden="true" />
+        <span className="sm:hidden">Už podnikáte? Získejte zákazníky i online</span>
+        <span className="hidden sm:inline">Už podnikáte offline? Zjistěte, kde vám online přinese nové zákazníky</span>
+        <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+      </a>
       <PublicHeader onStart={onAccessGranted} />
 
       <main id="top">
@@ -454,6 +470,47 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </figure>
             </div>
           ))}
+        </section>
+
+        {/* Pro podnikatele: z offline do online */}
+        <section id="podnikatele" className="scroll-mt-20 px-3 pt-20 sm:px-6 md:pt-28 lg:px-10">
+          <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-orange-50 ring-1 ring-orange-100">
+            <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8 lg:px-12">
+              <div className="max-w-3xl">
+                <p className="text-sm font-bold uppercase tracking-[0.08em] text-orange-700">Pro podnikatele</p>
+                <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Podnikáte offline? Zjistěte, kde vám online přinese nové zákazníky
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  Stejná metodika, jiný start. Zjistíte, kde můžete online přidat novou hodnotu, kolik to vydělá a kde
+                  jsou vaši zákazníci. A naučíte se to řídit sami, bez agentury.
+                </p>
+              </div>
+              <ul className="mt-8 grid gap-4 md:grid-cols-3">
+                {OFFLINE_EXAMPLES.map((e) => (
+                  <li key={e.who} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-orange-100">
+                    <p className="font-bold">{e.who}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{e.ideas}</p>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <a
+                  href={`mailto:info@visible7.io?subject=${encodeURIComponent("Podnikám offline a chci online")}`}
+                  className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-base font-semibold text-white hover:bg-orange-600"
+                >
+                  Domluvit úvodní konzultaci <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                </a>
+                <button
+                  type="button"
+                  onClick={onAccessGranted}
+                  className="px-2 text-left font-semibold text-primary underline-offset-4 hover:underline"
+                >
+                  Nebo začněte zdarma v aplikaci
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Mýty */}
