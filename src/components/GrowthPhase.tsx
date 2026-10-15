@@ -494,6 +494,7 @@ export const GrowthPhase = () => {
           <p className="mt-1 text-muted-foreground">Ke každému bloku bude instruktážní video.</p>
         </div>
         <BlockList
+          area="rust"
           blocks={GROWTH_BLOCKS}
           steps={s.steps}
           done={s.blocks}

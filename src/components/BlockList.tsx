@@ -3,8 +3,11 @@ import { Check, ChevronDown, Lightbulb, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BlockVideo } from "@/components/BlockVideo";
 import { stepId, type BuildBlock } from "@/lib/buildPlans";
+import type { BlockArea } from "@/lib/blockVideos";
 
 interface BlockListProps {
+  /** Oblast pro videa vložená v administraci */
+  area: BlockArea;
   blocks: (BuildBlock & { optional?: boolean })[];
   steps: string[];
   done: string[];
@@ -17,7 +20,7 @@ interface BlockListProps {
 const czk = (v: number) => `${v.toLocaleString("cs-CZ")} Kč`;
 
 /** Rozbalovací bloky s videem, kroky, tipem a náklady (fáze 4–6). */
-export const BlockList = ({ blocks, steps, done, onToggleStep, onFinish, onAddCosts }: BlockListProps) => {
+export const BlockList = ({ area, blocks, steps, done, onToggleStep, onFinish, onAddCosts }: BlockListProps) => {
   const [open, setOpen] = useState<string | null>(null);
   const [added, setAdded] = useState<string[]>([]);
   const current = open ?? blocks.find((b) => !done.includes(b.id) && !b.optional)?.id ?? null;
@@ -70,7 +73,7 @@ export const BlockList = ({ blocks, steps, done, onToggleStep, onFinish, onAddCo
 
             {expanded && (
               <div className="grid gap-6 border-t border-border p-4 sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-                <BlockVideo block={b} />
+                <BlockVideo block={b} area={area} />
                 <div className="space-y-4">
                   <ul className="space-y-2">
                     {b.steps.map((s, j) => {

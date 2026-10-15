@@ -171,7 +171,7 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
               </button>
               {expanded && (
                 <div className="grid gap-6 border-t border-border p-4 sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-                  <BlockVideo block={b} />
+                  <BlockVideo block={b} area="marketing" />
                   <div className="space-y-4">
                     <ul className="space-y-2">
                       {b.steps.map((s, j) => {

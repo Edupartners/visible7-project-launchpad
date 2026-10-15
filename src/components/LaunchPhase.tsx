@@ -308,6 +308,7 @@ export const LaunchPhase = () => {
         </div>
         <TradeLicenseCard placement="gate6" launchDate={s.date || undefined} />
         <BlockList
+          area="start"
           blocks={LAUNCH_BLOCKS}
           steps={s.steps}
           done={s.blocks}

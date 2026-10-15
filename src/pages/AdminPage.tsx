@@ -28,6 +28,7 @@ import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
 import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
 import { ShopAdmin } from "@/components/admin/ShopAdmin";
 import { SeminarsAdmin } from "@/components/admin/SeminarsAdmin";
+import { BlockVideosAdmin } from "@/components/admin/BlockVideosAdmin";
 import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
 import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
@@ -298,6 +299,8 @@ const AdminPage = () => {
                 )}
               </section>
             )}
+
+            <BlockVideosAdmin />
 
             <SeminarsAdmin />
 
