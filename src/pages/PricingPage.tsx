@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
-import { canBuy, nbsp, kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
+import { FREE_CONSULT_URL, canBuy, kc, monthsLabel, nbsp, perMonth, useShop } from "@/lib/shop";
 import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
@@ -79,7 +79,7 @@ const PricingPage = () => {
               <p className="text-sm text-muted-foreground">bez platební karty</p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {[
-                  "Rentgen nápadu za 10 minut",
+                  "Rentgen nápadu do 10 minut",
                   "Brána 1 Vize (modrý oceán)",
                   "Brána 2 Ideace (Lean Canvas) s AI",
                   "Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma",
@@ -89,6 +89,21 @@ const PricingPage = () => {
                     {it}
                   </li>
                 ))}
+                <li className="flex gap-2 rounded-lg bg-orange-50 px-2 py-1.5 -mx-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" strokeWidth={3} />
+                  <span>
+                    <b>Úvodní konzultace s expertem, 20 minut zdarma.</b>{" "}
+                    <a
+                      href={FREE_CONSULT_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track("free_consult_click", { from: "cenik" })}
+                      className="font-semibold text-orange-700 underline underline-offset-2 hover:no-underline"
+                    >
+                      Vybrat termín
+                    </a>
+                  </span>
+                </li>
               </ul>
               <button
                 type="button"

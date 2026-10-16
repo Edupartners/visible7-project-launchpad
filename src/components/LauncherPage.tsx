@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
-import { kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
+import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
 import { REFERENCES } from "@/lib/references";
 import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { track } from "@/lib/track";
@@ -327,9 +327,6 @@ const Cta = ({
     <ArrowRight className="h-5 w-5" aria-hidden="true" />
   </button>
 );
-
-/** Rezervační stránka v Google Kalendáři (20 min konzultace zdarma v pilotním provozu). */
-const FREE_CONSULT_URL = "https://calendar.app.google/Lh1bJygQnhK12CMN7";
 
 const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 

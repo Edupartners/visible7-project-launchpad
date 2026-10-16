@@ -67,3 +67,6 @@ export const useFounderOffer = () =>
 
 /** „zbývá 1 místo / 3 místa / 12 míst“ */
 export const seatsLabel = (n: number) => `${n} ${n === 1 ? "místo" : n >= 2 && n <= 4 ? "místa" : "míst"}`;
+
+/** Rezervační stránka v Google Kalendáři: 20 min konzultace zdarma (pilotní provoz, vyhodnotit 01/2027). */
+export const FREE_CONSULT_URL = "https://calendar.app.google/Lh1bJygQnhK12CMN7";
