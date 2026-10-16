@@ -282,3 +282,18 @@
 @media (max-width: 767px) {
   .lean-grid > * { grid-area: auto !important; }
 }
+
+/* Úvod: šipka dolů pod hero – jemně pulzuje a pohupuje se */
+@keyframes scroll-nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+@keyframes scroll-ring {
+  0% { box-shadow: 0 0 0 0 hsl(24 95% 53% / 0.45); }
+  70%, 100% { box-shadow: 0 0 0 14px hsl(24 95% 53% / 0); }
+}
+.scroll-cue { animation: scroll-ring 2.4s ease-out infinite; }
+.scroll-cue > svg { animation: scroll-nudge 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue, .scroll-cue > svg { animation: none; }
+}

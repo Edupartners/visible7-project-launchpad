@@ -13,6 +13,7 @@ import {
   BarChart3,
   Calculator,
   Check,
+  ChevronDown,
   Download,
   FileSpreadsheet,
   FileText,
@@ -234,12 +235,12 @@ const HeroJourney = () => {
   }, []);
 
   return (
-    <div className="rounded-[28px] bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-7">
-      <div className="flex items-center justify-between">
-        <p className="font-semibold">Startér e-shopu</p>
-        <p className="text-sm text-white/60">Otevřeno {open} ze 7 bran</p>
+    <div className="mx-auto w-full max-w-[340px] rounded-3xl bg-primary p-4 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-5 xl:mr-0">
+      <div className="flex items-baseline justify-between gap-3 px-1">
+        <p className="whitespace-nowrap text-sm font-semibold">Startér e-shopu</p>
+        <p className="whitespace-nowrap text-xs text-white/60">{open} ze 7 bran</p>
       </div>
-      <ol className="mt-5 space-y-1.5" aria-label="Ukázka cesty přes 7 bran">
+      <ol className="mt-3 space-y-1" aria-label="Ukázka cesty přes 7 bran">
         {GATES.map((g, i) => {
           const done = i < open;
           const current = i === open;
@@ -247,20 +248,20 @@ const HeroJourney = () => {
           return (
             <li
               key={g.name}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-500 ${
+              className={`flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition-colors duration-500 ${
                 current ? "bg-white text-foreground" : done ? "bg-white/[0.07]" : ""
               }`}
             >
               <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors duration-500 ${
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors duration-500 ${
                   done
                     ? "bg-emerald-500 text-white"
                     : current
-                      ? "bg-orange-500 text-white ring-4 ring-orange-200"
+                      ? "bg-orange-500 text-white ring-[3px] ring-orange-200"
                       : "border border-white/30 text-white/60"
                 }`}
               >
-                {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
+                {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
               </span>
               <span className="min-w-0 flex-1">
                 <span className={`block text-sm font-semibold ${!done && !current ? "text-white/60" : ""}`}>
@@ -275,7 +276,7 @@ const HeroJourney = () => {
               {done ? (
                 <Icon className="h-4 w-4 shrink-0 text-white/50" />
               ) : current ? (
-                <span className="shrink-0 rounded-full bg-orange-500 px-2.5 py-1 text-xs font-semibold text-white">
+                <span className="shrink-0 rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-semibold text-white">
                   Pokračovat
                 </span>
               ) : null}
@@ -284,13 +285,13 @@ const HeroJourney = () => {
         })}
       </ol>
       <div
-        className={`mt-4 flex items-center gap-3 rounded-xl border border-amber-300/40 bg-amber-400/10 px-3 py-2.5 transition-all duration-700 ${
+        className={`mt-3 flex items-center gap-2.5 rounded-xl border border-amber-300/40 xl:[@media(max-height:760px)]:hidden bg-amber-400/10 px-2.5 py-2 transition-all duration-700 ${
           open >= 3 ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
         }`}
         aria-hidden={open < 3}
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400 text-primary">
-          <Award className="h-4 w-4" strokeWidth={2.5} />
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-primary">
+          <Award className="h-3.5 w-3.5" strokeWidth={2.5} />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block whitespace-nowrap text-sm font-semibold">Osvědčení za 3 brány</span>
@@ -339,7 +340,7 @@ const RotatingVerbs = () => {
   return (
     <p
       aria-label={VERBS.join(" ")}
-      className="mt-5 flex flex-wrap gap-x-3.5 gap-y-1 text-xl font-extrabold tracking-tight min-[400px]:text-2xl lg:text-[1.65rem]"
+      className="mt-5 flex flex-wrap gap-x-3.5 gap-y-1 text-xl font-extrabold tracking-tight min-[400px]:text-2xl lg:text-[1.65rem] xl:mt-4 xl:text-[clamp(1.3rem,3vh,1.65rem)]"
     >
       {VERBS.map((v, i) => (
         <span
@@ -383,26 +384,38 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
       <main id="top">
         {/* Hero */}
-        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-14">
-          <div>
-            <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl">
-              Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
-            </h1>
-            <RotatingVerbs />
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Bez drahých
-              agentur.
-            </p>
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
-              <a href="#kalkulacka" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
-                Kolik ušetříte?
-              </a>
+        {/* Lišta + menu + hero = jedna obrazovka (od md, kde je horní lišta na jeden řádek: 43 + 65 px). */}
+        <section className="relative flex flex-col md:min-h-[calc(100svh-108px)]">
+          <div className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-10 px-4 pb-6 pt-12 sm:px-8 md:pt-14 lg:px-12 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-14 xl:py-6">
+            <div>
+              <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
+                Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
+              </h1>
+              <RotatingVerbs />
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+                Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Bez drahých
+                agentur.
+              </p>
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
+                <a href="#kalkulacka" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
+                  Kolik ušetříte?
+                </a>
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty. Výsledek do 10 minut.</p>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty. Výsledek do 10 minut.</p>
+            <div className="w-full">
+              <HeroJourney />
+            </div>
           </div>
-          <div className="w-full max-w-xl xl:max-w-none">
-            <HeroJourney />
+          <div className="flex justify-center pb-5">
+            <a
+              href="#kalkulacka"
+              aria-label="Pokračovat dolů"
+              className="scroll-cue flex h-12 w-12 items-center justify-center rounded-full border border-orange-300 bg-white text-orange-600 shadow-sm transition-colors hover:bg-orange-50"
+            >
+              <ChevronDown className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
+            </a>
           </div>
         </section>
 
