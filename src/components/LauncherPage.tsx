@@ -900,12 +900,12 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <div className="space-y-1 px-5 py-3 text-sm text-muted-foreground">
                 {offer && offer.left > 0 && (
                   <p className="font-semibold text-orange-800">
-                    Startovací cena pro prvních {offer.seats} lidí, zbývá {seatsLabel(offer.left)}. Pak{" "}
-                    {kc(offer.next_price)}.
+                    Startovací cena pro prvních {offer.seats} lidí a k ní 20 minut konzultace zdarma. Zbývá{" "}
+                    {seatsLabel(offer.left)}. Pak {kc(offer.next_price)}.
                   </p>
                 )}
                 <p>vychází na {perMonth(shop)} měsíčně, včetně DPH</p>
-                <p>Konzultace se seniorními poradci nejsou součástí členství, platí se zvlášť.</p>
+                <p>Další konzultace se seniorními poradci nejsou součástí členství, platí se zvlášť.</p>
               </div>
             </dl>
           </div>

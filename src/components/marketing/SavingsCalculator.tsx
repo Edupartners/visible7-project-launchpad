@@ -124,8 +124,8 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
           {founder && (
             <>
               {" "}
-              <span className="ml-1 inline-block rounded-full bg-primary px-2.5 py-0.5 align-middle text-xs font-bold text-white">
-                Startovací cena pro prvních {offer.seats} · zbývá {seatsLabel(offer.left)}
+              <span className="ml-1 inline-block rounded-lg bg-primary px-2.5 py-0.5 align-middle text-xs font-bold leading-snug text-white">
+                Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma · zbývá {seatsLabel(offer.left)}
               </span>{" "}
               <span>(pak {kc(offer.next_price)})</span>
             </>
@@ -133,8 +133,8 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
           .
         </p>
         <p className="mt-1.5 text-xs text-muted-foreground">
-          Orientační odhad podle cen z praxe. Skutečná úspora závisí na vašem projektu. Konzultace se seniorními poradci
-          nejsou součástí členství, platí se zvlášť.
+          Orientační odhad podle cen z praxe. Skutečná úspora závisí na vašem projektu. Další konzultace se seniorními
+          poradci nejsou součástí členství, platí se zvlášť.
         </p>
       </div>
     </section>
