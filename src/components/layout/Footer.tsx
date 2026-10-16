@@ -37,15 +37,19 @@ export const Footer = () => {
             href="https://www.edu-partners.cz/"
             target="_blank"
             rel="noopener"
-            className="mx-auto flex max-w-xl flex-col items-center gap-1.5 rounded-2xl border border-border px-5 py-4 hover:border-primary/40 sm:flex-row sm:gap-4 sm:text-left"
+            className="mx-auto flex max-w-3xl flex-col items-center gap-1.5 rounded-2xl border border-border px-5 py-4 hover:border-primary/40 sm:flex-row sm:gap-4 sm:text-left"
           >
             <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
               Za projektem stojí
             </span>
-            {/* Logo Edu Partners: až bude soubor, nahradit textem <img src="/edu-partners-logo.svg" … /> */}
-            <span className="whitespace-nowrap text-xl font-bold tracking-tight text-foreground">
-              edu<span className="text-orange-500">·</span>partners
-            </span>
+            <img
+              src="/edu-partners-logo.webp"
+              alt="Edu Partners – In education we trust"
+              width={480}
+              height={91}
+              loading="lazy"
+              className="h-9 w-auto shrink-0"
+            />
             <span className="text-xs text-muted-foreground">
               Vzdělávací společnost z Ostravy, od roku 2011. Akreditované kurzy a reference na edu-partners.cz
             </span>
