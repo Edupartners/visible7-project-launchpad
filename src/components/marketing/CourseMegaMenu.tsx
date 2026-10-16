@@ -121,8 +121,8 @@ export const CourseMegaMenu = ({ id, onStart }: { id: string; onStart: () => voi
       <div className="mx-auto flex max-w-6xl flex-wrap gap-x-10 gap-y-8 px-4 py-7 sm:px-8 lg:px-12">
         <div className="min-w-0 flex-[999_1_640px]">
           <p className="text-xs font-bold uppercase tracking-[0.12em]">
-            Kompletní kurz · V-I-S-I-B-L-E{" "}
-            <span className="font-medium normal-case tracking-normal">od nápadu po růst</span>
+            Kompletní kurz online podnikání a marketingu{" "}
+            <span className="font-medium normal-case tracking-normal">· V-I-S-I-B-L-E od nápadu po růst</span>
           </p>
           <div className="mb-5 mt-3 h-px bg-border" />
           <div className="grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2 lg:grid-cols-4">
