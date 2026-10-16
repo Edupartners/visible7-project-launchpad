@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
-import { kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
+import { kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
 import { REFERENCES } from "@/lib/references";
 import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
+import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import {
   ArrowRight,
   Award,
@@ -25,7 +26,6 @@ import {
   Store,
   Target,
   TrendingUp,
-  Users,
   Wrench,
 } from "lucide-react";
 
@@ -91,29 +91,6 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     get: "Plán růstu",
     tags: ["Výpočet"],
     sample: "Osvědčení VISIBLE7 Gold",
-  },
-];
-
-const BENEFITS = [
-  {
-    icon: Rocket,
-    title: "Vlastní fungující projekt",
-    text: "Web nebo e-shop, finanční plán a první zákazníci. Ne jen teorie.",
-  },
-  {
-    icon: Award,
-    title: "7 osvědčení a cesta ke státní kvalifikaci",
-    text: "Osvědčení za každou bránu. Po bráně 4 zkouška NSK Specialista internetového obchodu.",
-  },
-  {
-    icon: Users,
-    title: "Podpora profesionálů",
-    text: `${ADVISORS.length} seniorních poradců z praxe, když se zaseknete.`,
-  },
-  {
-    icon: Sparkles,
-    title: "AI, která zná váš projekt",
-    text: "Navrhne texty, čísla i pitch z vašich vlastních dat.",
   },
 ];
 
@@ -349,8 +326,39 @@ const Cta = ({
   </button>
 );
 
+const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
+
+/** Slovesa pod nadpisem: aktivní se střídá po 1,8 s (bez animace, pokud uživatel nechce pohyb). */
+const RotatingVerbs = () => {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setActive((i) => (i + 1) % VERBS.length), 1800);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <p
+      aria-label={VERBS.join(" ")}
+      className="mt-5 flex flex-wrap gap-x-3.5 gap-y-1 text-xl font-extrabold tracking-tight min-[400px]:text-2xl lg:text-[1.65rem]"
+    >
+      {VERBS.map((v, i) => (
+        <span
+          key={v}
+          aria-hidden="true"
+          className={`border-b-4 pb-0.5 transition-colors duration-500 ${
+            i === active ? "border-orange-500 text-foreground" : "border-transparent text-[#A3A9B7]"
+          }`}
+        >
+          {v}
+        </span>
+      ))}
+    </p>
+  );
+};
+
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
+  const offer = useFounderOffer();
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
     const id = window.location.hash.slice(1);
@@ -375,40 +383,30 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
       <main id="top">
         {/* Hero */}
-        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-14 sm:px-8 lg:px-12 md:pt-20 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] xl:gap-16">
+        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-14">
           <div>
-            <h1 className="text-[2.6rem] font-extrabold leading-[1.05] tracking-[-0.035em] sm:text-6xl">
-              Otestujte svůj podnikatelský nápad za&nbsp;10&nbsp;minut.
+            <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl">
+              Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
             </h1>
+            <RotatingVerbs />
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              AI vám řekne, jestli obstojí a kdy vás může uživit. Pak ho postavíte v sedmi branách a s poradci z praxe
-              konzultujete, kdykoli se zaseknete.
+              Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Bez drahých
+              agentur.
             </p>
-            <ul className="mt-7 grid max-w-xl grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-              {BENEFITS.map(({ icon: Icon, title, text }) => (
-                <li key={title} className="flex gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700">
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block font-bold leading-snug">{title}</span>
-                    <span className="block text-sm leading-snug text-muted-foreground">{text}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
-              <a href="#jak" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
-                Jak to funguje
+              <a href="#kalkulacka" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
+                Kolik ušetříte?
               </a>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty. Výsledek do 10 minut.</p>
           </div>
           <div className="w-full max-w-xl xl:max-w-none">
             <HeroJourney />
           </div>
         </section>
+
+        <SavingsCalculator onStart={onAccessGranted} />
 
         {/* Co je uvnitř */}
         <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
@@ -883,10 +881,19 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               ].map(([name, price]) => (
                 <div key={name} className="flex items-baseline justify-between gap-4 px-5 py-4">
                   <dt className="font-semibold">{name}</dt>
-                  <dd className="text-xl font-extrabold tracking-tight">{price}</dd>
+                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{price}</dd>
                 </div>
               ))}
-              <p className="px-5 py-3 text-sm text-muted-foreground">vychází na {perMonth(shop)} měsíčně, včetně DPH</p>
+              <div className="space-y-1 px-5 py-3 text-sm text-muted-foreground">
+                {offer && offer.left > 0 && (
+                  <p className="font-semibold text-orange-800">
+                    Startovací cena pro prvních {offer.seats} lidí, zbývá {seatsLabel(offer.left)}. Pak{" "}
+                    {kc(offer.next_price)}.
+                  </p>
+                )}
+                <p>vychází na {perMonth(shop)} měsíčně, včetně DPH</p>
+                <p>Konzultace se seniorními poradci nejsou součástí členství, platí se zvlášť.</p>
+              </div>
             </dl>
           </div>
         </section>

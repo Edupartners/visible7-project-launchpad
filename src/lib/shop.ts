@@ -47,3 +47,23 @@ export const canBuy = (s: ShopSettings) => !!(s.form_id || s.checkout_url);
 
 /** Čísla s mezerou (49 000 Kč) se nesmí zalomit na dva řádky. */
 export const nbsp = (t: string) => t.replace(/(\d) (\d)/g, "$1\u00a0$2").replace(/ Kč/g, "\u00a0Kč");
+
+/** Startovací cena pro prvních N členů (nastavení app_settings.founder_offer, počítá funkce founder_offer). */
+export interface FounderOffer {
+  seats: number;
+  left: number;
+  next_price: number;
+}
+
+export async function loadFounderOffer(): Promise<FounderOffer | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc("founder_offer");
+  if (error || !data) return null;
+  return data as FounderOffer;
+}
+
+export const useFounderOffer = () =>
+  useQuery({ queryKey: ["founder-offer"], queryFn: loadFounderOffer, staleTime: 60_000 }).data ?? null;
+
+/** „zbývá 1 místo / 3 místa / 12 míst“ */
+export const seatsLabel = (n: number) => `${n} ${n === 1 ? "místo" : n >= 2 && n <= 4 ? "místa" : "míst"}`;
