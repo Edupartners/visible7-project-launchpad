@@ -28,6 +28,7 @@ import CertificatePage from "./pages/CertificatePage";
 import AdvisorsPage from "./pages/AdvisorsPage";
 import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
+import WorksheetsPage from "./pages/WorksheetsPage";
 import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
 import QuizPage from "./pages/QuizPage";
@@ -149,6 +150,7 @@ const App = () => (
           {/* Veřejné ověření osvědčení – bez přihlášení */}
           <Route path="/osvedceni/:code" element={<CertificatePage />} />
           <Route path="/cenik" element={<PricingPage />} />
+          <Route path="/pracovni-listy" element={<WorksheetsPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />
           <Route path="/ochrana-osobnich-udaju" element={<LegalPage doc={PRIVACY} />} />
           <Route path="/odhlasit" element={<UnsubscribePage />} />

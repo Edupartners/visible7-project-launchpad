@@ -142,6 +142,7 @@ export const PRIVACY: LegalDoc = {
         "Bezpečnost aplikace, prevence zneužití a ochrana práv správce – oprávněný zájem (čl. 6 odst. 1 písm. f) GDPR).",
         "Členství v Klubu VISIBLE7 – plnění podmínek členství, o které jste požádali.",
         "Zasílání novinek a nabídek – váš souhlas (čl. 6 odst. 1 písm. a) GDPR), který můžete kdykoli odvolat v nastavení účtu.",
+        "Pracovní listy ke stažení – e-mail, který zadáte, použijeme k zaslání odkazu na listy (vaše žádost, čl. 6 odst. 1 písm. b) GDPR). Tipy a novinky posíláme jen se samostatným souhlasem.",
       ],
     },
     {
@@ -182,6 +183,7 @@ export const PRIVACY: LegalDoc = {
         "Daňové doklady 10 let podle zákona o DPH.",
         "Údaje pro ověření vydaných osvědčení po dobu jejich platnosti, aby šly ověřit; osvědčení můžete požádat zneplatnit.",
         "Souhlas s marketingem do jeho odvolání.",
+        "E-mail ze stažení pracovních listů bez souhlasu s tipy 12 měsíců, se souhlasem do jeho odvolání.",
         "Data Google Analytics 14 měsíců; volba cookies v prohlížeči do jejího smazání nebo změny.",
         "Pseudonymizované odpovědi pro výzkum do odvolání souhlasu, nejdéle do ukončení výzkumu.",
       ],

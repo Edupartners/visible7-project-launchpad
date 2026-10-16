@@ -17,6 +17,14 @@ export const Footer = () => {
             </div>
           </div>
 
+          <nav aria-label="Odkazy" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm">
+            <Link to="/pracovni-listy" className="font-semibold text-primary hover:underline">
+              Pracovní listy ke stažení
+            </Link>
+            <Link to="/cenik" className="text-muted-foreground hover:text-foreground hover:underline">
+              Ceník
+            </Link>
+          </nav>
           <nav aria-label="Právní informace" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm">
             <Link to="/podminky" className="text-muted-foreground hover:text-foreground hover:underline">
               Podmínky užívání

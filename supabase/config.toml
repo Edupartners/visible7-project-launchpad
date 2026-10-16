@@ -10,3 +10,6 @@ verify_jwt = false
 
 [functions.ares]
 verify_jwt = false
+
+[functions.worksheets]
+verify_jwt = false
