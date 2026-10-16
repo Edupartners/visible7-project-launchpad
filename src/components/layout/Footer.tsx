@@ -33,6 +33,24 @@ export const Footer = () => {
             </button>
           </nav>
 
+          <a
+            href="https://www.edu-partners.cz/"
+            target="_blank"
+            rel="noopener"
+            className="mx-auto flex max-w-xl flex-col items-center gap-1.5 rounded-2xl border border-border px-5 py-4 hover:border-primary/40 sm:flex-row sm:gap-4 sm:text-left"
+          >
+            <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Za projektem stojí
+            </span>
+            {/* Logo Edu Partners: až bude soubor, nahradit textem <img src="/edu-partners-logo.svg" … /> */}
+            <span className="whitespace-nowrap text-xl font-bold tracking-tight text-foreground">
+              edu<span className="text-orange-500">·</span>partners
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Vzdělávací společnost z Ostravy, od roku 2011. Akreditované kurzy a reference na edu-partners.cz
+            </span>
+          </a>
+
           <div className="space-y-2 border-t border-border pt-4">
             <div className="text-sm font-medium text-foreground">© 2026 MICEK® – Všechna práva vyhrazena</div>
             <div className="mx-auto max-w-2xl text-xs text-muted-foreground">

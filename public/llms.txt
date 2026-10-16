@@ -1,0 +1,42 @@
+# VISIBLE7 MICEK®
+
+> VISIBLE7 je česká online platforma a kompletní kurz online podnikání a marketingu. Provede začínající podnikatele od nápadu po první zákazníky a růst v 7 fázích metodiky V-I-S-I-B-L-E: s videi, AI asistentem, který zná jejich projekt, živými semináři a poradci z praxe. Provozuje ji Edu Partners s.r.o., vzdělávací společnost z Ostravy (od roku 2011). Autor metodiky: Mgr. Michal Míček, LL.M.
+
+## Pro koho
+- Lidé, kteří chtějí začít podnikat online (e-shop, služby, kurzy, aplikace) a nemají na drahé agentury a konzultanty.
+- Podnikatelé, kteří už podnikají offline a chtějí získat zákazníky i online.
+- Vše v češtině, svépomocí, krok za krokem.
+
+## Jak to funguje
+1. Rentgen nápadu zdarma: 4 otázky, do 10 minut AI řekne, jestli nápad obstojí, kolik bude stát a kdy může podnikatele uživit.
+2. Cesta 7 fázemi (bránami) metodiky V-I-S-I-B-L-E:
+   - V – Vize: Strategie modrého oceánu a Hooked (jak nesoutěžit cenou a mít zákazníky, kteří se vracejí)
+   - I – Ideace: byznys model na jedné stránce (Lean Canvas)
+   - S – Strategie a čísla: byznys case na 24 měsíců, bod zvratu, ROI
+   - I – Implementace: 12+1 modelů online byznysu s hotovým postupem, web nebo e-shop postavený svépomocí podle videí
+   - B – Budování poptávky: měření (GA4) a placené i neplacené marketingové kanály
+   - L – Launch: MVP, první zákazníci, KPI, živnost a úřady
+   - E – Expanze: tým, automatizace, růst
+3. Za každou fázi osvědčení. Cesta navazuje na státní kvalifikaci NSK Specialista internetového obchodu.
+
+## Co je v ceně
+- Videonávody (přes 100 krátkých videí: tvorba webu ve WordPressu a Elementoru, WooCommerce, SEO, PPC a další)
+- AI asistent napojený na data projektu
+- Kalkulačky: finanční plán, daně, PNO, cash-flow, nábor
+- Živé online semináře každých 14 dní (90 minut): AI nástroje pro zrychlení práce, Google Analytics 4, SEO/GEO/AIO a AI trendy, Facebook reklama, WordPress + MCP AI, byznysové strategie (Modrý oceán, Hooked)
+
+## Cena
+- Rentgen nápadu a první dvě fáze: zdarma, bez platební karty.
+- Členství na 6 měsíců (všech 7 fází a živé semináře): 2 990 Kč vč. DPH jednorázově, nic se samo neobnovuje. Startovací cena pro prvních 50 členů, poté 5 990 Kč.
+- 20minutová konzultace projektu zdarma (pilotní provoz). Další konzultace se seniorními poradci se platí zvlášť.
+- Pro srovnání: kurz Specialista internetového obchodu s lektorem stojí v Edu Partners 49 000 Kč.
+
+## Odkazy
+- [Úvodní stránka a rentgen nápadu](https://visible7.io/)
+- [Ceník](https://visible7.io/cenik)
+- [Členství a semináře](https://visible7.io/clenstvi)
+- [Metodika VISIBLE7 (popis, kniha)](https://visible7.cz/)
+- [Edu Partners – provozovatel, reference](https://www.edu-partners.cz/)
+
+## Kontakt
+Edu Partners s.r.o., IČO 28660757, Raisova 889/5, 709 00 Ostrava · michal.micek@edu-partners.cz

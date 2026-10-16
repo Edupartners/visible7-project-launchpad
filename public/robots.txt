@@ -1,14 +1,41 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# VISIBLE7 MICEK – visible7.io
+# Veřejné stránky může procházet každý vyhledávač i AI asistent.
+# Aplikace po přihlášení a testovací stránky uživatelů se neindexují.
 
 User-agent: *
 Allow: /
+Disallow: /home
+Disallow: /settings
+Disallow: /admin
+Disallow: /rentgen
+Disallow: /kviz
+Disallow: /seminare
+Disallow: /poradci
+Disallow: /testovaci-stranka
+Disallow: /odhlasit
+Disallow: /t/
+
+# AI vyhledávače a asistenti – výslovně povoleno (citace v ChatGPT, Claude, Perplexity, Gemini)
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /home
+Disallow: /settings
+Disallow: /admin
+Disallow: /rentgen
+Disallow: /kviz
+Disallow: /seminare
+Disallow: /poradci
+Disallow: /testovaci-stranka
+Disallow: /odhlasit
+Disallow: /t/
+
+Sitemap: https://visible7.io/sitemap.xml
