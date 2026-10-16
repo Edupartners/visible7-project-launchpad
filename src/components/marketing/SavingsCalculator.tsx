@@ -48,17 +48,46 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
 
   return (
     <section id="kalkulacka" className="scroll-mt-20 border-y border-border bg-muted/40">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-8 lg:px-12">
-        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Kalkulačka úspory</p>
-            <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight sm:text-[1.75rem]">
-              Kolik ušetříte, když to zvládnete sami?
-            </h2>
-          </div>
-          <div className="flex w-full flex-wrap gap-x-7 gap-y-4 sm:w-auto">
-            <label className="min-w-[240px] flex-1 text-sm font-semibold sm:min-w-[290px]">
-              Vaše hodina: <b className="text-orange-700">{kc(rate)}</b>
+      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8 lg:px-12">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Kalkulačka úspory</p>
+        <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight sm:text-[2rem]">
+          Kolik ušetříte, když to zvládnete sami?
+        </h2>
+        <p className="mt-2 text-muted-foreground">Odškrtněte, co byste jinak platili, a nastavte cenu své hodiny.</p>
+
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-10">
+          {/* Co ušetříte */}
+          <div className="rounded-2xl border border-border bg-card">
+            <ul className="divide-y divide-border">
+              {items.map((it) => (
+                <li key={it.id}>
+                  <label className="flex cursor-pointer items-center gap-3 px-3.5 py-3.5 hover:bg-muted/40 sm:gap-3.5 sm:px-5 sm:py-4">
+                    <input
+                      type="checkbox"
+                      checked={!off[it.id]}
+                      onChange={() => setOff((o) => ({ ...o, [it.id]: !o[it.id] }))}
+                      className="h-5 w-5 shrink-0 accent-orange-500"
+                    />
+                    <span className={`min-w-0 flex-1 ${off[it.id] ? "opacity-45" : ""}`}>
+                      <span className="block font-semibold leading-snug">{it.title}</span>
+                      <span className="block text-sm leading-snug text-muted-foreground">{it.how}</span>
+                    </span>
+                    <span
+                      className={`shrink-0 whitespace-nowrap text-base font-bold tabular-nums sm:text-lg ${
+                        off[it.id] ? "text-muted-foreground line-through" : ""
+                      }`}
+                    >
+                      {kc(it.value)}
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <label className="block border-t border-border px-3.5 py-4 text-sm font-semibold sm:px-5">
+              <span className="flex items-baseline justify-between gap-3">
+                <span>Kolik stojí hodina vaší práce?</span>
+                <b className="whitespace-nowrap text-base text-orange-600">{kc(rate)}</b>
+              </span>
               <input
                 type="range"
                 min={150}
@@ -66,71 +95,53 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 step={50}
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
-                className="mt-1.5 block h-6 w-full accent-orange-500"
+                className="mt-2 block h-6 w-full accent-orange-500"
+                aria-label="Cena vaší hodiny"
               />
             </label>
           </div>
-        </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
-          {items.map((it) => (
-            <label
-              key={it.id}
-              className={`flex cursor-pointer flex-col gap-1.5 rounded-xl border bg-card px-3.5 py-3 ${
-                off[it.id] ? "border-border opacity-60" : "border-border"
-              }`}
+          {/* Výsledek */}
+          <div className="rounded-2xl bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-8 lg:sticky lg:top-24">
+            <p className="text-sm font-semibold text-white/70">Ušetříte přibližně</p>
+            <p
+              className="mt-1 whitespace-nowrap text-[2.75rem] font-extrabold leading-tight tracking-tight text-orange-400 tabular-nums min-[400px]:text-5xl sm:text-6xl"
+              aria-live="polite"
             >
-              <span className="flex items-start gap-2 text-sm font-bold leading-snug">
-                <input
-                  type="checkbox"
-                  checked={!off[it.id]}
-                  onChange={() => setOff((o) => ({ ...o, [it.id]: !o[it.id] }))}
-                  className="mt-0.5 h-4 w-4 shrink-0 accent-[hsl(var(--primary))]"
-                />
-                {it.title}
-              </span>
-              <span className="text-xs leading-snug text-muted-foreground">{it.how}</span>
-              <span className="mt-auto text-[15px] font-bold">{kc(it.value)}</span>
-            </label>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-2xl bg-orange-100 px-5 py-4">
-          <p className="text-lg" aria-live="polite">
-            Ušetříte přibližně <b className="text-2xl">{kc(total)}</b>
+              {kc(total)}
+            </p>
             {times >= 2 && (
-              <>
-                {" "}
-                · <span className="font-bold text-orange-800">{times}× víc, než stojí VISIBLE7</span>
-              </>
+              <p className="mt-3 text-lg font-semibold">
+                To je <span className="text-orange-300">{times}× víc</span>, než stojí VISIBLE7.
+              </p>
             )}
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              track("calculator_cta", { total, rate });
-              onStart();
-            }}
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-[15px] font-semibold text-white hover:bg-[hsl(var(--primary-hover))]"
-          >
-            Otestovat nápad zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+            <div className="mt-5 rounded-xl bg-white/[0.07] px-4 py-3 text-sm">
+              <p>
+                Členství VISIBLE7: <b>{kc(shop.price)}</b>
+                {founder && <span className="text-white/70"> (pak {kc(offer.next_price)})</span>}
+              </p>
+              {founder && (
+                <p className="mt-1 font-semibold text-orange-300">
+                  Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma · zbývá {seatsLabel(offer.left)}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                track("calculator_cta", { total, rate });
+                onStart();
+              }}
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 text-[15px] font-semibold text-white hover:bg-orange-600"
+            >
+              Otestovat nápad zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
-        <p className="mt-4 text-sm text-muted-foreground">
+        <p className="mt-6 text-sm text-muted-foreground">
           Pro srovnání: <b className="text-foreground">kurz Specialista internetového obchodu s lektorem</b> stojí v Edu
-          Partners <b className="text-foreground">49&nbsp;000&nbsp;Kč</b>. VISIBLE7 vás provede stejnou cestou za{" "}
-          <b className="text-foreground">{kc(shop.price)}</b>
-          {founder && (
-            <>
-              {" "}
-              <span className="ml-1 inline-block rounded-lg bg-primary px-2.5 py-0.5 align-middle text-xs font-bold leading-snug text-white">
-                Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma · zbývá {seatsLabel(offer.left)}
-              </span>{" "}
-              <span>(pak {kc(offer.next_price)})</span>
-            </>
-          )}
-          .
+          Partners <b className="text-foreground">49&nbsp;000&nbsp;Kč</b>. VISIBLE7 vás provede stejnou cestou.
         </p>
         <p className="mt-1.5 text-xs text-muted-foreground">
           Orientační odhad podle cen z praxe. Skutečná úspora závisí na vašem projektu. Další konzultace se seniorními
