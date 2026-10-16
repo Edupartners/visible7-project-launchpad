@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthGate";
 /**
  * Úroveň přístupu přihlášeného uživatele.
  *  - zdarma: brány 1–2, rentgen, kvíz
- *  - trial: 7 dní všechny brány a videa (bez prémiových výstupů)
+ *  - trial: 3 dny (nastavení trial_days) všechny brány a videa (bez prémiových výstupů)
  *  - placený: vše včetně Excelu, osvědčení 3–7, pitche a plného limitu AI
  * Dokud je v databázi vypnutý přepínač paywall_enabled, je odemčeno všechno (pilot bez plateb).
  * Skutečné zámky hlídá i databáze a AI funkce – tohle je jen zobrazení.

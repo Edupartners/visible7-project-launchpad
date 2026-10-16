@@ -50,7 +50,7 @@ const PricingPage = () => {
     ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
     [
       "Mohu nejdřív vyzkoušet?",
-      "Ano. Rentgen nápadu a brány 1 a 2 jsou zdarma bez platební karty. Když zjistíte, jaký jste typ podnikatele (krátký kvíz), získáte navíc 7 dní plného přístupu zdarma.",
+      "Ano. Rentgen nápadu a brány 1 a 2 jsou zdarma bez platební karty. Když zjistíte, jaký jste typ podnikatele (krátký kvíz), získáte navíc 3 dny plného přístupu zdarma.",
     ],
     [
       "Jak se členství aktivuje?",
@@ -82,7 +82,7 @@ const PricingPage = () => {
                   "Rentgen nápadu do 10 minut",
                   "Brána 1 Vize (modrý oceán)",
                   "Brána 2 Ideace (Lean Canvas) s AI",
-                  "Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma",
+                  "Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma",
                 ].map((it) => (
                   <li key={it} className="flex gap-2">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />

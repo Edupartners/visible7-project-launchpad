@@ -123,7 +123,7 @@ const QuizResultView = ({ attempt, reward, onDone }: { attempt: QuizAttempt; rew
           <div>
             {reward.status === "started" ? (
               <>
-                <p className="text-xl font-bold">Odměna: 7 dní plného přístupu</p>
+                <p className="text-xl font-bold">Odměna: 3 dny plného přístupu</p>
                 <p className="mt-1 text-muted-foreground">
                   Všechny brány a videa máte odemčené do{" "}
                   {reward.until ? new Date(reward.until).toLocaleDateString("cs-CZ") : "konce zkušební doby"}.

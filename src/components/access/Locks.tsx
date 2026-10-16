@@ -7,7 +7,7 @@ import { FREE_GATES, useAccess } from "@/lib/access";
 import { PromoRedeem } from "./PromoRedeem";
 import { useState } from "react";
 
-/** Co nabídnout uživateli bez přístupu: kvíz za 7 dní zdarma (jednou) a ceník. */
+/** Co nabídnout uživateli bez přístupu: kvíz za 3 dny zdarma (jednou) a ceník. */
 const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
   const navigate = useNavigate();
   return (
@@ -17,7 +17,7 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
           onClick={() => navigate("/kviz")}
           className="h-12 rounded-[10px] bg-orange-500 px-6 text-base font-semibold text-white hover:bg-orange-600"
         >
-          <Gift className="mr-2 h-5 w-5" /> Jaký jste typ podnikatele? 7 dní zdarma
+          <Gift className="mr-2 h-5 w-5" /> Jaký jste typ podnikatele? 3 dny zdarma
         </Button>
       )}
       <Link
@@ -76,7 +76,7 @@ export const GateLock = ({ gate, children }: { gate: number; children: React.Rea
           <p className="mt-3 text-lg text-white/80">
             {access.trialUsed
               ? "Zkušební přístup už jste využili. Vaše data jsou uložená a čekají na vás – stačí odemknout plný přístup."
-              : "Brány 1 a 2 jsou zdarma. Další brány odemknete na 7 dní zdarma, když vyplníte krátký kvíz o tom, jaký jste typ podnikatele."}
+              : "Brány 1 a 2 jsou zdarma. Další brány odemknete na 3 dny zdarma, když vyplníte krátký kvíz o tom, jaký jste typ podnikatele."}
           </p>
           <ul className="mt-6 space-y-2 text-white/90">
             {[

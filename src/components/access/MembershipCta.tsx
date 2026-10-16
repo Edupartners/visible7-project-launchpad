@@ -98,7 +98,7 @@ export function MembershipCard({
         <BuyButton source={`dashboard_${state}`} />
         {state === "free" && (
           <Link to="/kviz" className="text-center text-sm font-semibold text-primary hover:underline">
-            Zjistěte, jaký jste typ podnikatele, a získejte 7 dní zdarma
+            Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma
           </Link>
         )}
       </div>

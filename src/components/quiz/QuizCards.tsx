@@ -6,11 +6,11 @@ import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useAccess } from "@/lib/access";
 import { QUIZ_KEY, QuizData, QuizStage } from "@/lib/quiz";
 
-/** Text odměny podle stavu přístupu: 7 dní zdarma jen když ještě nebyly využity a platby jsou zapnuté. */
+/** Text odměny podle stavu přístupu: 3 dny zdarma jen když ještě nebyly využity a platby jsou zapnuté. */
 const useRewardText = () => {
   const access = useAccess();
   return access.paywall && !access.trialUsed && !access.paid
-    ? "odznak a 7 dní plného přístupu zdarma"
+    ? "odznak a 3 dny plného přístupu zdarma"
     : "odznak a osobní tipy";
 };
 
