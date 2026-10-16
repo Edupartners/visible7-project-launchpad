@@ -8,6 +8,7 @@ import { NSK_QUALIFICATION } from "@/lib/qualification";
 import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
+import { WorksheetsTeaser } from "@/components/marketing/WorksheetsTeaser";
 import {
   ArrowRight,
   Award,
@@ -691,6 +692,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <PlayCircle className="h-6 w-6 text-sky-600" aria-hidden="true" />
           </div>
         </section>
+
+        <WorksheetsTeaser />
 
         {/* Reference */}
         <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-24">

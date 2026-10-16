@@ -282,3 +282,9 @@ export function sheetFromFileName(name: string): Worksheet | undefined {
   const norm = (c: string) => c.replace("·", "M").replace("I M", "IM");
   return WORKSHEETS.find((w) => norm(w.code) === code || w.code === code || `${w.slug}.pdf` === name);
 }
+
+export const WORKSHEET_BENEFITS = [
+  `${WORKSHEETS.filter((w) => w.free).length} listů zdarma, připravených k tisku`,
+  "Metody, které používají startupy: modrý oceán, Lean Canvas, Hooked",
+  "Ke každému listu video, jak ho vyplnit",
+];

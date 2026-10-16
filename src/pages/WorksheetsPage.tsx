@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Download, FileText, Lock, Mail } from "lucide-react";
+import { Check, Download, Lock, Mail } from "lucide-react";
+import { WorksheetFan } from "@/components/marketing/WorksheetsTeaser";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,6 +9,7 @@ import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import {
   BUNDLE,
+  WORKSHEET_BENEFITS,
   PHASE_LABELS,
   WORKSHEETS,
   type Worksheet,
@@ -89,18 +91,37 @@ const WorksheetsPage = () => {
     setDone({ sent: !!data.sent });
   };
 
+  const BADGE: Record<string, string> = { "v0-karta-projektu": "Začněte tady", "im3-checklist-ai-first-web": "Novinka" };
+
   const Card = ({ w }: { w: Worksheet }) => {
     const ph = PHASE_LABELS[w.phase];
+    const go = () => (w.free ? open({ slug: w.slug, title: w.title, file: worksheetFile(w) }) : navigate("/cenik"));
     return (
-      <article className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="flex aspect-[4/3] items-center justify-center bg-muted/60 p-3">
+      <article className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-[0_18px_40px_-20px_rgba(15,23,42,0.35)]">
+        <button
+          type="button"
+          onClick={go}
+          aria-label={w.free ? `Stáhnout ${w.title}` : `${w.title} – pro členy`}
+          className="relative flex h-56 items-center justify-center overflow-hidden bg-muted/60 p-4"
+        >
           <img
             src={worksheetPreview(w)}
-            alt={`Náhled listu ${w.title}`}
+            alt=""
             loading="lazy"
-            className={`max-h-full max-w-full rounded shadow-[0_6px_20px_-8px_rgba(15,23,42,0.35)] ${w.free ? "" : "opacity-80"}`}
+            className={`max-h-full max-w-full object-contain rounded shadow-[0_8px_24px_-10px_rgba(15,23,42,0.45)] transition-transform duration-300 group-hover:scale-[1.03] ${w.free ? "" : "blur-[1.5px] grayscale-[30%]"}`}
           />
-        </div>
+          {w.free ? (
+            <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 text-xs font-extrabold text-white">
+              {BADGE[w.slug] ?? "ZDARMA"}
+            </span>
+          ) : (
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="flex items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1.5 text-xs font-bold text-white">
+                <Lock className="h-3.5 w-3.5" aria-hidden="true" /> Pro členy
+              </span>
+            </span>
+          )}
+        </button>
         <div className="flex flex-1 flex-col p-4">
           <p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
             <span className="inline-flex h-5 min-w-5 items-center justify-center rounded bg-primary px-1 text-[11px] font-bold text-white">
@@ -108,13 +129,13 @@ const WorksheetsPage = () => {
             </span>
             {ph.name} · {w.code}
           </p>
-          <h3 className="mt-1.5 font-bold leading-snug">{w.title}</h3>
+          <h3 className="mt-1.5 text-lg font-bold leading-snug">{w.title}</h3>
           <p className="mt-1 flex-1 text-sm leading-snug text-muted-foreground">{w.desc}</p>
           {w.free ? (
             <button
               type="button"
-              onClick={() => open({ slug: w.slug, title: w.title, file: worksheetFile(w) })}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-[hsl(var(--primary-hover))]"
+              onClick={go}
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
             >
               <Download className="h-4 w-4" aria-hidden="true" /> Stáhnout zdarma
             </button>
@@ -124,7 +145,7 @@ const WorksheetsPage = () => {
               onClick={() => track("worksheet_locked", { sheet: w.slug })}
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary"
             >
-              <Lock className="h-4 w-4" aria-hidden="true" /> Pro členy
+              <Lock className="h-4 w-4" aria-hidden="true" /> Odemknout členstvím
             </Link>
           )}
         </div>
@@ -136,31 +157,32 @@ const WorksheetsPage = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PublicHeader onStart={() => navigate("/home?novy")} />
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-10 pt-14 sm:px-8 lg:px-12 md:pt-20">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Ke stažení</p>
-          <h1 className="mt-2 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">Pracovní listy VISIBLE7</h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Osvědčené nástroje pro každou fázi cesty od nápadu po růst: modrý oceán, Lean Canvas, SWOT, měření i
-            reklama. Vytiskněte si je a vyplňte, ke každému listu je video, jak na to.
-          </p>
-
-          <div className="mt-10 flex flex-col gap-5 rounded-2xl bg-primary p-6 text-white sm:flex-row sm:items-center sm:p-8">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10">
-              <FileText className="h-7 w-7 text-orange-300" aria-hidden="true" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-300">Zdarma</p>
-              <h2 className="mt-1 text-2xl font-extrabold tracking-tight">{BUNDLE.title}</h2>
-              <p className="mt-1 text-white/80">{BUNDLE.desc}</p>
-            </div>
+        <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-12 sm:px-8 md:grid-cols-[1.1fr_1fr] md:pt-16 lg:px-12">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Ke stažení zdarma</p>
+            <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Pracovní listy, se kterými se nápad mění v plán
+            </h1>
+            <ul className="mt-6 space-y-2.5 text-lg">
+              {WORKSHEET_BENEFITS.map((b) => (
+                <li key={b} className="flex gap-2.5">
+                  <Check className="mt-1 h-5 w-5 shrink-0 text-orange-600" strokeWidth={3} aria-hidden="true" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
             <button
               type="button"
               onClick={() => open({ slug: BUNDLE.slug, title: BUNDLE.title, file: BUNDLE.file })}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600"
+              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-4 text-base font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-orange-600"
             >
-              <Download className="h-4 w-4" aria-hidden="true" /> Stáhnout balíček
+              <Download className="h-5 w-5" aria-hidden="true" /> Stáhnout startovní balíček zdarma
             </button>
+            <p className="mt-3 text-sm text-muted-foreground">
+              PDF · 13 stran A4 k tisku · Vize a Ideace + úvod do metodiky
+            </p>
           </div>
+          <WorksheetFan />
         </section>
 
         <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-8 lg:px-12">
