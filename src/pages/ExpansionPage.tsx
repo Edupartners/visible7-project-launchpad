@@ -20,7 +20,7 @@ const ExpansionPage = () => {
     <PageLayout onBack={back}>
       {showIntro ? (
         <PhaseIntroTemplate
-          title="Růst"
+          title="Expanze"
           subtitle="Rosťte podle marže, ne podle pocitu"
           description="Projekt běží a chcete víc. Tady zjistíte, jestli jste na růst připravení, která páka vám přinese nejvíc zisku, kolik peněz růst spolkne dřív, než vám zákazníci zaplatí, a kdy si můžete dovolit prvního člověka. Bez zbytečných nákladů."
           phaseNumber={7}

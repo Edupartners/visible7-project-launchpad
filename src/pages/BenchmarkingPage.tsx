@@ -21,7 +21,7 @@ const BenchmarkingPage = () => {
     <PageLayout onBack={back}>
       {showIntro ? (
         <PhaseIntroTemplate
-          title="Marketing a testování"
+          title="Budování poptávky"
           subtitle="Kde najdete zákazníky a co se vyplatí"
           description="Vyberete kanály seřazené podle vašeho projektu, nastavíte je podle instruktážních videí a otestujete s malým rozpočtem. Výsledek porovnáme s maximálním PNO z vašeho byznys case, takže víte, kam dát peníze."
           phaseNumber={5}

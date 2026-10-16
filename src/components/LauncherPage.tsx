@@ -37,7 +37,7 @@ type Tag = "AI" | "Video" | "Výpočet";
 
 const GATES: { name: string; icon: typeof Target; does: string; get: string; tags: Tag[]; sample: string }[] = [
   {
-    name: "Strategie modrého oceánu",
+    name: "Vize",
     icon: Target,
     does: "Najdete místo mezi levnou a prémiovou konkurencí.",
     get: "Křivka hodnoty a USP",
@@ -45,7 +45,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     sample: "USP: e-shop za víkend bez programátora",
   },
   {
-    name: "Lean Canvas",
+    name: "Ideace",
     icon: Lightbulb,
     does: "Celý byznys na jedné stránce. AI navrhne texty a ohodnotí je.",
     get: "Lean Canvas a typ byznysu",
@@ -53,7 +53,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     sample: "AI: typ byznysu – e-shop",
   },
   {
-    name: "Byznys case",
+    name: "Strategie a čísla",
     icon: TrendingUp,
     does: "Příjmy, náklady a marketing na 24 měsíců. AI odhadne obvyklá čísla.",
     get: "Potřebný kapitál, bod zvratu, PNO",
@@ -61,7 +61,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     sample: "Bod zvratu: 6. měsíc",
   },
   {
-    name: "Tvorba",
+    name: "Implementace",
     icon: Wrench,
     does: "Postup a nástroje pro váš typ byznysu: web, e-shop, kurz, předplatné…",
     get: "Plán tvorby krok za krokem",
@@ -69,7 +69,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     sample: "Video: jak spustit e-shop",
   },
   {
-    name: "Marketing a testování",
+    name: "Budování poptávky",
     icon: BarChart3,
     does: "Kanály seřazené podle toho, kde váš zákazník opravdu nakupuje.",
     get: "Ověřené kanály a rozpočet",
@@ -85,7 +85,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
     sample: "První zákazník",
   },
   {
-    name: "Růst",
+    name: "Expanze",
     icon: Layers,
     does: "Když projekt běží: automatizace, tým a další trhy.",
     get: "Plán růstu",
@@ -151,7 +151,7 @@ const SHOWCASE = [
     text: "Za každou splněnou bránu získáte osvědčení s ověřovacím kódem. Na LinkedIn ho přidáte jedním klikem a zaměstnavatel si pravost ověří přes QR kód. Po bráně 4 můžete složit zkoušku profesní kvalifikace Specialista internetového obchodu, zapsanou v Národní soustavě kvalifikací.",
     cta: "Získat první osvědčení",
     image: "/landing/ukazka-osvedceni.webp",
-    alt: "Osvědčení VISIBLE7 za fázi 1 Strategie modrého oceánu s ověřovacím kódem a QR kódem",
+    alt: "Osvědčení VISIBLE7 za fázi 1 Vize s ověřovacím kódem a QR kódem",
     width: 1100,
     height: 782,
   },

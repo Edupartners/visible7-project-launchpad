@@ -45,7 +45,7 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-6 sm:px-6">
       <header>
         <p className="text-sm font-semibold text-primary">Fáze 4 ze 7</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Tvorba</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Implementace</h1>
         <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
           Postavíte web, e-shop nebo jiný typ projektu krok za krokem. Každý blok má instruktážní video, kroky k
           odškrtnutí a náklady, které převezmete do byznys case.

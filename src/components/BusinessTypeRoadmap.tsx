@@ -106,7 +106,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
           gate={4}
           title="Projekt má skutečnou podobu"
           message="Další brána ukáže, kde vaše zákazníky najdete a kolik do marketingu dát."
-          nextLabel="Pokračovat na Marketing a testování"
+          nextLabel="Pokračovat na Budování poptávky"
           onNext={() => navigate("/benchmarking-phase")}
           onHome={() => navigate("/home")}
         />
@@ -330,7 +330,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {phaseDone
-              ? "Fáze Tvorba je hotová."
+              ? "Fáze Implementace je hotová."
               : !isMine
                 ? "Fázi dokončíte v plánu svého typu byznysu."
                 : allDone
@@ -342,7 +342,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
             disabled={!isMine || !allDone || phaseDone}
             onClick={finishPhase}
           >
-            Dokončit fázi Tvorba
+            Dokončit fázi Implementace
           </Button>
         </div>
       </section>

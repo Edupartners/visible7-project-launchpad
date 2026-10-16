@@ -20,7 +20,7 @@ const ImplementationPage = () => {
     <PageLayout onBack={back}>
       {showIntro ? (
         <PhaseIntroTemplate
-          title="Tvorba"
+          title="Implementace"
           subtitle="Postavte to – bez programátora"
           description="Typ byznysu jste zvolili ve fázi 2. Teď dostanete plán tvorby přesně pro něj: bloky od domény po kontrolu před spuštěním, u každého instruktážní video a kroky k odškrtnutí. E-shop postavíte na Shoptetu, web na WordPressu."
           phaseNumber={4}

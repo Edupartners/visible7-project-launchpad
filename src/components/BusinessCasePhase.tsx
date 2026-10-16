@@ -1319,7 +1319,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       <AdvisorsInline
         phase={3}
         title="Projděte čísla se seniorním poradcem"
-        topic="Fáze 3 – Byznys case"
+        topic="Fáze 3 – Strategie a čísla"
         lines={caseLines()}
       />
 

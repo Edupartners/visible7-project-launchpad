@@ -16,10 +16,10 @@ const db = supabase as any;
 export type BlockArea = "tvorba" | "marketing" | "start" | "rust";
 
 export const AREA_NAMES: Record<BlockArea, string> = {
-  tvorba: "Fáze 4 – Tvorba",
-  marketing: "Fáze 5 – Marketing",
-  start: "Fáze 6 – Start podnikání",
-  rust: "Fáze 7 – Růst",
+  tvorba: "Fáze 4 – Implementace",
+  marketing: "Fáze 5 – Budování poptávky",
+  start: "Fáze 6 – Launch",
+  rust: "Fáze 7 – Expanze",
 };
 
 /** 1 video, 2–4 videa, 5+ videí */

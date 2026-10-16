@@ -56,14 +56,49 @@ const EMPTY_CANVAS: LeanCanvasData = {
 };
 
 const FIELDS: { key: FieldKey; title: string; hint: string; area: string }[] = [
-  { key: "customerSegments", title: "Segment zákazníků", hint: "Komu konkrétně prodáváte? Kdo bude první zákazník?", area: "customer" },
+  {
+    key: "customerSegments",
+    title: "Segment zákazníků",
+    hint: "Komu konkrétně prodáváte? Kdo bude první zákazník?",
+    area: "customer",
+  },
   { key: "problem", title: "Problém", hint: "Co zákazníka trápí? 1–3 hlavní problémy jeho slovy.", area: "problem" },
-  { key: "uniqueValueProposition", title: "Unikátní hodnota (USP)", hint: "Proč koupí právě u vás? Jedna jasná věta.", area: "usp" },
-  { key: "solution", title: "Řešení", hint: "Jak problém řešíte – hlavní funkce nebo obsah nabídky.", area: "solution" },
-  { key: "existingAlternatives", title: "Existující alternativy", hint: "Jak to zákazník řeší dnes? Levná a prémiová konkurence.", area: "alternatives" },
-  { key: "channels", title: "Marketingové kanály", hint: "Kudy se k zákazníkovi dostanete? 3–5 kanálů.", area: "channels" },
-  { key: "costStructure", title: "Náklady", hint: "Položky nákladů online projektu – zatím bez částek, spočítáme je ve fázi 3.", area: "costs" },
-  { key: "revenueStreams", title: "Příjmy", hint: "Za co vám zákazník zaplatí? Prodej, předplatné, upsell…", area: "revenue" },
+  {
+    key: "uniqueValueProposition",
+    title: "Unikátní hodnota (USP)",
+    hint: "Proč koupí právě u vás? Jedna jasná věta.",
+    area: "usp",
+  },
+  {
+    key: "solution",
+    title: "Řešení",
+    hint: "Jak problém řešíte – hlavní funkce nebo obsah nabídky.",
+    area: "solution",
+  },
+  {
+    key: "existingAlternatives",
+    title: "Existující alternativy",
+    hint: "Jak to zákazník řeší dnes? Levná a prémiová konkurence.",
+    area: "alternatives",
+  },
+  {
+    key: "channels",
+    title: "Marketingové kanály",
+    hint: "Kudy se k zákazníkovi dostanete? 3–5 kanálů.",
+    area: "channels",
+  },
+  {
+    key: "costStructure",
+    title: "Náklady",
+    hint: "Položky nákladů online projektu – zatím bez částek, spočítáme je ve fázi 3.",
+    area: "costs",
+  },
+  {
+    key: "revenueStreams",
+    title: "Příjmy",
+    hint: "Za co vám zákazník zaplatí? Prodej, předplatné, upsell…",
+    area: "revenue",
+  },
 ];
 
 const RATING_STYLE: Record<string, string> = {
@@ -107,7 +142,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
   const { currentProject, setBusinessType } = useProject();
   const [canvas, setCanvas, { loading: canvasLoading }] = useSupabaseProgress<LeanCanvasData>(
     "ideation_lean_canvas",
-    EMPTY_CANVAS
+    EMPTY_CANVAS,
   );
 
   const [preFilled, setPreFilled] = useState<FieldKey[]>([]);
@@ -172,7 +207,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
     setBusy(kind);
     const res = await callAi<CanvasSuggestion | CanvasEvaluation>(
       projectId,
-      kind === "navrh" ? "canvas_suggest" : "canvas_evaluate"
+      kind === "navrh" ? "canvas_suggest" : "canvas_evaluate",
     );
     setBusy(null);
     if (res.error || !res.output) {
@@ -180,9 +215,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
       toast({ title: "AI se nepodařilo použít", description: res.error, variant: "destructive" });
       return;
     }
-    setUsage((u) =>
-      u ? { ...u, used: { ...u.used, [kind]: u.used[kind] + 1 }, usedDaily: u.usedDaily + 1 } : u
-    );
+    setUsage((u) => (u ? { ...u, used: { ...u.used, [kind]: u.used[kind] + 1 }, usedDaily: u.usedDaily + 1 } : u));
     if (kind === "navrh") {
       const s = res.output as CanvasSuggestion;
       setSuggestion(s);
@@ -248,7 +281,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
           gate={2}
           title="Lean Canvas je hotový"
           message="Typ byznysu, náklady a příjmy se propíšou do byznys case."
-          nextLabel="Pokračovat na Byznys case"
+          nextLabel="Pokračovat na Strategii a čísla"
           onNext={() => navigate("/strategy")}
           onHome={() => navigate("/home")}
         />
@@ -287,8 +320,8 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
             <div>
               <h3 className="text-lg font-semibold">AI pomocník</h3>
               <p className="text-sm text-muted-foreground">
-                Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u každého
-                pole sami rozhodnete.
+                Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u
+                každého pole sami rozhodnete.
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Zbývá {left("navrh")} z {AI_LIMITS.navrh} návrhů pro tento projekt.
@@ -300,7 +333,11 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
             onClick={() => runAi("navrh")}
             disabled={busy !== null || left("navrh") === 0 || aiOff}
           >
-            {busy === "navrh" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+            {busy === "navrh" ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="mr-2 h-4 w-4" />
+            )}
             {busy === "navrh" ? "Připravuji návrh…" : suggestion ? "Navrhnout znovu" : "Navrhnout s AI"}
           </Button>
         </div>
@@ -387,7 +424,12 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
                     <Button size="sm" className="rounded-lg" onClick={() => applySuggestion(f.key, s)}>
                       <Check className="mr-1 h-4 w-4" /> Použít
                     </Button>
-                    <Button size="sm" variant="outline" className="rounded-lg" onClick={() => applySuggestion(f.key, s, true)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-lg"
+                      onClick={() => applySuggestion(f.key, s, true)}
+                    >
                       <Pencil className="mr-1 h-4 w-4" /> Upravit
                     </Button>
                     <Button size="sm" variant="ghost" className="rounded-lg" onClick={() => dismiss(f.key)}>
@@ -524,7 +566,9 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
               {c.ok ? (
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
               ) : (
-                <span className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`} />
+                <span
+                  className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`}
+                />
               )}
               <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
             </li>

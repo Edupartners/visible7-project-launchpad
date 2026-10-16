@@ -53,14 +53,14 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
       <div className="px-6 pb-4 pt-6 sm:px-8">
         <h2 className="text-xl font-bold">Osvědčení</h2>
         <p className="mt-1 max-w-2xl text-muted-foreground">
-          Za každou dokončenou fázi si vystavíte osvědčení s ověřovacím kódem. Stáhnete ho jako PDF a můžete ho přidat na
-          LinkedIn nebo do životopisu.
+          Za každou dokončenou fázi si vystavíte osvědčení s ověřovacím kódem. Stáhnete ho jako PDF a můžete ho přidat
+          na LinkedIn nebo do životopisu.
         </p>
       </div>
 
       {certs.length === 0 && offers.length === 0 && (
         <p className="border-t border-border px-6 py-4 text-sm text-muted-foreground sm:px-8">
-          Zatím tu nic není. První osvědčení získáte po dokončení brány 1 – Strategie modrého oceánu.
+          Zatím tu nic není. První osvědčení získáte po dokončení brány 1 – Vize.
         </p>
       )}
 
@@ -72,10 +72,14 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
               className="flex flex-col gap-3 border-b border-border px-6 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:px-8"
             >
               <div className="flex items-start gap-3">
-                <Award className={`mt-0.5 h-5 w-5 shrink-0 ${o.kind === "gold" ? "text-gate-copper" : "text-primary"}`} />
+                <Award
+                  className={`mt-0.5 h-5 w-5 shrink-0 ${o.kind === "gold" ? "text-gate-copper" : "text-primary"}`}
+                />
                 <div>
                   <p className="font-semibold">{offerLabel(o)}</p>
-                  <p className="text-sm text-muted-foreground">Připraveno k vystavení pro projekt „{currentProject?.name}“</p>
+                  <p className="text-sm text-muted-foreground">
+                    Připraveno k vystavení pro projekt „{currentProject?.name}“
+                  </p>
                 </div>
               </div>
               <Button className="btn-apple shrink-0 py-2" onClick={() => setDialog(o)}>

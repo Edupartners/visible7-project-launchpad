@@ -16,13 +16,13 @@ export interface Certificate {
 }
 
 export const GATE_NAMES: Record<number, string> = {
-  1: "Strategie modrého oceánu",
-  2: "Lean Canvas",
-  3: "Byznys case",
-  4: "Tvorba",
-  5: "Marketing a testování",
+  1: "Vize",
+  2: "Ideace",
+  3: "Strategie a čísla",
+  4: "Implementace",
+  5: "Budování poptávky",
   6: "Launch",
-  7: "Růst",
+  7: "Expanze",
 };
 
 export const ISSUER_LINE = "Edu Partners s.r.o. | Partner: World eCommerce Business School | VISIBLE7 MICEK®";
@@ -39,7 +39,7 @@ export const certificateDescription = (kind: CertificateKind, phase: number | nu
   if (kind === "gold")
     return "za projití všech sedmi bran metodiky VISIBLE7 MICEK® a spuštění vlastního projektu na trh";
   if (kind === "zamer")
-    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK®: strategie modrého oceánu, Lean Canvas, byznys case a tvorba";
+    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK®: vize, ideace, strategie a čísla a implementace";
   return `za absolvování fáze ${phase} – ${GATE_NAMES[phase ?? 0] ?? ""} – metodiky VISIBLE7 MICEK®`;
 };
 

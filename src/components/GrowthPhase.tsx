@@ -503,14 +503,14 @@ export const GrowthPhase = () => {
         />
       </section>
 
-      <AdvisorsInline phase={7} title="Poraďte se o růstu" topic="Růst projektu (fáze 7)" />
+      <AdvisorsInline phase={7} title="Poraďte se o růstu" topic="Expanze projektu (fáze 7)" />
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
           <h2 className="text-xl font-bold">Dokončení fáze a osvědčení Gold</h2>
           <p className="text-muted-foreground">
             {phaseDone
-              ? "Fáze Růst je hotová. Všech 7 bran je otevřených."
+              ? "Fáze Expanze je hotová. Všech 7 bran je otevřených."
               : blocksDone
                 ? "Plán růstu je připravený."
                 : "Fázi dokončíte, až projdete povinné bloky „Jak růst krok za krokem“."}
@@ -527,7 +527,7 @@ export const GrowthPhase = () => {
             setCelebrate(true);
           }}
         >
-          Dokončit fázi Růst
+          Dokončit fázi Expanze
         </Button>
       </section>
     </div>

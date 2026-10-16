@@ -262,7 +262,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           gate={1}
           title="Strategie modrého oceánu je hotová"
           message="Váš zákazník, ERRC matice a USP se propíšou do Lean Canvasu."
-          nextLabel="Pokračovat na Lean Canvas"
+          nextLabel="Pokračovat na Ideaci"
           onNext={() => navigate("/ideation")}
           onHome={() => navigate("/home")}
         />
@@ -630,7 +630,11 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         </div>
       </Card>
 
-      <AdvisorsInline phase={1} title="Probrat modrý oceán s poradcem" topic="Fáze 1 – Strategie modrého oceánu" />
+      <AdvisorsInline
+        phase={1}
+        title="Probrat modrý oceán s poradcem"
+        topic="Fáze 1 – Vize (strategie modrého oceánu)"
+      />
 
       {/* Kontrola a dokončení */}
       <Card className="card-apple p-6">

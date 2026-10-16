@@ -83,7 +83,7 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
 
       <header>
         <p className="text-sm font-semibold text-primary">Fáze 5 ze 7</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Marketing a testování</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Budování poptávky</h1>
         <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
           Vyberete 2–3 kanály, nastavíte je podle videí, otestujete s malým rozpočtem a podle čísel rozhodnete:
           škálovat, ladit, nebo vypnout.
@@ -214,7 +214,7 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
           <h2 className="text-xl font-bold">Dokončení fáze</h2>
           <p className="text-muted-foreground">
             {phaseDone
-              ? "Fáze Marketing a testování je hotová."
+              ? "Fáze Budování poptávky je hotová."
               : tested.length > 0
                 ? `Otestováno: ${tested.map((c) => c.name).join(", ")}.`
                 : "Fázi dokončíte, až zapíšete výsledek testu aspoň u jednoho kanálu."}

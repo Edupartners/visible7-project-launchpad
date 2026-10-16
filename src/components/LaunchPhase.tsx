@@ -138,7 +138,7 @@ export const LaunchPhase = () => {
           gate={6}
           title="Jste venku. Máte prvního zákazníka."
           message="Tohle většina lidí nikdy nedokáže. Poslední brána ukáže, jak růst."
-          nextLabel="Pokračovat na Růst"
+          nextLabel="Pokračovat na Expanzi"
           onNext={() => navigate("/expansion")}
           onHome={() => navigate("/home")}
         />
