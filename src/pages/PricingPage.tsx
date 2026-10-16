@@ -20,7 +20,7 @@ const INCLUDED: { row: string; free: boolean }[] = [
 ];
 
 const MEMBER_ITEMS = [
-  "Všech 7 bran a přes 50 videonávodů",
+  "Všech 7 bran a přes 100 videonávodů",
   "Živé online semináře každých 14 dní a jejich záznamy",
   "AI asistent u každé brány",
   "Byznys case, Excel a pitch na A4",

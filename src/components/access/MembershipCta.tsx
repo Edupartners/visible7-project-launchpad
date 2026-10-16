@@ -63,7 +63,7 @@ export function MembershipCard({
         ? "Zkušební přístup skončil, vaše data zůstávají. Členstvím odemknete brány 3–7, videa, Excel, pitch a osvědčení."
         : state === "pilot"
           ? "Teď v pilotním provozu máte vše odemčené. Členstvím si zajistíte brány 3–7, videa, Excel, pitch a osvědčení i po jeho skončení."
-          : "Brány 3–7, přes 50 videonávodů, byznys case v Excelu, pitch na A4 a osvědčení za každou bránu.";
+          : "Brány 3–7, přes 100 videonávodů, byznys case v Excelu, pitch na A4 a osvědčení za každou bránu.";
 
   return (
     <section

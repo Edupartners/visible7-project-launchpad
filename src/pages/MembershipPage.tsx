@@ -9,7 +9,7 @@ import { track } from "@/lib/track";
 
 const ITEMS = [
   "Všech 7 bran metodiky VISIBLE7 MICEK®",
-  "Přes 50 videonávodů, kde je vidět každé kliknutí",
+  "Přes 100 videonávodů, kde je vidět každé kliknutí",
   "AI asistent u každé brány",
   "Byznys case v Excelu a pitch na A4",
   "Osvědčení za každou bránu",
