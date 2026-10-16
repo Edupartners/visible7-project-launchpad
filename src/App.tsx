@@ -29,6 +29,7 @@ import AdvisorsPage from "./pages/AdvisorsPage";
 import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
 import WorksheetsPage from "./pages/WorksheetsPage";
+import MemberWorksheetsPage from "./pages/MemberWorksheetsPage";
 import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
 import QuizPage from "./pages/QuizPage";
@@ -56,6 +57,7 @@ const ProtectedRoutes = () => (
       <Route path="/rentgen" element={<RentgenPage />} />
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />
+      <Route path="/listy" element={<MemberWorksheetsPage />} />
       <Route
         path="/testovaci-stranka"
         element={

@@ -3,6 +3,8 @@
  * PDF zdarma leží v public/listy, náhledy v public/listy/nahled. Listy pro členy tu mají jen náhled.
  * Zdroj listů: Documents › 02 PROJEKTY › VISIBLE7 › Pracovní listy › Nová sada 2026 (generátor v _zdroj).
  */
+import { supabase } from "@/integrations/visible7/client";
+
 export type WorksheetPhase = "V" | "I" | "S" | "IM" | "B" | "L" | "E";
 
 export interface Worksheet {
@@ -228,3 +230,55 @@ export const WORKSHEETS: Worksheet[] = [
 
 export const worksheetFile = (w: Pick<Worksheet, "slug">) => `/listy/${w.slug}.pdf`;
 export const worksheetPreview = (w: Pick<Worksheet, "slug">) => `/listy/nahled/${w.slug}.webp`;
+
+/* ---------- Listy pro členy (soukromé úložiště listy-clenove) ---------- */
+
+export const MEMBER_BUCKET = "listy-clenove";
+
+/** Dočasný odkaz na PDF pro členy (platí 2 minuty). Null = soubor není nahraný nebo chybí přístup. */
+export async function memberSheetUrl(slug: string): Promise<string | null> {
+  const { data, error } = await supabase.storage.from(MEMBER_BUCKET).createSignedUrl(`${slug}.pdf`, 120, {
+    download: `VISIBLE7 ${slug}.pdf`,
+  });
+  return error || !data?.signedUrl ? null : data.signedUrl;
+}
+
+/** Které listy pro členy jsou v úložišti nahrané (pro administraci). */
+export async function uploadedMemberSheets(): Promise<Set<string>> {
+  const { data } = await supabase.storage.from(MEMBER_BUCKET).list("", { limit: 100 });
+  return new Set((data ?? []).map((f) => f.name.replace(/\.pdf$/, "")));
+}
+
+export async function uploadMemberSheet(slug: string, file: File) {
+  const { error } = await supabase.storage
+    .from(MEMBER_BUCKET)
+    .upload(`${slug}.pdf`, file, { upsert: true, contentType: "application/pdf" });
+  if (error) throw error;
+}
+
+export interface WorksheetLead {
+  id: string;
+  email: string;
+  sheet: string;
+  marketing: boolean;
+  source: string;
+  created_at: string;
+}
+
+export async function loadWorksheetLeads(): Promise<WorksheetLead[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("worksheet_leads")
+    .select("id, email, sheet, marketing, source, created_at")
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (error) throw error;
+  return (data as WorksheetLead[]) ?? [];
+}
+
+/** Podle názvu souboru z „Nová sada 2026“ (např. „B4 Výkonnostní reklama.pdf“) najde list. */
+export function sheetFromFileName(name: string): Worksheet | undefined {
+  const code = name.split(" ")[0].toUpperCase();
+  const norm = (c: string) => c.replace("·", "M").replace("I M", "IM");
+  return WORKSHEETS.find((w) => norm(w.code) === code || w.code === code || `${w.slug}.pdf` === name);
+}

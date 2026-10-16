@@ -29,6 +29,7 @@ import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
 import { ShopAdmin } from "@/components/admin/ShopAdmin";
 import { SeminarsAdmin } from "@/components/admin/SeminarsAdmin";
 import { BlockVideosAdmin } from "@/components/admin/BlockVideosAdmin";
+import { WorksheetsAdmin } from "@/components/admin/WorksheetsAdmin";
 import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
 import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
@@ -301,6 +302,8 @@ const AdminPage = () => {
             )}
 
             <BlockVideosAdmin />
+
+            <WorksheetsAdmin />
 
             <SeminarsAdmin />
 
