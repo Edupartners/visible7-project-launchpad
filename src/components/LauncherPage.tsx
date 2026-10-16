@@ -5,6 +5,7 @@ import { ADVISORS, CONSULTATION } from "@/lib/advisors";
 import { kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
 import { REFERENCES } from "@/lib/references";
 import { NSK_QUALIFICATION } from "@/lib/qualification";
+import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import {
@@ -326,6 +327,9 @@ const Cta = ({
     <ArrowRight className="h-5 w-5" aria-hidden="true" />
   </button>
 );
+
+/** Rezervační stránka v Google Kalendáři (20 min konzultace zdarma v pilotním provozu). */
+const FREE_CONSULT_URL = "https://calendar.app.google/Lh1bJygQnhK12CMN7";
 
 const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 
@@ -897,6 +901,24 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{price}</dd>
                 </div>
               ))}
+              <div className="flex items-center justify-between gap-4 bg-orange-50 px-5 py-4">
+                <dt className="min-w-0">
+                  <span className="block font-semibold">Konzultace vašeho projektu, 20 minut</span>
+                  <span className="block text-sm text-muted-foreground">
+                    Probereme váš nápad a které řešení zvolit.{" "}
+                    <a
+                      href={FREE_CONSULT_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track("free_consult_click", { from: "landing_cenik" })}
+                      className="font-semibold text-orange-700 underline-offset-4 hover:underline"
+                    >
+                      Vybrat termín
+                    </a>
+                  </span>
+                </dt>
+                <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight text-orange-700">Zdarma</dd>
+              </div>
               <div className="space-y-1 px-5 py-3 text-sm text-muted-foreground">
                 {offer && offer.left > 0 && (
                   <p className="font-semibold text-orange-800">

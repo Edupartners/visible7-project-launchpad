@@ -154,6 +154,7 @@ export const loadEventStats = async (days = 30): Promise<EventStats> => {
 export const EVENT_LABELS: Record<string, string> = {
   mega_menu_open: "Otevřel menu Kurzy a videa",
   seminar_menu_open: "Otevřel menu Živé semináře",
+  free_consult_click: "Klikl na konzultaci zdarma",
   signup: "Registrace",
   trial_started: "Zkušební přístup zahájen",
   premium_blocked: "Narazil na placenou funkci",
