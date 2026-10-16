@@ -9,7 +9,8 @@ import { track } from "@/lib/track";
  */
 const WEB = 25_000;
 const CARE_MONTHLY = 1_000;
-const MKT_MONTHLY = 10_000;
+const WEBINARS = 6; // živé webináře v rámci členství
+const WEBINAR_PRICE = 1_500;
 const PLAN_HOURS = 56; // byznys plán, Lean Canvas a ideace: z měsíců (~80 h) na 3 dny (~24 h)
 const ADVISOR_HOURS = 5; // hledání a ověřování poradce
 
@@ -17,17 +18,16 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
   const shop = useShop();
   const offer = useFounderOffer();
   const [rate, setRate] = useState(400);
-  const [months, setMonths] = useState(3);
   const [off, setOff] = useState<Record<string, boolean>>({});
 
   const items = [
     { id: "web", title: "Web nebo e-shop na zakázku", how: "Postavíte si ho sami podle videí", value: WEB },
     { id: "care", title: "Správa webu", how: `${kc(CARE_MONTHLY)} měsíčně × 12 měsíců`, value: CARE_MONTHLY * 12 },
     {
-      id: "mkt",
-      title: "Konzultace k nastavení marketingu",
-      how: `${kc(MKT_MONTHLY)} měsíčně × ${months} měs.`,
-      value: MKT_MONTHLY * months,
+      id: "webinar",
+      title: "Živé webináře s praktiky",
+      how: `${WEBINARS} webinářů po ${kc(WEBINAR_PRICE)}`,
+      value: WEBINARS * WEBINAR_PRICE,
     },
     {
       id: "plan",
@@ -66,21 +66,6 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 step={50}
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
-                className="mt-1.5 block h-6 w-full accent-orange-500"
-              />
-            </label>
-            <label className="min-w-[240px] flex-1 text-sm font-semibold sm:min-w-[290px]">
-              Marketing s konzultantem:{" "}
-              <b className="text-orange-700">
-                {months} {months === 1 ? "měsíc" : months < 5 ? "měsíce" : "měsíců"}
-              </b>
-              <input
-                type="range"
-                min={1}
-                max={12}
-                step={1}
-                value={months}
-                onChange={(e) => setMonths(Number(e.target.value))}
                 className="mt-1.5 block h-6 w-full accent-orange-500"
               />
             </label>
@@ -123,7 +108,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
           <button
             type="button"
             onClick={() => {
-              track("calculator_cta", { total, rate, months });
+              track("calculator_cta", { total, rate });
               onStart();
             }}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-[15px] font-semibold text-white hover:bg-[hsl(var(--primary-hover))]"
