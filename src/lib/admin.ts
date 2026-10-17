@@ -155,6 +155,7 @@ export const EVENT_LABELS: Record<string, string> = {
   mega_menu_open: "Otevřel menu Kurzy a videa",
   seminar_menu_open: "Otevřel menu Živé semináře",
   free_consult_click: "Klikl na konzultaci zdarma",
+  figure_open: "Otevřel obrázek metodiky",
   worksheet_open: "Otevřel stažení pracovního listu",
   worksheet_lead: "Nechal e-mail za pracovní list",
   worksheet_download: "Stáhl pracovní list",

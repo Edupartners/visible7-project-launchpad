@@ -35,6 +35,7 @@ import {
   VisionBasics,
   errcTexts,
 } from "@/lib/projectData";
+import { MethodFigures } from "@/components/MethodFigures";
 
 interface VisionPhaseProps {
   onComplete: () => void;
@@ -629,6 +630,8 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           <p className="text-xs text-muted-foreground">Koncept je jen výchozí bod – přepište ho vlastními slovy.</p>
         </div>
       </Card>
+
+      <MethodFigures ids={["04_errc", "05_mapa_oceanu", "06_mapa_uzitku", "11_hooked"]} />
 
       <AdvisorsInline
         phase={1}

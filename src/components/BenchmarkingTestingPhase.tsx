@@ -18,6 +18,7 @@ import {
   rankChannels,
 } from "@/lib/marketingPlans";
 import { stepId } from "@/lib/buildPlans";
+import { MethodFigures } from "@/components/MethodFigures";
 
 interface BenchmarkingTestingPhaseProps {
   onChannelSelect: (channelId: string) => void;
@@ -207,6 +208,8 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
           ))}
         </ul>
       </section>
+
+      <MethodFigures ids={["12_ab_test"]} />
 
       {/* Dokončení */}
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">

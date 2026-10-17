@@ -25,6 +25,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import { MethodFigures } from "@/components/MethodFigures";
 
 interface LeanCanvasData {
   problem: string;
@@ -556,6 +557,8 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
           )}
         </Card>
       </div>
+
+      <MethodFigures ids={["07_lean_canvas"]} />
 
       {/* Kontrola a dokončení */}
       <Card className="card-apple p-6">

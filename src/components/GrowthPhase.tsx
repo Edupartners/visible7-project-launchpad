@@ -25,6 +25,7 @@ import {
   hireCalc,
   levers,
 } from "@/lib/growthPlan";
+import { MethodFigures } from "@/components/MethodFigures";
 
 const czk = (v: number | null) => (v === null ? "—" : `${Math.round(v).toLocaleString("cs-CZ")} Kč`);
 const n1 = (v: number) => (Math.round(v * 10) / 10).toLocaleString("cs-CZ");
@@ -502,6 +503,8 @@ export const GrowthPhase = () => {
           onFinish={finishBlock}
         />
       </section>
+
+      <MethodFigures ids={["13_caesaruv_kvadrant"]} />
 
       <AdvisorsInline phase={7} title="Poraďte se o růstu" topic="Expanze projektu (fáze 7)" />
 

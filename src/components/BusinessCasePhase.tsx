@@ -52,6 +52,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, FileSpreadsheet, Loader2, Lock, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 import { downloadBusinessCaseExcel } from "@/lib/businessCaseExcel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { MethodFigures } from "@/components/MethodFigures";
 
 interface BusinessCasePhaseProps {
   onComplete: () => void;
@@ -1315,6 +1316,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
           </div>
         )}
       </Card>
+
+      <MethodFigures ids={["08_bod_zvratu", "09_ltv_cac"]} />
 
       <AdvisorsInline
         phase={3}

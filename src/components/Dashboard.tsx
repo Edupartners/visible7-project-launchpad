@@ -37,6 +37,7 @@ import {
   X,
   PartyPopper,
 } from "lucide-react";
+import { MethodFigures } from "@/components/MethodFigures";
 
 const phases = [
   {
@@ -275,6 +276,8 @@ export const Dashboard = (_props: DashboardProps) => {
             onCertificate={() => navigate("/settings#osvedceni")}
           />
         </section>
+
+        <MethodFigures ids={["02_mapa_visible7", "03_hierarchie", "01_krivka_rustu"]} />
 
         {/* Odměny a pomoc */}
         <section aria-label="Osvědčení a poradci" className="grid gap-4 sm:grid-cols-2">

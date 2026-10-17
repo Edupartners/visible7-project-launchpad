@@ -15,6 +15,7 @@ import {
   buildType,
   typeStats,
 } from "@/lib/buildPlans";
+import { MethodFigures } from "@/components/MethodFigures";
 
 interface ImplementationPhaseProps {
   onSelectBusinessType: (businessTypeId: string) => void;
@@ -189,6 +190,11 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
           })}
         </ul>
       </section>
+
+      <MethodFigures
+        ids={["10_trychtyr"]}
+        intro="U každého typu byznysu najdete i procesní diagram: kdo co dělá, kdy jde jaký e-mail a kde vyděláváte."
+      />
     </div>
   );
 };

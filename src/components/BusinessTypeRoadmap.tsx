@@ -22,6 +22,8 @@ import {
   typeStats,
 } from "@/lib/buildPlans";
 import { addCostsToCase } from "@/lib/caseCosts";
+import { MethodFigures } from "@/components/MethodFigures";
+import { TYPE_FIGURE } from "@/lib/figures";
 
 interface BusinessTypeRoadmapProps {
   businessTypeId: string;
@@ -184,6 +186,14 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
       </header>
 
       <CustomerJourney steps={t.funnel} />
+
+      {TYPE_FIGURE[t.id] && (
+        <MethodFigures
+          ids={[TYPE_FIGURE[t.id]]}
+          title="Jak to funguje"
+          intro="Kdo co dělá, kdy odchází jaký e-mail nebo SMS a kde vyděláváte."
+        />
+      )}
 
       {/* Bloky */}
       <ol className="space-y-3">
