@@ -33,6 +33,14 @@ export const BUNDLE = {
   desc: "Úvod do metodiky a 11 listů pro první dvě fáze v jednom PDF.",
 };
 
+export const POSTER = {
+  slug: "p1-plakat-cesta-visible7",
+  file: "/listy/p1-plakat-cesta-visible7.pdf",
+  preview: "/listy/nahled/p1-plakat-cesta-visible7.webp",
+  title: "Plakát A3: Od vize k úspěchu",
+  desc: "Všech sedm fází metodiky V-I-S-I-B-L-E: co v každé děláte, s jakými nástroji a kdy přichází zlom ze sólo cesty k týmu.",
+};
+
 export const WORKSHEETS: Worksheet[] = [
   {
     slug: "v0-karta-projektu",

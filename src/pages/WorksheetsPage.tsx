@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import {
   BUNDLE,
+  POSTER,
   WORKSHEET_BENEFITS,
   PHASE_LABELS,
   WORKSHEETS,
@@ -91,7 +92,10 @@ const WorksheetsPage = () => {
     setDone({ sent: !!data.sent });
   };
 
-  const BADGE: Record<string, string> = { "v0-karta-projektu": "Začněte tady", "im3-checklist-ai-first-web": "Novinka" };
+  const BADGE: Record<string, string> = {
+    "v0-karta-projektu": "Začněte tady",
+    "im3-checklist-ai-first-web": "Novinka",
+  };
 
   const Card = ({ w }: { w: Worksheet }) => {
     const ph = PHASE_LABELS[w.phase];
@@ -183,6 +187,39 @@ const WorksheetsPage = () => {
             </p>
           </div>
           <WorksheetFan />
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-8 lg:px-12">
+          <div className="grid items-center gap-6 overflow-hidden rounded-3xl bg-[#173663] p-5 text-white sm:p-8 md:grid-cols-[1.35fr_1fr]">
+            <button
+              type="button"
+              onClick={() => open({ slug: POSTER.slug, title: POSTER.title, file: POSTER.file })}
+              aria-label={`Stáhnout ${POSTER.title}`}
+              className="group overflow-hidden rounded-xl bg-white p-2 shadow-[0_20px_40px_-18px_rgba(0,0,0,0.6)]"
+            >
+              <img
+                src={POSTER.preview}
+                alt="Náhled plakátu Od vize k úspěchu: 7 fází V-I-S-I-B-L-E"
+                loading="lazy"
+                className="w-full rounded transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+            </button>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-300">
+                Plakát zdarma · A3 k tisku
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold leading-tight">Celá cesta na jedné stránce</h2>
+              <p className="mt-3 text-base leading-relaxed text-white/80">{POSTER.desc}</p>
+              <button
+                type="button"
+                onClick={() => open({ slug: POSTER.slug, title: POSTER.title, file: POSTER.file })}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 font-semibold text-white hover:bg-orange-600"
+              >
+                <Download className="h-5 w-5" aria-hidden="true" /> Stáhnout plakát zdarma
+              </button>
+              <p className="mt-2 text-sm text-white/60">PDF · A3 na šířku · vytiskne se i na A4</p>
+            </div>
+          </div>
         </section>
 
         <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-8 lg:px-12">
