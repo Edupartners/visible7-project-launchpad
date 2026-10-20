@@ -343,13 +343,14 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <div>
               <p className="mb-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 sm:rounded-full bg-orange-50 px-3.5 py-1.5 text-sm font-semibold text-orange-800">
                 <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
-                Kompletní průvodce online podnikáním s certifikací
+                Online kurz podnikání s AI
               </p>
               <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
                 Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Videa, AI, která zná váš projekt, a poradci z praxe. Na konci máte rozjetý projekt a certifikaci.
+                Výuková videa krok za krokem, AI, která zná váš projekt, a poradci z praxe. Na konci nemáte jen
+                certifikát, ale rozjetý projekt.
               </p>
               <div className="mt-8">
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
