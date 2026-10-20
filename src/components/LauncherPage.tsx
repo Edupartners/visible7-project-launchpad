@@ -118,7 +118,7 @@ const SHOWCASE = [
   {
     eyebrow: "Marketing napojený na AI",
     title: "12 marketingových kanálů. AI vám řekne, kterými začít",
-    text: "Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Aplikace je seřadí podle vašeho typu byznysu, zákazníka a rozpočtu. Ke každému kanálu máte videonávod krok za krokem, testovací rozpočet a maximální PNO z vašeho byznys casu, takže víte, kam dát peníze.",
+    text: "Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Aplikace je seřadí podle vašeho typu byznysu, zákazníka a rozpočtu. Ke každému kanálu máte postup krok za krokem, záznamy z přednášek, testovací rozpočet a maximální PNO z vašeho byznys casu, takže víte, kam dát peníze.",
     cta: "Najít moje kanály",
     image: "/landing/ukazka-marketing.webp",
     alt: "Doporučené marketingové kanály seřazené podle typu byznysu, hodnocení AI a rozpočtu",
