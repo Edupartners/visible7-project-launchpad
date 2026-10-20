@@ -8,6 +8,8 @@ import {
   Certificate,
   ISSUER_LINE,
   certificateDescription,
+  certificateSkills,
+  certificateSyllabus,
   certificateTitle,
   certificateUrl,
   linkedInAddUrl,
@@ -66,6 +68,8 @@ const CertificatePage = () => {
   }
 
   const gold = cert.kind === "gold";
+  const skills = certificateSkills(cert.kind, cert.phase);
+  const syllabus = certificateSyllabus(cert.kind, cert.phase);
   const issued = new Date(cert.issued_at).toLocaleDateString("cs-CZ", {
     day: "numeric",
     month: "long",
@@ -138,6 +142,9 @@ const CertificatePage = () => {
               <p className="mt-3 text-[clamp(1rem,2vw,1.35rem)] font-semibold">
                 {certificateTitle(cert.kind, cert.phase)}
               </p>
+              <p className="mx-auto mt-2 max-w-3xl text-[clamp(0.75rem,1.3vw,0.9rem)] text-slate-600">
+                Prokázané dovednosti: {skills.join(" · ")}
+              </p>
               <p className="mt-2 text-sm text-slate-500">
                 Projekt: <span className="font-medium text-slate-700">{cert.project_name}</span>
                 {cert.launch_url && (
@@ -173,6 +180,52 @@ const CertificatePage = () => {
 
             <p className="mt-4 border-t border-slate-200 pt-2 text-center text-[11px] text-slate-500">{ISSUER_LINE}</p>
           </div>
+        </div>
+      </div>
+
+      {/* Příloha: obsah programu (při tisku samostatná strana) */}
+      <div className="certificate-sheet mx-auto mt-8 aspect-[297/210] w-full max-w-5xl break-before-page bg-white text-slate-900 shadow-xl print:mt-0 print:max-w-none print:shadow-none">
+        <div className="flex h-full flex-col p-[4%]">
+          <div className="flex items-baseline justify-between border-b border-slate-200 pb-3">
+            <div>
+              <p
+                className={`text-xs font-semibold uppercase tracking-[0.25em] ${gold ? "text-[#9A5F29]" : "text-[#183A66]"}`}
+              >
+                Příloha k osvědčení
+              </p>
+              <h2 className="mt-1 text-[clamp(1rem,2vw,1.4rem)] font-semibold">
+                Obsah programu: {certificateTitle(cert.kind, cert.phase)}
+              </h2>
+            </div>
+            <p className="font-mono text-xs text-slate-500">{cert.code}</p>
+          </div>
+          <p className="mt-3 text-[clamp(0.7rem,1.2vw,0.85rem)] text-slate-600">
+            {cert.holder_name} prošel(a) níže uvedený obsah metodiky VISIBLE7 MICEK® a na vlastním projektu „
+            {cert.project_name}“ zpracoval(a) všechny výstupy. Každá fáze končí branou: další se otevře až po odevzdání
+            výstupů té předchozí.
+          </p>
+          <div
+            className={`mt-4 grid flex-1 content-start gap-x-6 gap-y-3 ${syllabus.length > 1 ? "grid-cols-2" : "grid-cols-1"} ${syllabus.length > 4 ? "text-[clamp(0.55rem,0.95vw,0.72rem)]" : "text-[clamp(0.65rem,1.15vw,0.85rem)]"}`}
+          >
+            {syllabus.map((s) => (
+              <div key={s.phase} className="break-inside-avoid">
+                <p className={`font-semibold ${gold ? "text-[#9A5F29]" : "text-[#183A66]"}`}>
+                  Fáze {s.phase}: {s.name}
+                </p>
+                <ul className="mt-1 list-disc space-y-0.5 pl-4 text-slate-700">
+                  {s.topics.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+                <p className="mt-1 text-slate-600">
+                  <span className="font-medium text-slate-800">Výstup:</span> {s.outputs.join(", ")}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 border-t border-slate-200 pt-2 text-center text-[11px] text-slate-500">
+            Ověření pravosti: {certificateUrl(cert.code).replace(/^https?:\/\//, "")} · {ISSUER_LINE}
+          </p>
         </div>
       </div>
 
