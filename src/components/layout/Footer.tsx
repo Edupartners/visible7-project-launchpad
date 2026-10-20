@@ -21,6 +21,9 @@ export const Footer = () => {
             <Link to="/pracovni-listy" className="font-semibold text-primary hover:underline">
               Pracovní listy ke stažení
             </Link>
+            <Link to="/certifikace" className="text-muted-foreground hover:text-foreground hover:underline">
+              Certifikace
+            </Link>
             <Link to="/cenik" className="text-muted-foreground hover:text-foreground hover:underline">
               Ceník
             </Link>

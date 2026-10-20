@@ -22,7 +22,7 @@ const offerLabel = (o: Offer) =>
   o.kind === "phase"
     ? `Fáze ${o.phase}: ${GATE_NAMES[o.phase ?? 0]}`
     : o.kind === "zamer"
-      ? "Podnikatelský záměr (fáze 1–4)"
+      ? "Marketingový a projektový specialista (fáze 1–5)"
       : "VISIBLE7 Gold – spuštěný projekt";
 
 /** Osvědčení: co si uživatel může vystavit a co už má ke stažení. */
@@ -43,7 +43,7 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
 
   const offers: Offer[] = [];
   if ([1, 2, 3, 4, 5, 6, 7].every((p) => done.has(p)) && !has("gold", null)) offers.push({ kind: "gold", phase: null });
-  if ([1, 2, 3, 4].every((p) => done.has(p)) && !has("zamer", null)) offers.push({ kind: "zamer", phase: null });
+  if ([1, 2, 3, 4, 5].every((p) => done.has(p)) && !has("zamer", null)) offers.push({ kind: "zamer", phase: null });
   [1, 2, 3, 4, 5, 6, 7].forEach((p) => {
     if (done.has(p) && !has("phase", p)) offers.push({ kind: "phase", phase: p });
   });

@@ -31,7 +31,7 @@ export const ISSUER_ORG = "Edu Partners s.r.o.";
 /** Název osvědčení tak, jak se zobrazí na osvědčení a na LinkedInu. */
 export const certificateTitle = (kind: CertificateKind, phase: number | null) => {
   if (kind === "gold") return "VISIBLE7 Gold – Spuštěný projekt";
-  if (kind === "zamer") return "VISIBLE7 MICEK® – Podnikatelský záměr";
+  if (kind === "zamer") return "Certifikovaný marketingový a projektový specialista";
   return `VISIBLE7 MICEK® – Fáze ${phase}: ${GATE_NAMES[phase ?? 0] ?? ""}`;
 };
 
@@ -39,7 +39,7 @@ export const certificateDescription = (kind: CertificateKind, phase: number | nu
   if (kind === "gold")
     return "za projití všech sedmi bran metodiky VISIBLE7 MICEK® a spuštění vlastního projektu na trh";
   if (kind === "zamer")
-    return "za zpracování podnikatelského záměru ve fázích 1–4 metodiky VISIBLE7 MICEK®: vize, ideace, strategie a čísla a implementace";
+    return "za absolvování fází 1–5 metodiky VISIBLE7 MICEK®: vize, ideace, strategie a čísla, implementace a budování poptávky";
   return `za absolvování fáze ${phase} – ${GATE_NAMES[phase ?? 0] ?? ""} – metodiky VISIBLE7 MICEK®`;
 };
 
@@ -123,7 +123,7 @@ export const PHASE_CONTENT: Record<number, PhaseContent> = {
 };
 
 const phasesOf = (kind: CertificateKind, phase: number | null) =>
-  kind === "gold" ? [1, 2, 3, 4, 5, 6, 7] : kind === "zamer" ? [1, 2, 3, 4] : phase ? [phase] : [];
+  kind === "gold" ? [1, 2, 3, 4, 5, 6, 7] : kind === "zamer" ? [1, 2, 3, 4, 5] : phase ? [phase] : [];
 
 /** Krátký výčet dovedností na přední stranu osvědčení. */
 export const certificateSkills = (kind: CertificateKind, phase: number | null) =>
@@ -132,6 +132,9 @@ export const certificateSkills = (kind: CertificateKind, phase: number | null) =
 /** Obsah po fázích pro přílohu osvědčení. */
 export const certificateSyllabus = (kind: CertificateKind, phase: number | null) =>
   phasesOf(kind, phase).map((p) => ({ phase: p, name: GATE_NAMES[p], ...PHASE_CONTENT[p] }));
+
+/** Krátký název celkového osvědčení pro texty na webu. */
+export const SPECIALIST_TITLE = "Certifikovaný marketingový a projektový specialista";
 
 export const certificateUrl = (code: string) => `${window.location.origin}/osvedceni/${code}`;
 

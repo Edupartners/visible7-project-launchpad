@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
 import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
 import { REFERENCES } from "@/lib/references";
-import { NSK_QUALIFICATION } from "@/lib/qualification";
+import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
@@ -171,6 +171,28 @@ const COMPARE: { row: string; values: [number, number, number, number] }[] = [
   { row: "Pitch na A4 pro investora nebo banku", values: [1, 0, 0.5, 1] },
   { row: "Osvědčení za každý splněný krok", values: [1, 1, 0, 0] },
   { row: "Cesta ke státem uznané profesní kvalifikaci", values: [1, 0.5, 0, 0] },
+];
+
+const INSIDE_TAGS = [
+  "Podnikatelský plán",
+  "Business case v Excelu",
+  "100+ videí",
+  "AI asistent",
+  "Web a e-shop",
+  "Marketing a PPC",
+  "Živnostenský úřad krok za krokem",
+  "Daně a živnost v kostce",
+  "Pracovní listy",
+  "Poradci z praxe",
+  "Živé semináře",
+  "Osvědčení",
+];
+
+const CERT_STEPS: [string, string][] = [
+  ["Brány 1–5", "osvědčení za každou fázi"],
+  ["Po bráně 5", SPECIALIST_TITLE],
+  ["Brány 6–7", "VISIBLE7 Gold za spuštěný projekt"],
+  ["Volitelně", "státní profesní kvalifikace"],
 ];
 
 const OUTPUTS = [
@@ -400,7 +422,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <RotatingVerbs />
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
                 Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Na konci
-                máte rozjetý projekt a osvědčení{" "}
+                máte rozjetý projekt a certifikaci{" "}
                 <strong className="text-foreground">Marketingový a projektový specialista</strong>.
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -410,6 +432,16 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 </a>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty. Výsledek do 10 minut.</p>
+              <ul className="mt-6 flex max-w-2xl flex-wrap gap-1.5" aria-label="Co v aplikaci najdete">
+                {INSIDE_TAGS.map((t) => (
+                  <li
+                    key={t}
+                    className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground/80"
+                  >
+                    {t}
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="w-full">
               <HeroJourney />
@@ -448,6 +480,40 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, vzděláváme od roku 2011, akreditace
                 MŠMT a MPO.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Poradci */}
+        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Když se zaseknete, zavoláte člověku
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  15 seniorních poradců z Edu Partners, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
+                  e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
+                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+                </p>
+              </div>
+              <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
+                {photos.map((a) => (
+                  <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
+                    <img
+                      src={a.photo}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
+                    />
+                    <p className="mt-1.5 truncate text-xs font-semibold">
+                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>
@@ -802,76 +868,32 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
-        {/* Poradci */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
-              <div>
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Když se zaseknete, zavoláte člověku
-                </h2>
-                <p className="mt-4 text-lg text-muted-foreground">
-                  15 seniorních poradců z Edu Partners, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
-                  e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
-                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
-                </p>
-              </div>
-              <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
-                {photos.map((a) => (
-                  <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
-                    <img
-                      src={a.photo}
-                      alt=""
-                      loading="lazy"
-                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
-                    />
-                    <p className="mt-1.5 truncate text-xs font-semibold">
-                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Profesní kvalifikace NSK */}
+        {/* Certifikace – krátce, celý program je na /certifikace */}
         <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-[hsl(var(--gate-copper))] text-white">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.3fr_1fr] md:py-20">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.2fr_1fr] md:py-20">
               <div>
-                <p className="font-semibold text-white/80">Navíc po bráně 4</p>
-                <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Z aplikace ke státem uznané kvalifikaci
-                </h2>
+                <p className="font-semibold text-white/80">Certifikace</p>
+                <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{SPECIALIST_TITLE}</h2>
                 <p className="mt-4 text-lg text-white/85">
-                  Kdo projde branou 4, může se přihlásit ke zkoušce profesní kvalifikace{" "}
-                  <strong>{NSK_QUALIFICATION.name}</strong>. Zkoušku pořádá Edu Partners jako autorizovaná osoba.
-                  Osvědčení o profesní kvalifikaci je státem uznané.
+                  Za každou bránu osvědčení, po bráně 5 certifikace s přílohou obsahu programu. A kdo chce víc, může
+                  složit zkoušku státem uznané profesní kvalifikace.
                 </p>
-                <a
-                  href={NSK_QUALIFICATION.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-6 inline-block font-semibold underline underline-offset-4 hover:no-underline"
+                <Link
+                  to="/certifikace"
+                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-[hsl(var(--gate-copper))] hover:bg-white/90"
                 >
-                  Kvalifikace v Národní soustavě kvalifikací
-                </a>
+                  Celý program a osvědčení <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
               </div>
-              <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/20">
-                {[
-                  ["Kód kvalifikace", NSK_QUALIFICATION.code],
-                  ["Úroveň", `EQF ${NSK_QUALIFICATION.eqf}`],
-                  ["Uznává", "Národní soustava kvalifikací"],
-                  ["Přihlášení", `po bráně ${NSK_QUALIFICATION.unlockGate}`],
-                ].map(([l, v]) => (
-                  <div key={l} className="bg-[hsl(28_58%_34%)] p-5">
-                    <dt className="text-sm text-white/70">{l}</dt>
-                    <dd className="mt-1 text-xl font-bold">{v}</dd>
-                  </div>
+              <ol className="space-y-px overflow-hidden rounded-2xl bg-white/20">
+                {CERT_STEPS.map(([when, what]) => (
+                  <li key={when} className="flex gap-4 bg-[hsl(28_58%_34%)] p-4">
+                    <span className="w-24 shrink-0 text-sm text-white/70">{when}</span>
+                    <span className="font-semibold">{what}</span>
+                  </li>
                 ))}
-              </dl>
+              </ol>
             </div>
           </div>
         </section>
