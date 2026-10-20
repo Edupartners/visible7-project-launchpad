@@ -390,13 +390,18 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         <section className="relative flex flex-col md:min-h-[calc(100svh-108px)]">
           <div className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-10 px-4 pb-6 pt-12 sm:px-8 md:pt-14 lg:px-12 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-14 xl:py-6">
             <div>
+              <p className="mb-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 sm:rounded-full bg-orange-50 px-3.5 py-1.5 text-sm font-semibold text-orange-800">
+                <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
+                Kompletní průvodce online podnikáním s certifikací
+              </p>
               <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
                 Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
               </h1>
               <RotatingVerbs />
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Bez drahých
-                agentur.
+                Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Na konci
+                máte rozjetý projekt a osvědčení{" "}
+                <strong className="text-foreground">Marketingový a projektový specialista</strong>.
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
