@@ -3,12 +3,10 @@ import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
 import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
-import { REFERENCES } from "@/lib/references";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
-import { WorksheetsTeaser } from "@/components/marketing/WorksheetsTeaser";
 import {
   ArrowRight,
   Award,
@@ -17,12 +15,8 @@ import {
   Check,
   ChevronDown,
   Download,
-  FileSpreadsheet,
-  FileText,
   Layers,
   Lightbulb,
-  Linkedin,
-  Minus,
   PlayCircle,
   Rocket,
   Sparkles,
@@ -135,52 +129,6 @@ const SHOWCASE = [
     width: 1037,
     height: 430,
   },
-  {
-    eyebrow: "Osvědčení a profesní zkouška",
-    title: "Doložte, co umíte. V CV, na LinkedIn i u státní zkoušky",
-    text: "Za každou splněnou bránu získáte osvědčení s ověřovacím kódem. Na LinkedIn ho přidáte jedním klikem a zaměstnavatel si pravost ověří přes QR kód. Po bráně 4 můžete složit zkoušku profesní kvalifikace Specialista internetového obchodu, zapsanou v Národní soustavě kvalifikací.",
-    cta: "Získat první osvědčení",
-    image: "/landing/ukazka-osvedceni.webp",
-    alt: "Osvědčení VISIBLE7 za fázi 1 Vize s ověřovacím kódem a QR kódem",
-    width: 1100,
-    height: 782,
-  },
-];
-
-const OFFLINE_EXAMPLES = [
-  { who: "Masérna", ideas: "Online rezervace, dárkové poukazy na Vánoce a Valentýna, permanentky." },
-  { who: "Pekárna", ideas: "Objednávky dortů online, předplatné pečiva s rozvozem, catering pro firmy." },
-  { who: "Kosmetické studio", ideas: "E-shop s produkty, které už prodáváte na pultu, poukazy a rezervace." },
-];
-
-const MYTHS = [
-  [
-    "Potřebuji na začátek hodně peněz.",
-    "Začíná se tím, kolik si můžete dovolit ztratit. Aplikace spočítá, kolik opravdu potřebujete.",
-  ],
-  ["Nerozumím technice.", "Většinu technické práce dnes udělá AI. Na zbytek máte video, kde je vidět každé kliknutí."],
-  ["Musí to být dokonalé, než začnu.", "Spouští se hotový základ. Dokonalost přijde s prvními zákazníky."],
-  [
-    "Bojím se, že něco porušíme a přijde pokuta.",
-    "Základní povinnosti projdete s poradcem, který se tomu věnuje každý den.",
-  ],
-  ["Postavím to rovnou ve velkém.", "Nejdřív ověříte, že o produkt je zájem. Teprve potom investujete."],
-  [
-    "Prodávám službu, ne produkt.",
-    "I službu jde zabalit do produktu s jasným rozsahem a cenou. Pak se dá propagovat a prodat.",
-  ],
-];
-
-/** 1 = ano, 0.5 = částečně, 0 = ne */
-const COMPARE: { row: string; values: [number, number, number, number] }[] = [
-  { row: "Postup krok za krokem od nápadu po spuštění", values: [1, 1, 0, 0.5] },
-  { row: "AI napojená na metodiku a čísla vašeho projektu", values: [1, 0, 0.5, 0] },
-  { row: "Video ukáže, kam přesně kliknout", values: [1, 1, 0, 0] },
-  { row: "Finanční plán na 24 měsíců z vašich čísel", values: [1, 0, 0.5, 1] },
-  { row: "Živý poradce, když se zaseknete", values: [1, 0, 0, 1] },
-  { row: "Pitch na A4 pro investora nebo banku", values: [1, 0, 0.5, 1] },
-  { row: "Osvědčení za každý splněný krok", values: [1, 1, 0, 0] },
-  { row: "Cesta ke státem uznané profesní kvalifikaci", values: [1, 0.5, 0, 0] },
 ];
 
 const INSIDE_TAGS = [
@@ -205,21 +153,6 @@ const CERT_STEPS: [string, string][] = [
   ["Volitelně", "státní profesní kvalifikace"],
 ];
 
-const OUTPUTS = [
-  { icon: Lightbulb, title: "Lean Canvas", text: "Celý byznys na jedné stránce, zkontrolovaný AI." },
-  { icon: FileSpreadsheet, title: "Byznys case v Excelu", text: "Živé vzorce: změníte cenu a přepočítá se celý plán." },
-  { icon: FileText, title: "Pitch na jednu A4", text: "Pro investora, banku nebo partnera. Stáhnete jako PDF." },
-  { icon: Linkedin, title: "Osvědčení za každou bránu", text: "S ověřovacím kódem, rovnou na LinkedIn." },
-];
-
-const PYRAMID = [
-  { name: "Víra", text: "v sebe a ve svůj projekt" },
-  { name: "Vize", text: "jak má projekt vypadat" },
-  { name: "Strategie", text: "cesta od dneška k vizi" },
-  { name: "Cíle", text: "milníky, které postupně zdoláte" },
-  { name: "Prostředky", text: "nástroje, technologie, marketing" },
-];
-
 const FAQ = [
   [
     "Je rentgen nápadu opravdu zdarma?",
@@ -230,8 +163,20 @@ const FAQ = [
     "Je to první odhad z vašich odpovědí a obvyklých čísel v oboru, ne záruka. Ukáže, kde je nápad silný a co ověřit jako první. Se skutečnými čísly v bráně 3 se zpřesní.",
   ],
   [
-    "Musím umět programovat?",
-    "Ne. Aplikace počítá s tím, že web nebo e-shop postavíte v hotovém nástroji. Videa ukazují každé kliknutí.",
+    "Musím umět programovat nebo rozumět technice?",
+    "Ne. Web nebo e-shop postavíte v hotovém nástroji, většinu technické práce udělá AI a na zbytek máte video, kde je vidět každé kliknutí.",
+  ],
+  [
+    "Potřebuji na začátek hodně peněz?",
+    "Ne. Začíná se tím, kolik si můžete dovolit ztratit. Aplikace spočítá, kolik opravdu potřebujete, a nejdřív ověříte zájem, teprve potom investujete.",
+  ],
+  [
+    "Bojím se, že něco porušíme a přijde pokuta.",
+    "Základní povinnosti (živnost, obchodní podmínky, GDPR) projdete krok za krokem a s poradcem, který se tomu věnuje každý den.",
+  ],
+  [
+    "Prodávám službu, ne produkt. Hodí se to i pro mě?",
+    "Ano. I službu jde zabalit do produktu s jasným rozsahem a cenou. Pak se dá propagovat a prodat. Funguje to i pro kamenné podniky, které chtějí přidat online prodej.",
   ],
   [
     "Co když ještě nemám nápad?",
@@ -363,34 +308,6 @@ const Cta = ({
 
 const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 
-/** Slovesa pod nadpisem: aktivní se střídá po 1,8 s (bez animace, pokud uživatel nechce pohyb). */
-const RotatingVerbs = () => {
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setActive((i) => (i + 1) % VERBS.length), 1800);
-    return () => clearInterval(t);
-  }, []);
-  return (
-    <p
-      aria-label={VERBS.join(" ")}
-      className="mt-5 flex flex-wrap gap-x-3.5 gap-y-1 text-xl font-extrabold tracking-tight min-[400px]:text-2xl lg:text-[1.65rem] xl:mt-4 xl:text-[clamp(1.3rem,3vh,1.65rem)]"
-    >
-      {VERBS.map((v, i) => (
-        <span
-          key={v}
-          aria-hidden="true"
-          className={`border-b-4 pb-0.5 transition-colors duration-500 ${
-            i === active ? "border-orange-500 text-foreground" : "border-transparent text-[#A3A9B7]"
-          }`}
-        >
-          {v}
-        </span>
-      ))}
-    </p>
-  );
-};
-
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
   const offer = useFounderOffer();
@@ -406,12 +323,14 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <a
-        href="#podnikatele"
+        href="#poradci"
         className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary/90"
       >
         <Store className="hidden h-4 w-4 shrink-0 text-orange-300 sm:block" aria-hidden="true" />
         <span className="sm:hidden">Už podnikáte? Získejte zákazníky i online</span>
-        <span className="hidden sm:inline">Už podnikáte offline? Zjistěte, kde vám online přinese nové zákazníky</span>
+        <span className="hidden sm:inline">
+          Už podnikáte offline? Poradci vám ukážou, kde vám online přinese nové zákazníky
+        </span>
         <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
       </a>
       <PublicHeader onStart={onAccessGranted} />
@@ -429,29 +348,15 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
                 Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
               </h1>
-              <RotatingVerbs />
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Projdete celou cestu krok za krokem: s videi, AI, která zná váš projekt, a poradci z praxe. Na konci
-                máte rozjetý projekt a certifikaci{" "}
-                <strong className="text-foreground">Marketingový a projektový specialista</strong>.
+                Videa, AI, která zná váš projekt, a poradci z praxe. Na konci máte rozjetý projekt a certifikaci.
               </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="mt-8">
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
-                <a href="#kalkulacka" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
-                  Kolik ušetříte?
-                </a>
               </div>
-              <p className="mt-4 text-sm text-muted-foreground">Zdarma, bez platební karty. Výsledek do 10 minut.</p>
-              <ul className="mt-6 flex max-w-2xl flex-wrap gap-1.5" aria-label="Co v aplikaci najdete">
-                {INSIDE_TAGS.map((t) => (
-                  <li
-                    key={t}
-                    className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground/80"
-                  >
-                    {t}
-                  </li>
-                ))}
-              </ul>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Stačí e-mail, bez platební karty. Výsledek do 10 minut.
+              </p>
             </div>
             <div className="w-full">
               <HeroJourney />
@@ -459,7 +364,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
           <div className="flex justify-center pb-5">
             <a
-              href="#kalkulacka"
+              href="#uvnitr"
               aria-label="Pokračovat dolů"
               className="scroll-cue flex h-12 w-12 items-center justify-center rounded-full border border-orange-300 bg-white text-orange-600 shadow-sm transition-colors hover:bg-orange-50"
             >
@@ -468,10 +373,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
-        <SavingsCalculator onStart={onAccessGranted} />
-
         {/* Co je uvnitř */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
+        <section id="uvnitr" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
             <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 lg:px-12">
               <dl className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
@@ -486,16 +389,26 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   </div>
                 ))}
               </dl>
+              <ul className="mt-6 flex flex-wrap gap-2" aria-label="Co v aplikaci najdete">
+                {INSIDE_TAGS.map((t) => (
+                  <li
+                    key={t}
+                    className="rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground/80"
+                  >
+                    {t}
+                  </li>
+                ))}
+              </ul>
               <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">
                 Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, vzděláváme od roku 2011, akreditace
-                MŠMT a MPO.
+                MŠMT a MPO. Metodika vyrostla z kurzů, ne od stolu.
               </p>
             </div>
           </div>
         </section>
 
         {/* Poradci */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
+        <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
               <div>
@@ -570,130 +483,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           ))}
         </section>
 
-        {/* Pro podnikatele: z offline do online */}
-        <section id="podnikatele" className="scroll-mt-20 px-3 pt-20 sm:px-6 md:pt-28 lg:px-10">
-          <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-orange-50 ring-1 ring-orange-100">
-            <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8 lg:px-12">
-              <div className="max-w-3xl">
-                <p className="text-sm font-bold uppercase tracking-[0.08em] text-orange-700">Pro podnikatele</p>
-                <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Podnikáte offline? Zjistěte, kde vám online přinese nové zákazníky
-                </h2>
-                <p className="mt-4 text-lg text-muted-foreground">
-                  Stejná metodika, jiný start. Zjistíte, kde můžete online přidat novou hodnotu, kolik to vydělá a kde
-                  jsou vaši zákazníci. A naučíte se to řídit sami, bez agentury.
-                </p>
-              </div>
-              <ul className="mt-8 grid gap-4 md:grid-cols-3">
-                {OFFLINE_EXAMPLES.map((e) => (
-                  <li key={e.who} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-orange-100">
-                    <p className="font-bold">{e.who}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{e.ideas}</p>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <Link
-                  to="/rentgen?rezim=podnik&novy"
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-base font-semibold text-white hover:bg-orange-600"
-                >
-                  Udělat rentgen podniku zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                </Link>
-                <a
-                  href={`mailto:info@visible7.io?subject=${encodeURIComponent("Podnikám offline a chci online")}`}
-                  className="px-2 text-left font-semibold text-primary underline-offset-4 hover:underline"
-                >
-                  Nebo si domluvte úvodní konzultaci
-                </a>
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                4 krátké otázky. Dostanete 3 online příležitosti s odhadem tržeb a první krok na tento týden.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Mýty */}
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-28">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Většinu nápadů nezabije trh, ale strach
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Na kurzech od roku 2011 slýcháme pořád stejné důvody, proč lidé nezačnou. Žádný z nich neobstojí.
-            </p>
-          </div>
-          <dl className="mt-12 divide-y divide-border border-y border-border">
-            {MYTHS.map(([myth, truth]) => (
-              <div key={myth} className="grid gap-2 py-6 md:grid-cols-[1fr_1.3fr] md:gap-10">
-                <dt className="text-lg font-semibold text-muted-foreground line-through decoration-orange-400/70 decoration-2">
-                  {myth}
-                </dt>
-                <dd className="text-lg leading-relaxed">{truth}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        {/* Čím je jiná */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-28">
-            <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
-              <div className="max-w-2xl">
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Metodika, AI, videa a finanční plán v jedné aplikaci
-                </h2>
-                <p className="mt-4 text-lg text-muted-foreground">
-                  Kurz vám dá teorii, ChatGPT odpovědi bez souvislostí a konzultant drahé hodiny. VISIBLE7 spojuje
-                  všechno do jedné cesty, která si pamatuje váš projekt.
-                </p>
-              </div>
-              <div className="mt-12 overflow-x-auto rounded-2xl border border-border bg-card">
-                <table className="w-full min-w-[640px] text-left">
-                  <thead>
-                    <tr className="border-b border-border text-sm">
-                      <th className="w-[40%] p-4 font-semibold text-muted-foreground sm:p-5" scope="col">
-                        <span className="sr-only">Co dostanete</span>
-                      </th>
-                      <th className="bg-primary p-4 text-center font-bold text-white sm:p-5" scope="col">
-                        VISIBLE7
-                      </th>
-                      {["Online kurz", "ChatGPT", "Konzultant"].map((h) => (
-                        <th key={h} className="p-4 text-center font-semibold text-muted-foreground sm:p-5" scope="col">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {COMPARE.map(({ row, values }) => (
-                      <tr key={row} className="border-b border-border last:border-0">
-                        <th scope="row" className="p-4 font-medium sm:p-5">
-                          {row}
-                        </th>
-                        {values.map((v, i) => (
-                          <td key={i} className={`p-4 text-center sm:p-5 ${i === 0 ? "bg-primary/[0.04]" : ""}`}>
-                            {v === 1 ? (
-                              <Check
-                                className={`mx-auto h-5 w-5 ${i === 0 ? "text-emerald-600" : "text-muted-foreground"}`}
-                                strokeWidth={3}
-                                aria-label="ano"
-                              />
-                            ) : v > 0 ? (
-                              <span className="text-xs font-semibold text-muted-foreground">částečně</span>
-                            ) : (
-                              <Minus className="mx-auto h-5 w-5 text-border" aria-label="ne" />
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
+        <SavingsCalculator onStart={onAccessGranted} />
 
         {/* Proces: 7 bran */}
         <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
@@ -741,139 +531,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   );
                 })}
               </ol>
-            </div>
-          </div>
-        </section>
-
-        {/* Výstupy */}
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-28">
-          <h2 className="max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Na konci máte v ruce věci, které můžete ukázat
-          </h2>
-          <ul className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2">
-            {OUTPUTS.map(({ icon: Icon, title, text }) => (
-              <li key={title} className="flex gap-5">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--gate-copper)/0.12)] text-[hsl(var(--gate-copper))]">
-                  <Icon className="h-6 w-6" aria-hidden="true" />
-                </span>
-                <div>
-                  <h3 className="text-lg font-bold">{title}</h3>
-                  <p className="mt-1 text-muted-foreground">{text}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-border p-6">
-            <Sparkles className="h-6 w-6 text-violet-600" aria-hidden="true" />
-            <p className="flex-1 text-muted-foreground">
-              <span className="font-semibold text-foreground">AI pracuje s vaším projektem, ne s obecnými radami.</span>{" "}
-              Návrhy z Lean Canvasu použije pro čísla v byznys casu a z obojího napíše pitch.
-            </p>
-            <Calculator className="h-6 w-6 text-emerald-600" aria-hidden="true" />
-            <PlayCircle className="h-6 w-6 text-sky-600" aria-hidden="true" />
-          </div>
-        </section>
-
-        <WorksheetsTeaser />
-
-        {/* Reference */}
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12 md:py-24">
-          <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-start">
-            <div>
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Vyrostla z kurzů, ne od stolu</h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Edu Partners učí podnikání od roku 2011. Z té praxe vznikla metodika VISIBLE7 a dnes je základem kurzu
-                Specialista internetového obchodu i firemních školení. Aplikace z ní dělá postup, kterým projdete sami a
-                svým tempem.
-              </p>
-            </div>
-            {REFERENCES.length > 0 ? (
-              <ul className="grid gap-6">
-                {REFERENCES.slice(0, 3).map((r) => (
-                  <li key={r.name} className="border-l-4 border-[hsl(var(--gate-copper))] pl-5">
-                    <blockquote className="text-lg leading-relaxed">„{r.quote}“</blockquote>
-                    <p className="mt-3 flex items-center gap-3 text-sm">
-                      {r.photo && <img src={r.photo} alt="" className="h-9 w-9 rounded-full object-cover" />}
-                      <span>
-                        <span className="font-semibold">{r.name}</span>
-                        <span className="text-muted-foreground">, {r.role}</span>
-                      </span>
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <dl className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
-                {[
-                  [
-                    "Specialista internetového obchodu",
-                    "Rekvalifikační kurz Edu Partners postavený na metodice VISIBLE7",
-                  ],
-                  ["Firemní školení", "E-commerce, digitální marketing a AI pro týmy firem"],
-                  ["1 000+ absolventů", "Lidé, kteří prošli kurzy podnikání a e-commerce"],
-                  ["Od roku 2011", "Edu Partners s akreditací MŠMT a MPO"],
-                ].map(([t, d]) => (
-                  <div key={t} className="bg-card p-6">
-                    <dt className="font-bold">{t}</dt>
-                    <dd className="mt-1 text-sm text-muted-foreground">{d}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-          </div>
-        </section>
-
-        {/* Mise */}
-        <section className="border-t border-border">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-8 lg:px-12 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-orange-700">Naše mise</p>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl">
-                Jistota, kterou vám nikdo nevezme.
-              </h2>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Firma zavře, majitel prodá, AI zruší celé oddělení. Jediná skutečná jistota jste vy sami. Proto jsme
-                vytvořili VISIBLE7: aby každý, kdo chce, měl vlastní příjem ve svých rukou. Ať hledáte práci, chcete si
-                přivydělat, nebo rozjet vlastní firmu.
-              </p>
-              <figure className="mt-8 flex items-center gap-4">
-                <img
-                  src="https://www.edu-partners.cz/wp-content/uploads/2026/05/michal_micek_edu-scaled-1-1024x766.jpeg"
-                  alt="Michal Míček"
-                  loading="lazy"
-                  className="h-16 w-16 shrink-0 rounded-full bg-muted object-cover"
-                />
-                <figcaption>
-                  <blockquote className="font-semibold">„Nezačínáte od nuly. Začínáte od sebe.“</blockquote>
-                  <p className="text-sm text-muted-foreground">
-                    Mgr. Michal Míček, LL.M. · autor metodiky VISIBLE7 MICEK®
-                  </p>
-                </figcaption>
-              </figure>
-            </div>
-            <div>
-              <ol
-                className="flex flex-col items-center gap-2"
-                aria-label="Pyramida: víra, vize, strategie, cíle, prostředky"
-              >
-                {PYRAMID.map((l, i) => (
-                  <li
-                    key={l.name}
-                    style={{ width: `${52 + i * 12}%` }}
-                    className={`rounded-xl px-3 py-2.5 text-center ${i === 0 ? "bg-orange-500 text-white" : "bg-primary text-white"}`}
-                  >
-                    <span className="block font-bold">{l.name}</span>
-                    <span className={`block text-xs ${i === 0 ? "text-white/85" : "text-white/65"}`}>{l.text}</span>
-                  </li>
-                ))}
-              </ol>
-              <p className="mt-5 text-center text-sm text-muted-foreground">
-                Většina lidí začíná od konce – nástroji. To je nejdražší chyba.
-                <br />
-                <strong className="text-foreground">
-                  VISIBLE7 vás vede shora: od víry v sebe k prvním zákazníkům.
-                </strong>
-              </p>
             </div>
           </div>
         </section>
