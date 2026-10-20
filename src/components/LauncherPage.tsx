@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
-import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
+import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useFounderOffer, useShop } from "@/lib/shop";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
@@ -616,8 +616,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <div className="space-y-1 px-5 py-3 text-sm text-muted-foreground">
                 {offer && offer.left > 0 && (
                   <p className="font-semibold text-orange-800">
-                    Startovací cena pro prvních {offer.seats} lidí a k ní 20 minut konzultace zdarma. Zbývá{" "}
-                    {seatsLabel(offer.left)}. Pak {kc(offer.next_price)}.
+                    Startovací cena pro prvních {offer.seats} lidí a k ní 20 minut konzultace zdarma. Pak{" "}
+                    {kc(offer.next_price)}.
                   </p>
                 )}
                 <p>vychází na {perMonth(shop)} měsíčně, včetně DPH</p>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { kc, seatsLabel, useFounderOffer, useShop } from "@/lib/shop";
+import { kc, useFounderOffer, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
 /**
@@ -122,7 +122,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
               </p>
               {founder && (
                 <p className="mt-1 font-semibold text-orange-300">
-                  Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma · zbývá {seatsLabel(offer.left)}
+                  Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma
                 </p>
               )}
             </div>
