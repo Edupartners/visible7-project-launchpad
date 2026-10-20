@@ -2,51 +2,49 @@ import { Link } from "react-router-dom";
 
 /**
  * Obsah mega menu „Živé semináře“. Semináře se opakují, termíny vypisuje správce v administraci.
- * Písmeno = fáze V-I-S-I-B-L-E, do které seminář patří (stejně jako v menu „Kurzy a videa“).
+ * U každého tématu je fáze V-I-S-I-B-L-E, do které seminář patří.
  */
 interface SeminarTopic {
-  letter: string;
+  phase?: string;
   title: string;
   hint: string;
 }
 
 const START: SeminarTopic = {
-  letter: "AI",
   title: "AI nástroje pro zrychlení práce",
   hint: "Úvodní seminář. Nástroje, které vám ušetří hodiny týdně, a jak je použít na vlastním projektu.",
 };
 
 const CORE: SeminarTopic[] = [
-  { letter: "B", title: "Google Analytics 4", hint: "Měření návštěvnosti a konverzí, abyste věděli, co funguje" },
-  { letter: "B", title: "SEO, GEO, AIO a AI trendy", hint: "Jak vás najde Google i AI vyhledávače" },
-  { letter: "B", title: "Facebook reklama", hint: "Kampaně, publika a rozpočet, aby se reklama vyplatila" },
-  { letter: "I", title: "WordPress + MCP AI", hint: "Web, který s pomocí AI postavíte a spravujete sami" },
+  {
+    phase: "Budování poptávky",
+    title: "Google Analytics 4",
+    hint: "Měření návštěvnosti a konverzí, abyste věděli, co funguje",
+  },
+  { phase: "Budování poptávky", title: "SEO, GEO, AIO a AI trendy", hint: "Jak vás najde Google i AI vyhledávače" },
+  {
+    phase: "Budování poptávky",
+    title: "Facebook reklama",
+    hint: "Kampaně, publika a rozpočet, aby se reklama vyplatila",
+  },
+  { phase: "Implementace", title: "WordPress + MCP AI", hint: "Web, který s pomocí AI postavíte a spravujete sami" },
 ];
 
 const EXTRA: SeminarTopic = {
-  letter: "V",
+  phase: "Vize",
   title: "Byznysové strategie: Modrý oceán a Hooked",
   hint: "Jak nesoutěžit cenou a jak si udržet zákazníky, kteří se vracejí",
 };
 
-const Badge = ({ letter, accent = false }: { letter: string; accent?: boolean }) => (
-  <span
-    className={`inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md px-1 text-[12px] font-extrabold ${
-      accent ? "bg-orange-500 text-white" : "bg-foreground text-background"
-    }`}
-    aria-hidden="true"
-  >
-    {letter}
-  </span>
-);
-
 const Topic = ({ t }: { t: SeminarTopic }) => (
-  <li className="flex gap-2.5">
-    <Badge letter={t.letter} />
-    <span className="min-w-0">
-      <span className="block font-semibold leading-snug">{t.title}</span>
-      <span className="block text-[13px] leading-snug text-muted-foreground">{t.hint}</span>
-    </span>
+  <li className="min-w-0">
+    <span className="block font-semibold leading-snug">{t.title}</span>
+    <span className="block text-[13px] leading-snug text-muted-foreground">{t.hint}</span>
+    {t.phase && (
+      <span className="mt-1 inline-block rounded bg-muted px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
+        Fáze {t.phase}
+      </span>
+    )}
   </li>
 );
 
@@ -63,8 +61,7 @@ export const SeminarMegaMenu = ({ id, onStart }: { id: string; onStart: () => vo
         </p>
         <div className="mb-5 mt-3 h-px bg-border" />
 
-        <div className="flex gap-3 rounded-xl border border-orange-200 bg-orange-50 p-4">
-          <Badge letter={START.letter} accent />
+        <div className="rounded-xl border border-orange-200 bg-orange-50 p-4">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-wider text-orange-700">Začněte tady</p>
             <p className="mt-0.5 font-bold leading-snug">{START.title}</p>
@@ -91,7 +88,7 @@ export const SeminarMegaMenu = ({ id, onStart }: { id: string; onStart: () => vo
           <li>Online, naživo s lektorem z praxe</li>
           <li>Otázky k vašemu projektu</li>
           <li>Každý seminář se opakuje</li>
-          <li>Písmeno ukazuje fázi V-I-S-I-B-L-E</li>
+          <li>Termíny dostanou členové e-mailem</li>
         </ul>
         <Link to="/clenstvi" className="mt-6 block font-semibold text-primary underline-offset-4 hover:underline">
           Termíny a členství

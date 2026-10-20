@@ -1,4 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Award, BadgeCheck, Briefcase, Check, FileText, Linkedin, QrCode, Rocket } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
@@ -52,7 +53,13 @@ const POSITIONS = [
 const CertificationPage = () => {
   const navigate = useNavigate();
   const start = () => navigate("/home?novy");
-  const syllabus = certificateSyllabus("zamer", null);
+  const syllabus = certificateSyllabus("gold", null);
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const t = setTimeout(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth" }), 50);
+    return () => clearTimeout(t);
+  }, [hash]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -109,12 +116,15 @@ const CertificationPage = () => {
             <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Co budete umět</h2>
               <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-                Obsah programu, tak jak ho uvádí příloha certifikace.
+                Brány 1–5 vedou k certifikaci, brány 6–7 k VISIBLE7 Gold. Stejný obsah uvádí příloha osvědčení.
               </p>
               <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {syllabus.map((s) => (
-                  <div key={s.phase} className="rounded-2xl bg-card p-6">
-                    <p className="text-sm font-semibold text-orange-700">Brána {s.phase}</p>
+                  <div key={s.phase} id={`brana-${s.phase}`} className="scroll-mt-24 rounded-2xl bg-card p-6">
+                    <p className="text-sm font-semibold text-orange-700">
+                      Brána {s.phase}
+                      {s.phase > 5 && <span className="ml-2 text-muted-foreground">· pro VISIBLE7 Gold</span>}
+                    </p>
                     <h3 className="mt-1 text-xl font-bold">{s.name}</h3>
                     <ul className="mt-3 space-y-2 text-sm">
                       {s.topics.map((t) => (

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { BUILD_TYPES } from "@/lib/buildPlans";
 import { CHANNELS } from "@/lib/marketingPlans";
 
@@ -90,16 +91,22 @@ const ItemList = ({ items }: { items: Item[] }) => (
 
 const PhaseBlock = ({ p }: { p: Phase }) => (
   <div className="space-y-2.5">
-    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-bold">
+    <Link
+      to={`/certifikace#brana-${COURSE_PHASES.indexOf(p) + 1}`}
+      className="group flex flex-wrap items-center gap-x-2 gap-y-1 font-bold hover:text-primary"
+    >
       <span
         className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-foreground text-[13px] font-extrabold text-background"
         aria-hidden="true"
       >
         {p.letter}
       </span>
-      <span>{p.name}</span>
+      <span className="underline-offset-4 group-hover:underline">{p.name}</span>
       {p.note && <span className="text-[13px] font-medium text-muted-foreground">{p.note}</span>}
-    </p>
+      <span className="text-[13px] font-medium text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        →
+      </span>
+    </Link>
     {p.hint && <p className="text-[13px] text-muted-foreground">{p.hint}</p>}
     {p.items && <ItemList items={p.items} />}
     {p.groups?.map((g) => (
@@ -149,10 +156,13 @@ export const CourseMegaMenu = ({ id, onStart }: { id: string; onStart: () => voi
             <li>Živé semináře každých 14 dní</li>
             <li>Seniorní poradci z praxe</li>
           </ul>
+          <Link to="/certifikace" className="mt-6 block font-semibold text-primary underline-offset-4 hover:underline">
+            Celý obsah programu
+          </Link>
           <button
             type="button"
             onClick={onStart}
-            className="mt-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-[hsl(var(--primary-hover))]"
+            className="mt-4 w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-[hsl(var(--primary-hover))]"
           >
             Začít zdarma
           </button>
