@@ -676,7 +676,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
       </main>
 
-      <Footer />
+      <Footer variant="full" />
     </div>
   );
 };

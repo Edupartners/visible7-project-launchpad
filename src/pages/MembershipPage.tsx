@@ -89,7 +89,7 @@ const MembershipPage = () => {
             .
           </p>
         </main>
-        <Footer />
+        <Footer variant="full" />
       </div>
     );
   }
@@ -163,7 +163,7 @@ const MembershipPage = () => {
           </p>
         </section>
       </main>
-      <Footer />
+      <Footer variant="full" />
     </div>
   );
 };

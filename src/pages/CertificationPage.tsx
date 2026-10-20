@@ -229,7 +229,7 @@ const CertificationPage = () => {
           </button>
         </section>
       </main>
-      <Footer />
+      <Footer variant="full" />
     </div>
   );
 };

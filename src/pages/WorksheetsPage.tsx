@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Check, Download, Lock, Mail } from "lucide-react";
 import { WorksheetFan } from "@/components/marketing/WorksheetsTeaser";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
@@ -40,6 +40,7 @@ const readEmail = () => {
 /** Veřejná stránka s pracovními listy ke stažení za e-mail (po vzoru Strategyzeru). */
 const WorksheetsPage = () => {
   const navigate = useNavigate();
+  const { search } = useLocation();
   const [phase, setPhase] = useState<WorksheetPhase | "all">("all");
   const [target, setTarget] = useState<Target | null>(null);
   const [email, setEmail] = useState(readEmail);
@@ -51,6 +52,22 @@ const WorksheetsPage = () => {
   useEffect(() => {
     document.title = "Pracovní listy ke stažení | VISIBLE7 MICEK";
   }, []);
+
+  // Odkaz ?list=slug (např. z patičky): rovnou otevře formulář ke stažení daného listu.
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("list");
+    if (!slug) return;
+    const w = WORKSHEETS.find((x) => x.slug === slug && x.free);
+    const t =
+      slug === BUNDLE.slug
+        ? { slug, title: BUNDLE.title, file: BUNDLE.file }
+        : slug === POSTER.slug
+          ? { slug, title: POSTER.title, file: POSTER.file }
+          : w
+            ? { slug, title: w.title, file: worksheetFile(w) }
+            : null;
+    if (t) open(t);
+  }, [search]);
 
   const list = useMemo(() => WORKSHEETS.filter((w) => phase === "all" || w.phase === phase), [phase]);
   const phases = Object.keys(PHASE_LABELS) as WorksheetPhase[];
@@ -254,7 +271,7 @@ const WorksheetsPage = () => {
           </p>
         </section>
       </main>
-      <Footer />
+      <Footer variant="full" />
 
       <Dialog open={!!target} onOpenChange={(o) => !o && setTarget(null)}>
         <DialogContent className="sm:max-w-md">

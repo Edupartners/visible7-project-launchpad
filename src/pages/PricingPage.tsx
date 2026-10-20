@@ -236,7 +236,7 @@ const PricingPage = () => {
           </p>
         </section>
       </main>
-      <Footer />
+      <Footer variant="full" />
     </div>
   );
 };
