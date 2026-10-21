@@ -343,11 +343,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Kompletní kurz online podnikání s AI
               </p>
               <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
-                Informací o podnikání máte dost. Chybí cesta, jak je poskládat.
+                Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                VISIBLE7 vás provede krok za krokem od nápadu k vlastnímu projektu. Začnete s málem a cestu ohneme podle
-                vás.
+                Informací o podnikání máte dost, chybí cesta, jak je poskládat. VISIBLE7 vás provede krok za krokem od
+                nápadu k vlastnímu projektu. Začnete s málem a cestu ohneme podle vás.
               </p>
               <div className="mt-8">
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
