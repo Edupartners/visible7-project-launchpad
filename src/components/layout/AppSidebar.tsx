@@ -286,7 +286,7 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
               aria-current={pathname === "/testovaci-stranka" ? "page" : undefined}
               className={itemCls(pathname === "/testovaci-stranka")}
             >
-              <FlaskConical className="h-4 w-4 text-muted-foreground" /> Testovací stránka
+              <FlaskConical className="h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
             </button>
           </li>
         </ul>

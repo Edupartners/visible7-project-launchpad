@@ -240,7 +240,7 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
                   <FileText className="mr-2.5 h-4 w-4 text-muted-foreground" /> Pracovní listy
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/testovaci-stranka")}>
-                  <FlaskConical className="mr-2.5 h-4 w-4 text-muted-foreground" /> Testovací stránka
+                  <FlaskConical className="mr-2.5 h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

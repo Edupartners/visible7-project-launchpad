@@ -362,7 +362,7 @@ const TestPageEditor = () => {
               className="mt-8 h-12 rounded-[10px] bg-orange-500 px-6 text-base font-semibold text-white hover:bg-orange-600"
             >
               {creating ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
-              Vytvořit testovací stránku
+              Vytvořit web projektu
             </Button>
           </section>
         </main>
@@ -1186,7 +1186,7 @@ const TestPageEditor = () => {
         <header className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 sm:gap-3 sm:px-6">
           <div className="min-w-0 basis-full sm:flex-1 sm:basis-0">
             <p className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-              <FlaskConical className="h-3.5 w-3.5" /> Testovací stránka · {currentProject.name}
+              <FlaskConical className="h-3.5 w-3.5" /> Web projektu (test zájmu) · {currentProject.name}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <span

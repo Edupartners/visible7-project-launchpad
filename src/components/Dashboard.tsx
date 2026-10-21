@@ -244,7 +244,7 @@ export const Dashboard = (_props: DashboardProps) => {
               onClick={() => navigate("/testovaci-stranka")}
               className="h-11 shrink-0 rounded-[10px] bg-orange-500 px-5 font-semibold text-white hover:bg-orange-600"
             >
-              Otevřít testovací stránku
+              Otevřít web projektu
             </Button>
           </section>
         )}
