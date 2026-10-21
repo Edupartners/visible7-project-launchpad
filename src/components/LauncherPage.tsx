@@ -346,8 +346,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Informací o podnikání máte dost, chybí cesta, jak je poskládat. VISIBLE7 vás provede krok za krokem od
-                nápadu k vlastnímu projektu. Začnete s málem a cestu ohneme podle vás.
+                VISIBLE7 vás provede krok za krokem od nápadu k vlastnímu projektu. Začnete s málem a cestu ohneme podle
+                vás.
               </p>
               <div className="mt-8">
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
