@@ -494,8 +494,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
                   <p className="mt-4 text-lg text-white/70">
-                    Každá brána má jasný výstup. Další otevřete, až je ta předchozí hotová, takže nic důležitého
-                    nepřeskočíte.
+                    Jdete krok za krokem. Výstup každé brány otevře tu další, takže nic důležitého nepřeskočíte.
                   </p>
                 </div>
                 <ul className="flex gap-2 text-sm" aria-label="Legenda">
@@ -506,32 +505,49 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   ))}
                 </ul>
               </div>
-              <ol className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
-                {GATES.map((g, i) => {
-                  const Icon = g.icon;
-                  return (
-                    <li key={g.name} className={`flex flex-col bg-primary p-6 ${i === 6 ? "lg:col-span-2" : ""}`}>
-                      <div className="flex items-center justify-between">
-                        <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[hsl(var(--gate-copper))] text-lg font-bold">
-                          {i + 1}
-                        </span>
-                        <Icon className="h-5 w-5 text-white/50" aria-hidden="true" />
-                      </div>
-                      <h3 className="mt-5 text-xl font-bold">{g.name}</h3>
-                      <p className="mt-2 flex-1 text-white/70">{g.does}</p>
-                      <p className="mt-5 text-sm text-white/50">Výstup</p>
-                      <p className="font-semibold">{g.get}</p>
-                      <div className="mt-4 flex gap-1.5">
+              <ol className="relative mt-12 grid gap-y-3 lg:grid-cols-7 lg:gap-x-3">
+                <span
+                  className="absolute left-[1.375rem] top-6 bottom-6 w-0.5 bg-gradient-to-b from-[hsl(var(--gate-copper))] to-white/25 lg:left-[7%] lg:right-[7%] lg:top-[1.375rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
+                  aria-hidden="true"
+                />
+                {GATES.map((g, i) => (
+                  <li key={g.name} className="relative flex gap-4 lg:flex-col lg:items-center lg:gap-0 lg:text-center">
+                    <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--gate-copper))] text-lg font-extrabold shadow-[0_0_0_5px_hsl(var(--primary))]">
+                      {i + 1}
+                    </span>
+                    <div className="lg:mt-4">
+                      <h3 className="font-bold leading-tight lg:text-lg">
+                        {g.name}
+                        {i < 2 && <span className="ml-1.5 text-xs font-semibold text-emerald-300">zdarma</span>}
+                      </h3>
+                      <p className="mt-1 text-sm text-white/65">
+                        <Check className="mr-1 inline h-3.5 w-3.5 text-emerald-300" aria-hidden="true" />
+                        {g.get}
+                      </p>
+                      <div className="mt-2 flex gap-1 lg:justify-center">
                         {g.tags.map((t) => (
-                          <span key={t} className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${TAG_STYLE[t]}`}>
+                          <span
+                            key={t}
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${TAG_STYLE[t]}`}
+                          >
                             {t}
                           </span>
                         ))}
                       </div>
-                    </li>
-                  );
-                })}
+                    </div>
+                  </li>
+                ))}
               </ol>
+              <div className="mt-8 grid gap-3 text-sm font-semibold lg:grid-cols-7 lg:gap-x-3">
+                <p className="flex items-center justify-center gap-2 rounded-full bg-[hsl(var(--gate-copper))] px-4 py-2 lg:col-span-5">
+                  <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  Brány 1–5: certifikace {SPECIALIST_TITLE}
+                </p>
+                <p className="flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-2 ring-1 ring-white/25 lg:col-span-2">
+                  <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  Brány 6–7: VISIBLE7 Gold
+                </p>
+              </div>
             </div>
           </div>
         </section>
