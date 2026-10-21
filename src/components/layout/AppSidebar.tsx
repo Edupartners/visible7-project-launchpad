@@ -126,7 +126,6 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
         </button>
         {!onNavigate && (
           <div className="flex items-center">
-            <NotificationBell />
             {onCollapse && (
               <button
                 type="button"
@@ -539,7 +538,7 @@ export const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
         {collapsed ? <SidebarRail onExpand={() => toggle(false)} /> : <SidebarBody onCollapse={() => toggle(true)} />}
       </aside>
       <div className="min-w-0 flex-1">
-        <AppHeader onOpenMobile={() => setOpen(true)} mobileOnly />
+        <AppHeader onOpenMobile={() => setOpen(true)} withSidebar />
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent side="left" className="w-72 p-0">
             <SheetTitle className="sr-only">Menu</SheetTitle>

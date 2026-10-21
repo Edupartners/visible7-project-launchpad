@@ -64,7 +64,13 @@ const navCls = (active: boolean) =>
   }`;
 
 /** Horizontální hlavička aplikace (jako Ecomail): projekt vlevo, sekce uprostřed, účet vpravo. */
-export const AppHeader = ({ onOpenMobile, mobileOnly = false }: { onOpenMobile: () => void; mobileOnly?: boolean }) => {
+export const AppHeader = ({
+  onOpenMobile,
+  withSidebar = false,
+}: {
+  onOpenMobile: () => void;
+  withSidebar?: boolean;
+}) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
@@ -95,9 +101,7 @@ export const AppHeader = ({ onOpenMobile, mobileOnly = false }: { onOpenMobile: 
 
   return (
     <>
-      <header
-        className={`sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur ${mobileOnly ? "lg:hidden" : ""}`}
-      >
+      <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6">
           <button
             type="button"
@@ -114,7 +118,7 @@ export const AppHeader = ({ onOpenMobile, mobileOnly = false }: { onOpenMobile: 
           <button
             type="button"
             onClick={() => navigate("/home")}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-foreground text-[13px] font-bold text-white"
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-foreground text-[13px] font-bold text-white ${withSidebar ? "lg:hidden" : ""}`}
             aria-label="VISIBLE7 MICEK – přehled"
           >
             V7
