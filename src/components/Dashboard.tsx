@@ -1,5 +1,7 @@
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { MembershipCard } from "@/components/access/MembershipCta";
+import { useAccess } from "@/lib/access";
+import { kc, monthsLabel, useShop } from "@/lib/shop";
 import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
 import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
@@ -7,12 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
-import { PhaseCards } from "./PhaseCards";
-import { GrowthBadge } from "./GrowthBadge";
 import { DashboardJourney } from "./diagnosis/DashboardJourney";
 import { DIAGNOSIS_KEY } from "@/lib/diagnosis";
-import { AdvisorAvatar } from "./AdvisorsInline";
-import { ADVISORS } from "@/lib/advisors";
 import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
@@ -21,10 +19,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowRight,
+  ChevronDown,
+  Crown,
   Award,
   Check,
   Clock,
-  FileText,
   FlaskConical,
   Layers,
   Lightbulb,
@@ -37,7 +36,6 @@ import {
   X,
   PartyPopper,
 } from "lucide-react";
-import { MethodFigures } from "@/components/MethodFigures";
 
 const phases = [
   {
@@ -142,20 +140,50 @@ const ProjectTitle = () => {
   );
 };
 
+/** Tenký pruh se členstvím; podrobnosti se rozbalí až po kliknutí. */
+const MembershipBar = () => {
+  const access = useAccess();
+  const shop = useShop();
+  const [open, setOpen] = useState(false);
+  if (access.loading || access.paid) return null;
+  return (
+    <section className="rounded-2xl border border-border">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm"
+      >
+        <Crown className="h-4 w-4 shrink-0 text-orange-500" />
+        <span className="font-semibold">Členství VISIBLE7</span>
+        <span className="text-muted-foreground">
+          {kc(shop.price)} / {monthsLabel(shop.months)}
+        </span>
+        <span className="ml-auto flex items-center gap-1 font-semibold text-primary">
+          {open ? "Skrýt" : "Více"}{" "}
+          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        </span>
+      </button>
+      {open && (
+        <div className="border-t border-border p-2">
+          <MembershipCard placement="below" hasProgress />
+        </div>
+      )}
+    </section>
+  );
+};
+
 export const Dashboard = (_props: DashboardProps) => {
   const navigate = useNavigate();
   const { currentProject } = useProject();
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
-  const [watched, setWatched] = useSupabaseProgress<number[]>("watched_videos", []);
   const [diagnosis, , { loading: diagnosisLoading }] = useSupabaseProgress<unknown>(DIAGNOSIS_KEY, null);
   const [certCount, setCertCount] = useState<number | null>(null);
-  const [certified, setCertified] = useState<number[]>([]);
 
   useEffect(() => {
     listMyCertificates().then((list) => {
       const mine = list.filter((c) => c.project_id === currentProject?.id);
       setCertCount(mine.length);
-      setCertified(mine.filter((c) => c.kind === "phase" && c.phase).map((c) => c.phase as number));
     });
   }, [currentProject?.id]);
 
@@ -163,33 +191,39 @@ export const Dashboard = (_props: DashboardProps) => {
   const next = phases.find((p) => !done.has(p.id)) ?? null;
   const doneCount = phases.filter((p) => done.has(p.id)).length;
   const certsAvailable = phases.filter((p) => done.has(p.id)).length - (certCount ?? 0);
-  const allCoreCompleted = [1, 2, 3].every((id) => done.has(id));
   const NextIcon = next?.icon;
+
+  // Jeden tip podle situace (KISS): nikdy víc karet najednou.
+  const tip: "certs" | "web" | "nsk" | "quiz" | null =
+    certsAvailable > 0
+      ? "certs"
+      : done.has(3) && !done.has(5)
+        ? "web"
+        : done.has(NSK_QUALIFICATION.unlockGate)
+          ? "nsk"
+          : !diagnosisLoading && (diagnosis || doneCount > 0)
+            ? "quiz"
+            : null;
 
   return (
     <SidebarLayout>
       <main className="mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-8 sm:py-10">
         {/* Projekt */}
-        <header className="flex flex-col-reverse gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-muted-foreground">Váš projekt</p>
-            <ProjectTitle />
-            <p className="mt-1 text-sm text-muted-foreground">Otevřeno {doneCount} ze 7 bran</p>
-          </div>
-          <div className="self-end sm:self-auto">
-            <GrowthBadge currentCompleted={doneCount} />
-          </div>
+        <header className="min-w-0">
+          <ProjectTitle />
+          <p className="mt-1 text-sm text-muted-foreground">Otevřeno {doneCount} ze 7 bran</p>
         </header>
 
         <DashboardAnnouncements />
 
+        {/* Jen naléhavé stavy členství (končí zkušební přístup) */}
         <MembershipCard placement="top" />
 
         {/* Bez rentgenu na začátku cesty: rentgen je první krok */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 && <DashboardJourney prominent />}
 
         {/* Co dělat teď – jedna jasná akce */}
-        {next && NextIcon ? (
+        {!diagnosisLoading && !diagnosis && doneCount === 0 ? null : next && NextIcon ? (
           <section
             aria-label="Další krok"
             className="flex flex-col gap-5 rounded-2xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:flex-row sm:items-center sm:justify-between sm:p-8"
@@ -229,7 +263,33 @@ export const Dashboard = (_props: DashboardProps) => {
           </section>
         )}
 
-        {done.has(3) && !done.has(5) && (
+        {/* Celá cesta – jeden řádek */}
+        <GateJourney
+          gates={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
+          completed={completedPhases}
+          onOpen={(route) => navigate(route)}
+          showHeader={false}
+          showList={false}
+        />
+
+        {/* Jeden tip na teď */}
+        {tip === "certs" && (
+          <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <Award className="mt-1 h-6 w-6 shrink-0 text-primary" />
+              <div>
+                <h2 className="text-lg font-bold">
+                  {certsAvailable === 1 ? "Máte připravené osvědčení" : `Máte ${certsAvailable} osvědčení připravená`}
+                </h2>
+                <p className="text-sm text-muted-foreground">Vystavte si ho a přidejte na LinkedIn i do životopisu.</p>
+              </div>
+            </div>
+            <Button className="shrink-0 rounded-[10px]" onClick={() => navigate("/settings#osvedceni")}>
+              Získat osvědčení
+            </Button>
+          </section>
+        )}
+        {tip === "web" && (
           <section className="flex flex-col items-start gap-4 rounded-2xl bg-primary p-6 text-white sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
               <p className="flex items-center gap-1.5 text-sm font-semibold text-orange-300">
@@ -248,75 +308,7 @@ export const Dashboard = (_props: DashboardProps) => {
             </Button>
           </section>
         )}
-
-        <MembershipCard placement="below" hasProgress={!diagnosisLoading && (!!diagnosis || doneCount > 0)} />
-
-        {!diagnosisLoading && (diagnosis || doneCount > 0) && <QuizDashboardCard />}
-
-        {/* Celá cesta */}
-        <section aria-labelledby="cesta" className="space-y-4">
-          <h2 id="cesta" className="text-lg font-bold">
-            Celá cesta
-          </h2>
-          <GateJourney
-            gates={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
-            completed={completedPhases}
-            onOpen={(route) => navigate(route)}
-            showHeader={false}
-            showList={false}
-          />
-          <PhaseCards
-            phases={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
-            completed={completedPhases}
-            certified={certified}
-            watched={watched}
-            onOpen={(route) => navigate(route)}
-            onWatched={(id) => !watched.includes(id) && setWatched([...watched, id])}
-            onCertificate={() => navigate("/settings#osvedceni")}
-          />
-        </section>
-
-        <MethodFigures ids={["02_mapa_visible7", "03_hierarchie", "01_krivka_rustu"]} />
-
-        {/* Odměny a pomoc */}
-        <section aria-label="Osvědčení a poradci" className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
-            <Award className="h-6 w-6 text-primary" />
-            <h2 className="mt-3 text-lg font-bold">Osvědčení</h2>
-            <p className="mt-1 flex-1 text-sm text-muted-foreground">
-              {certsAvailable > 0
-                ? `${certsAvailable === 1 ? "Máte 1 osvědčení připravené" : `Máte ${certsAvailable} osvědčení připravená`} k vystavení.`
-                : certCount
-                  ? `Za tento projekt máte ${certCount} ${certCount === 1 ? "osvědčení" : "osvědčení"}.`
-                  : "Za každou dokončenou fázi získáte osvědčení pro LinkedIn a životopis."}
-            </p>
-            <Button
-              variant={certsAvailable > 0 ? "default" : "outline"}
-              className="mt-4 self-start rounded-[10px]"
-              onClick={() => navigate("/settings#osvedceni")}
-            >
-              {certsAvailable > 0 ? "Získat osvědčení" : "Moje osvědčení"}
-            </Button>
-          </div>
-          <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
-            <div className="flex -space-x-3">
-              {ADVISORS.filter((a) => a.photo)
-                .slice(0, 5)
-                .map((a) => (
-                  <AdvisorAvatar key={a.id} advisor={a} />
-                ))}
-            </div>
-            <h2 className="mt-3 text-lg font-bold">Seniorní poradci</h2>
-            <p className="mt-1 flex-1 text-sm text-muted-foreground">
-              15 podnikatelů a lektorů Edu Partners. Konzultace 45 minut, orientačně 1 500 Kč.
-            </p>
-            <Button variant="outline" className="mt-4 self-start rounded-[10px]" onClick={() => navigate("/poradci")}>
-              Vybrat poradce
-            </Button>
-          </div>
-        </section>
-
-        {done.has(NSK_QUALIFICATION.unlockGate) && (
+        {tip === "nsk" && (
           <section className="flex flex-col gap-4 rounded-2xl bg-[hsl(var(--gate-copper))] p-6 text-white sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
               <Award className="mt-1 h-6 w-6 shrink-0" />
@@ -338,23 +330,10 @@ export const Dashboard = (_props: DashboardProps) => {
             </Button>
           </section>
         )}
+        {tip === "quiz" && <QuizDashboardCard />}
 
-        {allCoreCompleted && (
-          <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-4">
-              <FileText className="mt-1 h-6 w-6 shrink-0 text-primary" />
-              <div>
-                <h2 className="text-lg font-bold">Pitch projektu na jednu stránku</h2>
-                <p className="text-sm text-muted-foreground">
-                  AI z fází 1–3 napíše pitch pro investora, banku nebo partnera. Stáhnete ho jako PDF na A4.
-                </p>
-              </div>
-            </div>
-            <Button onClick={() => navigate("/investor-pitch")} variant="outline" className="shrink-0 rounded-[10px]">
-              Vytvořit pitch
-            </Button>
-          </section>
-        )}
+        {/* Členství až po bezplatné části, nenápadně dole */}
+        {doneCount >= 2 && <MembershipBar />}
       </main>
       <Footer />
     </SidebarLayout>

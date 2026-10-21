@@ -254,9 +254,11 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
-            <div className="hidden w-44 xl:block">
-              <SidebarMembership />
-            </div>
+            {done.size >= 2 && (
+              <div className="hidden w-44 xl:block">
+                <SidebarMembership />
+              </div>
+            )}
             <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger
