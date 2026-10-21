@@ -448,9 +448,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   Když se zaseknete, zavoláte člověku
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground">
-                  15 seniorních poradců z Edu Partners, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
-                  e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
-                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+                  16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
+                  i AI. Konzultace {CONSULTATION.minutes} minut, orientačně {CONSULTATION.price.toLocaleString("cs-CZ")}{" "}
+                  Kč.
                 </p>
               </div>
               <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">

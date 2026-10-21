@@ -29,7 +29,6 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { NotificationBell } from "@/components/announcements/NotificationBell";
-import { SidebarMembership } from "@/components/access/MembershipCta";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
@@ -229,11 +228,6 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
-            {done.size >= 2 && (
-              <div className="hidden w-44 xl:block">
-                <SidebarMembership />
-              </div>
-            )}
             <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger
