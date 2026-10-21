@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import { MarketRentgen } from "@/components/diagnosis/MarketRentgen";
 import { JourneyMap } from "@/components/diagnosis/JourneyMap";
 import { BadgeIcon } from "@/components/GrowthBadge";
 import { buildType } from "@/lib/buildPlans";
@@ -299,6 +300,8 @@ export const DiagnosisResult = ({
       </section>
 
       <QuizBonusCard />
+
+      <MarketRentgen />
 
       <section className="flex flex-col items-start gap-5 rounded-3xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
