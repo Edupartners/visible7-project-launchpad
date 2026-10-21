@@ -11,15 +11,12 @@ import {
   ArrowRight,
   Award,
   BarChart3,
-  Calculator,
   Check,
   ChevronDown,
   Download,
   Layers,
   Lightbulb,
-  PlayCircle,
   Rocket,
-  Sparkles,
   Store,
   Target,
   TrendingUp,
@@ -91,11 +88,25 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
   },
 ];
 
-const INSIDE = [
-  { icon: PlayCircle, value: "100+", label: "videonávodů, kde je vidět každé kliknutí" },
-  { icon: Sparkles, value: "7", label: "AI asistentů napojených na vaše čísla" },
-  { icon: Calculator, value: "5", label: "kalkulaček: finanční plán, daně, PNO, cash-flow, nábor" },
-  { icon: Layers, value: "13", label: "typů online byznysu s hotovým postupem" },
+const STEPS = [
+  { title: "Test nápadu", meta: "10 minut · zdarma", text: "Uvidíte, kde je váš nápad silný a co ověřit jako první." },
+  { title: "Brány 1–2", meta: "zdarma", text: "Ujasníte si, pro koho to je a jak bude byznys fungovat." },
+  { title: "Celá cesta", meta: "PRICE", text: "Čísla, web, marketing a spuštění. S videi, AI a poradci." },
+];
+
+const FAIL_REASONS: [string, string][] = [
+  [
+    "Chybí technické dovednosti",
+    "Videa krok za krokem, kde je vidět každé kliknutí. Většinu technické práce udělá AI.",
+  ],
+  [
+    "Nevědí, jak nastavit marketing",
+    "Kanály vybrané pro váš typ byznysu, testovací rozpočet a postup ke každému z nich.",
+  ],
+  [
+    "Mají mylnou představu o velikosti podnikání",
+    "Plán z vašich čísel: kolik opravdu potřebujete a kdy vás projekt uživí.",
+  ],
 ];
 
 const SHOWCASE = [
@@ -131,21 +142,6 @@ const SHOWCASE = [
   },
 ];
 
-const INSIDE_TAGS = [
-  "Podnikatelský plán",
-  "Business case v Excelu",
-  "100+ videí",
-  "AI asistent",
-  "Web a e-shop",
-  "Marketing a PPC",
-  "Živnostenský úřad krok za krokem",
-  "Daně a živnost v kostce",
-  "Pracovní listy",
-  "Poradci z praxe",
-  "Živé semináře",
-  "Osvědčení",
-];
-
 const CERT_STEPS: [string, string][] = [
   ["Brány 1–5", "osvědčení za každou fázi"],
   ["Po bráně 5", SPECIALIST_TITLE],
@@ -155,11 +151,11 @@ const CERT_STEPS: [string, string][] = [
 
 const FAQ = [
   [
-    "Je rentgen nápadu opravdu zdarma?",
+    "Je test nápadu opravdu zdarma?",
     "Ano. Stačí registrace e-mailem, platební kartu nezadáváte. Zdarma jsou i brány 1 a 2.",
   ],
   [
-    "Jak přesný je výsledek rentgenu?",
+    "Jak přesný je výsledek testu nápadu?",
     "Je to první odhad z vašich odpovědí a obvyklých čísel v oboru, ne záruka. Ukáže, kde je nápad silný a co ověřit jako první. Se skutečnými čísly v bráně 3 se zpřesní.",
   ],
   [
@@ -311,6 +307,7 @@ const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
   const offer = useFounderOffer();
+  const author = ADVISORS.find((a) => a.name.includes("Míček"));
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
     const id = window.location.hash.slice(1);
@@ -346,17 +343,17 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Kompletní kurz online podnikání s AI
               </p>
               <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
-                Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
+                Informací o podnikání máte dost. Chybí cesta, jak je poskládat.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                Výuková videa krok za krokem, AI, která zná váš projekt, a poradci z praxe. Na konci nemáte jen
-                certifikát, ale rozjetý projekt.
+                VISIBLE7 vás provede krok za krokem od nápadu k vlastnímu projektu. Začnete s málem a cestu ohneme podle
+                vás.
               </p>
               <div className="mt-8">
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                Stačí e-mail, bez platební karty. Výsledek do 10 minut.
+                Test nápadu a brány 1–2 zdarma · celá cesta {kc(shop.price)} · stačí e-mail
               </p>
             </div>
             <div className="w-full">
@@ -374,37 +371,71 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
-        {/* Co je uvnitř */}
+        {/* Co vás čeká */}
         <section id="uvnitr" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
-            <div className="mx-auto max-w-6xl px-4 py-8 sm:px-8 lg:px-12">
-              <dl className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
-                {INSIDE.map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="flex items-start gap-3">
-                    <Icon className="mt-1 h-6 w-6 shrink-0 text-orange-600" aria-hidden="true" />
+            <div className="mx-auto max-w-6xl px-4 py-10 sm:px-8 lg:px-12">
+              <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Co vás čeká</h2>
+              <ol className="mt-6 grid gap-4 md:grid-cols-3">
+                {STEPS.map((st, i) => (
+                  <li key={st.title} className="flex gap-4 rounded-2xl bg-background p-5">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white">
+                      {i + 1}
+                    </span>
                     <div>
-                      <dt className="sr-only">{label}</dt>
-                      <dd className="text-2xl font-extrabold tracking-tight text-primary">{value}</dd>
-                      <dd className="text-sm leading-snug text-muted-foreground">{label}</dd>
+                      <p className="font-bold">{st.title}</p>
+                      <p className="text-sm font-semibold text-orange-700">
+                        {st.meta === "PRICE" ? kc(shop.price) : st.meta}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">{st.text}</p>
                     </div>
-                  </div>
-                ))}
-              </dl>
-              <ul className="mt-6 flex flex-wrap gap-2" aria-label="Co v aplikaci najdete">
-                {INSIDE_TAGS.map((t) => (
-                  <li
-                    key={t}
-                    className="rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground/80"
-                  >
-                    {t}
                   </li>
                 ))}
-              </ul>
+              </ol>
               <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">
                 Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, vzděláváme od roku 2011, akreditace
                 MŠMT a MPO. Metodika vyrostla z kurzů, ne od stolu.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Proč projekty krachují + slovo autora */}
+        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8 md:py-24 lg:px-12">
+          <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Proč projekty krachují</h2>
+              <p className="mt-3 text-lg text-muted-foreground">A jak tomu předejít.</p>
+              <ul className="mt-8 space-y-5">
+                {FAIL_REASONS.map(([why, fix]) => (
+                  <li key={why} className="border-l-4 border-orange-400 pl-4">
+                    <p className="font-bold">{why}</p>
+                    <p className="mt-1 text-muted-foreground">{fix}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <figure className="self-start rounded-3xl bg-primary p-7 text-white sm:p-9">
+              <blockquote className="text-lg leading-relaxed text-white/90">
+                „Lidé k nám přicházejí s představou, že podnikání není pro ně. Odcházejí s tím, že vědí, jak začít, a
+                zvládnou to sami. Většina kurzů má osnovu a všichni se jí musí podřídit. U nás je to naopak: cesta se
+                ohne podle vás. A nejde o to mít peníze na velkou věc. Začněte s málem, škálujte až potom.“
+              </blockquote>
+              <figcaption className="mt-6 flex items-center gap-4">
+                {author?.photo && (
+                  <img
+                    src={author.photo}
+                    alt=""
+                    loading="lazy"
+                    className="h-14 w-14 rounded-full bg-white/10 object-cover object-top"
+                  />
+                )}
+                <span>
+                  <span className="block font-bold">Michal Míček</span>
+                  <span className="block text-sm text-white/70">autor metodiky VISIBLE7 MICEK®</span>
+                </span>
+              </figcaption>
+            </figure>
           </div>
         </section>
 
@@ -590,7 +621,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Začněte zdarma. Celá cesta za {kc(shop.price)}.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Rentgen nápadu a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
+                Test nápadu a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
                 semináře každých 14 dní. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
                 {shop.anchor}
               </p>
@@ -603,7 +634,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
-                ["Rentgen nápadu a brány 1–2", "0 Kč"],
+                ["Test nápadu (10 minut) a brány 1–2", "0 Kč"],
                 ["Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma", "0 Kč"],
                 [`Členství na ${monthsLabel(shop.months)}: 7 bran a živé semináře`, `${kc(shop.price)}`],
               ].map(([name, price]) => (
@@ -614,9 +645,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               ))}
               <div className="flex items-center justify-between gap-4 bg-orange-50 px-5 py-4">
                 <dt className="min-w-0">
-                  <span className="block font-semibold">Konzultace vašeho projektu, 20 minut</span>
+                  <span className="block font-semibold">Úvodní konzultace s expertem, 20 minut</span>
                   <span className="block text-sm text-muted-foreground">
-                    Probereme váš nápad a které řešení zvolit.{" "}
+                    Online videohovor bez závazku: projdeme váš nápad a doporučíme, kterou cestou jít.{" "}
                     <a
                       href={FREE_CONSULT_URL}
                       target="_blank"

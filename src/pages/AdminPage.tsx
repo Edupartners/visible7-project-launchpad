@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Check, ChevronDown, Download, Mail, Phone, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
@@ -210,6 +210,12 @@ const AdminPage = () => {
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
+            <Link
+              to="/home"
+              className="mb-2 inline-block text-sm font-semibold text-muted-foreground hover:text-foreground"
+            >
+              ← Zpět do přehledu
+            </Link>
             <p className="flex items-center gap-1.5 text-sm font-semibold text-primary">
               <ShieldCheck className="h-4 w-4" /> Jen pro správce
             </p>

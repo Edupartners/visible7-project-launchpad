@@ -6,6 +6,7 @@ import {
   FileText,
   FlaskConical,
   FolderOpen,
+  Globe,
   LogOut,
   Menu,
   Plus,
@@ -193,6 +194,15 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-foreground/80 hover:bg-muted"
             >
               <Award className="h-4 w-4 text-muted-foreground" /> Moje osvědčení
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              onClick={() => go("/")}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm text-foreground/80 hover:bg-muted"
+            >
+              <Globe className="h-4 w-4 text-muted-foreground" /> Úvodní stránka webu
             </button>
           </li>
           {isAdmin && (
