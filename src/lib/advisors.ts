@@ -39,6 +39,15 @@ export const ADVISORS: Advisor[] = [
     channels: [],
   },
   {
+    id: "jakub-rak",
+    name: "Jakub Rak, MBA",
+    photo: "/poradci/jakub-rak.webp",
+    focus: "Byznys case, finance a fintech",
+    bio: "Spoluzakladatel Goodveri a company builder s více než 20 lety praxe ve finančních institucích, fintechu a startupech. Pomůže sestavit a zkontrolovat byznys case: ceny, marže, náklady, bod zvratu a potřebný kapitál.",
+    phases: [3, 7],
+    channels: [],
+  },
+  {
     id: "monika-vesela",
     name: "Monika Veselá",
     focus: "Základy podnikání a byznys plán",
