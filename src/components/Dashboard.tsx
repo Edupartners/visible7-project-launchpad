@@ -1,5 +1,6 @@
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { MembershipCard } from "@/components/access/MembershipCta";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAccess } from "@/lib/access";
 import { kc, monthsLabel, useShop } from "@/lib/shop";
 import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
@@ -10,6 +11,7 @@ import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
 import { DashboardJourney } from "./diagnosis/DashboardJourney";
+import { GrowthBadge } from "./GrowthBadge";
 import { DIAGNOSIS_KEY } from "@/lib/diagnosis";
 import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
@@ -19,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowRight,
-  ChevronDown,
+  ChevronUp,
   Crown,
   Award,
   Check,
@@ -140,36 +142,35 @@ const ProjectTitle = () => {
   );
 };
 
-/** Tenký pruh se členstvím; podrobnosti se rozbalí až po kliknutí. */
+/** Členství přilepené ke spodnímu okraji obrazovky; po kliknutí vyjede panel s informacemi. */
 const MembershipBar = () => {
   const access = useAccess();
   const shop = useShop();
   const [open, setOpen] = useState(false);
   if (access.loading || access.paid) return null;
   return (
-    <section className="rounded-2xl border border-border">
+    <>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm"
+        onClick={() => setOpen(true)}
+        className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-3 border-t border-orange-200 bg-orange-50/95 px-4 py-3 text-sm backdrop-blur hover:bg-orange-100"
       >
         <Crown className="h-4 w-4 shrink-0 text-orange-500" />
         <span className="font-semibold">Členství VISIBLE7</span>
-        <span className="text-muted-foreground">
+        <span className="hidden text-muted-foreground sm:inline">
           {kc(shop.price)} / {monthsLabel(shop.months)}
         </span>
-        <span className="ml-auto flex items-center gap-1 font-semibold text-primary">
-          {open ? "Skrýt" : "Více"}{" "}
-          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        <span className="flex items-center gap-1 font-semibold text-orange-700">
+          Více <ChevronUp className="h-4 w-4" />
         </span>
       </button>
-      {open && (
-        <div className="border-t border-border p-2">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="bottom" className="mx-auto max-w-4xl rounded-t-3xl px-4 pb-6 pt-12 sm:px-6">
+          <SheetTitle className="sr-only">Členství VISIBLE7</SheetTitle>
           <MembershipCard placement="below" hasProgress />
-        </div>
-      )}
-    </section>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 
@@ -209,9 +210,14 @@ export const Dashboard = (_props: DashboardProps) => {
     <SidebarLayout>
       <main className="mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-8 sm:py-10">
         {/* Projekt */}
-        <header className="min-w-0">
-          <ProjectTitle />
-          <p className="mt-1 text-sm text-muted-foreground">Otevřeno {doneCount} ze 7 bran</p>
+        <header className="flex flex-col-reverse gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <ProjectTitle />
+            <p className="mt-1 text-sm text-muted-foreground">Otevřeno {doneCount} ze 7 bran</p>
+          </div>
+          <div className="self-end sm:self-auto">
+            <GrowthBadge currentCompleted={doneCount} />
+          </div>
         </header>
 
         <DashboardAnnouncements />
@@ -336,6 +342,7 @@ export const Dashboard = (_props: DashboardProps) => {
         {doneCount >= 2 && <MembershipBar />}
       </main>
       <Footer />
+      {doneCount >= 2 && <div className="h-12" aria-hidden="true" />}
     </SidebarLayout>
   );
 };
