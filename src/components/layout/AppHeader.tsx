@@ -8,6 +8,7 @@ import {
   FileText,
   FlaskConical,
   Globe,
+  Globe2,
   Lock,
   LogOut,
   Map,
@@ -63,42 +64,6 @@ const navCls = (active: boolean) =>
       : "text-muted-foreground hover:text-foreground"
   }`;
 
-/** Tenký pruh pod hlavičkou na stránkách bran: kde na cestě jsem. */
-const GateStrip = () => {
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const { done, nextGate } = useGateStatus();
-  const idx = GATE_ROUTES.findIndex((g) => g.route === pathname);
-  if (idx < 0) return null;
-  return (
-    <div className="border-b border-border bg-muted/40">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2 text-sm sm:px-6">
-        <span className="font-semibold">
-          Brána {idx + 1} ze 7: {GATE_ROUTES[idx].name}
-        </span>
-        <ol className="ml-auto flex items-center gap-1.5" aria-label="Postup na cestě">
-          {GATE_ROUTES.map((g, i) => {
-            const n = i + 1;
-            return (
-              <li key={g.route}>
-                <button
-                  type="button"
-                  onClick={() => navigate(g.route)}
-                  title={`${n} ${g.name}`}
-                  aria-label={`Brána ${n}: ${g.name}`}
-                  className={`block h-2.5 rounded-full transition-all ${i === idx ? "w-6" : "w-2.5"} ${
-                    done.has(n) ? "bg-emerald-500" : n === nextGate ? "bg-orange-500" : "bg-border"
-                  }`}
-                />
-              </li>
-            );
-          })}
-        </ol>
-      </div>
-    </div>
-  );
-};
-
 /** Horizontální hlavička aplikace (jako Ecomail): projekt vlevo, sekce uprostřed, účet vpravo. */
 export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
   const navigate = useNavigate();
@@ -111,7 +76,14 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
   const [name, setName] = useState("");
   const email = user?.email ?? "";
   const onGate = GATE_ROUTES.some((g) => g.route === pathname);
-  const onTool = ["/strategy", "/mapa-cesty", "/investor-pitch", "/listy", "/testovaci-stranka"].includes(pathname);
+  const onTool = [
+    "/strategy",
+    "/mapa-cesty",
+    "/rentgen-trhu",
+    "/investor-pitch",
+    "/listy",
+    "/testovaci-stranka",
+  ].includes(pathname);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,6 +197,9 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
                   <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
                   {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5" />}
                 </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => navigate("/rentgen-trhu")}>
+                  <Globe2 className="mr-2.5 h-4 w-4 text-muted-foreground" /> Rentgen trhu
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/benchmarking-phase")}>
                   <Megaphone className="mr-2.5 h-4 w-4 text-muted-foreground" /> Marketingové kanály
                 </DropdownMenuItem>
@@ -300,7 +275,6 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
           </div>
         </div>
       </header>
-      <GateStrip />
 
       <Dialog open={creating} onOpenChange={setCreating}>
         <DialogContent className="max-w-sm">

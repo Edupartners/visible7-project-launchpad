@@ -11,6 +11,8 @@ import {
   FlaskConical,
   FolderOpen,
   Globe,
+  Globe2,
+  Map,
   LogOut,
   Menu,
   Plus,
@@ -244,6 +246,16 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
               className={itemCls(pathname === "/strategy")}
             >
               <Calculator className="h-4 w-4 text-muted-foreground" /> Finanční plán
+            </button>
+          </li>
+          <li>
+            <button type="button" onClick={() => go("/mapa-cesty")} className={itemCls(pathname === "/mapa-cesty")}>
+              <Map className="h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
+            </button>
+          </li>
+          <li>
+            <button type="button" onClick={() => go("/rentgen-trhu")} className={itemCls(pathname === "/rentgen-trhu")}>
+              <Globe2 className="h-4 w-4 text-muted-foreground" /> Rentgen trhu
             </button>
           </li>
           <li>
