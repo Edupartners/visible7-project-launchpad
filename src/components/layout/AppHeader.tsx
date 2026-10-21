@@ -126,7 +126,9 @@ export const AppHeader = ({
 
           {/* Přepínač projektů */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex min-w-0 max-w-[14rem] items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold hover:bg-muted">
+            <DropdownMenuTrigger
+              className={`flex min-w-0 max-w-[14rem] items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold hover:bg-muted ${withSidebar ? "lg:hidden" : ""}`}
+            >
               <span className="truncate">{currentProject?.name ?? "Projekt"}</span>
               <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
             </DropdownMenuTrigger>
@@ -151,79 +153,83 @@ export const AppHeader = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <span className="mx-2 hidden h-6 w-px bg-border lg:block" aria-hidden="true" />
+          {!withSidebar && <span className="mx-2 hidden h-6 w-px bg-border lg:block" aria-hidden="true" />}
 
           <nav aria-label="Hlavní menu" className="hidden items-center lg:flex">
             <button type="button" onClick={() => navigate("/home")} className={navCls(pathname === "/home")}>
               Přehled
             </button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className={navCls(onGate)}>
-                Moje cesta <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                {GATE_ROUTES.map((g, i) => {
-                  const n = i + 1;
-                  const isDone = done.has(n);
-                  return (
-                    <DropdownMenuItem key={g.route} onSelect={() => navigate(g.route)}>
-                      <span
-                        className={`mr-2.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                          isDone
-                            ? "bg-emerald-500 text-white"
-                            : n === nextGate
-                              ? "bg-orange-500 text-white"
-                              : "border border-border text-muted-foreground"
-                        }`}
-                      >
-                        {isDone ? <Check className="h-3 w-3" /> : n}
-                      </span>
-                      <span className={locked(n) ? "text-muted-foreground" : ""}>{g.name}</span>
-                      {locked(n) && <Lock className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}
-                      {n === nextGate && !locked(n) && (
-                        <span className="ml-auto text-xs font-semibold text-orange-600">na řadě</span>
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {!withSidebar && (
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className={navCls(onGate)}>
+                    Moje cesta <ChevronDown className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64">
+                    {GATE_ROUTES.map((g, i) => {
+                      const n = i + 1;
+                      const isDone = done.has(n);
+                      return (
+                        <DropdownMenuItem key={g.route} onSelect={() => navigate(g.route)}>
+                          <span
+                            className={`mr-2.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                              isDone
+                                ? "bg-emerald-500 text-white"
+                                : n === nextGate
+                                  ? "bg-orange-500 text-white"
+                                  : "border border-border text-muted-foreground"
+                            }`}
+                          >
+                            {isDone ? <Check className="h-3 w-3" /> : n}
+                          </span>
+                          <span className={locked(n) ? "text-muted-foreground" : ""}>{g.name}</span>
+                          {locked(n) && <Lock className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}
+                          {n === nextGate && !locked(n) && (
+                            <span className="ml-auto text-xs font-semibold text-orange-600">na řadě</span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className={navCls(onTool)}>
-                Nástroje <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                <DropdownMenuItem onSelect={() => navigate("/strategy")}>
-                  <Calculator className="mr-2.5 h-4 w-4 text-muted-foreground" /> Finanční plán
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/mapa-cesty")} disabled={!pitchReady}>
-                  <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
-                  {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5" />}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/rentgen-trhu")}>
-                  <Globe2 className="mr-2.5 h-4 w-4 text-muted-foreground" /> Rentgen trhu
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/benchmarking-phase")}>
-                  <Megaphone className="mr-2.5 h-4 w-4 text-muted-foreground" /> Marketingové kanály
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/investor-pitch")} disabled={!pitchReady}>
-                  <Presentation className="mr-2.5 h-4 w-4 text-muted-foreground" /> Pitch pro investory
-                  {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5" />}
-                </DropdownMenuItem>
-                {!pitchReady && (
-                  <p className="px-2 pb-1 text-xs text-muted-foreground">Mapa a pitch se odemknou po bráně 3.</p>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => navigate("/listy")}>
-                  <FileText className="mr-2.5 h-4 w-4 text-muted-foreground" /> Pracovní listy
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/testovaci-stranka")}>
-                  <FlaskConical className="mr-2.5 h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className={navCls(onTool)}>
+                    Nástroje <ChevronDown className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64">
+                    <DropdownMenuItem onSelect={() => navigate("/strategy")}>
+                      <Calculator className="mr-2.5 h-4 w-4 text-muted-foreground" /> Finanční plán
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => navigate("/mapa-cesty")} disabled={!pitchReady}>
+                      <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
+                      {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5" />}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => navigate("/rentgen-trhu")}>
+                      <Globe2 className="mr-2.5 h-4 w-4 text-muted-foreground" /> Rentgen trhu
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => navigate("/benchmarking-phase")}>
+                      <Megaphone className="mr-2.5 h-4 w-4 text-muted-foreground" /> Marketingové kanály
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => navigate("/investor-pitch")} disabled={!pitchReady}>
+                      <Presentation className="mr-2.5 h-4 w-4 text-muted-foreground" /> Pitch pro investory
+                      {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5" />}
+                    </DropdownMenuItem>
+                    {!pitchReady && (
+                      <p className="px-2 pb-1 text-xs text-muted-foreground">Mapa a pitch se odemknou po bráně 3.</p>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => navigate("/listy")}>
+                      <FileText className="mr-2.5 h-4 w-4 text-muted-foreground" /> Pracovní listy
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => navigate("/testovaci-stranka")}>
+                      <FlaskConical className="mr-2.5 h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
 
             <button type="button" onClick={() => navigate("/poradci")} className={navCls(pathname === "/poradci")}>
               Poradci
