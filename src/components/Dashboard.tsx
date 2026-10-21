@@ -1,8 +1,5 @@
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { MembershipCard } from "@/components/access/MembershipCta";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { useAccess } from "@/lib/access";
-import { kc, monthsLabel, useShop } from "@/lib/shop";
 import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
 import { track } from "@/lib/track";
 import { useEffect, useState } from "react";
@@ -21,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   ArrowRight,
-  ChevronUp,
-  Crown,
   Award,
   Check,
   Clock,
@@ -139,38 +134,6 @@ const ProjectTitle = () => {
         <Pencil className="h-4 w-4" />
       </button>
     </div>
-  );
-};
-
-/** Členství přilepené ke spodnímu okraji obrazovky; po kliknutí vyjede panel s informacemi. */
-const MembershipBar = () => {
-  const access = useAccess();
-  const shop = useShop();
-  const [open, setOpen] = useState(false);
-  if (access.loading || access.paid) return null;
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-center gap-3 border-t border-orange-200 bg-orange-50/95 px-4 py-3 text-sm backdrop-blur hover:bg-orange-100"
-      >
-        <Crown className="h-4 w-4 shrink-0 text-orange-500" />
-        <span className="font-semibold">Členství VISIBLE7</span>
-        <span className="hidden text-muted-foreground sm:inline">
-          {kc(shop.price)} / {monthsLabel(shop.months)}
-        </span>
-        <span className="flex items-center gap-1 font-semibold text-orange-700">
-          Více <ChevronUp className="h-4 w-4" />
-        </span>
-      </button>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="mx-auto max-w-4xl rounded-t-3xl px-4 pb-6 pt-12 sm:px-6">
-          <SheetTitle className="sr-only">Členství VISIBLE7</SheetTitle>
-          <MembershipCard placement="below" hasProgress />
-        </SheetContent>
-      </Sheet>
-    </>
   );
 };
 
@@ -337,12 +300,8 @@ export const Dashboard = (_props: DashboardProps) => {
           </section>
         )}
         {tip === "quiz" && <QuizDashboardCard />}
-
-        {/* Členství až po bezplatné části, nenápadně dole */}
-        {doneCount >= 2 && <MembershipBar />}
       </main>
       <Footer />
-      {doneCount >= 2 && <div className="h-12" aria-hidden="true" />}
     </SidebarLayout>
   );
 };

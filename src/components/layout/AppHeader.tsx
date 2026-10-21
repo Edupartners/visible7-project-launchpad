@@ -64,7 +64,7 @@ const navCls = (active: boolean) =>
   }`;
 
 /** Horizontální hlavička aplikace (jako Ecomail): projekt vlevo, sekce uprostřed, účet vpravo. */
-export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
+export const AppHeader = ({ onOpenMobile, mobileOnly = false }: { onOpenMobile: () => void; mobileOnly?: boolean }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, signOut } = useAuth();
@@ -95,7 +95,9 @@ export const AppHeader = ({ onOpenMobile }: { onOpenMobile: () => void }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
+      <header
+        className={`sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur ${mobileOnly ? "lg:hidden" : ""}`}
+      >
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6">
           <button
             type="button"

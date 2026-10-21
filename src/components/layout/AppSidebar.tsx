@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Award,
+  Crown,
+  PanelLeftClose,
+  PanelLeftOpen,
   Lock,
   Megaphone,
   Calculator,
@@ -76,7 +79,7 @@ const SidebarSeminars = ({ onClick }: { onClick: () => void }) => {
 };
 
 /** Obsah postranního panelu – projekty nahoře, odkazy a účet s ozubeným kolem dole (jako ChatGPT/Claude). */
-const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
+const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCollapse?: () => void }) => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { projects, currentProject, switchProject, createProject } = useProject();
@@ -107,21 +110,36 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between pr-3">
+      <div className="flex items-center justify-between pr-2">
         <button
           type="button"
           onClick={() => go("/home")}
-          className="flex items-center gap-2.5 px-4 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex min-w-0 items-center gap-2 py-4 pl-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label="VISIBLE7 MICEK – přehled"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-foreground text-[13px] font-bold text-white">
             V7
           </span>
-          <span className="text-[17px] font-semibold tracking-tight">
+          <span className="whitespace-nowrap text-[15px] font-semibold tracking-tight">
             VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
           </span>
         </button>
-        {!onNavigate && <NotificationBell />}
+        {!onNavigate && (
+          <div className="flex items-center">
+            <NotificationBell />
+            {onCollapse && (
+              <button
+                type="button"
+                onClick={onCollapse}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Zmenšit menu"
+                title="Zmenšit menu"
+              >
+                <PanelLeftClose className="h-[18px] w-[18px]" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <nav aria-label="Menu" className="min-h-0 flex-1 overflow-y-auto px-2 pt-2">
@@ -355,7 +373,7 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
 
       <div className="px-3 pb-2">
         <SidebarSeminars onClick={() => go("/seminare")} />
-        <SidebarMembership onNavigate={onNavigate} />
+        {done.size >= 2 && <SidebarMembership onNavigate={onNavigate} />}
       </div>
 
       {/* Účet dole – jako v ChatGPT/Claude */}
@@ -398,19 +416,138 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
   );
 };
 
-/** Rozvržení aplikace: horizontální hlavička (jako Ecomail), na mobilu menu z boku. */
+/** Zmenšené menu (jako ve WordPressu): jen ikony, popisky v bublině po najetí. */
+const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const access = useAccess();
+  const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
+  const done = new Set(completedPhases);
+  const nextGate = [1, 2, 3, 4, 5, 6, 7].find((n) => !done.has(n));
+  const icon = (label: string, path: string, Icon: typeof Award) => (
+    <button
+      key={path}
+      type="button"
+      onClick={() => navigate(path)}
+      title={label}
+      aria-label={label}
+      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+        pathname === path
+          ? "bg-primary/10 text-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
+    >
+      <Icon className="h-[18px] w-[18px]" />
+    </button>
+  );
+  return (
+    <div className="flex h-full flex-col items-center gap-1 py-3">
+      <button
+        type="button"
+        onClick={() => navigate("/home")}
+        className="mb-2 flex h-9 w-9 items-center justify-center rounded-[9px] bg-foreground text-[13px] font-bold text-white"
+        aria-label="VISIBLE7 MICEK – přehled"
+      >
+        V7
+      </button>
+      <div className="flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto">
+        {icon("Přehled", "/home", LayoutDashboard)}
+        <span className="my-1 h-px w-8 bg-border" />
+        {GATE_ROUTES.map((g, i) => {
+          const n = i + 1;
+          const isDone = done.has(n);
+          return (
+            <button
+              key={g.route}
+              type="button"
+              onClick={() => navigate(g.route)}
+              title={`${n} ${g.name}`}
+              aria-label={`Brána ${n}: ${g.name}`}
+              className={`flex h-9 w-9 items-center justify-center rounded-lg ${pathname === g.route ? "bg-primary/10" : "hover:bg-muted"}`}
+            >
+              <span
+                className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${
+                  isDone
+                    ? "bg-emerald-500 text-white"
+                    : n === nextGate
+                      ? "bg-orange-500 text-white"
+                      : "border border-border text-muted-foreground"
+                }`}
+              >
+                {isDone ? <Check className="h-3 w-3" /> : n}
+              </span>
+            </button>
+          );
+        })}
+        <span className="my-1 h-px w-8 bg-border" />
+        {icon("Finanční plán", "/strategy", Calculator)}
+        {icon("Mapa cesty A → D", "/mapa-cesty", Map)}
+        {icon("Rentgen trhu", "/rentgen-trhu", Globe2)}
+        {icon("Marketingové kanály", "/benchmarking-phase", Megaphone)}
+        {icon("Pitch pro investory", "/investor-pitch", Presentation)}
+        {icon("Pracovní listy", "/listy", FileText)}
+        {icon("Web projektu (test zájmu)", "/testovaci-stranka", FlaskConical)}
+        <span className="my-1 h-px w-8 bg-border" />
+        {icon("Seniorní poradci", "/poradci", Users)}
+        {icon("Živé semináře", "/seminare", Presentation)}
+      </div>
+      <div className="flex flex-col items-center gap-1 border-t border-border pt-2">
+        {done.size >= 2 && !access.loading && !access.paid && icon("Získat členství", "/clenstvi", Crown)}
+        {icon("Nastavení", "/settings", Settings)}
+        <button
+          type="button"
+          onClick={onExpand}
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+          aria-label="Rozbalit menu"
+          title="Rozbalit menu"
+        >
+          <PanelLeftOpen className="h-[18px] w-[18px]" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const COLLAPSE_KEY = "v7_menu_collapsed";
+const readCollapsed = () => {
+  try {
+    return localStorage.getItem(COLLAPSE_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
+/** Rozvržení aplikace: boční menu, které jde zmenšit na ikony; na mobilu horní lišta a menu z boku. */
 export const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const toggle = (v: boolean) => {
+    setCollapsed(v);
+    try {
+      localStorage.setItem(COLLAPSE_KEY, v ? "1" : "0");
+    } catch {
+      /* soukromé okno */
+    }
+  };
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader onOpenMobile={() => setOpen(true)} />
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-72 p-0">
-          <SheetTitle className="sr-only">Menu</SheetTitle>
-          <SidebarBody onNavigate={() => setOpen(false)} />
-        </SheetContent>
-      </Sheet>
-      <div className="min-w-0">{children}</div>
+    <div className="min-h-screen bg-background lg:flex">
+      <aside
+        className={`sticky top-0 hidden h-screen shrink-0 border-r border-border bg-muted/40 transition-[width] lg:block ${
+          collapsed ? "w-16" : "w-64"
+        }`}
+      >
+        {collapsed ? <SidebarRail onExpand={() => toggle(false)} /> : <SidebarBody onCollapse={() => toggle(true)} />}
+      </aside>
+      <div className="min-w-0 flex-1">
+        <AppHeader onOpenMobile={() => setOpen(true)} mobileOnly />
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent side="left" className="w-72 p-0">
+            <SheetTitle className="sr-only">Menu</SheetTitle>
+            <SidebarBody onNavigate={() => setOpen(false)} />
+          </SheetContent>
+        </Sheet>
+        {children}
+      </div>
     </div>
   );
 };
