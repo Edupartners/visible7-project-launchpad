@@ -35,6 +35,7 @@ import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
 import QuizPage from "./pages/QuizPage";
 import SeminarsPage from "./pages/SeminarsPage";
+import JourneyMapPage from "./pages/JourneyMapPage";
 import TestPageEditor from "./pages/TestPageEditor";
 import TestPagePublic from "./pages/TestPagePublic";
 import { GateLock, PremiumGate } from "@/components/access/Locks";
@@ -58,6 +59,7 @@ const ProtectedRoutes = () => (
       <Route path="/rentgen" element={<RentgenPage />} />
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />
+      <Route path="/mapa-cesty" element={<JourneyMapPage />} />
       <Route path="/listy" element={<MemberWorksheetsPage />} />
       <Route
         path="/testovaci-stranka"

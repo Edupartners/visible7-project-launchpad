@@ -251,7 +251,6 @@ export const Dashboard = (_props: DashboardProps) => {
 
         <MembershipCard placement="below" hasProgress={!diagnosisLoading && (!!diagnosis || doneCount > 0)} />
 
-        {!diagnosisLoading && (diagnosis || doneCount > 0) && <DashboardJourney prominent={false} />}
         {!diagnosisLoading && (diagnosis || doneCount > 0) && <QuizDashboardCard />}
 
         {/* Celá cesta */}

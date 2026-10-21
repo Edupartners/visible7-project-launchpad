@@ -28,6 +28,7 @@ import { SidebarMembership } from "@/components/access/MembershipCta";
 import { NotificationBell } from "@/components/announcements/NotificationBell";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
+import { AppHeader } from "./AppHeader";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { FREE_GATES, useAccess } from "@/lib/access";
 
@@ -122,6 +123,69 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
       </div>
 
       <nav aria-label="Menu" className="min-h-0 flex-1 overflow-y-auto px-2 pt-2">
+        <p className="px-2 pb-1 pt-1 text-xs font-semibold text-muted-foreground">Projekty</p>
+        <div className="px-1 pb-1.5">
+          {creating ? (
+            <form onSubmit={submit} className="flex items-center gap-1.5">
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Název projektu"
+                className="h-10"
+                autoFocus
+                aria-label="Název nového projektu"
+              />
+              <button
+                type="submit"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"
+                aria-label="Založit projekt"
+              >
+                <Check className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreating(false)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted"
+                aria-label="Zrušit"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setCreating(true)}
+              className="flex w-full items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold hover:border-primary/40"
+            >
+              <Plus className="h-4 w-4" /> Nový projekt
+            </button>
+          )}
+        </div>
+        <ul className="space-y-0.5">
+          {projects.map((p) => {
+            const active = p.id === currentProject?.id;
+            return (
+              <li key={p.id}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    switchProject(p.id);
+                    go("/home");
+                  }}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm ${
+                    active ? "bg-primary/10 font-semibold text-foreground" : "text-foreground/80 hover:bg-muted"
+                  }`}
+                >
+                  <FolderOpen className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className="truncate">{p.name}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="pt-4" />
         <ul className="space-y-0.5">
           <li>
             <button
@@ -251,68 +315,6 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
           </li>
         </ul>
 
-        <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Projekty</p>
-        <div className="px-1 pb-1.5">
-          {creating ? (
-            <form onSubmit={submit} className="flex items-center gap-1.5">
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Název projektu"
-                className="h-10"
-                autoFocus
-                aria-label="Název nového projektu"
-              />
-              <button
-                type="submit"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"
-                aria-label="Založit projekt"
-              >
-                <Check className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setCreating(false)}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted"
-                aria-label="Zrušit"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </form>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setCreating(true)}
-              className="flex w-full items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-semibold hover:border-primary/40"
-            >
-              <Plus className="h-4 w-4" /> Nový projekt
-            </button>
-          )}
-        </div>
-        <ul className="space-y-0.5">
-          {projects.map((p) => {
-            const active = p.id === currentProject?.id;
-            return (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    switchProject(p.id);
-                    go("/home");
-                  }}
-                  aria-current={active ? "page" : undefined}
-                  className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm ${
-                    active ? "bg-primary/10 font-semibold text-foreground" : "text-foreground/80 hover:bg-muted"
-                  }`}
-                >
-                  <FolderOpen className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className="truncate">{p.name}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-
         <ul className="mt-3 space-y-0.5 border-t border-border pt-3">
           <li>
             <button
@@ -384,50 +386,19 @@ const SidebarBody = ({ onNavigate }: { onNavigate?: () => void }) => {
   );
 };
 
-/** Rozvržení s postranním panelem: na počítači stále vidět, na mobilu se otevře z horní lišty. */
+/** Rozvržení aplikace: horizontální hlavička (jako Ecomail), na mobilu menu z boku. */
 export const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-background lg:flex">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-border bg-muted/40 lg:block">
-        <SidebarBody />
-      </aside>
-
-      {/* Mobilní lišta */}
-      <div className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-white/90 px-3 backdrop-blur lg:hidden">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted"
-          aria-label="Otevřít menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-        <span className="text-[17px] font-semibold tracking-tight">
-          VISIBLE7 <span className="font-normal text-muted-foreground">MICEK®</span>
-        </span>
-        <div className="flex items-center">
-          <NotificationBell className="h-10 w-10" />
-          <button
-            type="button"
-            onClick={() => navigate("/settings")}
-            className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted"
-            aria-label="Nastavení"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <AppHeader onOpenMobile={() => setOpen(true)} />
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <SidebarBody onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
-
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 };
