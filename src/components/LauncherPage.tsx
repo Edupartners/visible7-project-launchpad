@@ -353,7 +353,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                Test nápadu a brány 1–2 zdarma · celá cesta {kc(shop.price)} · stačí e-mail
+                Test nápadu a brány 1–2 ze 7 zdarma · pro registraci stačí e-mail
               </p>
             </div>
             <div className="w-full">
