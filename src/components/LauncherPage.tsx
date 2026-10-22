@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Download,
   Layers,
+  Lock,
   Lightbulb,
   Rocket,
   Store,
@@ -177,6 +178,10 @@ const FAQ = [
   [
     "Co když ještě nemám nápad?",
     "Začněte bránou 1. Strategie modrého oceánu je přesně nástroj na to, jak najít místo, kde nebudete jen další z mnoha.",
+  ],
+  [
+    "Neukradne mi někdo nápad?",
+    "Ne. Obsah vašeho projektu vidíte jen vy. Bez vašeho souhlasu ho nečte nikdo z nás, s výjimkou technické podpory, o kterou sami požádáte. AI poskytovatel podle svých smluvních podmínek data nepoužívá k trénování modelů. Data jsou uložena v EU a projekt můžete kdykoli smazat. Poradci jsou vázáni mlčenlivostí.",
   ],
   [
     "Jak pracuje AI s mými daty?",
@@ -354,6 +359,10 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
                 Test nápadu a brány 1–2 ze 7 zdarma · pro registraci stačí e-mail
+              </p>
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                Váš nápad zůstává jen váš. Nikomu ho neukazujeme a AI se na něm neučí.
               </p>
             </div>
             <div className="w-full">
