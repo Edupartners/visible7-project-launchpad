@@ -12,10 +12,9 @@ import {
   Award,
   BarChart3,
   Check,
-  ChevronDown,
-  Download,
   Layers,
   Lightbulb,
+  Play,
   Rocket,
   Store,
   Target,
@@ -196,90 +195,60 @@ const TAG_STYLE: Record<Tag, string> = {
   Výpočet: "bg-emerald-100 text-emerald-800",
 };
 
-/** Živá ukázka cesty: brány se po načtení postupně otevírají. */
-const HeroJourney = () => {
-  const [open, setOpen] = useState(0);
-  useEffect(() => {
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setOpen(3);
-      return;
-    }
-    const timers = [1, 2, 3].map((n) => setTimeout(() => setOpen(n), 500 + n * 750));
-    return () => timers.forEach(clearTimeout);
-  }, []);
+/** Úvodní video s Michalem. Dokud není natočené, ukazujeme fotku a štítek „připravujeme“. */
+const HERO_VIDEO_EMBED = "";
 
-  return (
-    <div className="mx-auto w-full max-w-[340px] rounded-3xl bg-primary p-4 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-5 xl:mr-0">
-      <div className="flex items-baseline justify-between gap-3 px-1">
-        <p className="whitespace-nowrap text-sm font-semibold">Startér e-shopu</p>
-        <p className="whitespace-nowrap text-xs text-white/60">{open} ze 7 bran</p>
+const HeroVideo = ({ photo }: { photo?: string }) => {
+  const [playing, setPlaying] = useState(false);
+  if (playing && HERO_VIDEO_EMBED)
+    return (
+      <div className="aspect-video w-full overflow-hidden rounded-3xl bg-black">
+        <iframe
+          src={`${HERO_VIDEO_EMBED}?autoplay=1`}
+          title="Jak VISIBLE7 funguje"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+          className="h-full w-full"
+        />
       </div>
-      <ol className="mt-3 space-y-1" aria-label="Ukázka cesty přes 7 bran">
-        {GATES.map((g, i) => {
-          const done = i < open;
-          const current = i === open;
-          const Icon = g.icon;
-          return (
-            <li
-              key={g.name}
-              className={`flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition-colors duration-500 ${
-                current ? "bg-white text-foreground" : done ? "bg-white/[0.07]" : ""
-              }`}
-            >
-              <span
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors duration-500 ${
-                  done
-                    ? "bg-emerald-500 text-white"
-                    : current
-                      ? "bg-orange-500 text-white ring-[3px] ring-orange-200"
-                      : "border border-white/30 text-white/60"
-                }`}
-              >
-                {done ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : i + 1}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className={`block text-sm font-semibold ${!done && !current ? "text-white/60" : ""}`}>
-                  {g.name}
-                </span>
-                {(done || current) && (
-                  <span className={`block truncate text-xs ${current ? "text-muted-foreground" : "text-white/60"}`}>
-                    {current ? "Na řadě" : g.sample}
-                  </span>
-                )}
-              </span>
-              {done ? (
-                <Icon className="h-4 w-4 shrink-0 text-white/50" />
-              ) : current ? (
-                <span className="shrink-0 rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-semibold text-white">
-                  Pokračovat
-                </span>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
-      <div
-        className={`mt-3 flex items-center gap-2.5 rounded-xl border border-amber-300/40 xl:[@media(max-height:760px)]:hidden bg-amber-400/10 px-2.5 py-2 transition-all duration-700 ${
-          open >= 3 ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-        }`}
-        aria-hidden={open < 3}
-      >
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-primary">
-          <Award className="h-3.5 w-3.5" strokeWidth={2.5} />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block whitespace-nowrap text-sm font-semibold">Osvědčení za 3 brány</span>
-          <span className="block truncate text-xs text-white/60">Do CV i na LinkedIn</span>
-        </span>
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold">
-          <Download className="h-3.5 w-3.5" />
-          PDF
-        </span>
+    );
+  return (
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-primary shadow-[0_40px_80px_-40px_hsl(216_62%_24%/0.6)] sm:aspect-[16/8]">
+      {photo && (
+        <img
+          src={photo}
+          alt="Michal Míček, autor metodiky VISIBLE7 MICEK®"
+          className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
+        />
+      )}
+      <div className="absolute inset-x-0 bottom-0 flex justify-center p-4 sm:p-7">
+        <button
+          type="button"
+          disabled={!HERO_VIDEO_EMBED}
+          onClick={() => {
+            setPlaying(true);
+            track("hero_video_play", {});
+          }}
+          className="flex min-h-11 items-center gap-3 rounded-full bg-[hsl(216_40%_13%/0.88)] py-2 pl-2 pr-5 text-left text-sm text-white backdrop-blur transition-colors hover:bg-[hsl(216_40%_13%)] disabled:cursor-default sm:text-base"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500">
+            <Play className="h-4 w-4 fill-white text-white" aria-hidden="true" />
+          </span>
+          <span>
+            <strong className="font-semibold">Michal ukazuje, jak VISIBLE7 funguje</strong>
+            <span className="ml-2 text-white/70">{HERO_VIDEO_EMBED ? "~2 min" : "video připravujeme"}</span>
+          </span>
+        </button>
       </div>
     </div>
   );
 };
+
+const TRUST: [string, string][] = [
+  ["Od roku 2011", "učíme podnikat (Edu Partners)"],
+  ["1 000+ absolventů", "kurzů podnikání"],
+  ["16+ poradců", "seniorních, z praxe"],
+];
 
 const Cta = ({
   onClick,
@@ -333,41 +302,43 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
       <PublicHeader onStart={onAccessGranted} />
 
       <main id="top">
-        {/* Hero */}
-        {/* Lišta + menu + hero = jedna obrazovka (od md, kde je horní lišta na jeden řádek: 43 + 65 px). */}
-        <section className="relative flex flex-col md:min-h-[calc(100svh-108px)]">
-          <div className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-10 px-4 pb-6 pt-12 sm:px-8 md:pt-14 lg:px-12 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-14 xl:py-6">
-            <div>
-              <p className="mb-5 inline-flex items-center gap-2 rounded-2xl border border-orange-200 sm:rounded-full bg-orange-50 px-3.5 py-1.5 text-sm font-semibold text-orange-800">
-                <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
-                Kompletní kurz online podnikání s AI
-              </p>
-              <h1 className="text-[2.1rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl xl:text-[clamp(2.75rem,6.6vh,3.75rem)]">
-                Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                100+ videonávodů krok za krokem. Naučíte se rozjet byznys kvalifikovaně, od nápadu až po první
-                zákazníky.
-              </p>
-              <div className="mt-8">
-                <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Test nápadu a brány 1–2 ze 7 zdarma · pro registraci stačí e-mail
-              </p>
+        {/* Hero: na střed, důvěra nahoře, pod ním velké video s Michalem */}
+        <section className="bg-muted/50 px-4 pb-16 pt-10 sm:px-8 sm:pt-12 md:pb-24">
+          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+            <ul className="flex flex-wrap justify-center gap-x-10 gap-y-3" aria-label="Proč nám věřit">
+              {TRUST.map(([strong, rest]) => (
+                <li key={strong} className="flex flex-col items-center leading-tight">
+                  <span className="font-bold text-primary">{strong}</span>
+                  <span className="text-sm text-muted-foreground">{rest}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-9 inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
+              <Award className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />
+              Kompletní kurz online podnikání s AI
+            </p>
+            <h1 className="mt-6 text-[2.2rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl">
+              Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              100+ videonávodů krok za krokem. Naučíte se rozjet byznys kvalifikovaně, od nápadu až po první zákazníky.
+            </p>
+            <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
+              <a
+                href="#video"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+              >
+                Jak to funguje
+                <Play className="h-4 w-4" aria-hidden="true" />
+              </a>
             </div>
-            <div className="w-full">
-              <HeroJourney />
-            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Test nápadu a brány 1–2 ze 7 zdarma · pro registraci stačí e-mail
+            </p>
           </div>
-          <div className="flex justify-center pb-5">
-            <a
-              href="#uvnitr"
-              aria-label="Pokračovat dolů"
-              className="scroll-cue flex h-12 w-12 items-center justify-center rounded-full border border-orange-300 bg-white text-orange-600 shadow-sm transition-colors hover:bg-orange-50"
-            >
-              <ChevronDown className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
-            </a>
+          <div id="video" className="mx-auto mt-14 max-w-6xl scroll-mt-24">
+            <HeroVideo photo={author?.photo} />
           </div>
         </section>
 

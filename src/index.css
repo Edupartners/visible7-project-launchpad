@@ -159,14 +159,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Poppins", -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-family: "Rethink Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
     font-feature-settings: "tnum" 0;
     overflow-x: clip;
   }
 
   h1, h2, h3 {
-    letter-spacing: -0.015em;
-    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-weight: 800;
   }
 }
 
