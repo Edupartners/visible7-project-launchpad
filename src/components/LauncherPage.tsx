@@ -285,6 +285,15 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
     return () => clearTimeout(t);
   }, []);
   const photos = ADVISORS.filter((a) => a.photo).slice(0, 8);
+  // Úvodní stránka má o kousek větší písmo než aplikace (18 px místo 17 px), vše v rem se zvětší úměrně.
+  useEffect(() => {
+    const html = document.documentElement;
+    const prev = html.style.fontSize;
+    html.style.fontSize = "112.5%";
+    return () => {
+      html.style.fontSize = prev;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -317,10 +326,10 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <Award className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />
               Kompletní kurz online podnikání s AI
             </p>
-            <h1 className="mt-6 text-[2.2rem] font-extrabold leading-[1.05] tracking-[-0.035em] min-[400px]:text-[2.6rem] sm:text-6xl">
+            <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-7xl lg:text-[5rem]">
               Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+            <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
               100+ videonávodů krok za krokem. Naučíte se rozjet byznys kvalifikovaně, od nápadu až po první zákazníky.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">

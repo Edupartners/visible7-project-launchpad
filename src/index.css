@@ -8,13 +8,13 @@
   :root {
     /* Bílý papír, inkoustový text */
     --background: 0 0% 100%;
-    --foreground: 216 40% 13%;
+    --foreground: 163 70% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 216 40% 13%;
+    --card-foreground: 163 70% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 216 40% 13%;
+    --popover-foreground: 163 70% 12%;
 
     /* Primary: námořnická modř VISIBLE7 */
     --primary: 216 62% 24%;
@@ -23,10 +23,10 @@
 
     /* Secondary: Subtle gray */
     --secondary: 40 14% 95%;
-    --secondary-foreground: 216 40% 13%;
+    --secondary-foreground: 163 70% 12%;
 
     --muted: 40 14% 96%;
-    --muted-foreground: 216 9% 38%;
+    --muted-foreground: 160 8% 34%;
 
     --accent: 216 45% 96%;
     --accent-foreground: 216 62% 24%;
