@@ -12,8 +12,8 @@ import {
   vimeoSrc,
 } from "@/lib/blockVideos";
 
-const PLACEHOLDER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(216_45%_32%)]";
-const POSTER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)]";
+const PLACEHOLDER_BG = "bg-gradient-to-br from-[hsl(163_70%_13%)] to-[hsl(156_45%_24%)]";
+const POSTER_BG = "bg-gradient-to-br from-[hsl(163_70%_13%)] to-[hsl(28_58%_38%)]";
 
 /** Video ke kartě z Vimea. Videa vložená v administraci mají přednost (seznam se zhlédnutím). */
 export const BlockVideo = ({ block, area }: { block: BuildBlock; area: BlockArea }) => {

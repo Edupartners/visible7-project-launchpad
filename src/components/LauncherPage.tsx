@@ -210,7 +210,7 @@ const HeroJourney = () => {
   }, []);
 
   return (
-    <div className="mx-auto w-full max-w-[340px] rounded-3xl bg-primary p-4 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-5 xl:mr-0">
+    <div className="mx-auto w-full max-w-[340px] rounded-3xl bg-primary p-4 text-white shadow-[0_30px_60px_-30px_hsl(163_70%_13%/0.6)] sm:p-5 xl:mr-0">
       <div className="flex items-baseline justify-between gap-3 px-1">
         <p className="whitespace-nowrap text-sm font-semibold">Startér e-shopu</p>
         <p className="whitespace-nowrap text-xs text-white/60">{open} ze 7 bran</p>
@@ -507,7 +507,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   width={b.width}
                   height={b.height}
                   loading="lazy"
-                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(216_62%_24%/0.5)]"
+                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(163_70%_13%/0.5)]"
                 />
                 <figcaption className="mt-2 text-center text-xs text-muted-foreground">Ukázka z aplikace</figcaption>
               </figure>

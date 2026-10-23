@@ -81,7 +81,7 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
       {mine ? (
         <section
           aria-label="Váš plán tvorby"
-          className="overflow-hidden rounded-3xl bg-primary text-white shadow-[0_30px_60px_-35px_hsl(216_62%_24%/0.7)]"
+          className="overflow-hidden rounded-3xl bg-primary text-white shadow-[0_30px_60px_-35px_hsl(163_70%_13%/0.7)]"
         >
           <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
             <div>

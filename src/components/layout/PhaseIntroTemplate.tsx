@@ -193,7 +193,7 @@ export const PhaseIntroTemplate = ({
               track("video_play", { where: "phase_intro", phase: phaseNumber });
               setPlaying(true);
             }}
-            className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[hsl(216_62%_20%)] to-[hsl(28_58%_38%)]"
+            className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[hsl(163_70%_13%)] to-[hsl(28_58%_38%)]"
             aria-label={`Přehrát úvodní video k bráně ${name}`}
           >
             <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-transform group-hover:scale-110">
@@ -201,7 +201,7 @@ export const PhaseIntroTemplate = ({
             </span>
           </button>
         ) : (
-          <div className="flex aspect-video w-full flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-[hsl(216_62%_20%)] to-[hsl(216_45%_32%)] text-center text-white">
+          <div className="flex aspect-video w-full flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-[hsl(163_70%_13%)] to-[hsl(156_45%_24%)] text-center text-white">
             <Video className="h-9 w-9 text-white/60" />
             <p className="mt-2 font-semibold">Úvodní video k bráně {name}</p>
             <p className="text-sm text-white/60">připravujeme</p>

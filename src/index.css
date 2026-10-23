@@ -8,45 +8,45 @@
   :root {
     /* Bílý papír, inkoustový text */
     --background: 0 0% 100%;
-    --foreground: 216 40% 13%;
+    --foreground: 163 70% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 216 40% 13%;
+    --card-foreground: 163 70% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 216 40% 13%;
+    --popover-foreground: 163 70% 12%;
 
     /* Primary: námořnická modř VISIBLE7 */
-    --primary: 216 62% 24%;
+    --primary: 163 70% 14%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 216 62% 17%;
+    --primary-hover: 163 70% 9%;
 
     /* Secondary: Subtle gray */
-    --secondary: 40 14% 95%;
-    --secondary-foreground: 216 40% 13%;
+    --secondary: 150 20% 95%;
+    --secondary-foreground: 163 70% 12%;
 
-    --muted: 40 14% 96%;
-    --muted-foreground: 216 9% 38%;
+    --muted: 150 22% 96%;
+    --muted-foreground: 163 17% 35%;
 
-    --accent: 216 45% 96%;
-    --accent-foreground: 216 62% 24%;
+    --accent: 150 33% 94%;
+    --accent-foreground: 163 70% 14%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    --success: 142 76% 36%;
+    --success: 145 50% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 40 9% 87%;
-    --input: 40 7% 80%;
-    --ring: 215 65% 40%;
+    --border: 165 13% 87%;
+    --input: 165 10% 78%;
+    --ring: 150 70% 30%;
 
     /* VISIBLE7 pilot palette */
-    --ink: 216 55% 15%;
-    --paper: 60 13% 95%;
-    --brand-blue: 215 65% 33%;
-    --gate-copper: 28 58% 38%;
-    --gate-copper-foreground: 60 13% 98%;
+    --ink: 163 70% 12%;
+    --paper: 150 22% 97%;
+    --brand-blue: 150 70% 30%;
+    --gate-copper: 150 70% 30%;
+    --gate-copper-foreground: 0 0% 100%;
     --gate-teal: 163 33% 37%;
     --gate-teal-foreground: 60 13% 98%;
 
@@ -59,15 +59,15 @@
     /* Apple-style shadows */
     --shadow-card: none;
     --shadow-button: none;
-    --shadow-elevated: 0 18px 48px -12px hsl(216 40% 13% / 0.22);
+    --shadow-elevated: 0 18px 48px -12px hsl(163 70% 12% / 0.22);
 
     /* Animations */
     --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     /* Chart colors */
-    --chart-1: 210 100% 50%;  /* Revenue - Primary blue */
-    --chart-2: 142 76% 36%;   /* Profit - Success green */
+    --chart-1: 150 70% 30%;  /* Revenue - Primary blue */
+    --chart-2: 113 47% 52%;   /* Profit - Success green */
     --chart-3: 0 84% 60%;     /* Costs - Destructive red */
 
     --sidebar-background: 0 0% 98%;
@@ -84,7 +84,7 @@
 
     --sidebar-border: 220 13% 91%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 163 100% 26%;
   }
 
   .dark {
@@ -159,14 +159,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Poppins", -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-family: "Rethink Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
     font-feature-settings: "tnum" 0;
     overflow-x: clip;
   }
 
   h1, h2, h3 {
-    letter-spacing: -0.015em;
-    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-weight: 800;
   }
 }
 
@@ -289,8 +289,8 @@
   50% { transform: translateY(5px); }
 }
 @keyframes scroll-ring {
-  0% { box-shadow: 0 0 0 0 hsl(24 95% 53% / 0.45); }
-  70%, 100% { box-shadow: 0 0 0 14px hsl(24 95% 53% / 0); }
+  0% { box-shadow: 0 0 0 0 hsl(146 52% 33% / 0.45); }
+  70%, 100% { box-shadow: 0 0 0 14px hsl(146 52% 33% / 0); }
 }
 .scroll-cue { animation: scroll-ring 2.4s ease-out infinite; }
 .scroll-cue > svg { animation: scroll-nudge 2.4s ease-in-out infinite; }

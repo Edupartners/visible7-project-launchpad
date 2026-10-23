@@ -36,8 +36,8 @@ const Cover = ({ phase, state }: { phase: PhaseCardData; state: "done" | "curren
     <div
       className={`absolute inset-0 overflow-hidden ${
         state === "current"
-          ? "bg-gradient-to-br from-[hsl(216_62%_24%)] via-[hsl(216_55%_30%)] to-orange-500"
-          : "bg-gradient-to-br from-[hsl(216_62%_20%)] via-[hsl(216_50%_28%)] to-[hsl(28_58%_38%)]"
+          ? "bg-gradient-to-br from-[hsl(163_70%_13%)] via-[hsl(158_55%_22%)] to-orange-500"
+          : "bg-gradient-to-br from-[hsl(163_70%_13%)] via-[hsl(158_50%_20%)] to-[hsl(28_58%_38%)]"
       }`}
     >
       <span

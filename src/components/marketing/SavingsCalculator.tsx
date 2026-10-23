@@ -102,7 +102,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
           </div>
 
           {/* Výsledek */}
-          <div className="rounded-2xl bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-8 lg:sticky lg:top-24">
+          <div className="rounded-2xl bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(163_70%_13%/0.6)] sm:p-8 lg:sticky lg:top-24">
             <p className="text-sm font-semibold text-white/70">Ušetříte přibližně</p>
             <p
               className="mt-1 whitespace-nowrap text-[2.75rem] font-extrabold leading-tight tracking-tight text-orange-400 tabular-nums min-[400px]:text-5xl sm:text-6xl"
