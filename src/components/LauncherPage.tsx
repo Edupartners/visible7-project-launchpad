@@ -324,7 +324,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </ul>
             <p className="mt-9 inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />
-              Kompletní kurz online podnikání s AI
+              Kompletní kurz online podnikání s podporou AI
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-7xl lg:text-[5rem]">
               Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
