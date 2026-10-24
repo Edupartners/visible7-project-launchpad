@@ -28,6 +28,8 @@ export interface FeaturePageData {
   note: string;
   heroImage: string;
   heroAlt: string;
+  /** Plovoucí karta s čísly v úvodu, nejvýš 2–3 řádky. */
+  heroStats?: [string, string][];
   problemTitle: string;
   problems: { title: string; text: string }[];
   problemNote?: string;
@@ -76,12 +78,13 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
     <div className="min-h-screen bg-background text-foreground">
       <PublicHeader onStart={start} />
       <main>
-        {/* Úvod */}
-        <section className="bg-muted/50">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-8 md:py-20 lg:grid-cols-[1fr_1.1fr] lg:px-12">
+        {/* Úvod: vlevo text, vpravo zelený panel se snímkem aplikace, kartou s čísly a fotkou (jako LivePlan) */}
+        <section className="relative overflow-hidden bg-background">
+          <div aria-hidden="true" className="absolute inset-y-0 right-0 hidden w-[44%] bg-leaf-500 lg:block" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-12 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:px-12 lg:py-24">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-leaf-700">{d.eyebrow}</p>
-              <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-5xl lg:text-[3.4rem]">
+              <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-5xl lg:text-[3.25rem]">
                 {d.title}
               </h1>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">{d.lead}</p>
@@ -89,25 +92,44 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
                 <button
                   type="button"
                   onClick={start}
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
+                  className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
                 >
                   {d.cta} <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </button>
                 <a
                   href="#ukazka"
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+                  className="inline-flex h-14 items-center justify-center gap-2 rounded-full border-2 border-leaf-500 px-6 text-base font-semibold text-leaf-700 transition-colors hover:bg-leaf-50"
                 >
                   Jak to funguje <Play className="h-4 w-4" aria-hidden="true" />
                 </a>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">{d.note}</p>
             </div>
-            <div className="relative">
-              <img
-                src={d.heroImage}
-                alt={d.heroAlt}
-                className="w-full rounded-2xl bg-card shadow-[0_40px_80px_-40px_hsl(160_61%_15%/0.55)]"
-              />
+            <div className="rounded-3xl bg-leaf-500 px-5 py-10 sm:px-10 lg:rounded-none lg:bg-transparent lg:p-0">
+              <div className="relative mx-auto max-w-[520px] pb-16 pt-10 lg:ml-auto lg:mr-0">
+                <img
+                  src={d.heroImage}
+                  alt={d.heroAlt}
+                  className="w-[92%] rounded-2xl bg-white shadow-[0_30px_60px_-25px_rgba(0,0,0,0.45)]"
+                />
+                {d.heroStats && (
+                  <div className="absolute right-0 top-0 rounded-2xl bg-white px-5 py-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)]">
+                    {d.heroStats.map(([label, value]) => (
+                      <p key={label} className="leading-tight [&+p]:mt-3">
+                        <span className="block text-xs font-semibold text-muted-foreground">{label}</span>
+                        <span className="text-xl font-extrabold tracking-tight text-foreground">{value}</span>
+                      </p>
+                    ))}
+                  </div>
+                )}
+                {author?.photo && (
+                  <img
+                    src={author.photo}
+                    alt="Michal Míček, autor metodiky VISIBLE7 MICEK®"
+                    className="absolute bottom-0 right-2 h-28 w-28 rounded-2xl object-cover object-top shadow-[0_20px_40px_-15px_rgba(0,0,0,0.45)] ring-4 ring-white sm:h-32 sm:w-32"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </section>

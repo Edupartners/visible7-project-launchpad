@@ -26,8 +26,12 @@ const FinancialPlanPage = () => {
     lead: "Finanční plán na 24 měsíců hotový za odpoledne. AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy je jen potvrdíte nebo přepíšete.",
     cta: "Začít plán zdarma",
     note: `Test nápadu a brány 1–2 zdarma. Finanční plán je brána 3, součást členství za ${price}.`,
-    heroImage: `${IMG}vysledek.webp`,
-    heroAlt: "Výsledek finančního plánu za 2 roky: obrat, zisk, potřebný kapitál, bod zvratu a graf peněz v projektu",
+    heroImage: `${IMG}graf.webp`,
+    heroAlt: "Graf peněz v projektu: kolik kapitálu potřebujete a kdy se vám peníze vrátí",
+    heroStats: [
+      ["Bod zvratu", "8. měsíc"],
+      ["Potřebný kapitál", "165 805 Kč"],
+    ],
     problemTitle: "Finanční plán si dnes lidé dělají jedním ze tří způsobů. Ani jeden nefunguje.",
     problems: [
       {
