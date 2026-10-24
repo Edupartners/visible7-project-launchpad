@@ -21,7 +21,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
   const [off, setOff] = useState<Record<string, boolean>>({});
 
   const items = [
-    { id: "web", title: "Web nebo e-shop na zakázku", how: "Postavíte si ho sami podle videí", value: WEB },
+    { id: "web", title: "Web nebo e-shop na zakázku", how: "Postavíš si ho sám podle videí", value: WEB },
     { id: "care", title: "Správa webu", how: `${kc(CARE_MONTHLY)} měsíčně × 12 měsíců`, value: CARE_MONTHLY * 12 },
     {
       id: "webinar",
@@ -32,13 +32,13 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
     {
       id: "plan",
       title: "Byznys plán, Lean Canvas a ideace",
-      how: `Z měsíců na 3 dny díky AI: asi ${PLAN_HOURS} hodin vaší práce`,
+      how: `Z měsíců na 3 dny díky AI: asi ${PLAN_HOURS} hodin tvojí práce`,
       value: PLAN_HOURS * rate,
     },
     {
       id: "adv",
       title: "Kontakt na poradce z praxe",
-      how: `Nemusíte hledat ani ověřovat: asi ${ADVISOR_HOURS} hodin`,
+      how: `Nemusíš hledat ani ověřovat: asi ${ADVISOR_HOURS} hodin`,
       value: ADVISOR_HOURS * rate,
     },
   ];
@@ -51,12 +51,12 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8 lg:px-12">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Kalkulačka úspory</p>
         <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight sm:text-[2rem]">
-          Kolik ušetříte, když to zvládnete sami?
+          Kolik ušetříš, když to zvládneš sám?
         </h2>
         <p className="mt-2 text-muted-foreground">Odškrtněte, co byste jinak platili, a nastavte cenu své hodiny.</p>
 
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-10">
-          {/* Co ušetříte */}
+          {/* Co ušetříš */}
           <div className="rounded-2xl border border-border bg-card">
             <ul className="divide-y divide-border">
               {items.map((it) => (
@@ -85,7 +85,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
             </ul>
             <label className="block border-t border-border px-3.5 py-4 text-sm font-semibold sm:px-5">
               <span className="flex items-baseline justify-between gap-3">
-                <span>Kolik stojí hodina vaší práce?</span>
+                <span>Kolik stojí hodina tvojí práce?</span>
                 <b className="whitespace-nowrap text-base text-orange-600">{kc(rate)}</b>
               </span>
               <input
@@ -96,7 +96,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
                 className="mt-2 block h-6 w-full accent-orange-500"
-                aria-label="Cena vaší hodiny"
+                aria-label="Cena tvojí hodiny"
               />
             </label>
           </div>
@@ -134,17 +134,17 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
               }}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 text-[15px] font-semibold text-white hover:bg-orange-600"
             >
-              Otestovat nápad zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Začít plán zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">
           Pro srovnání: <b className="text-foreground">kurz Specialista internetového obchodu s lektorem</b> stojí v Edu
-          Partners <b className="text-foreground">49&nbsp;000&nbsp;Kč</b>. VISIBLE7 vás provede stejnou cestou.
+          Partners <b className="text-foreground">49&nbsp;000&nbsp;Kč</b>. VISIBLE7 tě provede stejnou cestou.
         </p>
         <p className="mt-1.5 text-xs text-muted-foreground">
-          Orientační odhad podle cen z praxe. Skutečná úspora závisí na vašem projektu. Další konzultace se seniorními
+          Orientační odhad podle cen z praxe. Skutečná úspora závisí na tvém projektu. Další konzultace se seniorními
           poradci nejsou součástí členství, platí se zvlášť.
         </p>
       </div>

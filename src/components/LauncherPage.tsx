@@ -7,6 +7,7 @@ import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
+import { BankWaitlist } from "@/components/marketing/BankWaitlist";
 import {
   ArrowRight,
   Award,
@@ -32,7 +33,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
   {
     name: "Vize",
     icon: Target,
-    does: "Najdete místo mezi levnou a prémiovou konkurencí.",
+    does: "Najdeš místo mezi levnou a prémiovou konkurencí.",
     get: "Křivka hodnoty a USP",
     tags: ["Video"],
     sample: "USP: e-shop za víkend bez programátora",
@@ -56,7 +57,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
   {
     name: "Implementace",
     icon: Wrench,
-    does: "Postup a nástroje pro váš typ byznysu: web, e-shop, kurz, předplatné…",
+    does: "Postup a nástroje pro tvůj typ byznysu: web, e-shop, kurz, předplatné…",
     get: "Plán tvorby krok za krokem",
     tags: ["Video"],
     sample: "Video: jak spustit e-shop",
@@ -64,7 +65,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
   {
     name: "Budování poptávky",
     icon: BarChart3,
-    does: "Kanály seřazené podle toho, kde váš zákazník opravdu nakupuje.",
+    does: "Kanály seřazené podle toho, kde tvůj zákazník opravdu nakupuje.",
     get: "Ověřené kanály a rozpočet",
     tags: ["Video", "Výpočet"],
     sample: "Meta Ads: doporučeno",
@@ -72,7 +73,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
   {
     name: "Launch",
     icon: Rocket,
-    does: "Spustíte hotový základ, ne dokonalý projekt, a měříte, co funguje.",
+    does: "Spustíš hotový základ, ne dokonalý projekt, a měříš, co funguje.",
     get: "Spuštěný projekt a ukazatele",
     tags: ["Video"],
     sample: "První zákazník",
@@ -88,9 +89,9 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
 ];
 
 const STEPS = [
-  { title: "Test nápadu", meta: "10 minut · zdarma", text: "Uvidíte, kde je váš nápad silný a co ověřit jako první." },
-  { title: "Brány 1–2", meta: "zdarma", text: "Ujasníte si, pro koho to je a jak bude byznys fungovat." },
-  { title: "Celá cesta", meta: "PRICE", text: "Čísla, web, marketing a spuštění. S videi, AI a poradci." },
+  { title: "Otestuj nápad do 3 minut", meta: "zdarma", text: "Zjistíš, jestli o to někdo stojí a zaplatí." },
+  { title: "Čísla, která sedí", meta: "zdarma", text: "Tržby, náklady, daně a bod zvratu spočítané za tebe." },
+  { title: "Hotový plán", meta: "PRICE", text: "Sedm fází od vize po škálování, s videi, AI a poradci." },
 ];
 
 const FAIL_REASONS: [string, string][] = [
@@ -100,11 +101,11 @@ const FAIL_REASONS: [string, string][] = [
   ],
   [
     "Nevědí, jak nastavit marketing",
-    "Kanály vybrané pro váš typ byznysu, testovací rozpočet a postup ke každému z nich.",
+    "Kanály vybrané pro tvůj typ byznysu, testovací rozpočet a postup ke každému z nich.",
   ],
   [
     "Mají mylnou představu o velikosti podnikání",
-    "Plán z vašich čísel: kolik opravdu potřebujete a kdy vás projekt uživí.",
+    "Plán z tvých čísel: kolik opravdu potřebuješ a kdy tě projekt uživí.",
   ],
 ];
 
@@ -112,7 +113,7 @@ const SHOWCASE = [
   {
     eyebrow: "Byznys case s AI",
     title: "Finanční plán na 24 měsíců hotový za odpoledne",
-    text: "AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy jen potvrdíte nebo přepíšete. Spočítáme potřebný kapitál, bod zvratu i maximální cenu za zákazníka.",
+    text: "AI navrhne ceny, marže a náklady obvyklé ve tvém oboru a vysvětlí proč. Ty jen potvrdíš nebo přepíšeš. Spočítáme potřebný kapitál, bod zvratu i maximální cenu za zákazníka.",
     cta: "Vyzkoušet zdarma",
     image: "/landing/ukazka-byznys-case.webp",
     alt: "Byznys case: AI doporučuje marži a odchodovost s vysvětlením",
@@ -121,8 +122,8 @@ const SHOWCASE = [
   },
   {
     eyebrow: "Marketing napojený na AI",
-    title: "12 marketingových kanálů. AI vám řekne, kterými začít",
-    text: "Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Aplikace je seřadí podle vašeho typu byznysu, zákazníka a rozpočtu. Ke každému kanálu máte postup krok za krokem, záznamy z přednášek, testovací rozpočet a maximální PNO z vašeho byznys casu, takže víte, kam dát peníze.",
+    title: "12 marketingových kanálů. AI ti řekne, kterými začít",
+    text: "Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Aplikace je seřadí podle tvého typu byznysu, zákazníka a rozpočtu. Ke každému kanálu máš postup krok za krokem, záznamy z přednášek, testovací rozpočet a maximální PNO z tvého byznys casu, takže víš, kam dát peníze.",
     cta: "Najít moje kanály",
     image: "/landing/ukazka-marketing.webp",
     alt: "Doporučené marketingové kanály seřazené podle typu byznysu, hodnocení AI a rozpočtu",
@@ -131,8 +132,8 @@ const SHOWCASE = [
   },
   {
     eyebrow: "Mapa cesty A → D",
-    title: "Zjistěte, kdy můžete dát výpověď",
-    text: "Aplikace z vašich čísel spočítá, kdy přijdou první zákazníci, kdy vás projekt uživí a kdy unese prvního spolupracovníka. S každou úpravou plánu se mapa zpřesní.",
+    title: "Zjisti, kdy můžeš dát výpověď",
+    text: "Aplikace z tvých čísel spočítá, kdy přijdou první zákazníci, kdy tě projekt uživí a kdy unese prvního spolupracovníka. S každou úpravou plánu se mapa zpřesní.",
     cta: "Spočítat moji cestu",
     image: "/landing/ukazka-mapa-cesty.webp",
     alt: "Mapa cesty: dnes, první zákazníci, živí mě to, roste to beze mě",
@@ -151,23 +152,23 @@ const CERT_STEPS: [string, string][] = [
 const FAQ = [
   [
     "Je test nápadu opravdu zdarma?",
-    "Ano. Stačí registrace e-mailem, platební kartu nezadáváte. Zdarma jsou i brány 1 a 2.",
+    "Ano. Stačí registrace e-mailem, platební kartu nezadáváš. Zdarma jsou i brány 1 a 2.",
   ],
   [
     "Jak přesný je výsledek testu nápadu?",
-    "Je to první odhad z vašich odpovědí a obvyklých čísel v oboru, ne záruka. Ukáže, kde je nápad silný a co ověřit jako první. Se skutečnými čísly v bráně 3 se zpřesní.",
+    "Je to první odhad z tvých odpovědí a obvyklých čísel v oboru, ne záruka. Ukáže, kde je nápad silný a co ověřit jako první. Se skutečnými čísly v bráně 3 se zpřesní.",
   ],
   [
     "Musím umět programovat nebo rozumět technice?",
-    "Ne. Web nebo e-shop postavíte v hotovém nástroji, většinu technické práce udělá AI a na zbytek máte video, kde je vidět každé kliknutí.",
+    "Ne. Web nebo e-shop postavíš v hotovém nástroji, většinu technické práce udělá AI a na zbytek máš video, kde je vidět každé kliknutí.",
   ],
   [
     "Potřebuji na začátek hodně peněz?",
-    "Ne. Začíná se tím, kolik si můžete dovolit ztratit. Aplikace spočítá, kolik opravdu potřebujete, a nejdřív ověříte zájem, teprve potom investujete.",
+    "Ne. Začíná se tím, kolik si můžeš dovolit ztratit. Aplikace spočítá, kolik opravdu potřebuješ, a nejdřív ověříš zájem, teprve potom investuješ.",
   ],
   [
-    "Bojím se, že něco porušíme a přijde pokuta.",
-    "Základní povinnosti (živnost, obchodní podmínky, GDPR) projdete krok za krokem a s poradcem, který se tomu věnuje každý den.",
+    "Bojím se, že něco poruším a přijde pokuta.",
+    "Základní povinnosti (živnost, obchodní podmínky, GDPR) projdeš krok za krokem a s poradcem, který se tomu věnuje každý den.",
   ],
   [
     "Prodávám službu, ne produkt. Hodí se to i pro mě?",
@@ -175,17 +176,17 @@ const FAQ = [
   ],
   [
     "Co když ještě nemám nápad?",
-    "Začněte bránou 1. Strategie modrého oceánu je přesně nástroj na to, jak najít místo, kde nebudete jen další z mnoha.",
+    "Začni bránou 1. Strategie modrého oceánu je přesně nástroj na to, jak najít místo, kde nebudeš jen další z mnoha.",
   ],
   [
     "Jak pracuje AI s mými daty?",
-    "AI vidí jen to, co do projektu napíšete, a jen když ji sami zavoláte. Data jsou uložena v EU.",
+    "AI vidí jen to, co do projektu napíšeš, a jen když ji sám zavoláš. Data jsou uložena v EU.",
   ],
   [
     "Co jsou živé semináře?",
-    "Každých 14 dní 90 minut online s lektory Edu Partners: AI, SEO, reklama, WordPress, affiliate a další. Výklad, práce na projektech účastníků a otázky. Jsou součástí členství, záznamy najdete v aplikaci.",
+    "Každých 14 dní 90 minut online s lektory Edu Partners: AI, SEO, reklama, WordPress, affiliate a další. Výklad, práce na projektech účastníků a otázky. Jsou součástí členství, záznamy najdeš v aplikaci.",
   ],
-  ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
+  ["Obnovuje se předplatné samo?", "Ne. Platíš jednorázově za zvolené období. Po jeho skončení tvoje data zůstanou."],
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
 ];
 
@@ -302,9 +303,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary/90"
       >
         <Store className="hidden h-4 w-4 shrink-0 text-orange-300 sm:block" aria-hidden="true" />
-        <span className="sm:hidden">Už podnikáte? Získejte zákazníky i online</span>
+        <span className="sm:hidden">Už podnikáš? Získej zákazníky i online</span>
         <span className="hidden sm:inline">
-          Už podnikáte offline? Poradci vám ukážou, kde vám online přinese nové zákazníky
+          Už podnikáš offline? Poradci ti ukážou, kde ti online přinese nové zákazníky
         </span>
         <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
       </a>
@@ -324,26 +325,38 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </ul>
             <p className="mt-9 inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />
-              Kompletní kurz online podnikání s podporou AI
+              Podnikatelský plán s AI · metodika VISIBLE7 MICEK®
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-7xl lg:text-[5rem]">
-              Otestujte svůj podnikatelský nápad do&nbsp;10&nbsp;minut.
+              Vytvoř si plán, který ti <span className="text-orange-600">vydělá peníze</span>.
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              100+ videonávodů krok za krokem. Naučíte se rozjet byznys kvalifikovaně, od nápadu až po první zákazníky.
+              Ověřený nápad, reálná čísla a AI, která za tebe udělá tu nejtěžší práci. VISIBLE7 tě provede sedmi kroky od
+              nápadu až k hotovému plánu.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <Cta onClick={onAccessGranted}>Otestovat nápad zdarma</Cta>
+              <Cta onClick={onAccessGranted}>Začít plán zdarma</Cta>
               <a
-                href="#video"
+                href="#uvnitr"
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
               >
                 Jak to funguje
                 <Play className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Test nápadu a brány 1–2 ze 7 zdarma · pro registraci stačí e-mail
+            <button
+              type="button"
+              onClick={() => {
+                track("hero_idea_test_click", {});
+                onAccessGranted();
+              }}
+              className="mt-5 inline-flex items-center gap-2 font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary"
+            >
+              <Lightbulb className="h-4 w-4 text-orange-600" aria-hidden="true" />
+              Nebo nejdřív otestuj nápad do 3 minut, zdarma
+            </button>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Pro registraci stačí e-mail. Platební kartu nezadáváš.
             </p>
           </div>
           <div id="video" className="mx-auto mt-14 max-w-6xl scroll-mt-24">
@@ -351,11 +364,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
-        {/* Co vás čeká */}
+        {/* Jak to funguje */}
         <section id="uvnitr" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
             <div className="mx-auto max-w-6xl px-4 py-10 sm:px-8 lg:px-12">
-              <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Co vás čeká</h2>
+              <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Jak to funguje</h2>
               <ol className="mt-6 grid gap-4 md:grid-cols-3">
                 {STEPS.map((st, i) => (
                   <li key={st.title} className="flex gap-4 rounded-2xl bg-background p-5">
@@ -380,6 +393,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
+        <BankWaitlist />
+
         {/* Proč projekty krachují + slovo autora */}
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8 md:py-24 lg:px-12">
           <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
@@ -399,7 +414,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <blockquote className="text-lg leading-relaxed text-white/90">
                 „Lidé k nám přicházejí s představou, že podnikání není pro ně. Odcházejí s tím, že vědí, jak začít, a
                 zvládnou to sami. Většina kurzů má osnovu a všichni se jí musí podřídit. U nás je to naopak: cesta se
-                ohne podle vás. A nejde o to mít peníze na velkou věc. Začněte s málem, škálujte až potom.“
+                ohne podle tebe. A nejde o to mít peníze na velkou věc. Začni s málem, škáluj až potom.“
               </blockquote>
               <figcaption className="mt-6 flex items-center gap-4">
                 {author?.photo && (
@@ -425,7 +440,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
               <div>
                 <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Když se zaseknete, zavoláte člověku
+                  Když se zasekneš, zavoláš člověku
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground">
                   16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
@@ -457,7 +472,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         <section className="mx-auto max-w-6xl px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Podnikatelský plán, kterému můžete věřit. Bez Excelu a bez teorie.
+              Podnikatelský plán, kterému můžeš věřit. Bez Excelu a bez teorie.
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">Každý krok je hotový výstup, ne lekce.</p>
           </div>
@@ -505,7 +520,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
                   <p className="mt-4 text-lg text-white/70">
-                    Jdete krok za krokem. Výstup každé brány otevře tu další, takže nic důležitého nepřeskočíte.
+                    Jdeš krok za krokem. Výstup každé brány otevře tu další, takže nic důležitého nepřeskočíš.
                   </p>
                 </div>
                 <ul className="flex gap-2 text-sm" aria-label="Legenda">
@@ -598,11 +613,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <div className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Začněte zdarma. Celá cesta za {kc(shop.price)}.
+                Začni zdarma. Celá cesta za {kc(shop.price)}.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Test nápadu a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
-                semináře každých 14 dní. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
+                Test nápadu a brány 1 a 2 vyzkoušíš zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
+                semináře každých 14 dní. Platíš jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
                 {shop.anchor}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -614,8 +629,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
-                ["Test nápadu (10 minut) a brány 1–2", "0 Kč"],
-                ["Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma", "0 Kč"],
+                ["Test nápadu (3 minuty) a brány 1–2", "0 Kč"],
+                ["Zjisti, jaký jsi typ podnikatele, a získej 3 dny zdarma", "0 Kč"],
                 [`Členství na ${monthsLabel(shop.months)}: 7 bran a živé semináře`, `${kc(shop.price)}`],
               ].map(([name, price]) => (
                 <div key={name} className="flex items-baseline justify-between gap-4 px-5 py-4">
@@ -627,7 +642,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <dt className="min-w-0">
                   <span className="block font-semibold">Úvodní konzultace s expertem, 20 minut</span>
                   <span className="block text-sm text-muted-foreground">
-                    Online videohovor bez závazku: projdeme váš nápad a doporučíme, kterou cestou jít.{" "}
+                    Online videohovor bez závazku: projdeme tvůj nápad a doporučíme, kterou cestou jít.{" "}
                     <a
                       href={FREE_CONSULT_URL}
                       target="_blank"
@@ -686,17 +701,17 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Štěstí přeje odvážným. A připraveným.
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-lg text-white/70">
-                Za 10 minut zjistíte, jestli má váš nápad místo na trhu. Zdarma.
+                Za 3 minuty zjistíš, jestli má tvůj nápad místo na trhu. Zdarma.
               </p>
               <div className="mt-10">
                 <Cta onClick={onAccessGranted} light>
-                  Otestovat nápad zdarma
+                  Začít plán zdarma
                 </Cta>
               </div>
               <p className="mt-6 text-sm text-white/50">
-                Už máte účet?{" "}
+                Už máš účet?{" "}
                 <Link to="/home" className="font-semibold text-white underline-offset-4 hover:underline">
-                  Přihlaste se
+                  Přihlas se
                 </Link>
               </p>
             </div>
