@@ -37,7 +37,7 @@ export const BankWaitlist = () => {
       <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 md:grid-cols-[1.2fr_1fr] md:py-20 lg:px-12">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-orange-300 bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-800">
+            <p className="inline-flex items-center gap-2 rounded-full border border-leaf-300 bg-leaf-50 px-3 py-1 text-sm font-semibold text-leaf-800">
               <Landmark className="h-4 w-4" aria-hidden="true" />
               Připravujeme
             </p>
@@ -49,7 +49,7 @@ export const BankWaitlist = () => {
             <ul className="mt-6 space-y-3">
               {POINTS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex gap-3">
-                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" aria-hidden="true" />
+                  <Icon className="mt-0.5 h-5 w-5 shrink-0 text-leaf-600" aria-hidden="true" />
                   <span className="font-medium">{text}</span>
                 </li>
               ))}
@@ -69,7 +69,7 @@ export const BankWaitlist = () => {
                 <button
                   type="button"
                   onClick={() => setState("open")}
-                  className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-base font-semibold text-white transition-colors hover:bg-orange-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300"
+                  className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
                 >
                   Chci to mezi prvními
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
@@ -90,12 +90,12 @@ export const BankWaitlist = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jmeno@firma.cz"
-                  className="mt-3 h-14 w-full rounded-xl border border-border bg-background px-4 text-base focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300"
+                  className="mt-3 h-14 w-full rounded-xl border border-border bg-background px-4 text-base focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
                 />
                 <button
                   type="submit"
                   disabled={state === "sending"}
-                  className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-7 text-base font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-60"
+                  className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 disabled:opacity-60"
                 >
                   {state === "sending" ? "Odesílám…" : "Chci to mezi prvními"}
                 </button>

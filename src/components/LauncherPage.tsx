@@ -249,7 +249,7 @@ const HeroVideo = ({ photo }: { photo?: string }) => {
       </div>
     );
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-primary shadow-[0_40px_80px_-40px_hsl(216_62%_24%/0.6)] sm:aspect-[16/8]">
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-primary shadow-[0_40px_80px_-40px_hsl(160_61%_15%/0.6)] sm:aspect-[16/8]">
       {photo && (
         <img
           src={photo}
@@ -265,9 +265,9 @@ const HeroVideo = ({ photo }: { photo?: string }) => {
             setPlaying(true);
             track("hero_video_play", {});
           }}
-          className="flex min-h-11 items-center gap-3 rounded-full bg-[hsl(216_40%_13%/0.88)] py-2 pl-2 pr-5 text-left text-sm text-white backdrop-blur transition-colors hover:bg-[hsl(216_40%_13%)] disabled:cursor-default sm:text-base"
+          className="flex min-h-11 items-center gap-3 rounded-full bg-[hsl(160_61%_10%/0.88)] py-2 pl-2 pr-5 text-left text-sm text-white backdrop-blur transition-colors hover:bg-[hsl(160_61%_10%)] disabled:cursor-default sm:text-base"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-leaf-500">
             <Play className="h-4 w-4 fill-white text-white" aria-hidden="true" />
           </span>
           <span>
@@ -298,8 +298,8 @@ const Cta = ({
   <button
     type="button"
     onClick={onClick}
-    className={`inline-flex h-14 items-center justify-center gap-2 rounded-xl px-7 text-base font-semibold transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300 ${
-      light ? "bg-white text-primary hover:bg-white/90" : "bg-orange-500 text-white hover:bg-orange-600"
+    className={`inline-flex h-14 items-center justify-center gap-2 rounded-xl px-7 text-base font-semibold transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300 ${
+      light ? "bg-white text-primary hover:bg-white/90" : "bg-leaf-500 text-white hover:bg-leaf-600"
     }`}
   >
     {children}
@@ -337,7 +337,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         href="#poradci"
         className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary/90"
       >
-        <Store className="hidden h-4 w-4 shrink-0 text-orange-300 sm:block" aria-hidden="true" />
+        <Store className="hidden h-4 w-4 shrink-0 text-leaf-300 sm:block" aria-hidden="true" />
         <span className="sm:hidden">Už podnikáš? Získej zákazníky i online</span>
         <span className="hidden sm:inline">
           Už podnikáš offline? Poradci ti ukážou, kde ti online přinese nové zákazníky
@@ -359,11 +359,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               ))}
             </ul>
             <p className="mt-9 inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
-              <Award className="h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />
+              <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
               Podnikatelský plán s AI · metodika VISIBLE7 MICEK®
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-7xl lg:text-[5rem]">
-              Vytvoř si plán, který ti <span className="text-orange-600">vydělá peníze</span>.
+              Vytvoř si plán, který ti <span className="whitespace-nowrap text-leaf-500 underline decoration-leaf-200 decoration-[0.12em] underline-offset-[0.14em]">vydělá peníze</span>.
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
               Ověřený nápad, reálná čísla a AI, která za tebe udělá tu nejtěžší práci.
@@ -386,7 +386,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               }}
               className="mt-5 inline-flex items-center gap-2 font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary"
             >
-              <Lightbulb className="h-4 w-4 text-orange-600" aria-hidden="true" />
+              <Lightbulb className="h-4 w-4 text-leaf-600" aria-hidden="true" />
               Nebo nejdřív otestuj nápad do 3 minut, zdarma
             </button>
             <p className="mt-3 text-sm text-muted-foreground">
@@ -411,7 +411,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                     </span>
                     <div>
                       <p className="font-bold">{st.title}</p>
-                      <p className="text-sm font-semibold text-orange-700">
+                      <p className="text-sm font-semibold text-leaf-700">
                         {st.meta === "PRICE" ? kc(shop.price) : st.meta}
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">{st.text}</p>
@@ -437,7 +437,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <p className="mt-3 text-lg text-muted-foreground">A jak tomu předejít.</p>
               <ul className="mt-8 space-y-5">
                 {FAIL_REASONS.map(([why, fix]) => (
-                  <li key={why} className="border-l-4 border-orange-400 pl-4">
+                  <li key={why} className="border-l-4 border-leaf-400 pl-4">
                     <p className="font-bold">{why}</p>
                     <p className="mt-1 text-muted-foreground">{fix}</p>
                   </li>
@@ -518,7 +518,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               className="mt-16 grid grid-cols-1 items-center gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16"
             >
               <div className={i % 2 ? "lg:order-2" : ""}>
-                <p className="text-sm font-bold uppercase tracking-[0.08em] text-orange-700">{b.eyebrow}</p>
+                <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">{b.eyebrow}</p>
                 <h3 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
                   {b.title}
                 </h3>
@@ -538,7 +538,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   width={b.width}
                   height={b.height}
                   loading="lazy"
-                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(216_62%_24%/0.5)]"
+                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(160_61%_15%/0.5)]"
                 />
                 <figcaption className="mt-2 text-center text-xs text-muted-foreground">Ukázka z aplikace</figcaption>
               </figure>
@@ -561,7 +561,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   to={to}
                   className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
                 >
-                  <Icon className="h-7 w-7 text-orange-600" aria-hidden="true" />
+                  <Icon className="h-7 w-7 text-leaf-600" aria-hidden="true" />
                   <span className="mt-4 text-lg font-bold">{title}</span>
                   <span className="mt-2 flex-1 text-muted-foreground">{text}</span>
                   <span className="mt-5 inline-flex items-center gap-1.5 font-semibold text-primary group-hover:underline group-hover:underline-offset-4">
@@ -596,12 +596,12 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </div>
               <ol className="relative mt-12 grid gap-y-3 lg:grid-cols-7 lg:gap-x-3">
                 <span
-                  className="absolute left-[1.375rem] top-6 bottom-6 w-0.5 bg-gradient-to-b from-[hsl(var(--gate-copper))] to-white/25 lg:left-[7%] lg:right-[7%] lg:top-[1.375rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
+                  className="absolute left-[1.375rem] top-6 bottom-6 w-0.5 bg-gradient-to-b from-leaf-400 to-white/25 lg:left-[7%] lg:right-[7%] lg:top-[1.375rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
                   aria-hidden="true"
                 />
                 {GATES.map((g, i) => (
                   <li key={g.name} className="relative flex gap-4 lg:flex-col lg:items-center lg:gap-0 lg:text-center">
-                    <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--gate-copper))] text-lg font-extrabold shadow-[0_0_0_5px_hsl(var(--primary))]">
+                    <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-leaf-500 text-lg font-extrabold shadow-[0_0_0_5px_hsl(var(--primary))]">
                       {i + 1}
                     </span>
                     <div className="lg:mt-4">
@@ -628,7 +628,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 ))}
               </ol>
               <div className="mt-8 grid gap-3 text-sm font-semibold lg:grid-cols-7 lg:gap-x-3">
-                <p className="flex items-center justify-center gap-2 rounded-full bg-[hsl(var(--gate-copper))] px-4 py-2 lg:col-span-5">
+                <p className="flex items-center justify-center gap-2 rounded-full bg-leaf-500 px-4 py-2 lg:col-span-5">
                   <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
                   Brány 1–5: certifikace {SPECIALIST_TITLE}
                 </p>
@@ -643,7 +643,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
         {/* Certifikace – krátce, celý program je na /certifikace */}
         <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-[hsl(var(--gate-copper))] text-white">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-leaf-500 text-white">
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.2fr_1fr] md:py-20">
               <div>
                 <p className="font-semibold text-white/80">Certifikace</p>
@@ -654,14 +654,14 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 </p>
                 <Link
                   to="/certifikace"
-                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-[hsl(var(--gate-copper))] hover:bg-white/90"
+                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-leaf-600 hover:bg-white/90"
                 >
                   Celý program a osvědčení <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </div>
               <ol className="space-y-px overflow-hidden rounded-2xl bg-white/20">
                 {CERT_STEPS.map(([when, what]) => (
-                  <li key={when} className="flex gap-4 bg-[hsl(28_58%_34%)] p-4">
+                  <li key={when} className="flex gap-4 bg-leaf-700 p-4">
                     <span className="w-24 shrink-0 text-sm text-white/70">{when}</span>
                     <span className="font-semibold">{what}</span>
                   </li>
@@ -701,7 +701,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{price}</dd>
                 </div>
               ))}
-              <div className="flex items-center justify-between gap-4 bg-orange-50 px-5 py-4">
+              <div className="flex items-center justify-between gap-4 bg-leaf-50 px-5 py-4">
                 <dt className="min-w-0">
                   <span className="block font-semibold">Úvodní konzultace s expertem, 20 minut</span>
                   <span className="block text-sm text-muted-foreground">
@@ -711,17 +711,17 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => track("free_consult_click", { from: "landing_cenik" })}
-                      className="font-semibold text-orange-700 underline-offset-4 hover:underline"
+                      className="font-semibold text-leaf-700 underline-offset-4 hover:underline"
                     >
                       Vybrat termín
                     </a>
                   </span>
                 </dt>
-                <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight text-orange-700">Zdarma</dd>
+                <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight text-leaf-700">Zdarma</dd>
               </div>
               <div className="space-y-1 px-5 py-3 text-sm text-muted-foreground">
                 {offer && offer.left > 0 && (
-                  <p className="font-semibold text-orange-800">
+                  <p className="font-semibold text-leaf-800">
                     Startovací cena pro prvních {offer.seats} lidí a k ní 20 minut konzultace zdarma. Pak{" "}
                     {kc(offer.next_price)}.
                   </p>

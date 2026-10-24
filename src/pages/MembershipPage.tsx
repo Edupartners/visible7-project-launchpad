@@ -59,7 +59,7 @@ const MembershipPage = () => {
       <div className="min-h-screen bg-background text-foreground">
         <PublicHeader onStart={() => navigate("/home?novy")} />
         <main className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-8 lg:py-24">
-          <PartyPopper className="mx-auto h-12 w-12 text-orange-500" />
+          <PartyPopper className="mx-auto h-12 w-12 text-leaf-500" />
           <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Děkujeme, platba je přijatá</h1>
           <p className="mt-5 text-lg text-muted-foreground">
             Členství VISIBLE7 se vám zapne do pár minut
@@ -76,7 +76,7 @@ const MembershipPage = () => {
             <button
               type="button"
               onClick={() => navigate(email ? "/home" : "/home?novy")}
-              className="flex h-12 items-center justify-center rounded-xl bg-orange-500 px-7 font-semibold text-white hover:bg-orange-600"
+              className="flex h-12 items-center justify-center rounded-xl bg-leaf-500 px-7 font-semibold text-white hover:bg-leaf-600"
             >
               {email ? "Pokračovat v projektu" : "Přihlásit se nebo zaregistrovat"}
             </button>
@@ -99,7 +99,7 @@ const MembershipPage = () => {
       <PublicHeader onStart={() => navigate("/home?novy")} />
       <main className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:px-12 lg:py-16">
         <section>
-          <p className="font-semibold text-orange-700">Členství VISIBLE7</p>
+          <p className="font-semibold text-leaf-700">Členství VISIBLE7</p>
           <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">
             Celá cesta od nápadu k prvním zákazníkům
           </h1>
@@ -124,8 +124,8 @@ const MembershipPage = () => {
         </section>
 
         <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
-          <div className="mb-4 flex gap-3 rounded-xl bg-orange-50 p-4 text-sm">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-orange-700" />
+          <div className="mb-4 flex gap-3 rounded-xl bg-leaf-50 p-4 text-sm">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-leaf-700" />
             <p>
               {email ? (
                 <>
@@ -147,7 +147,7 @@ const MembershipPage = () => {
               href={shop.checkout_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-12 items-center justify-center rounded-xl bg-orange-500 font-semibold text-white hover:bg-orange-600"
+              className="flex h-12 items-center justify-center rounded-xl bg-leaf-500 font-semibold text-white hover:bg-leaf-600"
             >
               Přejít k objednávce
             </a>

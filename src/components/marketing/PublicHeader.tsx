@@ -12,12 +12,12 @@ const MenuItem = ({ item, onStart, onNavigate }: { item: NavLinkItem; onStart: (
   const Icon = item.icon;
   const body = (
     <>
-      <Icon className="mt-0.5 h-6 w-6 shrink-0 text-orange-600" aria-hidden="true" />
+      <Icon className="mt-0.5 h-6 w-6 shrink-0 text-leaf-600" aria-hidden="true" />
       <span className="min-w-0">
         <span className="flex flex-wrap items-center gap-2 font-bold leading-snug text-foreground group-hover:text-primary">
           {item.title}
           {item.badge && (
-            <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-semibold text-orange-800">
+            <span className="rounded-full bg-leaf-100 px-2 py-0.5 text-[11px] font-semibold text-leaf-800">
               {item.badge}
             </span>
           )}
@@ -70,7 +70,7 @@ const FeatureCard = ({ f, onStart, onNavigate }: { f: NavFeature; onStart: () =>
       {cta}
     </>
   );
-  const cls = "group block h-full rounded-2xl bg-orange-50/70 p-6 text-left";
+  const cls = "group block h-full rounded-2xl bg-leaf-50/70 p-6 text-left";
   if (f.start)
     return (
       <button type="button" onClick={onStart} className={cls}>
@@ -197,7 +197,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
           <button
             type="button"
             onClick={start}
-            className="hidden whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-white hover:bg-[hsl(var(--primary-hover))] sm:block"
+            className="hidden whitespace-nowrap rounded-full bg-leaf-500 px-5 py-2.5 text-white hover:bg-leaf-600 sm:block"
           >
             Začít zdarma
           </button>
@@ -250,7 +250,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
           <button
             type="button"
             onClick={start}
-            className="mt-6 w-full rounded-full bg-primary px-5 py-3.5 font-semibold text-white hover:bg-[hsl(var(--primary-hover))]"
+            className="mt-6 w-full rounded-full bg-leaf-500 px-5 py-3.5 font-semibold text-white hover:bg-leaf-600"
           >
             Začít plán zdarma
           </button>

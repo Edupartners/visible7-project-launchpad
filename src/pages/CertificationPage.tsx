@@ -66,7 +66,7 @@ const CertificationPage = () => {
       <PublicHeader onStart={start} />
       <main>
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-8 md:pt-16 lg:px-12">
-          <p className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3.5 py-1.5 text-sm font-semibold text-orange-800">
+          <p className="inline-flex items-center gap-2 rounded-full border border-leaf-200 bg-leaf-50 px-3.5 py-1.5 text-sm font-semibold text-leaf-800">
             <Award className="h-4 w-4" aria-hidden="true" /> Certifikace VISIBLE7 MICEK®
           </p>
           <h1 className="mt-5 max-w-4xl text-4xl font-extrabold tracking-tight sm:text-6xl">{SPECIALIST_TITLE}</h1>
@@ -78,7 +78,7 @@ const CertificationPage = () => {
             <button
               type="button"
               onClick={start}
-              className="rounded-xl bg-orange-500 px-6 py-4 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-orange-600"
+              className="rounded-xl bg-leaf-500 px-6 py-4 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-leaf-600"
             >
               Otestovat nápad zdarma
             </button>
@@ -121,7 +121,7 @@ const CertificationPage = () => {
               <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {syllabus.map((s) => (
                   <div key={s.phase} id={`brana-${s.phase}`} className="scroll-mt-24 rounded-2xl bg-card p-6">
-                    <p className="text-sm font-semibold text-orange-700">
+                    <p className="text-sm font-semibold text-leaf-700">
                       Brána {s.phase}
                       {s.phase > 5 && <span className="ml-2 text-muted-foreground">· pro VISIBLE7 Gold</span>}
                     </p>
@@ -177,7 +177,7 @@ const CertificationPage = () => {
         </section>
 
         <section className="px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-[hsl(var(--gate-copper))] text-white">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-leaf-500 text-white">
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.3fr_1fr] md:py-20">
               <div>
                 <p className="font-semibold text-white/80">Volitelně, po bráně {NSK_QUALIFICATION.unlockGate}</p>
@@ -205,7 +205,7 @@ const CertificationPage = () => {
                   ["Uznává", "Národní soustava kvalifikací"],
                   ["Přihlášení", `po bráně ${NSK_QUALIFICATION.unlockGate}`],
                 ].map(([l, v]) => (
-                  <div key={l} className="bg-[hsl(28_58%_34%)] p-5">
+                  <div key={l} className="bg-leaf-700 p-5">
                     <dt className="text-sm text-white/70">{l}</dt>
                     <dd className="mt-1 text-xl font-bold">{v}</dd>
                   </div>
@@ -223,7 +223,7 @@ const CertificationPage = () => {
           <button
             type="button"
             onClick={start}
-            className="mt-8 rounded-xl bg-orange-500 px-6 py-4 font-semibold text-white hover:bg-orange-600"
+            className="mt-8 rounded-xl bg-leaf-500 px-6 py-4 font-semibold text-white hover:bg-leaf-600"
           >
             Otestovat nápad zdarma
           </button>

@@ -89,8 +89,8 @@ const PricingPage = () => {
                     {it}
                   </li>
                 ))}
-                <li className="flex gap-2 rounded-lg bg-orange-50 px-2 py-1.5 -mx-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" strokeWidth={3} />
+                <li className="flex gap-2 rounded-lg bg-leaf-50 px-2 py-1.5 -mx-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} />
                   <span>
                     <b>Úvodní konzultace s expertem, 20 minut zdarma.</b>{" "}
                     <a
@@ -98,7 +98,7 @@ const PricingPage = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => track("free_consult_click", { from: "cenik" })}
-                      className="font-semibold text-orange-700 underline underline-offset-2 hover:no-underline"
+                      className="font-semibold text-leaf-700 underline underline-offset-2 hover:no-underline"
                     >
                       Vybrat termín
                     </a>
@@ -125,7 +125,7 @@ const PricingPage = () => {
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {MEMBER_ITEMS.map((it) => (
                   <li key={it} className="flex gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--gate-copper))]" strokeWidth={3} />
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} />
                     {it}
                   </li>
                 ))}
@@ -134,7 +134,7 @@ const PricingPage = () => {
                 <Link
                   to="/clenstvi"
                   onClick={() => track("checkout_click", { source: "cenik", price: shop.price })}
-                  className="mt-6 flex h-12 items-center justify-center rounded-xl bg-orange-500 text-base font-semibold text-white hover:bg-orange-600"
+                  className="mt-6 flex h-12 items-center justify-center rounded-xl bg-leaf-500 text-base font-semibold text-white hover:bg-leaf-600"
                 >
                   Koupit členství
                 </Link>
@@ -223,7 +223,7 @@ const PricingPage = () => {
           <button
             type="button"
             onClick={start}
-            className="mt-10 inline-flex h-14 items-center gap-2 rounded-xl bg-orange-500 px-7 font-semibold text-white hover:bg-orange-600"
+            className="mt-10 inline-flex h-14 items-center gap-2 rounded-xl bg-leaf-500 px-7 font-semibold text-white hover:bg-leaf-600"
           >
             Začít zdarma <ArrowRight className="h-5 w-5" />
           </button>

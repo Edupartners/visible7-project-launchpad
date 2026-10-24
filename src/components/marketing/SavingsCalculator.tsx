@@ -49,7 +49,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
   return (
     <section id="kalkulacka" className="scroll-mt-20 border-y border-border bg-muted/40">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8 lg:px-12">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Kalkulačka úspory</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-700">Kalkulačka úspory</p>
         <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight sm:text-[2rem]">
           Kolik ušetříš, když to zvládneš sám?
         </h2>
@@ -66,7 +66,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                       type="checkbox"
                       checked={!off[it.id]}
                       onChange={() => setOff((o) => ({ ...o, [it.id]: !o[it.id] }))}
-                      className="h-5 w-5 shrink-0 accent-orange-500"
+                      className="h-5 w-5 shrink-0 accent-leaf-500"
                     />
                     <span className={`min-w-0 flex-1 ${off[it.id] ? "opacity-45" : ""}`}>
                       <span className="block font-semibold leading-snug">{it.title}</span>
@@ -86,7 +86,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
             <label className="block border-t border-border px-3.5 py-4 text-sm font-semibold sm:px-5">
               <span className="flex items-baseline justify-between gap-3">
                 <span>Kolik stojí hodina tvojí práce?</span>
-                <b className="whitespace-nowrap text-base text-orange-600">{kc(rate)}</b>
+                <b className="whitespace-nowrap text-base text-leaf-600">{kc(rate)}</b>
               </span>
               <input
                 type="range"
@@ -95,24 +95,24 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 step={50}
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
-                className="mt-2 block h-6 w-full accent-orange-500"
+                className="mt-2 block h-6 w-full accent-leaf-500"
                 aria-label="Cena tvojí hodiny"
               />
             </label>
           </div>
 
           {/* Výsledek */}
-          <div className="rounded-2xl bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(216_62%_24%/0.6)] sm:p-8 lg:sticky lg:top-24">
+          <div className="rounded-2xl bg-primary p-5 text-white shadow-[0_30px_60px_-30px_hsl(160_61%_15%/0.6)] sm:p-8 lg:sticky lg:top-24">
             <p className="text-sm font-semibold text-white/70">Ušetříte přibližně</p>
             <p
-              className="mt-1 whitespace-nowrap text-[2.75rem] font-extrabold leading-tight tracking-tight text-orange-400 tabular-nums min-[400px]:text-5xl sm:text-6xl"
+              className="mt-1 whitespace-nowrap text-[2.75rem] font-extrabold leading-tight tracking-tight text-leaf-400 tabular-nums min-[400px]:text-5xl sm:text-6xl"
               aria-live="polite"
             >
               {kc(total)}
             </p>
             {times >= 2 && (
               <p className="mt-3 text-lg font-semibold">
-                To je <span className="text-orange-300">{times}× víc</span>, než stojí VISIBLE7.
+                To je <span className="text-leaf-300">{times}× víc</span>, než stojí VISIBLE7.
               </p>
             )}
             <div className="mt-5 rounded-xl bg-white/[0.07] px-4 py-3 text-sm">
@@ -121,7 +121,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 {founder && <span className="text-white/70"> (pak {kc(offer.next_price)})</span>}
               </p>
               {founder && (
-                <p className="mt-1 font-semibold text-orange-300">
+                <p className="mt-1 font-semibold text-leaf-300">
                   Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma
                 </p>
               )}
@@ -132,7 +132,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 track("calculator_cta", { total, rate });
                 onStart();
               }}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 text-[15px] font-semibold text-white hover:bg-orange-600"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-leaf-500 px-5 py-3.5 text-[15px] font-semibold text-white hover:bg-leaf-600"
             >
               Začít plán zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>

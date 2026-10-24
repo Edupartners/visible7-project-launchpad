@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* VISIBLE7 MICEK – vizuální styl: bílý papír, inkoustová námořnická modř, měď jen pro získané odznaky a osvědčení */
+/* VISIBLE7 MICEK – vizuální styl: bílý papír, lesní zeleň jako hlavní barva, světlá zeleň pro akce, měď jen pro odznaky v aplikaci */
 
 @layer base {
   :root {
@@ -16,20 +16,20 @@
     --popover: 0 0% 100%;
     --popover-foreground: 163 70% 12%;
 
-    /* Primary: námořnická modř VISIBLE7 */
-    --primary: 216 62% 24%;
+    /* Primary: lesní zeleň VISIBLE7 */
+    --primary: 160 61% 15%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 216 62% 17%;
+    --primary-hover: 160 61% 10%;
 
     /* Secondary: Subtle gray */
     --secondary: 40 14% 95%;
     --secondary-foreground: 163 70% 12%;
 
-    --muted: 40 14% 96%;
+    --muted: 140 20% 96%;
     --muted-foreground: 160 8% 34%;
 
-    --accent: 216 45% 96%;
-    --accent-foreground: 216 62% 24%;
+    --accent: 145 30% 94%;
+    --accent-foreground: 160 61% 15%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -39,7 +39,7 @@
 
     --border: 40 9% 87%;
     --input: 40 7% 80%;
-    --ring: 215 65% 40%;
+    --ring: 150 43% 36%;
 
     /* VISIBLE7 pilot palette */
     --ink: 216 55% 15%;

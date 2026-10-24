@@ -29,6 +29,19 @@ export default {
 				ink: 'hsl(var(--ink))',
 				paper: 'hsl(var(--paper))',
 				'brand-blue': 'hsl(var(--brand-blue))',
+				// Zelená akční barva veřejného webu (tlačítka, ikony, zvýraznění)
+				leaf: {
+					50: '#F1F7F2',
+					100: '#DFEEE3',
+					200: '#C2DFCB',
+					300: '#A3D2B0',
+					400: '#6FB083',
+					500: '#34845A',
+					600: '#2B7350',
+					700: '#22603F',
+					800: '#1B4D33',
+					900: '#133826'
+				},
 				'gate-copper': {
 					DEFAULT: 'hsl(var(--gate-copper))',
 					foreground: 'hsl(var(--gate-copper-foreground))'

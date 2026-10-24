@@ -132,7 +132,7 @@ const WorksheetsPage = () => {
             className={`max-h-full max-w-full object-contain rounded shadow-[0_8px_24px_-10px_rgba(15,23,42,0.45)] transition-transform duration-300 group-hover:scale-[1.03] ${w.free ? "" : "blur-[1.5px] grayscale-[30%]"}`}
           />
           {w.free ? (
-            <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 text-xs font-extrabold text-white">
+            <span className="absolute left-3 top-3 rounded-full bg-leaf-500 px-2.5 py-1 text-xs font-extrabold text-white">
               {BADGE[w.slug] ?? "ZDARMA"}
             </span>
           ) : (
@@ -156,7 +156,7 @@ const WorksheetsPage = () => {
             <button
               type="button"
               onClick={go}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-leaf-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-leaf-600"
             >
               <Download className="h-4 w-4" aria-hidden="true" /> Stáhnout zdarma
             </button>
@@ -180,14 +180,14 @@ const WorksheetsPage = () => {
       <main>
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-12 sm:px-8 md:grid-cols-[1.1fr_1fr] md:pt-16 lg:px-12">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Ke stažení zdarma</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-700">Ke stažení zdarma</p>
             <h1 className="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">
               Pracovní listy, se kterými se nápad mění v plán
             </h1>
             <ul className="mt-6 space-y-2.5 text-lg">
               {WORKSHEET_BENEFITS.map((b) => (
                 <li key={b} className="flex gap-2.5">
-                  <Check className="mt-1 h-5 w-5 shrink-0 text-orange-600" strokeWidth={3} aria-hidden="true" />
+                  <Check className="mt-1 h-5 w-5 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
                   <span>{b}</span>
                 </li>
               ))}
@@ -195,7 +195,7 @@ const WorksheetsPage = () => {
             <button
               type="button"
               onClick={() => open({ slug: BUNDLE.slug, title: BUNDLE.title, file: BUNDLE.file })}
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-4 text-base font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-orange-600"
+              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-leaf-500 px-6 py-4 text-base font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-leaf-600"
             >
               <Download className="h-5 w-5" aria-hidden="true" /> Stáhnout startovní balíček zdarma
             </button>
@@ -222,7 +222,7 @@ const WorksheetsPage = () => {
               />
             </button>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-300">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-300">
                 Plakát zdarma · A3 k tisku
               </p>
               <h2 className="mt-2 text-3xl font-extrabold leading-tight">Celá cesta na jedné stránce</h2>
@@ -230,7 +230,7 @@ const WorksheetsPage = () => {
               <button
                 type="button"
                 onClick={() => open({ slug: POSTER.slug, title: POSTER.title, file: POSTER.file })}
-                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 font-semibold text-white hover:bg-orange-600"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-leaf-500 px-5 py-3.5 font-semibold text-white hover:bg-leaf-600"
               >
                 <Download className="h-5 w-5" aria-hidden="true" /> Stáhnout plakát zdarma
               </button>

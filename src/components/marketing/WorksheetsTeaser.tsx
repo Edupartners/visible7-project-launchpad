@@ -20,7 +20,7 @@ export const WorksheetFan = ({ className = "" }: { className?: string }) => (
         }}
       />
     ))}
-    <span className="absolute right-2 top-2 z-10 rotate-6 rounded-full bg-orange-500 px-3 py-1.5 text-sm font-extrabold text-white shadow-lg sm:right-6">
+    <span className="absolute right-2 top-2 z-10 rotate-6 rounded-full bg-leaf-500 px-3 py-1.5 text-sm font-extrabold text-white shadow-lg sm:right-6">
       ZDARMA
     </span>
   </div>
@@ -29,23 +29,23 @@ export const WorksheetFan = ({ className = "" }: { className?: string }) => (
 /** Blok na úvodní stránce: pracovní listy ke stažení. */
 export const WorksheetsTeaser = () => (
   <section className="px-3 py-2 sm:px-6 lg:px-10">
-    <div className="mx-auto grid max-w-[1280px] items-center gap-8 overflow-hidden rounded-[2rem] bg-orange-50 px-5 py-12 sm:px-10 md:grid-cols-2 md:py-16 lg:px-16">
+    <div className="mx-auto grid max-w-[1280px] items-center gap-8 overflow-hidden rounded-[2rem] bg-leaf-50 px-5 py-12 sm:px-10 md:grid-cols-2 md:py-16 lg:px-16">
       <div>
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">Ke stažení zdarma</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-700">Ke stažení zdarma</p>
         <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
           Pracovní listy, se kterými se nápad mění v plán
         </h2>
         <ul className="mt-5 space-y-2.5">
           {WORKSHEET_BENEFITS.map((b) => (
             <li key={b} className="flex gap-2.5">
-              <Check className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" strokeWidth={3} aria-hidden="true" />
+              <Check className="mt-0.5 h-5 w-5 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
               <span>{b}</span>
             </li>
           ))}
         </ul>
         <Link
           to="/pracovni-listy"
-          className="mt-7 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-orange-600"
+          className="mt-7 inline-flex items-center gap-2 rounded-xl bg-leaf-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-leaf-600"
         >
           <Download className="h-5 w-5" aria-hidden="true" /> Stáhnout listy zdarma
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
