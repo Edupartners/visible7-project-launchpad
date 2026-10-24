@@ -33,6 +33,8 @@ import IdeaTestPage from "./pages/features/IdeaTestPage";
 import BusinessPlanPage from "./pages/features/BusinessPlanPage";
 import MarketingChannelsPage from "./pages/features/MarketingChannelsPage";
 import BankConnectPage from "./pages/features/BankConnectPage";
+import StartBusinessPage from "./pages/features/StartBusinessPage";
+import ExistingBusinessPage from "./pages/features/ExistingBusinessPage";
 import CertificationPage from "./pages/CertificationPage";
 import WorksheetsPage from "./pages/WorksheetsPage";
 import MemberWorksheetsPage from "./pages/MemberWorksheetsPage";
@@ -167,6 +169,8 @@ const App = () => (
           <Route path="/podnikatelsky-plan" element={<BusinessPlanPage />} />
           <Route path="/marketingove-kanaly" element={<MarketingChannelsPage />} />
           <Route path="/napojeni-banky" element={<BankConnectPage />} />
+          <Route path="/zacit-podnikat" element={<StartBusinessPage />} />
+          <Route path="/uz-podnikam" element={<ExistingBusinessPage />} />
           <Route path="/certifikace" element={<CertificationPage />} />
           <Route path="/pracovni-listy" element={<WorksheetsPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />
