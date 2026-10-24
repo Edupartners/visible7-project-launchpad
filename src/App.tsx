@@ -29,6 +29,10 @@ import AdvisorsPage from "./pages/AdvisorsPage";
 import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
 import FinancialPlanPage from "./pages/features/FinancialPlanPage";
+import IdeaTestPage from "./pages/features/IdeaTestPage";
+import BusinessPlanPage from "./pages/features/BusinessPlanPage";
+import MarketingChannelsPage from "./pages/features/MarketingChannelsPage";
+import BankConnectPage from "./pages/features/BankConnectPage";
 import CertificationPage from "./pages/CertificationPage";
 import WorksheetsPage from "./pages/WorksheetsPage";
 import MemberWorksheetsPage from "./pages/MemberWorksheetsPage";
@@ -159,6 +163,10 @@ const App = () => (
           <Route path="/osvedceni/:code" element={<CertificatePage />} />
           <Route path="/cenik" element={<PricingPage />} />
           <Route path="/financni-plan" element={<FinancialPlanPage />} />
+          <Route path="/test-napadu" element={<IdeaTestPage />} />
+          <Route path="/podnikatelsky-plan" element={<BusinessPlanPage />} />
+          <Route path="/marketingove-kanaly" element={<MarketingChannelsPage />} />
+          <Route path="/napojeni-banky" element={<BankConnectPage />} />
           <Route path="/certifikace" element={<CertificationPage />} />
           <Route path="/pracovni-listy" element={<WorksheetsPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />

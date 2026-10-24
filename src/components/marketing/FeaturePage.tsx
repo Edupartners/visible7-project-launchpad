@@ -33,8 +33,10 @@ export interface FeaturePageData {
   problemTitle: string;
   problems: { title: string; text: string }[];
   problemNote?: string;
-  rowsTitle: string;
-  rows: FeatureRow[];
+  rowsTitle?: string;
+  rows?: FeatureRow[];
+  /** Vlastní blok místo řádků se snímky nebo za nimi (např. formulář čekací listiny). */
+  extra?: ReactNode;
   /** Citace uprostřed stránky, jen skutečná. */
   quote?: { text: string; author: string; role: string };
   positioningTitle: string;
@@ -163,40 +165,48 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
         </section>
 
         {/* Řádky se snímky */}
-        <section id="ukazka" className="scroll-mt-20 bg-muted/40 py-16 md:py-24">
-          <h2 className="mx-auto max-w-3xl px-4 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {d.rowsTitle}
-          </h2>
-          <div className="mx-auto mt-14 max-w-6xl space-y-20 px-4 sm:px-8 md:space-y-28 lg:px-12">
-            {d.rows.map((r, i) => (
-              <div key={r.title} className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
-                <div className={i % 2 ? "lg:order-2" : ""}>
-                  <p className="text-sm font-bold uppercase tracking-[0.12em] text-leaf-700">{r.eyebrow}</p>
-                  <h3 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{r.title}</h3>
-                  <div className="mt-4 text-lg leading-relaxed text-muted-foreground">{r.text}</div>
-                  {r.points && (
-                    <ul className="mt-5 space-y-2">
-                      {r.points.map((p) => (
-                        <li key={p} className="flex gap-2.5">
-                          <Check className="mt-1 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
-                          <span>{p}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+        {d.rows && d.rows.length > 0 && (
+          <section id="ukazka" className="scroll-mt-20 bg-muted/40 py-16 md:py-24">
+            <h2 className="mx-auto max-w-3xl px-4 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">
+              {d.rowsTitle}
+            </h2>
+            <div className="mx-auto mt-14 max-w-6xl space-y-20 px-4 sm:px-8 md:space-y-28 lg:px-12">
+              {d.rows.map((r, i) => (
+                <div key={r.title} className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+                  <div className={i % 2 ? "lg:order-2" : ""}>
+                    <p className="text-sm font-bold uppercase tracking-[0.12em] text-leaf-700">{r.eyebrow}</p>
+                    <h3 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{r.title}</h3>
+                    <div className="mt-4 text-lg leading-relaxed text-muted-foreground">{r.text}</div>
+                    {r.points && (
+                      <ul className="mt-5 space-y-2">
+                        {r.points.map((p) => (
+                          <li key={p} className="flex gap-2.5">
+                            <Check className="mt-1 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
+                            <span>{p}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <figure className={i % 2 ? "lg:order-1" : ""}>
+                    <img
+                      src={r.image}
+                      alt={r.alt}
+                      loading="lazy"
+                      className="w-full rounded-2xl bg-card shadow-[0_30px_60px_-35px_hsl(160_61%_15%/0.5)]"
+                    />
+                  </figure>
                 </div>
-                <figure className={i % 2 ? "lg:order-1" : ""}>
-                  <img
-                    src={r.image}
-                    alt={r.alt}
-                    loading="lazy"
-                    className="w-full rounded-2xl bg-card shadow-[0_30px_60px_-35px_hsl(160_61%_15%/0.5)]"
-                  />
-                </figure>
-              </div>
-            ))}
+              ))}
+            </div>
+          </section>
+        )}
+
+        {d.extra && (
+          <div id={d.rows?.length ? undefined : "ukazka"} className="scroll-mt-20">
+            {d.extra}
           </div>
-        </section>
+        )}
 
         {/* Citace */}
         {d.quote && (
