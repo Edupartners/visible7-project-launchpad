@@ -4,13 +4,13 @@ const PARTNERS = [
   {
     name: "VIVERRA",
     role: "Partner pro umělou inteligenci",
-    text: "Česká AI s vlastní logikou výstupů. Společně připravujeme další AI pomocníky pro práci na vašem projektu.",
+    text: "Český AI asistent s vlastní logikou výstupů, podobně jako ChatGPT nebo Claude. Společně připravujeme AI pomocníky pro práci na vašem projektu.",
     href: "https://viverra.ai/",
   },
   {
     name: "Goodveri",
     role: "Technologický partner pro napojení banky (PSD2)",
-    text: "Open banking pro banky, pojišťovny a poskytovatele úvěrů. Přes Goodveri připravujeme bezpečné napojení vašeho účtu, aby plán stál na skutečných číslech.",
+    text: "Kompletní digitální onboarding klientů do finančních institucí: ověření identity, analýza bankovních dat a podpis online. Přes Goodveri připravujeme bezpečné napojení vašeho účtu, aby plán stál na skutečných číslech.",
     href: "https://goodveri.com/",
   },
 ];
