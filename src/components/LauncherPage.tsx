@@ -13,9 +13,13 @@ import {
   Award,
   BarChart3,
   Check,
+  ClipboardList,
+  GraduationCap,
   Layers,
   Lightbulb,
   Play,
+  PlayCircle,
+  Radio,
   Rocket,
   Store,
   Target,
@@ -190,6 +194,37 @@ const FAQ = [
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
 ];
 
+const LEARNING = [
+  {
+    icon: PlayCircle,
+    title: "E-learning",
+    text: "100+ videí krok za krokem ke každé fázi. Vidíš každé kliknutí.",
+    to: "/certifikace",
+    cta: "Obsah kurzu",
+  },
+  {
+    icon: ClipboardList,
+    title: "Pracovní listy",
+    text: "Hotové šablony k vyplnění a tisku, ať máš každý krok černé na bílém.",
+    to: "/pracovni-listy",
+    cta: "Pracovní listy",
+  },
+  {
+    icon: Radio,
+    title: "Živé semináře",
+    text: "Každých 14 dní 90 minut online s lektory. Záznamy najdeš v aplikaci.",
+    to: "/clenstvi",
+    cta: "Program seminářů",
+  },
+  {
+    icon: GraduationCap,
+    title: "Certifikace se zkouškou",
+    text: `Osvědčení za každou bránu, certifikace ${SPECIALIST_TITLE} a volitelně státní zkouška.`,
+    to: "/certifikace",
+    cta: "Certifikace",
+  },
+];
+
 const TAG_STYLE: Record<Tag, string> = {
   AI: "bg-violet-100 text-violet-800",
   Video: "bg-sky-100 text-sky-800",
@@ -331,8 +366,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Vytvoř si plán, který ti <span className="text-orange-600">vydělá peníze</span>.
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              Ověřený nápad, reálná čísla a AI, která za tebe udělá tu nejtěžší práci. VISIBLE7 tě provede sedmi kroky od
-              nápadu až k hotovému plánu.
+              Ověřený nápad, reálná čísla a AI, která za tebe udělá tu nejtěžší práci.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta onClick={onAccessGranted}>Začít plán zdarma</Cta>
@@ -396,7 +430,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         <BankWaitlist />
 
         {/* Proč projekty krachují + slovo autora */}
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8 md:py-24 lg:px-12">
+        <section id="proc-krachuji" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 sm:px-8 md:py-24 lg:px-12">
           <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Proč projekty krachují</h2>
@@ -469,12 +503,14 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         {/* Ukázky z aplikace */}
-        <section className="mx-auto max-w-6xl px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
+        <section id="ukazky" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Podnikatelský plán, kterému můžeš věřit. Bez Excelu a bez teorie.
+              Od prvního nápadu k hotovému plánu. A dál.
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">Každý krok je hotový výstup, ne lekce.</p>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Podnikatelský plán, kterému můžeš věřit. Bez Excelu a bez teorie, každý krok je hotový výstup.
+            </p>
           </div>
           {SHOWCASE.map((b, i) => (
             <div
@@ -508,6 +544,33 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </figure>
             </div>
           ))}
+        </section>
+
+        {/* Víc než plánovač: vzdělávání a certifikace */}
+        <section id="vzdelavani" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 md:py-28 lg:px-12">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Víc než plánovač</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Šablonu plánu ti dá kdekoli. U nás se k tomu naučíš, jak plán opravdu provést, a doložíš to certifikátem.
+            </p>
+          </div>
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {LEARNING.map(({ icon: Icon, title, text, to, cta }) => (
+              <li key={title}>
+                <Link
+                  to={to}
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
+                >
+                  <Icon className="h-7 w-7 text-orange-600" aria-hidden="true" />
+                  <span className="mt-4 text-lg font-bold">{title}</span>
+                  <span className="mt-2 flex-1 text-muted-foreground">{text}</span>
+                  <span className="mt-5 inline-flex items-center gap-1.5 font-semibold text-primary group-hover:underline group-hover:underline-offset-4">
+                    {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <SavingsCalculator onStart={onAccessGranted} />
