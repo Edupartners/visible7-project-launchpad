@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
@@ -286,43 +286,30 @@ const TRUST: [string, string][] = [
   ["16+ poradců", "seniorních, z praxe"],
 ];
 
-/** Měnící se slovo v nadpisu. Čtečka obrazovky i vyhledávače vidí jen „podnikat“. */
+/**
+ * Měnící se slovo v nadpisu. Všechna slova leží v jedné buňce mřížky, takže místo má vždy šířku nejdelšího
+ * slova a „Začněte“ se nehýbe. Čtečka obrazovky i vyhledávače vidí jen „podnikat“.
+ */
 const HERO_WORDS = ["podnikat", "vydělávat", "být svobodní", "se učit", "tvořit"];
 
 const RotatingWord = () => {
   const [i, setI] = useState(0);
-  const [width, setWidth] = useState<number>();
-  const refs = useRef<(HTMLSpanElement | null)[]>([]);
-
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => setI((n) => (n + 1) % HERO_WORDS.length), 3200);
     return () => clearInterval(t);
   }, []);
 
-  // Šířka se plynule přizpůsobí aktuálnímu slovu, takže okolní text neposkakuje.
-  useLayoutEffect(() => {
-    const measure = () => setWidth(refs.current[i]?.offsetWidth);
-    measure();
-    document.fonts?.ready.then(measure);
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [i]);
-
   return (
     <>
       <span className="sr-only">podnikat.</span>
       <span aria-hidden="true" className="block sm:inline">
-        <span
-          className="relative inline-block whitespace-nowrap text-left align-bottom transition-[width] duration-700 ease-in-out"
-          style={{ width }}
-        >
+        <span className="inline-grid whitespace-nowrap text-left align-bottom">
           {HERO_WORDS.map((w, n) => (
             <span
               key={w}
-              ref={(el) => (refs.current[n] = el)}
-              className={`left-0 top-0 inline-block text-leaf-500 transition-[opacity,transform] duration-700 ease-in-out ${
-                n === i ? "relative translate-y-0 opacity-100 delay-300" : "absolute translate-y-[0.2em] opacity-0"
+              className={`col-start-1 row-start-1 justify-self-center text-leaf-500 transition-[opacity,transform] duration-700 ease-in-out sm:justify-self-start ${
+                n === i ? "translate-y-0 opacity-100 delay-300" : "translate-y-[0.2em] opacity-0"
               }`}
             >
               {w}.
