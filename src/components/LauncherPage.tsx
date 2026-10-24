@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
@@ -291,20 +291,44 @@ const HERO_WORDS = ["podnikat", "vydělávat", "být svobodní", "se učit", "tv
 
 const RotatingWord = () => {
   const [i, setI] = useState(0);
+  const [width, setWidth] = useState<number>();
+  const refs = useRef<(HTMLSpanElement | null)[]>([]);
+
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((n) => (n + 1) % HERO_WORDS.length), 2600);
+    const t = setInterval(() => setI((n) => (n + 1) % HERO_WORDS.length), 3200);
     return () => clearInterval(t);
   }, []);
+
+  // Šířka se plynule přizpůsobí aktuálnímu slovu, takže okolní text neposkakuje.
+  useLayoutEffect(() => {
+    const measure = () => setWidth(refs.current[i]?.offsetWidth);
+    measure();
+    document.fonts?.ready.then(measure);
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [i]);
+
   return (
     <>
       <span className="sr-only">podnikat.</span>
-      <span
-        key={i}
-        aria-hidden="true"
-        className="block whitespace-nowrap text-leaf-500 duration-500 animate-in fade-in slide-in-from-bottom-3 sm:inline-block"
-      >
-        {HERO_WORDS[i]}.
+      <span aria-hidden="true" className="block sm:inline">
+        <span
+          className="relative inline-block whitespace-nowrap text-left align-bottom transition-[width] duration-700 ease-in-out"
+          style={{ width }}
+        >
+          {HERO_WORDS.map((w, n) => (
+            <span
+              key={w}
+              ref={(el) => (refs.current[n] = el)}
+              className={`left-0 top-0 inline-block text-leaf-500 transition-[opacity,transform] duration-700 ease-in-out ${
+                n === i ? "relative translate-y-0 opacity-100 delay-300" : "absolute translate-y-[0.2em] opacity-0"
+              }`}
+            >
+              {w}.
+            </span>
+          ))}
+        </span>
       </span>
     </>
   );
@@ -390,7 +414,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <span className="block">
                 Začněte <RotatingWord />
               </span>
-              Vytvořte si plán, který vám vydělá peníze.
+              Vytvořte si plán, který vám{" "}
+              <span className="whitespace-nowrap text-leaf-500 underline decoration-leaf-200 decoration-[0.12em] underline-offset-[0.14em]">
+                vydělá peníze
+              </span>
+              .
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
               Ověřený nápad, reálná čísla a AI, která za vás udělá tu nejtěžší práci.
