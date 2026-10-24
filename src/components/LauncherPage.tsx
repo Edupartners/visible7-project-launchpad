@@ -286,6 +286,30 @@ const TRUST: [string, string][] = [
   ["16+ poradců", "seniorních, z praxe"],
 ];
 
+/** Měnící se slovo v nadpisu. Čtečka obrazovky i vyhledávače vidí jen „podnikat“. */
+const HERO_WORDS = ["podnikat", "vydělávat", "být svobodní", "se učit", "tvořit"];
+
+const RotatingWord = () => {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setI((n) => (n + 1) % HERO_WORDS.length), 2600);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <>
+      <span className="sr-only">podnikat.</span>
+      <span
+        key={i}
+        aria-hidden="true"
+        className="block whitespace-nowrap text-leaf-500 duration-500 animate-in fade-in slide-in-from-bottom-3 sm:inline-block"
+      >
+        {HERO_WORDS[i]}.
+      </span>
+    </>
+  );
+};
+
 const Cta = ({
   onClick,
   children,
@@ -363,12 +387,10 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Podnikatelský plán s AI · metodika VISIBLE7 MICEK®
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
-              <span className="block">Začněte podnikat.</span>
-              Vytvořte si plán, který vám{" "}
-              <span className="whitespace-nowrap text-leaf-500 underline decoration-leaf-200 decoration-[0.12em] underline-offset-[0.14em]">
-                vydělá peníze
+              <span className="block">
+                Začněte <RotatingWord />
               </span>
-              .
+              Vytvořte si plán, který vám vydělá peníze.
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
               Ověřený nápad, reálná čísla a AI, která za vás udělá tu nejtěžší práci.
