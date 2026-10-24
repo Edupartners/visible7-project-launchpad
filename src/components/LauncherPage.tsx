@@ -362,7 +362,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
               Podnikatelský plán s AI · metodika VISIBLE7 MICEK®
             </p>
-            <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-7xl lg:text-[5rem]">
+            <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
+              <span className="block">Začněte podnikat.</span>
               Vytvořte si plán, který vám{" "}
               <span className="whitespace-nowrap text-leaf-500 underline decoration-leaf-200 decoration-[0.12em] underline-offset-[0.14em]">
                 vydělá peníze
