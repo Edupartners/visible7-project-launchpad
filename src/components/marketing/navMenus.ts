@@ -112,7 +112,7 @@ export const NAV_MENUS: NavMenu[] = [
             title: "Finanční plán a bod zvratu",
             hint: "24 měsíců čísel, kapitál a návratnost",
             icon: BarChart3,
-            to: "/#ukazky",
+            to: "/financni-plan",
           },
           { title: "Marketingové kanály", hint: "AI vybere, kterými začít", icon: Megaphone, to: "/#ukazky" },
           { title: "Mapa cesty", hint: "Kdy vás projekt uživí", icon: Map, to: "/#ukazky" },
