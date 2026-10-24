@@ -4,7 +4,7 @@ const PARTNERS = [
   {
     name: "VIVERRA",
     role: "Partner pro umělou inteligenci",
-    text: "Česká AI s vlastní logikou výstupů. S VIVERRA rozvíjíme AI pomocníka, který vás provází jednotlivými branami.",
+    text: "Česká AI s vlastní logikou výstupů. Společně připravujeme další AI pomocníky pro práci na vašem projektu.",
     href: "https://viverra.ai/",
   },
   {
