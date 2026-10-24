@@ -8,6 +8,7 @@ import { track } from "@/lib/track";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { BankWaitlist } from "@/components/marketing/BankWaitlist";
+import { Partners } from "@/components/marketing/Partners";
 import {
   ArrowRight,
   Award,
@@ -433,6 +434,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         <BankWaitlist />
+        <Partners />
 
         {/* Proč projekty krachují + slovo autora */}
         <section id="proc-krachuji" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 sm:px-8 md:py-24 lg:px-12">

@@ -5,7 +5,10 @@ import { track } from "@/lib/track";
 import { ArrowRight, Check, Landmark, LineChart, RefreshCw, ShieldCheck } from "lucide-react";
 
 const POINTS = [
-  { icon: ShieldCheck, text: "Bezpečné napojení přes licencovanou bankovní infrastrukturu (PSD2)" },
+  {
+    icon: ShieldCheck,
+    text: "Bezpečné napojení přes licencovanou bankovní infrastrukturu (PSD2), technologický partner Goodveri",
+  },
   { icon: LineChart, text: "Predikce tržeb a cash flow z vašich skutečných pohybů" },
   { icon: RefreshCw, text: "Plán, který se aktualizuje s vaším byznysem" },
 ];
