@@ -79,7 +79,7 @@ const PricingPage = () => {
               <p className="text-sm text-muted-foreground">bez platební karty</p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {[
-                  "Rentgen nápadu do 10 minut",
+                  "Rentgen nápadu do 5 minut",
                   "Brána 1 Vize (modrý oceán)",
                   "Brána 2 Ideace (Lean Canvas) s AI",
                   "Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma",

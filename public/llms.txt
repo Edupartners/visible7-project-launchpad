@@ -8,7 +8,7 @@
 - Vše v češtině, svépomocí, krok za krokem.
 
 ## Jak to funguje
-1. Rentgen nápadu zdarma: 4 otázky, do 10 minut AI řekne, jestli nápad obstojí, kolik bude stát a kdy může podnikatele uživit.
+1. Rentgen nápadu zdarma: 4 otázky, do 5 minut AI řekne, jestli nápad obstojí, kolik bude stát a kdy může podnikatele uživit.
 2. Cesta 7 fázemi (bránami) metodiky V-I-S-I-B-L-E:
    - V – Vize: Strategie modrého oceánu a Hooked (jak nesoutěžit cenou a mít zákazníky, kteří se vracejí)
    - I – Ideace: byznys model na jedné stránce (Lean Canvas)

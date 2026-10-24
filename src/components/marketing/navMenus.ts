@@ -66,7 +66,7 @@ export const NAV_MENUS: NavMenu[] = [
         items: [
           { title: "Čím jsme jiní", hint: "Plán, kurz a poradci v jedné aplikaci", icon: Sprout, to: "/#uvnitr" },
           { title: "Metodika VISIBLE7 MICEK®", hint: "Sedm bran od nápadu po růst", icon: Compass, to: "/#jak" },
-          { title: "Poradci z praxe", hint: "Když se zasekneš, zavoláš člověku", icon: UserRound, to: "/#poradci" },
+          { title: "Poradci z praxe", hint: "Když se zaseknete, zavoláte člověku", icon: UserRound, to: "/#poradci" },
         ],
       },
       {
@@ -77,14 +77,19 @@ export const NAV_MENUS: NavMenu[] = [
             icon: MessagesSquare,
             to: "/#proc-krachuji",
           },
-          { title: "Kdo za tím stojí", hint: "Edu Partners, učíme podnikat od roku 2011", icon: Users, to: "/#proc-krachuji" },
+          {
+            title: "Kdo za tím stojí",
+            hint: "Edu Partners, učíme podnikat od roku 2011",
+            icon: Users,
+            to: "/#proc-krachuji",
+          },
         ],
       },
     ],
     feature: {
       image: "author",
       title: "1 000+ absolventů kurzů podnikání",
-      text: "Metodika vyrostla z kurzů Edu Partners, ne od stolu. Teď ji máš v aplikaci.",
+      text: "Metodika vyrostla z kurzů Edu Partners, ne od stolu. Teď ji máte v aplikaci.",
       cta: "Jak to funguje",
       to: "/#uvnitr",
     },
@@ -96,7 +101,12 @@ export const NAV_MENUS: NavMenu[] = [
       {
         heading: "Funkce",
         items: [
-          { title: "Test nápadu", hint: "Za 3 minuty zjistíš, jestli o to někdo stojí", icon: FlaskConical, start: true },
+          {
+            title: "Test nápadu",
+            hint: "Za 5 minut zjistíte, jestli o to někdo stojí",
+            icon: FlaskConical,
+            start: true,
+          },
           { title: "Podnikatelský plán", hint: "Lean Canvas a byznys model s pomocí AI", icon: Lightbulb, to: "/#jak" },
           {
             title: "Finanční plán a bod zvratu",
@@ -105,7 +115,7 @@ export const NAV_MENUS: NavMenu[] = [
             to: "/#ukazky",
           },
           { title: "Marketingové kanály", hint: "AI vybere, kterými začít", icon: Megaphone, to: "/#ukazky" },
-          { title: "Mapa cesty", hint: "Kdy tě projekt uživí", icon: Map, to: "/#ukazky" },
+          { title: "Mapa cesty", hint: "Kdy vás projekt uživí", icon: Map, to: "/#ukazky" },
         ],
       },
       {
@@ -113,7 +123,7 @@ export const NAV_MENUS: NavMenu[] = [
         items: [
           {
             title: "Bankovní účet (PSD2)",
-            hint: "Predikce z tvých skutečných pohybů",
+            hint: "Predikce z vašich skutečných pohybů",
             icon: Landmark,
             to: "/#realna-data",
             badge: "Připravujeme",
@@ -123,8 +133,8 @@ export const NAV_MENUS: NavMenu[] = [
     ],
     feature: {
       image: "/landing/ukazka-byznys-case.webp",
-      title: "Prohlédni si VISIBLE7",
-      text: "Finanční plán na 24 měsíců hotový za odpoledne. AI navrhne čísla, ty je jen potvrdíš.",
+      title: "Prohlédněte si VISIBLE7",
+      text: "Finanční plán na 24 měsíců hotový za odpoledne. AI navrhne čísla, vy je jen potvrdíte.",
       cta: "Začít plán zdarma",
       start: true,
     },
@@ -134,10 +144,20 @@ export const NAV_MENUS: NavMenu[] = [
     label: "Vzdělávání",
     columns: [
       {
-        heading: "Učíš se při práci na svém plánu",
+        heading: "Učíte se při práci na svém plánu",
         items: [
-          { title: "E-learning", hint: "100+ videí krok za krokem ke každé fázi", icon: PlayCircle, to: "/certifikace" },
-          { title: "Pracovní listy", hint: "Hotové šablony k vyplnění a tisku", icon: ClipboardList, to: "/pracovni-listy" },
+          {
+            title: "E-learning",
+            hint: "100+ videí krok za krokem ke každé fázi",
+            icon: PlayCircle,
+            to: "/certifikace",
+          },
+          {
+            title: "Pracovní listy",
+            hint: "Hotové šablony k vyplnění a tisku",
+            icon: ClipboardList,
+            to: "/pracovni-listy",
+          },
           { title: "Živé semináře", hint: "Každých 14 dní online s lektory", icon: Radio, to: "/clenstvi" },
         ],
       },
@@ -157,7 +177,7 @@ export const NAV_MENUS: NavMenu[] = [
     ],
     feature: {
       title: "Plánovač, kurz a certifikace v jednom",
-      text: "Běžný plánovač ti dá šablonu. U nás se k tomu naučíš, jak plán opravdu provést, a doložíš to certifikátem.",
+      text: "Běžný plánovač vám dá šablonu. U nás se k tomu naučíte, jak plán opravdu provést, a doložíte to certifikátem.",
       cta: "Certifikace a zkouška",
       to: "/certifikace",
     },
@@ -169,10 +189,10 @@ export const NAV_MENUS: NavMenu[] = [
       {
         heading: "Pro podnikatele",
         items: [
-          { title: "Otestovat nápad", hint: "Než do něj dáš peníze", icon: FlaskConical, start: true },
+          { title: "Otestovat nápad", hint: "Než do něj dáte peníze", icon: FlaskConical, start: true },
           { title: "Plán pro banku a investory", hint: "Čísla, která banka chce vidět", icon: HandCoins, start: true },
           { title: "Začít podnikat", hint: "Od živnosti po prvního zákazníka", icon: Target, to: "/#jak" },
-          { title: "Už podnikám offline", hint: "Kde ti online přinese zákazníky", icon: Store, to: "/#poradci" },
+          { title: "Už podnikám offline", hint: "Kde vám online přinese zákazníky", icon: Store, to: "/#poradci" },
         ],
       },
       {
@@ -202,7 +222,7 @@ export const NAV_MENUS: NavMenu[] = [
     feature: {
       image: "author",
       title: "Úvodní konzultace zdarma",
-      text: "20 minut online s expertem: projdeme tvůj nápad a doporučíme, kterou cestou jít.",
+      text: "20 minut online s expertem: projdeme váš nápad a doporučíme, kterou cestou jít.",
       cta: "Vybrat termín",
       href: FREE_CONSULT_URL,
     },

@@ -629,7 +629,7 @@ const RentgenPage = () => {
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {(
                 [
-                  ["start", Lightbulb, "Začínám podnikat", "Ověřte nápad za 10 minut."],
+                  ["start", Lightbulb, "Začínám podnikat", "Ověřte nápad za 5 minut."],
                   ["business", Store, "Už podnikám", "Zjistěte, kde vám online přinese nové zákazníky a peníze."],
                 ] as const
               ).map(([m, Icon, title, text]) => (

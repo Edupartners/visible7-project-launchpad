@@ -141,7 +141,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
         </Link>
         <div className="max-w-md">
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight">
-            {isLogin ? "Vítejte zpátky." : "Otestujte svůj nápad za 10 minut."}
+            {isLogin ? "Vítejte zpátky." : "Otestujte svůj nápad za 5 minut."}
           </h1>
           <p className="mt-4 text-lg text-white/75">
             {isLogin
@@ -150,11 +150,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           </p>
           {!isLogin && (
             <ul className="mt-8 space-y-3">
-              {[
-                "Rentgen nápadu a brány 1 a 2 zdarma",
-                "Bez platební karty",
-                "Data uložená v EU",
-              ].map((t) => (
+              {["Rentgen nápadu a brány 1 a 2 zdarma", "Bez platební karty", "Data uložená v EU"].map((t) => (
                 <li key={t} className="flex items-center gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500">
                     <Check className="h-3.5 w-3.5" strokeWidth={3} />

@@ -8,7 +8,15 @@ import { NAV_MENUS, type NavFeature, type NavLinkItem, type NavMenu } from "@/co
 const author = ADVISORS.find((a) => a.name.includes("Míček"));
 
 /** Jeden odkaz menu: ikona, název a jednořádkový popis (jako u LivePlanu). */
-const MenuItem = ({ item, onStart, onNavigate }: { item: NavLinkItem; onStart: () => void; onNavigate: () => void }) => {
+const MenuItem = ({
+  item,
+  onStart,
+  onNavigate,
+}: {
+  item: NavLinkItem;
+  onStart: () => void;
+  onNavigate: () => void;
+}) => {
   const Icon = item.icon;
   const body = (
     <>
@@ -35,7 +43,12 @@ const MenuItem = ({ item, onStart, onNavigate }: { item: NavLinkItem; onStart: (
     );
   if (item.href)
     return (
-      <a href={item.href} onClick={onNavigate} className={cls} {...(item.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+      <a
+        href={item.href}
+        onClick={onNavigate}
+        className={cls}
+        {...(item.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >
         {body}
       </a>
     );
@@ -61,7 +74,9 @@ const FeatureCard = ({ f, onStart, onNavigate }: { f: NavFeature; onStart: () =>
           alt=""
           loading="lazy"
           className={`mb-5 w-full rounded-xl bg-background object-cover ${
-            f.image === "author" ? "aspect-[4/3] object-[center_20%]" : "aspect-[16/9] border border-border object-left-top"
+            f.image === "author"
+              ? "aspect-[4/3] object-[center_20%]"
+              : "aspect-[16/9] border border-border object-left-top"
           }`}
         />
       )}
@@ -209,7 +224,11 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
             aria-label={mobile ? "Zavřít menu" : "Otevřít menu"}
             className="rounded-lg p-2 text-foreground hover:bg-muted lg:hidden"
           >
-            {mobile ? <X className="h-6 w-6" aria-hidden="true" /> : <MenuIcon className="h-6 w-6" aria-hidden="true" />}
+            {mobile ? (
+              <X className="h-6 w-6" aria-hidden="true" />
+            ) : (
+              <MenuIcon className="h-6 w-6" aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>

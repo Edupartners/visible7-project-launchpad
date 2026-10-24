@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { track } from "@/lib/track";
 import { ArrowRight, Check, Landmark, LineChart, RefreshCw, ShieldCheck } from "lucide-react";
 
 const POINTS = [
   { icon: ShieldCheck, text: "Bezpečné napojení přes licencovanou bankovní infrastrukturu (PSD2)" },
-  { icon: LineChart, text: "Predikce tržeb a cash flow z tvých skutečných pohybů" },
-  { icon: RefreshCw, text: "Plán, který se aktualizuje s tvým byznysem" },
+  { icon: LineChart, text: "Predikce tržeb a cash flow z vašich skutečných pohybů" },
+  { icon: RefreshCw, text: "Plán, který se aktualizuje s vaším byznysem" },
 ];
 
 type State = "idle" | "open" | "sending" | "done" | "error";
@@ -41,10 +42,12 @@ export const BankWaitlist = () => {
               <Landmark className="h-4 w-4" aria-hidden="true" />
               Připravujeme
             </p>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Plán postavený na reálných datech</h2>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Plán postavený na reálných datech
+            </h2>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Žádné odhady podle průměrů. Připravujeme bezpečné napojení na tvůj bankovní účet, takže když už podnikáš,
-              VISIBLE7 spočítá predikci přesně podle toho, jak tvoje firma skutečně funguje.
+              Žádné odhady podle průměrů. Připravujeme bezpečné napojení na váš bankovní účet, takže když už podnikáte,
+              VISIBLE7 spočítá predikci přesně podle toho, jak vaše firma skutečně funguje.
             </p>
             <ul className="mt-6 space-y-3">
               {POINTS.map(({ icon: Icon, text }) => (
@@ -64,8 +67,8 @@ export const BankWaitlist = () => {
               </p>
             ) : state === "idle" ? (
               <>
-                <p className="text-lg font-semibold">Chceš to vyzkoušet mezi prvními?</p>
-                <p className="mt-2 text-muted-foreground">Nech nám e-mail a dáme ti vědět, až napojení spustíme.</p>
+                <p className="text-lg font-semibold">Chcete to vyzkoušet mezi prvními?</p>
+                <p className="mt-2 text-muted-foreground">Nechte nám e-mail a dáme vám vědět, až napojení spustíme.</p>
                 <button
                   type="button"
                   onClick={() => setState("open")}
@@ -78,7 +81,7 @@ export const BankWaitlist = () => {
             ) : (
               <form onSubmit={submit}>
                 <label htmlFor="bank-waitlist-email" className="text-lg font-semibold">
-                  Tvůj e-mail
+                  Váš e-mail
                 </label>
                 <input
                   id="bank-waitlist-email"
@@ -101,9 +104,16 @@ export const BankWaitlist = () => {
                 </button>
                 {state === "error" && (
                   <p className="mt-3 text-sm text-red-700" role="alert">
-                    E-mail se nepodařilo uložit. Zkus to prosím znovu.
+                    E-mail se nepodařilo uložit. Zkuste to prosím znovu.
                   </p>
                 )}
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+                  E-mail použijeme jen k oznámení, že napojení banky spouštíme. Správcem je Edu Partners s.r.o. Více v{" "}
+                  <Link to="/ochrana-osobnich-udaju" className="underline underline-offset-2 hover:text-foreground">
+                    Ochraně osobních údajů
+                  </Link>
+                  .
+                </p>
               </form>
             )}
           </div>

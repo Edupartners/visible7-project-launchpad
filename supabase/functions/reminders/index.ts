@@ -58,12 +58,12 @@ function compose(kind: Kind, d: Data, unsubscribe: string) {
   switch (kind) {
     case "rentgen":
       return {
-        subject: "Váš nápad čeká – stačí 10 minut",
+        subject: "Váš nápad čeká – stačí 5 minut",
         html: layout(
           "Obstojí váš nápad?",
           [
             "Dobrý den,",
-            "zaregistrovali jste se do VISIBLE7, ale Rentgen nápadu ještě čeká. Jsou to 4 otázky a za 10 minut víte, jestli nápad dává smysl, kolik bude stát a kdy vás může uživit.",
+            "zaregistrovali jste se do VISIBLE7, ale Rentgen nápadu ještě čeká. Jsou to 4 otázky a za 5 minut víte, jestli nápad dává smysl, kolik bude stát a kdy vás může uživit.",
             "Žádná teorie – rovnou uvidíte čísla a mapu cesty od dneška k prvním zákazníkům.",
           ],
           "Udělat Rentgen nápadu",

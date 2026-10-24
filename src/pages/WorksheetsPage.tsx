@@ -222,9 +222,7 @@ const WorksheetsPage = () => {
               />
             </button>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-300">
-                Plakát zdarma · A3 k tisku
-              </p>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-300">Plakát zdarma · A3 k tisku</p>
               <h2 className="mt-2 text-3xl font-extrabold leading-tight">Celá cesta na jedné stránce</h2>
               <p className="mt-3 text-base leading-relaxed text-white/80">{POSTER.desc}</p>
               <button
@@ -300,7 +298,7 @@ const WorksheetsPage = () => {
                 onClick={() => navigate("/home?novy")}
                 className="w-full rounded-xl border border-border px-5 py-3 text-sm font-semibold hover:border-primary hover:text-primary"
               >
-                Otestovat nápad zdarma do 10 minut
+                Otestovat nápad zdarma do 5 minut
               </button>
             </div>
           ) : (

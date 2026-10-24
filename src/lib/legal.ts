@@ -143,6 +143,7 @@ export const PRIVACY: LegalDoc = {
         "Členství v Klubu VISIBLE7 – plnění podmínek členství, o které jste požádali.",
         "Zasílání novinek a nabídek – váš souhlas (čl. 6 odst. 1 písm. a) GDPR), který můžete kdykoli odvolat v nastavení účtu.",
         "Pracovní listy ke stažení – e-mail, který zadáte, použijeme k zaslání odkazu na listy (vaše žádost, čl. 6 odst. 1 písm. b) GDPR). Tipy a novinky posíláme jen se samostatným souhlasem.",
+        "Čekací listina na napojení bankovního účtu – e-mail, který zadáte, použijeme jen k jednomu oznámení, že napojení spouštíme (vaše žádost, čl. 6 odst. 1 písm. b) GDPR).",
       ],
     },
     {
@@ -184,6 +185,7 @@ export const PRIVACY: LegalDoc = {
         "Údaje pro ověření vydaných osvědčení po dobu jejich platnosti, aby šly ověřit; osvědčení můžete požádat zneplatnit.",
         "Souhlas s marketingem do jeho odvolání.",
         "E-mail ze stažení pracovních listů bez souhlasu s tipy 12 měsíců, se souhlasem do jeho odvolání.",
+        "E-mail z čekací listiny na napojení banky do odeslání oznámení o spuštění, nejdéle 12 měsíců.",
         "Data Google Analytics 14 měsíců; volba cookies v prohlížeči do jejího smazání nebo změny.",
         "Pseudonymizované odpovědi pro výzkum do odvolání souhlasu, nejdéle do ukončení výzkumu.",
       ],

@@ -55,7 +55,7 @@ export const DashboardJourney = ({ prominent }: { prominent: boolean }) => {
             <p
               className={`mt-2 flex items-center gap-1.5 text-sm ${prominent ? "text-white/60" : "text-muted-foreground"}`}
             >
-              <Clock className="h-4 w-4" /> asi 10 minut · zdarma
+              <Clock className="h-4 w-4" /> asi 5 minut · zdarma
             </p>
           </div>
         </div>
