@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
@@ -223,6 +223,16 @@ const LEARNING = [
     to: "/certifikace",
     cta: "Certifikace",
   },
+];
+
+/** Kontrolní body mezi branami (volně podle modelu Stage-Gate R. G. Coopera). */
+const CHECKPOINTS = [
+  "Má nápad místo na trhu?",
+  "Dává byznys model smysl?",
+  "Vyplatí se to?",
+  "Je hotový základ?",
+  "Je ověřená poptávka?",
+  "Prodává to?",
 ];
 
 const TAG_STYLE: Record<Tag, string> = {
@@ -628,7 +638,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
                   <p className="mt-4 text-lg text-white/70">
-                    Jdete krok za krokem. Výstup každé brány otevře tu další, takže nic důležitého nepřeskočíte.
+                    Jdete krok za krokem. Mezi branami je vždy kontrolní otázka: dál jdete, až když na ni umíte
+                    odpovědět.
                   </p>
                 </div>
                 <ul className="flex gap-2 text-sm" aria-label="Legenda">
@@ -639,11 +650,27 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   ))}
                 </ul>
               </div>
-              <ol className="relative mt-12 grid gap-y-3 lg:grid-cols-7 lg:gap-x-3">
+              <ol className="relative mt-12 grid gap-y-3 lg:grid-cols-7 lg:gap-x-3 lg:pt-12">
                 <span
-                  className="absolute left-[1.375rem] top-6 bottom-6 w-0.5 bg-gradient-to-b from-leaf-400 to-white/25 lg:left-[7%] lg:right-[7%] lg:top-[1.375rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
+                  className="absolute left-[1.375rem] top-6 bottom-6 w-0.5 bg-gradient-to-b from-leaf-400 to-white/25 lg:left-[7%] lg:right-[7%] lg:top-[4.375rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
                   aria-hidden="true"
                 />
+                {CHECKPOINTS.map((q, i) => (
+                  <Fragment key={q}>
+                    <span
+                      className="pointer-events-none absolute top-[3rem] hidden w-28 -translate-x-1/2 -translate-y-full pb-1.5 text-center text-[11px] font-semibold leading-tight text-leaf-200 lg:block"
+                      style={{ left: `${((i + 1) / 7) * 100}%` }}
+                      aria-hidden="true"
+                    >
+                      {q}
+                    </span>
+                    <span
+                      className="pointer-events-none absolute top-[4.375rem] z-10 hidden h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[3px] border-2 border-leaf-300 bg-primary lg:block"
+                      style={{ left: `${((i + 1) / 7) * 100}%` }}
+                      aria-hidden="true"
+                    />
+                  </Fragment>
+                ))}
                 {GATES.map((g, i) => (
                   <li key={g.name} className="relative flex gap-4 lg:flex-col lg:items-center lg:gap-0 lg:text-center">
                     <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-leaf-500 text-lg font-extrabold shadow-[0_0_0_5px_hsl(var(--primary))]">
@@ -668,6 +695,15 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                           </span>
                         ))}
                       </div>
+                      {i < 6 && (
+                        <p className="mt-3 flex items-center gap-2 text-xs font-semibold text-leaf-200 lg:hidden">
+                          <span
+                            className="h-2.5 w-2.5 shrink-0 rotate-45 rounded-[2px] border-2 border-leaf-300"
+                            aria-hidden="true"
+                          />
+                          Kontrola: {CHECKPOINTS[i]}
+                        </p>
+                      )}
                     </div>
                   </li>
                 ))}
