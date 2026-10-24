@@ -287,8 +287,8 @@ const TRUST: [string, string][] = [
 ];
 
 /**
- * Měnící se slovo v nadpisu. Všechna slova leží v jedné buňce mřížky, takže místo má vždy šířku nejdelšího
- * slova a „Začněte“ se nehýbe. Čtečka obrazovky i vyhledávače vidí jen „podnikat“.
+ * Měnící se slovo v nadpisu. Místo má šířku prvního slova, takže „Začněte podnikat.“ je přesně na středu
+ * a „Začněte“ se nehýbe; delší slova přesahují doprava. Čtečka obrazovky i vyhledávače vidí jen „podnikat“.
  */
 const HERO_WORDS = ["podnikat", "vydělávat", "být svobodní", "se učit", "tvořit"];
 
@@ -300,22 +300,24 @@ const RotatingWord = () => {
     return () => clearInterval(t);
   }, []);
 
+  const fade = (n: number) =>
+    `text-leaf-500 transition-[opacity,transform] duration-700 ease-in-out ${
+      n === i ? "translate-y-0 opacity-100 delay-300" : "translate-y-[0.2em] opacity-0"
+    }`;
+
   return (
     <>
       <span className="sr-only">podnikat.</span>
-      <span aria-hidden="true" className="block sm:inline">
-        <span className="inline-grid whitespace-nowrap text-left align-bottom">
-          {HERO_WORDS.map((w, n) => (
-            <span
-              key={w}
-              className={`col-start-1 row-start-1 justify-self-center text-leaf-500 transition-[opacity,transform] duration-700 ease-in-out sm:justify-self-start ${
-                n === i ? "translate-y-0 opacity-100 delay-300" : "translate-y-[0.2em] opacity-0"
-              }`}
-            >
-              {w}.
-            </span>
-          ))}
-        </span>
+      <span aria-hidden="true" className="relative block whitespace-nowrap sm:inline-block sm:text-left">
+        <span className={`inline-block ${fade(0)}`}>{HERO_WORDS[0]}.</span>
+        {HERO_WORDS.slice(1).map((w, k) => (
+          <span
+            key={w}
+            className={`absolute inset-x-0 top-0 text-center sm:left-0 sm:right-auto sm:text-left ${fade(k + 1)}`}
+          >
+            {w}.
+          </span>
+        ))}
       </span>
     </>
   );
