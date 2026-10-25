@@ -1,4 +1,5 @@
 import { track } from "@/lib/track";
+import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { useAccess } from "@/lib/access";
 import { useEffect, useMemo, useState } from "react";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
@@ -662,6 +663,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               ? `Zbývá ${Math.max(0, AI_LIMITS.navrh - autofillUsed)} z ${AI_LIMITS.navrh} pro tento projekt.`
               : "Nejdřív zvolte typ byznysu ve fázi 2."}
           </p>
+          <AiPrivacyNote className="mt-2" />
         </div>
         <Button
           className="btn-apple shrink-0"
@@ -1265,6 +1267,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                 ? `Zbývá ${Math.max(0, AI_LIMITS.vyhodnoceni - commentsUsed)} z ${AI_LIMITS.vyhodnoceni} komentářů pro tento projekt.`
                 : "Nejdřív vyplňte příjmy a alespoň jeden náklad."}
             </p>
+            <AiPrivacyNote className="mt-2" />
           </div>
           <Button
             variant={comment ? "outline" : "default"}

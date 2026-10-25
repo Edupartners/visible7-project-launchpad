@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { CertificatesPanel } from "@/components/CertificatesPanel";
 import { ConsentSettings, ProfileForm } from "@/components/settings/ProfileSettings";
+import { DeleteAccount } from "@/components/settings/DeleteAccount";
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Zdarma (fáze 1 a 2)",
@@ -40,6 +41,7 @@ const SECTIONS = [
   { id: "osvedceni", label: "Osvědčení" },
   { id: "souhlasy", label: "Souhlasy a GDPR" },
   { id: "zabezpeceni", label: "Zabezpečení" },
+  { id: "smazani", label: "Smazání účtu" },
 ];
 
 const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
@@ -114,8 +116,8 @@ const ProjectRow = ({ project }: { project: Project }) => {
             <AlertDialogHeader>
               <AlertDialogTitle>Smazat projekt „{project.name}“?</AlertDialogTitle>
               <AlertDialogDescription>
-                Projekt i všechny jeho fáze zmizí z vašeho přehledu a nepůjde ho obnovit. Osvědčení, která jste za něj
-                získali, zůstanou platná.
+                Smaže se obsah projektu: všechny fáze, výstupy AI i web projektu se zájemci. Nepůjde ho obnovit.
+                Osvědčení, která jste za něj získali, zůstanou platná.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -256,6 +258,10 @@ const SettingsPage = () => {
               Změnit heslo
             </Button>
           </form>
+        </Section>
+
+        <Section id="smazani" title="Smazání účtu">
+          <DeleteAccount />
         </Section>
 
         <Button

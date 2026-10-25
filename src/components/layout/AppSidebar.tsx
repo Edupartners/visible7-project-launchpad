@@ -149,7 +149,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Název projektu"
+                placeholder="Název projektu (klidně krycí)"
                 className="h-10"
                 autoFocus
                 aria-label="Název nového projektu"

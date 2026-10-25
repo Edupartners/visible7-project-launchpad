@@ -36,6 +36,7 @@ import BankConnectPage from "./pages/features/BankConnectPage";
 import StartBusinessPage from "./pages/features/StartBusinessPage";
 import ExistingBusinessPage from "./pages/features/ExistingBusinessPage";
 import WhyDifferentPage from "./pages/features/WhyDifferentPage";
+import SecurityPage from "./pages/SecurityPage";
 import CertificationPage from "./pages/CertificationPage";
 import WorksheetsPage from "./pages/WorksheetsPage";
 import MemberWorksheetsPage from "./pages/MemberWorksheetsPage";
@@ -173,6 +174,7 @@ const App = () => (
           <Route path="/zacit-podnikat" element={<StartBusinessPage />} />
           <Route path="/uz-podnikam" element={<ExistingBusinessPage />} />
           <Route path="/cim-jsme-jini" element={<WhyDifferentPage />} />
+          <Route path="/bezpecnost" element={<SecurityPage />} />
           <Route path="/certifikace" element={<CertificationPage />} />
           <Route path="/pracovni-listy" element={<WorksheetsPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />

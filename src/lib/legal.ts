@@ -180,7 +180,7 @@ export const PRIVACY: LegalDoc = {
     {
       title: "6. Jak dlouho údaje uchováváme",
       paragraphs: [
-        "Údaje účtu a projektů po dobu existence účtu; po jeho zrušení je smažeme do 30 dnů, pokud je nemusíme uchovat ze zákona.",
+        "Údaje účtu a projektů po dobu existence účtu. Účet i jednotlivé projekty můžete smazat sami v Nastavení aplikace; data se tím smažou ihned, zálohy databáze se přepíšou do 30 dnů. Doklady o nákupu uchováváme po dobu, kterou ukládá zákon o účetnictví a zákon o DPH.",
         "Daňové doklady 10 let podle zákona o DPH.",
         "Údaje pro ověření vydaných osvědčení po dobu jejich platnosti, aby šly ověřit; osvědčení můžete požádat zneplatnit.",
         "Souhlas s marketingem do jeho odvolání.",

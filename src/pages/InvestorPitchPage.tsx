@@ -1,4 +1,5 @@
 import { track } from "@/lib/track";
+import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Check, Copy, Download, Loader2, Sparkles } from "lucide-react";
@@ -274,6 +275,7 @@ const InvestorPitchPage = () => {
               {pitch && " Nové vytvoření přepíše vaše úpravy."}
             </p>
           )}
+          {numbers && <AiPrivacyNote className="mt-2" />}
           {overflow && (
             <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800 ring-1 ring-red-200">
               Text je delší, než se vejde na jednu stránku. Zkraťte některý odstavec.

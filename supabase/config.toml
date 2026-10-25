@@ -13,3 +13,6 @@ verify_jwt = false
 
 [functions.worksheets]
 verify_jwt = false
+
+[functions.privacy]
+verify_jwt = false

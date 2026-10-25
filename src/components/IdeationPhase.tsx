@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
@@ -327,6 +328,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
               <p className="mt-1 text-xs text-muted-foreground">
                 Zbývá {left("navrh")} z {AI_LIMITS.navrh} návrhů pro tento projekt.
               </p>
+              <AiPrivacyNote className="mt-2" />
             </div>
           </div>
           <Button

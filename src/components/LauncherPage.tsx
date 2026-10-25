@@ -16,6 +16,7 @@ import {
   ClipboardList,
   GraduationCap,
   Layers,
+  Lock,
   Lightbulb,
   Play,
   PlayCircle,
@@ -183,8 +184,12 @@ const FAQ = [
     "Začněte bránou 1. Strategie modrého oceánu je přesně nástroj na to, jak najít místo, kde nebudete jen další z mnoha.",
   ],
   [
+    "Neukradne mi někdo nápad?",
+    "Projekt vidíte jen vy. Obsah projektů nečteme ani nepoužíváme, s výjimkou podpory, o kterou sami požádáte. Poradci zachovávají mlčenlivost a projekt i celý účet můžete kdykoli smazat. Podrobně na stránce Váš nápad a data.",
+  ],
+  [
     "Jak pracuje AI s mými daty?",
-    "AI vidí jen to, co do projektu napíšete, a jen když ji sami zavoláte. Data jsou uložena v EU.",
+    "AI se spustí jen na vaše kliknutí a dostane jen údaje z projektu, bez jména a e-mailu. Poskytovatel AI je podle smluvních podmínek nepoužívá k trénování modelů. Databáze je v EU, AI text zpracuje v USA se standardními smluvními doložkami.",
   ],
   [
     "Co jsou živé semináře?",
@@ -446,6 +451,13 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <p className="mt-3 text-sm text-muted-foreground">
               Pro registraci stačí e-mail. Platební kartu nezadáváte.
             </p>
+            <Link
+              to="/bezpecnost"
+              className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+            >
+              <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              Váš nápad zůstává jen váš. Nikomu ho neukazujeme a AI se na něm neučí.
+            </Link>
           </div>
           <div id="video" className="mx-auto mt-14 max-w-6xl scroll-mt-24">
             <HeroVideo photo={author?.photo} />

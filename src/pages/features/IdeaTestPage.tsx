@@ -110,7 +110,7 @@ const IdeaTestPage = () => {
       ],
       [
         "Jak AI pracuje s mými daty?",
-        "AI vidí jen to, co do projektu napíšete, a jen když ji sami zavoláte. Data jsou uložena v EU.",
+        "AI se spustí jen na vaše kliknutí a dostane jen údaje z projektu, bez jména a e-mailu. Neučí se na nich. Databáze je v EU, AI text zpracuje v USA se standardními smluvními doložkami. Podrobně na stránce Váš nápad a data.",
       ],
     ],
   };

@@ -1,4 +1,5 @@
 import { QuizBonusCard } from "@/components/quiz/QuizCards";
+import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { track } from "@/lib/track";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -669,6 +670,7 @@ const RentgenPage = () => {
                   autoFocus
                   aria-label="Čím se živíte"
                 />
+                <AiPrivacyNote idea className="mt-2" />
                 <div className="mt-2 flex flex-wrap gap-2">
                   {BUSINESS_EXAMPLES.map((ex) => (
                     <Chip key={ex} active={a.idea === ex} onClick={() => set("idea", ex)}>
@@ -805,6 +807,7 @@ const RentgenPage = () => {
                   autoFocus
                   aria-label="Váš nápad"
                 />
+                <AiPrivacyNote idea className="mt-2" />
                 <p className="mt-4 text-sm font-semibold text-muted-foreground">Nebo zkuste příklad:</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {EXAMPLES.map((ex) => (
