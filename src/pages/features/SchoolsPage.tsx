@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
 import { FeaturePage, type FeaturePageData } from "@/components/marketing/FeaturePage";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
@@ -44,8 +45,19 @@ const PACKAGES = [
   },
 ];
 
-const EXTRAS: [string, string][] = [
-  ["Jednodenní školení učitelů", "2 890 Kč za učitele"],
+/** Zaváděcí cena školení učitelů: platí do konce roku, pak běžná cena. */
+const TRAINING_UNTIL = "31. 12. 2026";
+const TrainingPrice = () => (
+  <span className="inline-flex flex-wrap items-baseline justify-end gap-x-2">
+    <s className="font-normal text-muted-foreground" aria-label="běžná cena 2 890 Kč">
+      2 890 Kč
+    </s>
+    <span className="text-leaf-700">990 Kč za učitele</span>
+  </span>
+);
+
+const EXTRAS: [string, ReactNode][] = [
+  [`Jednodenní školení učitelů (zaváděcí cena do ${TRAINING_UNTIL})`, <TrainingPrice key="t" />],
   [`Příprava a zkouška profesní kvalifikace ${NSK_QUALIFICATION.code}`, "8 000 Kč za žáka"],
   ["Konzultace se seniorním poradcem", "podle ceníku poradců"],
 ];
@@ -217,7 +229,7 @@ const SchoolsPage = () => {
       },
       {
         title: "Jednodenní školení",
-        text: "Podnikání a e-commerce od nápadu po projekt, pro učitele ekonomických předmětů. 2 890 Kč za učitele.",
+        text: `Podnikání a e-commerce od nápadu po projekt, pro učitele ekonomických předmětů. Zaváděcí cena 990 Kč za učitele místo 2 890 Kč, do ${TRAINING_UNTIL}.`,
       },
       {
         title: "Ochrana dat žáků",
