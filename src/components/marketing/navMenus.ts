@@ -64,7 +64,12 @@ export const NAV_MENUS: NavMenu[] = [
     columns: [
       {
         items: [
-          { title: "Čím jsme jiní", hint: "Plán, kurz a poradci v jedné aplikaci", icon: Sprout, to: "/#uvnitr" },
+          {
+            title: "Čím jsme jiní",
+            hint: "Plán, tvorba, e-learning a poradci v jedné aplikaci",
+            icon: Sprout,
+            to: "/cim-jsme-jini",
+          },
           { title: "Metodika VISIBLE7 MICEK®", hint: "Sedm bran od nápadu po růst", icon: Compass, to: "/#jak" },
           { title: "Poradci z praxe", hint: "Když se zaseknete, zavoláte člověku", icon: UserRound, to: "/#poradci" },
         ],

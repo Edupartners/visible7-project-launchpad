@@ -37,6 +37,8 @@ export interface FeaturePageData {
   rows?: FeatureRow[];
   /** Vlastní blok místo řádků se snímky nebo za nimi (např. formulář čekací listiny). */
   extra?: ReactNode;
+  /** Vlastní blok zařadit před řádky se snímky (hned za problém). */
+  extraFirst?: boolean;
   /** Citace uprostřed stránky, jen skutečná. */
   quote?: { text: string; author: string; role: string };
   positioningTitle: string;
@@ -164,6 +166,8 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
           {d.problemNote && <p className="mt-8 text-center text-lg font-semibold text-leaf-700">{d.problemNote}</p>}
         </section>
 
+        {d.extra && d.extraFirst && <div className="scroll-mt-20">{d.extra}</div>}
+
         {/* Řádky se snímky */}
         {d.rows && d.rows.length > 0 && (
           <section id="ukazka" className="scroll-mt-20 bg-muted/40 py-16 md:py-24">
@@ -202,7 +206,7 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
           </section>
         )}
 
-        {d.extra && (
+        {d.extra && !d.extraFirst && (
           <div id={d.rows?.length ? undefined : "ukazka"} className="scroll-mt-20">
             {d.extra}
           </div>
