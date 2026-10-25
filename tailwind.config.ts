@@ -29,6 +29,11 @@ export default {
 				ink: 'hsl(var(--ink))',
 				paper: 'hsl(var(--paper))',
 				'brand-blue': 'hsl(var(--brand-blue))',
+				// Podpis aplikace: limetková „na řadě“ (viz index.css)
+				signal: {
+					DEFAULT: 'hsl(var(--signal))',
+					foreground: 'hsl(var(--signal-foreground))'
+				},
 				// Zelená akční barva veřejného webu (tlačítka, ikony, zvýraznění)
 				leaf: {
 					50: '#F1F7F2',

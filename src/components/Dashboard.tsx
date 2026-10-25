@@ -195,28 +195,28 @@ export const Dashboard = (_props: DashboardProps) => {
         {!diagnosisLoading && !diagnosis && doneCount === 0 ? null : next && NextIcon ? (
           <section
             aria-label="Další krok"
-            className="flex flex-col gap-5 rounded-2xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:flex-row sm:items-center sm:justify-between sm:p-8"
+            className="v7-trap flex flex-col gap-5 bg-primary p-6 pr-12 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:p-8 sm:pr-16"
           >
-            <div className="flex items-start gap-4">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xl font-bold text-white">
+            <div className="flex items-start gap-5">
+              <span className="v7-para flex h-16 w-16 shrink-0 items-center justify-center bg-signal text-2xl font-extrabold text-signal-foreground">
                 {next.id}
               </span>
               <div>
-                <p className="text-sm font-semibold text-orange-700">
+                <p className="text-sm font-bold uppercase tracking-wider text-signal">
                   {doneCount === 0 ? (diagnosis ? "Začněte tady" : "Potom") : "Na řadě"}
                 </p>
                 <h2 className="text-2xl font-bold tracking-tight">
                   Brána {next.id}: {GATE_NAMES[next.id]}
                 </h2>
-                <p className="mt-1 text-muted-foreground">{next.description}</p>
-                <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <p className="mt-1 text-white/75">{next.description}</p>
+                <p className="mt-2 flex items-center gap-1.5 text-sm text-white/75">
                   <Clock className="h-4 w-4" /> asi {next.time}
                 </p>
               </div>
             </div>
             <Button
               onClick={() => navigate(next.route)}
-              className="h-12 shrink-0 rounded-[10px] bg-orange-500 px-6 text-base font-semibold text-white hover:bg-orange-600"
+              className="v7-trap-btn h-12 shrink-0 self-start rounded-none pl-6 text-base font-bold text-signal-foreground focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-auto"
             >
               {doneCount === 0 ? "Začít" : "Pokračovat"}
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -261,7 +261,7 @@ export const Dashboard = (_props: DashboardProps) => {
         {tip === "web" && (
           <section className="flex flex-col items-start gap-4 rounded-2xl bg-primary p-6 text-white sm:flex-row sm:items-center sm:justify-between sm:p-8">
             <div>
-              <p className="flex items-center gap-1.5 text-sm font-semibold text-orange-300">
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-signal">
                 <FlaskConical className="h-4 w-4" /> Než začnete stavět
               </p>
               <h2 className="mt-1 text-xl font-bold">Otestujte zájem jednoduchou stránkou</h2>
@@ -271,7 +271,7 @@ export const Dashboard = (_props: DashboardProps) => {
             </div>
             <Button
               onClick={() => navigate("/testovaci-stranka")}
-              className="h-11 shrink-0 rounded-[10px] bg-orange-500 px-5 font-semibold text-white hover:bg-orange-600"
+              className="h-11 shrink-0 rounded-[10px] bg-signal px-5 font-bold text-signal-foreground hover:bg-signal/90"
             >
               Otevřít web projektu
             </Button>

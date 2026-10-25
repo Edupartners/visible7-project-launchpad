@@ -240,7 +240,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
                       isDone
                         ? "bg-emerald-500 text-white"
                         : isNext
-                          ? "bg-orange-500 text-white"
+                          ? "bg-signal text-signal-foreground ring-1 ring-primary/40"
                           : "border border-border text-muted-foreground"
                     }`}
                   >
@@ -479,7 +479,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
                   isDone
                     ? "bg-emerald-500 text-white"
                     : n === nextGate
-                      ? "bg-orange-500 text-white"
+                      ? "bg-signal text-signal-foreground ring-1 ring-primary/40"
                       : "border border-border text-muted-foreground"
                 }`}
               >

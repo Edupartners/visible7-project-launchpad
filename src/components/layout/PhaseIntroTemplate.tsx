@@ -103,7 +103,7 @@ export const PhaseIntroTemplate = ({
                     done.has(n)
                       ? "bg-emerald-500 text-white"
                       : n === phaseNumber
-                        ? "bg-orange-500 text-white ring-4 ring-orange-500/30"
+                        ? "bg-signal text-signal-foreground ring-4 ring-signal/30"
                         : "border border-white/25 text-white/50"
                   }`}
                   title={GATE_NAMES[n]}
@@ -117,7 +117,7 @@ export const PhaseIntroTemplate = ({
 
           <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
             <div>
-              <p className="font-semibold text-orange-300">{greeting}</p>
+              <p className="font-semibold text-signal">{greeting}</p>
               <h1 className="mt-2 flex items-center gap-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
                 <Icon className="h-9 w-9 shrink-0 text-white/80 sm:h-11 sm:w-11" />
                 {name}
@@ -127,7 +127,7 @@ export const PhaseIntroTemplate = ({
               <button
                 type="button"
                 onClick={start}
-                className="mt-7 inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-8 text-lg font-semibold text-white shadow-lg shadow-orange-900/20 hover:bg-orange-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300"
+                className="mt-7 v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-8 pr-12 text-lg font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
               >
                 {ctaLabel}
                 <ArrowRight className="h-5 w-5" />
@@ -147,7 +147,7 @@ export const PhaseIntroTemplate = ({
                 </div>
               </div>
               <p className="mt-3 flex items-center gap-2 text-sm text-white/80">
-                <Award className="h-4 w-4 text-orange-300" /> Osvědčení s ověřovacím kódem pro LinkedIn
+                <Award className="h-4 w-4 text-signal" /> Osvědčení s ověřovacím kódem pro LinkedIn
               </p>
             </div>
           </div>
@@ -228,8 +228,8 @@ export const PhaseIntroTemplate = ({
           <h2 className="text-xl font-bold">Proč na tom záleží</h2>
           <p className="mt-3 leading-relaxed text-muted-foreground">{description}</p>
         </div>
-        <figure className="flex flex-col justify-center rounded-3xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:p-8">
-          <p className="text-sm font-semibold text-orange-700">Heslo dne</p>
+        <figure className="flex flex-col justify-center v7-trap bg-signal/25 p-6 pr-12 sm:pr-14 sm:p-8">
+          <p className="text-sm font-bold uppercase tracking-wider text-foreground">Heslo dne</p>
           <blockquote className="mt-2 text-2xl font-bold leading-snug tracking-tight">„{mottoOfDay()}“</blockquote>
         </figure>
       </section>
@@ -239,7 +239,7 @@ export const PhaseIntroTemplate = ({
         <button
           type="button"
           onClick={start}
-          className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-500 px-8 text-lg font-semibold text-white hover:bg-orange-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-300"
+          className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-8 pr-12 text-lg font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
         >
           {ctaLabel}
           <ArrowRight className="h-5 w-5" />

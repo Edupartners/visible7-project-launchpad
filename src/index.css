@@ -52,6 +52,10 @@
 
     --radius: 10px;
 
+    /* Podpis aplikace: limetkový signál „na řadě“ (jen výplň s tmavým textem nebo na tmavém podkladu, nikdy text na bílé) */
+    --signal: 77 83% 65%;
+    --signal-foreground: 160 61% 15%;
+
     /* Apple-style gradients */
     --gradient-primary: linear-gradient(135deg, hsl(210 100% 50%), hsl(220 100% 60%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
@@ -171,6 +175,42 @@
 }
 
 @layer components {
+  /* Lichoběžník – podpisový tvar aplikace. Zkosení v px, aby bylo stejné na každé šířce. */
+  .v7-trap {
+    clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%);
+  }
+  /* Kosodélník pro čísla bran a odznaky */
+  .v7-para {
+    clip-path: polygon(22% 0, 100% 0, 78% 100%, 0 100%);
+  }
+  /* Kosodélník pro štítky (pevné zkosení, i na širokém prvku) */
+  .v7-para-sm {
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  }
+  /* Tlačítko-lichoběžník: tvar nese pozadí (::before), takže zvýraznění při ovládání klávesnicí zůstane vidět */
+  .v7-trap-btn {
+    position: relative;
+    isolation: isolate;
+    background: transparent !important;
+    padding-right: 2.25rem;
+  }
+  .v7-trap-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--trap-bg, hsl(var(--signal)));
+    clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+    transition: filter 150ms;
+  }
+  /* Varianta na světlý podklad (odznak úrovně) */
+  .v7-trap-soft {
+    --trap-bg: hsl(var(--muted));
+  }
+  .v7-trap-btn:hover::before {
+    filter: brightness(0.94);
+  }
+
   /* Hlavní tlačítko: plná námořnická modř, mírně zaoblené */
   .btn-apple {
     @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-[10px];

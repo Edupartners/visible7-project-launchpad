@@ -59,7 +59,7 @@ export const useGateStatus = () => {
 const navCls = (active: boolean) =>
   `relative flex h-16 items-center gap-1 px-3 text-sm font-medium transition-colors ${
     active
-      ? "text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-orange-500"
+      ? "text-foreground after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:-skew-x-[14deg] after:bg-primary"
       : "text-muted-foreground hover:text-foreground"
   }`;
 
@@ -177,7 +177,7 @@ export const AppHeader = ({
                               isDone
                                 ? "bg-emerald-500 text-white"
                                 : n === nextGate
-                                  ? "bg-orange-500 text-white"
+                                  ? "bg-signal text-signal-foreground ring-1 ring-primary/40"
                                   : "border border-border text-muted-foreground"
                             }`}
                           >
@@ -186,7 +186,7 @@ export const AppHeader = ({
                           <span className={locked(n) ? "text-muted-foreground" : ""}>{g.name}</span>
                           {locked(n) && <Lock className="ml-auto h-3.5 w-3.5 text-muted-foreground" />}
                           {n === nextGate && !locked(n) && (
-                            <span className="ml-auto text-xs font-semibold text-orange-600">na řadě</span>
+                            <span className="ml-auto v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">na řadě</span>
                           )}
                         </DropdownMenuItem>
                       );

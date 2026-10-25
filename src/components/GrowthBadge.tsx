@@ -99,7 +99,7 @@ export const GrowthBadge = ({ currentCompleted }: { currentCompleted: number }) 
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="group flex items-center gap-3 rounded-2xl border border-border bg-card py-2 pl-2 pr-4 text-left shadow-sm transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="v7-trap-btn v7-trap-soft group flex items-center gap-3 py-2 pl-2 pr-9 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={`Váš odznak: ${current.name}, úroveň ${level} ze 7. Zobrazit podrobnosti.`}
         >
           <BadgeIcon level={level} />
@@ -125,7 +125,7 @@ export const GrowthBadge = ({ currentCompleted }: { currentCompleted: number }) 
           {LEVELS.map((l, i) => (
             <li
               key={l.name}
-              className={`flex items-center gap-3 rounded-lg px-2 py-1.5 ${i === level ? "bg-orange-50" : ""} ${
+              className={`flex items-center gap-3 rounded-lg px-2 py-1.5 ${i === level ? "bg-signal/20" : ""} ${
                 i > level ? "opacity-45" : ""
               }`}
             >

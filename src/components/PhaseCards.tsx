@@ -36,7 +36,7 @@ const Cover = ({ phase, state }: { phase: PhaseCardData; state: "done" | "curren
     <div
       className={`absolute inset-0 overflow-hidden ${
         state === "current"
-          ? "bg-gradient-to-br from-[hsl(216_62%_24%)] via-[hsl(216_55%_30%)] to-orange-500"
+          ? "bg-gradient-to-br from-[hsl(216_62%_24%)] via-[hsl(160_61%_18%)] to-[hsl(77_70%_45%)]"
           : "bg-gradient-to-br from-[hsl(216_62%_20%)] via-[hsl(216_50%_28%)] to-[hsl(28_58%_38%)]"
       }`}
     >
@@ -70,7 +70,7 @@ const Step = ({
       done
         ? "bg-emerald-50 text-emerald-700"
         : active
-          ? "bg-orange-50 text-orange-700"
+          ? "bg-signal/25 text-foreground"
           : "bg-muted text-muted-foreground"
     }`}
   >
@@ -112,7 +112,7 @@ export const PhaseCards = ({
             <li
               key={phase.id}
               className={`overflow-hidden rounded-2xl border bg-card transition-shadow hover:shadow-md ${
-                isCurrent ? "border-orange-300 ring-2 ring-orange-200" : "border-border"
+                isCurrent ? "border-primary ring-2 ring-signal" : "border-border"
               }`}
             >
               <div className="flex flex-col sm:flex-row">
@@ -155,7 +155,7 @@ export const PhaseCards = ({
                   <div>
                     <p
                       className={`text-xs font-bold uppercase tracking-wider ${
-                        isDone ? "text-emerald-700" : isCurrent ? "text-orange-700" : "text-muted-foreground"
+                        isDone ? "text-emerald-700" : isCurrent ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       {isDone ? "Hotovo" : isCurrent ? "Na řadě" : `Fáze ${phase.id}`}
@@ -195,7 +195,7 @@ export const PhaseCards = ({
                     ) : (
                       <Button
                         variant={isCurrent ? "default" : "outline"}
-                        className={`rounded-[10px] ${isCurrent ? "bg-orange-500 text-white hover:bg-orange-600" : ""}`}
+                        className={isCurrent ? "v7-trap-btn rounded-none font-bold text-signal-foreground" : "rounded-[10px]"}
                         onClick={() => onOpen(phase.route)}
                       >
                         {isDone ? "Otevřít fázi" : isCurrent ? (done.size === 0 ? "Začít" : "Pokračovat") : "Otevřít"}
