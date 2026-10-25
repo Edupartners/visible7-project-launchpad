@@ -8,11 +8,20 @@ import { track } from "@/lib/track";
 
 const Group = ({ g, tools }: { g: OfficeGroup; tools?: boolean }) => (
   <div className="rounded-3xl border border-border bg-card p-6">
-    <div className="flex flex-wrap items-baseline justify-between gap-2">
-      <h3 className="text-lg font-bold">{g.title}</h3>
-      <span className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{g.when}</span>
+    <div className="flex items-center gap-3">
+      <span
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white ${
+          tools ? "bg-leaf-500" : "bg-primary"
+        }`}
+      >
+        <g.icon className="h-5 w-5" aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <h3 className="text-lg font-bold leading-tight">{g.title}</h3>
+        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{g.when}</p>
+      </div>
     </div>
-    <ul className="mt-4 space-y-3">
+    <ul className="mt-5 space-y-1">
       {g.links.map((l) => (
         <li key={l.url}>
           <a
@@ -22,6 +31,17 @@ const Group = ({ g, tools }: { g: OfficeGroup; tools?: boolean }) => (
             onClick={() => track("office_link_click", { name: l.name, group: g.id })}
             className="group flex gap-3 rounded-2xl p-3 transition-colors hover:bg-muted/60"
           >
+            <span
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                tools
+                  ? l.pick
+                    ? "bg-leaf-100 text-leaf-700"
+                    : "bg-muted text-muted-foreground"
+                  : "bg-primary/10 text-primary"
+              } transition-colors group-hover:bg-leaf-500 group-hover:text-white`}
+            >
+              <l.icon className="h-[18px] w-[18px]" aria-hidden="true" />
+            </span>
             <span className="flex-1">
               <span className="flex flex-wrap items-center gap-2 font-semibold text-foreground">
                 {l.name}
