@@ -2,6 +2,7 @@
 // Spouští se jednou denně z pg_cron s klíčem z Vault (hlavička x-cron-key).
 // Správce si může nechat poslat ukázky všech připomínek sobě: POST { test: true } s jeho přihlášením.
 // Servisní sdělení k vlastnímu účtu – bez nabídek; v každém e-mailu odkaz na odhlášení.
+// Navíc připomínky termínů podnikatele (deadline_candidates) týden předem, jen ověřené termíny.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
@@ -121,6 +122,54 @@ function compose(kind: Kind, d: Data, unsubscribe: string) {
   }
 }
 
+// Připomínka termínů podnikatele (daně, pojištění, DPH): týden předem, jen ověřené termíny.
+type DeadlineItem = { id: string; title: string; detail: string; due: string; url: string | null; source: string | null };
+const czDate = (iso: string) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${d}. ${m}. ${y}`;
+};
+function composeDeadlines(items: DeadlineItem[], unsubscribe: string) {
+  const first = items[0];
+  const subject =
+    items.length === 1 ? `Do ${czDate(first.due)}: ${first.title}` : `Blíží se ${items.length} termíny (první ${czDate(first.due)})`;
+  const list = items
+    .map(
+      (i) =>
+        `<li style="margin:0 0 12px"><strong>${czDate(i.due)} – ${esc(i.title)}</strong><br>${esc(i.detail)}${
+          i.url ? `<br><a href="${i.url}" style="color:#2b7350">Otevřít portál</a>` : ""
+        }${i.source ? ` · <a href="${i.source}" style="color:#6b7280">Zdroj termínu</a>` : ""}</li>`,
+    )
+    .join("");
+  const html = layout(
+    items.length === 1 ? "Za týden máte termín" : "Za týden máte termíny",
+    [
+      "Dobrý den,",
+      `připomínáme, co vás čeká podle profilu podnikatele ve VISIBLE7:</p><ul style="font-size:15px;line-height:1.6;padding-left:18px;margin:0 0 14px">${list}</ul><p style="font-size:13px;line-height:1.5;color:#6b7280;margin:0 0 14px">Termíny jsou orientační připomínka, ne daňové poradenství. Ověřte si je prosím v daňovém kalendáři nebo u své účetní.`,
+    ],
+    "Moje termíny",
+    `${APP_URL}/digitalni-kancelar#terminy`,
+    unsubscribe,
+  );
+  return { subject, html };
+}
+
+async function sendDeadlines(to: string, items: DeadlineItem[], unsubscribe: string) {
+  const { subject, html } = composeDeadlines(items, unsubscribe);
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": BREVO_KEY!, "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({
+      sender: SENDER,
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+      headers: { "List-Unsubscribe": `<${unsubscribe}>` },
+      tags: ["pripominka", "termin"],
+    }),
+  });
+  if (!res.ok) throw new Error(`Brevo ${res.status}: ${(await res.text()).slice(0, 300)}`);
+}
+
 async function send(to: string, kind: Kind, d: Data, unsubscribe: string) {
   const { subject, html } = compose(kind, d, unsubscribe);
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -159,7 +208,21 @@ Deno.serve(async (req) => {
     const unsub = `${APP_URL}/odhlasit?t=ukazka`;
     const kinds: Kind[] = ["rentgen", "gate", "trial_end", "inactive14"];
     for (const k of kinds) await send(user.email, k, sample, unsub);
-    return json({ sent: kinds.length, to: user.email });
+    await sendDeadlines(
+      user.email,
+      [
+        {
+          id: "ukazka",
+          title: "Paušální daň: záloha za listopad",
+          detail: "Měsíční platba paušální daně (daň, sociální a zdravotní pojištění v jedné platbě).",
+          due: "2026-11-20",
+          url: "https://www.mojedane.cz/",
+          source: "https://financnisprava.gov.cz/cs/danovy-kalendar",
+        },
+      ],
+      unsub,
+    );
+    return json({ sent: kinds.length + 1, to: user.email });
   }
 
   // B) Denní rozeslání a upozornění na zájemce (jen s klíčem z Vault)
@@ -227,7 +290,31 @@ Deno.serve(async (req) => {
   const { data: rows, error } = await admin.rpc("reminder_candidates", { p_limit: 200 });
   if (error) return json({ error: error.message }, 500);
   const list = (rows ?? []) as { user_id: string; email: string; kind: Kind; data: Data; unsubscribe_token: string | null }[];
-  if (body.dry) return json({ candidates: list.map((r) => ({ kind: r.kind, data: r.data })) });
+  const { data: drows, error: derr } = await admin.rpc("deadline_candidates", { p_limit: 300 });
+  if (derr) console.error("deadline_candidates", derr.message);
+  const dlist = (drows ?? []) as { user_id: string; email: string; unsubscribe_token: string | null; items: DeadlineItem[] }[];
+  if (body.dry)
+    return json({
+      candidates: list.map((r) => ({ kind: r.kind, data: r.data })),
+      deadlines: dlist.map((r) => r.items.map((i) => `${i.due} ${i.title}`)),
+    });
+
+  // Termíny: samostatně, neblokuje je limit 1 připomínky za 3 dny
+  let dsent = 0;
+  for (const r of dlist) {
+    try {
+      let token = r.unsubscribe_token;
+      if (!token) {
+        const { data: t } = await admin.rpc("ensure_email_prefs", { p_user: r.user_id });
+        token = t as string;
+      }
+      await sendDeadlines(r.email, r.items, `${APP_URL}/odhlasit?t=${token}`);
+      await admin.from("email_log").insert({ user_id: r.user_id, kind: "deadline", meta: { ids: r.items.map((i) => i.id) } });
+      dsent++;
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   let sent = 0;
   const failed: string[] = [];
@@ -247,5 +334,5 @@ Deno.serve(async (req) => {
       failed.push(r.kind);
     }
   }
-  return json({ candidates: list.length, sent, failed: failed.length });
+  return json({ candidates: list.length, sent, failed: failed.length, deadlines: dsent });
 });

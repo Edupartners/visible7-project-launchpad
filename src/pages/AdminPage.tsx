@@ -26,6 +26,7 @@ import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
 import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmin";
 import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
 import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
+import { DeadlinesAdmin } from "@/components/admin/DeadlinesAdmin";
 import { ShopAdmin } from "@/components/admin/ShopAdmin";
 import { SeminarsAdmin } from "@/components/admin/SeminarsAdmin";
 import { BlockVideosAdmin } from "@/components/admin/BlockVideosAdmin";
@@ -316,6 +317,8 @@ const AdminPage = () => {
             <AnnouncementsAdmin users={stats.users} />
 
             <RemindersAdmin />
+
+            <DeadlinesAdmin />
 
             {quiz && <AudienceSection quiz={quiz} />}
 

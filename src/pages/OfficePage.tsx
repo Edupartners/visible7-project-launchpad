@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, Briefcase, Landmark, Star } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Bell, Briefcase, Landmark, Star } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
 import { OFFICE_GOV, OFFICE_TOOLS, type OfficeGroup } from "@/lib/office";
+import { MyDeadlines } from "@/components/deadlines/MyDeadlines";
 import { track } from "@/lib/track";
 
 const Group = ({ g, tools }: { g: OfficeGroup; tools?: boolean }) => (
@@ -108,6 +109,9 @@ const OfficePage = () => {
               Bez hledání, kde co je.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3 text-sm font-semibold">
+              <a href="#terminy" className="rounded-full border border-border px-4 py-2 hover:border-leaf-500">
+                Moje termíny
+              </a>
               <a href="#urady" className="rounded-full border border-border px-4 py-2 hover:border-leaf-500">
                 Úřady online
               </a>
@@ -115,6 +119,26 @@ const OfficePage = () => {
                 Nástroje
               </a>
             </div>
+          </div>
+        </section>
+
+        <section id="terminy" className="scroll-mt-20 px-4 pb-16 sm:px-8 md:pb-24">
+          <div className="mx-auto max-w-3xl">
+            <div className="flex items-center justify-center gap-3">
+              <Bell className="h-7 w-7 text-leaf-700" aria-hidden="true" />
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Moje termíny</h2>
+            </div>
+            <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-muted-foreground">
+              Daně, pojištění a DPH podle toho, jak podnikáte. Týden předem vám pošleme e-mail s odkazem na správný
+              portál.
+            </p>
+            <div className="mt-10">
+              <MyDeadlines onStart={start} />
+            </div>
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              Termíny jsou orientační připomínka podle daňového kalendáře, ne daňové poradenství. U nejasností se
+              poraďte se svou účetní.
+            </p>
           </div>
         </section>
 

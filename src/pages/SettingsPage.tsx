@@ -24,6 +24,7 @@ import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { CertificatesPanel } from "@/components/CertificatesPanel";
 import { ConsentSettings, ProfileForm } from "@/components/settings/ProfileSettings";
 import { DeleteAccount } from "@/components/settings/DeleteAccount";
+import { BusinessProfileForm } from "@/components/deadlines/BusinessProfileForm";
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Zdarma (fáze 1 a 2)",
@@ -39,6 +40,7 @@ const SECTIONS = [
   { id: "ucet", label: "Profil" },
   { id: "projekty", label: "Projekty" },
   { id: "osvedceni", label: "Osvědčení" },
+  { id: "terminy", label: "Termíny" },
   { id: "souhlasy", label: "Souhlasy a GDPR" },
   { id: "zabezpeceni", label: "Zabezpečení" },
   { id: "smazani", label: "Smazání účtu" },
@@ -240,6 +242,17 @@ const SettingsPage = () => {
         <div id="osvedceni" className="scroll-mt-24">
           <CertificatesPanel completed={completed} />
         </div>
+
+        <Section id="terminy" title="Profil podnikatele a termíny">
+          <p className="mb-4 text-sm text-muted-foreground">
+            Podle toho vám v{" "}
+            <a href="/digitalni-kancelar#terminy" className="font-semibold text-primary underline underline-offset-4">
+              Digitální kanceláři
+            </a>{" "}
+            ukážeme termíny daní a pojištění a týden předem pošleme připomínku.
+          </p>
+          <BusinessProfileForm />
+        </Section>
 
         <Section id="souhlasy" title="Souhlasy a ochrana osobních údajů">
           <ConsentSettings />
