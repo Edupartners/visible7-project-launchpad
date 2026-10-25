@@ -135,6 +135,7 @@ export const NAV_MENUS: NavMenu[] = [
           },
           { title: "Mapa cesty", hint: "Kdy vás projekt uživí", icon: Map, to: "/test-napadu" },
         ],
+        more: { label: "Všechny funkce a co je zdarma", to: "/cenik#funkce" },
       },
       {
         heading: "Napojení a nástroje",

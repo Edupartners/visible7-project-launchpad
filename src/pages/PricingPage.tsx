@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
@@ -7,17 +7,105 @@ import { FREE_CONSULT_URL, canBuy, kc, monthsLabel, nbsp, perMonth, useShop } fr
 import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
+import { SPECIALIST_TITLE } from "@/lib/certificates";
 
-const INCLUDED: { row: string; free: boolean }[] = [
-  { row: "Rentgen nápadu: verdikt AI, čísla a mapa cesty", free: true },
-  { row: "Brána 1 Vize (modrý oceán) a brána 2 Ideace (Lean Canvas) s AI", free: true },
-  { row: "Osvědčení za brány 1 a 2", free: true },
-  { row: "Brána 3 Strategie a čísla: kapitál, bod zvratu, PNO", free: false },
-  { row: "Brány 4–7 s videonávody krok za krokem", free: false },
-  { row: "Export byznys case do Excelu", free: false },
-  { row: "Pitch na jednu A4 pro investora, banku nebo partnera", free: false },
-  { row: "Osvědčení za brány 3–7 a záměr", free: false },
+/** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
+type Cell = boolean | string;
+const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell][] }[] => [
+  {
+    group: "Test nápadu a podnikatelský plán",
+    rows: [
+      ["Rentgen nápadu do 5 minut: verdikt, čísla a rizika (i pro ty, kdo už podnikají)", true, true],
+      ["Mapa cesty A → D: kdy první zákazníci a kdy vás projekt uživí", true, true],
+      ["Brána 1 Vize: strategie modrého oceánu, ERRC matice, hodnotová křivka a USP", true, true],
+      ["Brána 2 Ideace: Lean Canvas a výběr z 13 typů online byznysu", true, true],
+    ],
+  },
+  {
+    group: "Finanční plán a výpočty",
+    rows: [
+      ["Brána 3: finanční plán na 24 měsíců, potřebný kapitál, bod zvratu, návratnost", false, true],
+      ["Daně podle formy podnikání (OSVČ, paušální daň, s.r.o.)", false, true],
+      ["Tři scénáře, maximální PNO a hodnota zákazníka", false, true],
+      ["Export finančního plánu do Excelu", false, true],
+      ["Pitch na jednu A4 pro investora, banku nebo partnera", false, true],
+    ],
+  },
+  {
+    group: "Tvorba projektu",
+    rows: [
+      ["Brána 4: plán tvorby webu, e-shopu nebo kurzu pro 13 typů byznysu", false, true],
+      ["28 bloků s instruktážním videem a 112 kroků k odškrtnutí", false, true],
+      ["Web projektu pro test zájmu, se zápisem zájemců a vyhodnocením", false, true],
+    ],
+  },
+  {
+    group: "Marketing",
+    rows: [
+      ["Brána 5: 12 marketingových kanálů seřazených podle vašeho byznysu", false, true],
+      ["Postup nastavení každého kanálu a testovací rozpočet", false, true],
+      ["Vyhodnocení testu kanálu podle PNO z finančního plánu", false, true],
+    ],
+  },
+  {
+    group: "Spuštění a růst",
+    rows: [
+      ["Brána 6 Launch: tahák k ohlášení živnosti, ověření IČO, první ukazatele", false, true],
+      ["Brána 7 Expanze: plán růstu, tým a automatizace", false, true],
+    ],
+  },
+  {
+    group: "AI asistence",
+    rows: [
+      ["AI pomocník navrhne obsah, AI mentor zhodnotí výsledek", "brány 1–2", true],
+      ["AI návrh čísel, nákladů a textů webu projektu", false, true],
+    ],
+  },
+  {
+    group: "Vzdělávání",
+    rows: [
+      ["Úvodní video ke každé bráně", "brány 1–2", true],
+      ["Videonávody krok za krokem (100+ videí)", false, true],
+      ["Pracovní listy k vyplnění a tisku", "13 listů", "všechny"],
+      ["Živé online semináře každých 14 dní a jejich záznamy", "vybrané", true],
+    ],
+  },
+  {
+    group: "Poradci a konzultace",
+    rows: [
+      ["Úvodní konzultace 20 minut s expertem", true, true],
+      ["Konzultace se seniorním poradcem z praxe", "za poplatek", "za poplatek"],
+    ],
+  },
+  {
+    group: "Osvědčení a certifikace",
+    rows: [
+      ["Osvědčení za brány 1 a 2", true, true],
+      ["Osvědčení za brány 3–5", false, true],
+      [`${specialist}: certifikace po bráně 5`, false, true],
+      ["VISIBLE7 Gold za spuštěný projekt", false, true],
+      ["Zkouška státem uznané profesní kvalifikace", false, "za poplatek"],
+    ],
+  },
+  {
+    group: "Digitální kancelář",
+    rows: [
+      ["Úřady online a doporučené nástroje na jednom místě", true, true],
+      ["Moje termíny: daně a pojištění s připomínkou e-mailem týden předem", true, true],
+    ],
+  },
 ];
+
+const CellMark = ({ v }: { v: Cell }) =>
+  v === true ? (
+    <Check className="mx-auto h-5 w-5 text-emerald-600" strokeWidth={3} aria-label="ano" />
+  ) : v === false ? (
+    <span className="text-border" aria-label="ne">
+      —
+    </span>
+  ) : (
+    <span className="text-xs font-semibold text-muted-foreground">{v}</span>
+  );
 
 const MEMBER_ITEMS = [
   "Všech 7 bran a přes 100 videonávodů",
@@ -35,6 +123,8 @@ const PricingPage = () => {
   const start = () => navigate("/home?novy");
   useEffect(() => {
     document.title = "Ceník | VISIBLE7 MICEK";
+    const id = window.location.hash.slice(1);
+    if (id) setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 200);
     supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
   }, []);
 
@@ -159,10 +249,11 @@ const PricingPage = () => {
           </p>
         </section>
 
-        <section className="px-3 py-2 sm:px-6 lg:px-10">
+        <section id="funkce" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-muted/50 py-16 md:py-20">
             <div className="mx-auto max-w-4xl px-4 sm:px-8 lg:px-12">
-              <h2 className="text-3xl font-extrabold tracking-tight">Co je zdarma a co v placeném přístupu</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight">Všechno, co VISIBLE7 umí</h2>
+              <p className="mt-3 text-lg text-muted-foreground">Kompletní přehled funkcí a co z toho máte zdarma.</p>
               <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
                 <table className="w-full min-w-[520px] text-left">
                   <thead>
@@ -179,24 +270,27 @@ const PricingPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {INCLUDED.map(({ row, free }) => (
-                      <tr key={row} className="border-b border-border last:border-0">
-                        <th scope="row" className="p-4 font-medium">
-                          {row}
-                        </th>
-                        <td className="p-4 text-center">
-                          {free ? (
-                            <Check className="mx-auto h-5 w-5 text-emerald-600" strokeWidth={3} aria-label="ano" />
-                          ) : (
-                            <span className="text-border" aria-label="ne">
-                              —
-                            </span>
-                          )}
-                        </td>
-                        <td className="bg-primary/[0.04] p-4 text-center">
-                          <Check className="mx-auto h-5 w-5 text-emerald-600" strokeWidth={3} aria-label="ano" />
-                        </td>
-                      </tr>
+                    {ROWS(SPECIALIST_TITLE).map(({ group, rows }) => (
+                      <Fragment key={group}>
+                        <tr className="border-b border-border bg-muted/60">
+                          <th scope="colgroup" colSpan={3} className="px-4 py-2.5 text-sm font-bold text-primary">
+                            {group}
+                          </th>
+                        </tr>
+                        {rows.map(([row, free, member]) => (
+                          <tr key={row} className="border-b border-border last:border-0">
+                            <th scope="row" className="p-4 font-medium">
+                              {row}
+                            </th>
+                            <td className="p-4 text-center">
+                              <CellMark v={free} />
+                            </td>
+                            <td className="bg-primary/[0.04] p-4 text-center">
+                              <CellMark v={member} />
+                            </td>
+                          </tr>
+                        ))}
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>
