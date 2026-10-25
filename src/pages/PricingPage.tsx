@@ -11,7 +11,7 @@ import { SPECIALIST_TITLE } from "@/lib/certificates";
 
 /** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
 type Cell = boolean | string;
-const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell][] }[] => [
+const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, string?][] }[] => [
   {
     group: "Test nápadu a podnikatelský plán",
     rows: [
@@ -32,19 +32,52 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell][]
     ],
   },
   {
-    group: "Tvorba projektu",
+    group: "Tvorba projektu (brána 4)",
     rows: [
-      ["Brána 4: plán tvorby webu, e-shopu nebo kurzu pro 13 typů byznysu", false, true],
-      ["28 bloků s instruktážním videem a 112 kroků k odškrtnutí", false, true],
+      [
+        "Plán tvorby pro váš typ byznysu: na čem postavit a v jakém pořadí",
+        false,
+        true,
+        "13 typů: prezentační web (WordPress), e-shop (Shoptet), web s e-shopem (WooCommerce), konverzní web, squeeze page, online kurz, placený členský obsah, blog, affiliate web, dropshipping, komunita, marketplace a vlastní aplikace vyvíjená s AI.",
+      ],
+      [
+        "Stavba po blocích, každý s videem, kroky k odškrtnutí a náklady",
+        false,
+        true,
+        "Například doména, hosting a WordPress, šablona a vzhled, texty stránek, prodejní stránka, formulář poptávek, založení Shoptetu, produkty, platby a doprava, dodavatel, opakované platby, členská sekce, platforma a první modul kurzu, stránka pro sběr kontaktů s dárkem, uvítací e-maily, partnerské programy, komunitní platforma, zadání a prototyp aplikace.",
+      ],
+      [
+        "U každého typu právní minimum, měření návštěvnosti a kontrola před spuštěním",
+        false,
+        true,
+        "Identifikace podnikatele, zásady ochrany osobních údajů, cookie lišta, obchodní podmínky a reklamační řád, napojení Google Analytics s měřením objednávek a kontrolní seznam před spuštěním.",
+      ],
+      ["Náklady z bloků se samy propíšou do finančního plánu", false, true],
       ["Web projektu pro test zájmu, se zápisem zájemců a vyhodnocením", false, true],
     ],
   },
   {
-    group: "Marketing",
+    group: "Marketing (brána 5)",
     rows: [
-      ["Brána 5: 12 marketingových kanálů seřazených podle vašeho byznysu", false, true],
-      ["Postup nastavení každého kanálu a testovací rozpočet", false, true],
-      ["Vyhodnocení testu kanálu podle PNO z finančního plánu", false, true],
+      [
+        "12 marketingových kanálů seřazených podle vašeho typu byznysu a rozpočtu",
+        false,
+        true,
+        "Meta Ads (Facebook a Instagram), Google Ads, Sklik, srovnávače zboží, firemní profil na Googlu, e-mail marketing, ChatGPT Ads, SEO a obsah, LinkedIn, influenceři a PR, marketplace a katalogy, SMS.",
+      ],
+      [
+        "Postup nastavení krok za krokem s testovacím rozpočtem",
+        false,
+        true,
+        "Měření konverzí, texty a obrázky reklam, účet a publikum na Meta, první kampaň, klíčová slova a kampaň ve vyhledávání, Sklik, napojení feedu do srovnávačů, sběr kontaktů a e-mailové automatizace, základ SEO a obsah, LinkedIn profil, spolupráce s influencery, SMS.",
+      ],
+      ["Benchmark konkurence: kde a čím inzerují vaši konkurenti a co nikdo nenabízí", false, true],
+      [
+        "Vyhodnocení testu kanálu podle PNO z finančního plánu",
+        false,
+        true,
+        "Po testu aplikace doporučí kanál škálovat, ladit, nebo vypnout.",
+      ],
     ],
   },
   {
@@ -277,10 +310,15 @@ const PricingPage = () => {
                             {group}
                           </th>
                         </tr>
-                        {rows.map(([row, free, member]) => (
+                        {rows.map(([row, free, member, detail]) => (
                           <tr key={row} className="border-b border-border last:border-0">
                             <th scope="row" className="p-4 font-medium">
                               {row}
+                              {detail && (
+                                <span className="mt-1.5 block text-sm font-normal leading-relaxed text-muted-foreground">
+                                  {detail}
+                                </span>
+                              )}
                             </th>
                             <td className="p-4 text-center">
                               <CellMark v={free} />
