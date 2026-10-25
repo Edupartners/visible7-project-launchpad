@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Compass,
   BookOpen,
+  Briefcase,
   FlaskConical,
   GraduationCap,
   HandCoins,
@@ -136,7 +137,7 @@ export const NAV_MENUS: NavMenu[] = [
         ],
       },
       {
-        heading: "Napojení",
+        heading: "Napojení a nástroje",
         items: [
           {
             title: "Bankovní účet (PSD2)",
@@ -144,6 +145,12 @@ export const NAV_MENUS: NavMenu[] = [
             icon: Landmark,
             to: "/napojeni-banky",
             badge: "Připravujeme",
+          },
+          {
+            title: "Digitální kancelář",
+            hint: "Úřady a nástroje podnikatele na jednom místě",
+            icon: Briefcase,
+            to: "/digitalni-kancelar",
           },
         ],
       },

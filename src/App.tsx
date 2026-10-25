@@ -38,6 +38,7 @@ import ExistingBusinessPage from "./pages/features/ExistingBusinessPage";
 import WhyDifferentPage from "./pages/features/WhyDifferentPage";
 import SecurityPage from "./pages/SecurityPage";
 import SchoolsPage from "./pages/features/SchoolsPage";
+import OfficePage from "./pages/OfficePage";
 import CertificationPage from "./pages/CertificationPage";
 import WorksheetsPage from "./pages/WorksheetsPage";
 import MemberWorksheetsPage from "./pages/MemberWorksheetsPage";
@@ -177,6 +178,7 @@ const App = () => (
           <Route path="/cim-jsme-jini" element={<WhyDifferentPage />} />
           <Route path="/bezpecnost" element={<SecurityPage />} />
           <Route path="/pro-skoly" element={<SchoolsPage />} />
+          <Route path="/digitalni-kancelar" element={<OfficePage />} />
           <Route path="/certifikace" element={<CertificationPage />} />
           <Route path="/pracovni-listy" element={<WorksheetsPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />

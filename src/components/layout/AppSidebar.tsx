@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Award,
+  Briefcase,
   Crown,
   PanelLeftClose,
   PanelLeftOpen,
@@ -318,6 +319,15 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
               <FlaskConical className="h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
             </button>
           </li>
+          <li>
+            <button
+              type="button"
+              onClick={() => go("/digitalni-kancelar")}
+              className={itemCls(pathname === "/digitalni-kancelar")}
+            >
+              <Briefcase className="h-4 w-4 text-muted-foreground" /> Digitální kancelář
+            </button>
+          </li>
         </ul>
 
         <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Pomoc a výsledky</p>
@@ -486,6 +496,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
         {icon("Pitch pro investory", "/investor-pitch", Presentation)}
         {icon("Pracovní listy", "/listy", FileText)}
         {icon("Web projektu (test zájmu)", "/testovaci-stranka", FlaskConical)}
+        {icon("Digitální kancelář", "/digitalni-kancelar", Briefcase)}
         <span className="my-1 h-px w-8 bg-border" />
         {icon("Seniorní poradci", "/poradci", Users)}
         {icon("Živé semináře", "/seminare", Presentation)}
