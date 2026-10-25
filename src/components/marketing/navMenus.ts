@@ -222,9 +222,9 @@ export const NAV_MENUS: NavMenu[] = [
         items: [
           {
             title: "Školy a lektoři",
-            hint: "VISIBLE7 do výuky podnikání",
+            hint: "Roční licence pro žáky a školení učitelů",
             icon: School,
-            href: "mailto:michal.micek@edu-partners.cz?subject=VISIBLE7 pro školy",
+            to: "/pro-skoly",
           },
           {
             title: "Banky a podnikatelské programy",

@@ -5,7 +5,7 @@
 //  - jen přihlášený vlastník projektu,
 //  - limity: 3 návrhy + 3 vyhodnocení/komentáře na fázi a projekt, 20 volání AI denně na uživatele
 //    (při zapnutém paywallu 5 pro uživatele zdarma a ve zkušebním přístupu; pitch jen placený),
-//    celkový denní strop pro celou aplikaci (AI_GLOBAL_DAILY_LIMIT, výchozí 300),
+//    celkový denní strop pro celou aplikaci (AI_GLOBAL_DAILY_LIMIT, výchozí 2000 – školní třída udělá desítky volání za hodinu),
 //  - levný model (AI_MODEL, výchozí claude-haiku-5-5), pevný strop max_tokens,
 //  - vstupy se zkracují, všechna pole canvasu v jednom volání.
 // Klíč ANTHROPIC_API_KEY je jen v Supabase secrets, nikdy v prohlížeči.
@@ -18,7 +18,7 @@ const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
 const MODEL = Deno.env.get("AI_MODEL") ?? "claude-haiku-5-5";
-const GLOBAL_DAILY = Number(Deno.env.get("AI_GLOBAL_DAILY_LIMIT") ?? "300");
+const GLOBAL_DAILY = Number(Deno.env.get("AI_GLOBAL_DAILY_LIMIT") ?? "2000");
 
 const LIMITS = { navrh: 3, vyhodnoceni: 3, userDaily: 20, userDailyFree: 5 };
 
