@@ -102,7 +102,7 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
                 </button>
                 <a
                   href="#ukazka"
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-full border-2 border-leaf-500 px-6 text-base font-semibold text-leaf-700 transition-colors hover:bg-leaf-50"
+                  className="inline-flex h-14 items-center justify-center gap-2 border-2 border-leaf-500 px-6 text-base font-semibold text-leaf-700 transition-colors hover:bg-leaf-50"
                 >
                   Jak to funguje <Play className="h-4 w-4" aria-hidden="true" />
                 </a>
@@ -266,7 +266,7 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
           <button
             type="button"
             onClick={start}
-            className="mt-8 inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600"
+            className="v7-trap-btn mt-8 inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
           >
             {d.cta} <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </button>

@@ -198,13 +198,13 @@ const OfficePage = () => {
               <button
                 type="button"
                 onClick={start}
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600"
+                className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
               >
                 Otestovat nápad zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </button>
               <Link
                 to="/zacit-podnikat"
-                className="inline-flex h-14 items-center justify-center rounded-full border-2 border-leaf-500 px-7 text-base font-semibold text-leaf-700 hover:bg-leaf-50"
+                className="inline-flex h-14 items-center justify-center border-2 border-leaf-500 px-7 text-base font-semibold text-leaf-700 hover:bg-leaf-50"
               >
                 Jak začít podnikat
               </Link>

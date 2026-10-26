@@ -76,7 +76,7 @@ const MembershipPage = () => {
             <button
               type="button"
               onClick={() => navigate(email ? "/home" : "/home?novy")}
-              className="flex h-12 items-center justify-center rounded-xl bg-leaf-500 px-7 font-semibold text-white hover:bg-leaf-600"
+              className="v7-trap-btn flex h-12 items-center justify-center pl-7 pr-12 font-bold text-signal-foreground"
             >
               {email ? "Pokračovat v projektu" : "Přihlásit se nebo zaregistrovat"}
             </button>
@@ -147,7 +147,7 @@ const MembershipPage = () => {
               href={shop.checkout_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-12 items-center justify-center rounded-xl bg-leaf-500 font-semibold text-white hover:bg-leaf-600"
+              className="v7-trap-btn flex h-12 items-center justify-center font-bold text-signal-foreground"
             >
               Přejít k objednávce
             </a>

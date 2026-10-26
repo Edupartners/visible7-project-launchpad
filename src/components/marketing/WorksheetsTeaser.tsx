@@ -45,7 +45,7 @@ export const WorksheetsTeaser = () => (
         </ul>
         <Link
           to="/pracovni-listy"
-          className="mt-7 inline-flex items-center gap-2 rounded-xl bg-leaf-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-leaf-600"
+          className="v7-trap-btn mt-7 inline-flex items-center gap-2 pl-6 pr-12 py-3.5 text-base font-bold text-signal-foreground"
         >
           <Download className="h-5 w-5" aria-hidden="true" /> Stáhnout listy zdarma
           <ArrowRight className="h-4 w-4" aria-hidden="true" />

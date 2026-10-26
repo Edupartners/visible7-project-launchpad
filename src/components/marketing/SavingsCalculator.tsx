@@ -132,7 +132,7 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
                 track("calculator_cta", { total, rate });
                 onStart();
               }}
-              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-leaf-500 px-5 py-3.5 text-[15px] font-semibold text-white hover:bg-leaf-600"
+              className="v7-trap-btn mt-6 inline-flex w-full items-center justify-center gap-2 pl-5 pr-12 py-3.5 text-[15px] font-bold text-signal-foreground"
             >
               Začít plán zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>

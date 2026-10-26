@@ -102,10 +102,10 @@ const SchoolOffer = () => (
             <a
               href={inquiry(p.name)}
               onClick={() => track("school_inquiry_click", { pkg: p.name })}
-              className={`mt-7 inline-flex h-12 items-center justify-center rounded-full px-6 font-semibold transition-colors ${
+              className={`mt-7 inline-flex h-12 items-center justify-center ${
                 p.featured
-                  ? "bg-leaf-500 text-white hover:bg-leaf-600"
-                  : "border-2 border-leaf-500 text-leaf-700 hover:bg-leaf-50"
+                  ? "v7-trap-btn pl-6 pr-12 font-bold text-signal-foreground"
+                  : "border-2 border-leaf-500 px-6 font-semibold text-leaf-700 transition-colors hover:bg-leaf-50"
               }`}
             >
               Poptat licenci

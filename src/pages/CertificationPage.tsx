@@ -78,7 +78,7 @@ const CertificationPage = () => {
             <button
               type="button"
               onClick={start}
-              className="rounded-xl bg-leaf-500 px-6 py-4 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(234,88,12,0.7)] hover:bg-leaf-600"
+              className="v7-trap-btn pl-6 pr-12 py-4 font-bold text-signal-foreground"
             >
               Otestovat nápad zdarma
             </button>
@@ -223,7 +223,7 @@ const CertificationPage = () => {
           <button
             type="button"
             onClick={start}
-            className="mt-8 rounded-xl bg-leaf-500 px-6 py-4 font-semibold text-white hover:bg-leaf-600"
+            className="v7-trap-btn mt-8 pl-6 pr-12 py-4 font-bold text-signal-foreground"
           >
             Otestovat nápad zdarma
           </button>

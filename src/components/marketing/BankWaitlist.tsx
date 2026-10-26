@@ -72,7 +72,7 @@ export const BankWaitlist = () => {
                 <button
                   type="button"
                   onClick={() => setState("open")}
-                  className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
+                  className="v7-trap-btn mt-6 inline-flex h-14 w-full items-center justify-center gap-2 pl-7 pr-12 text-base focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300 font-bold text-signal-foreground"
                 >
                   Chci to mezi prvními
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
@@ -98,7 +98,7 @@ export const BankWaitlist = () => {
                 <button
                   type="submit"
                   disabled={state === "sending"}
-                  className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 disabled:opacity-60"
+                  className="v7-trap-btn mt-4 inline-flex h-14 w-full items-center justify-center gap-2 pl-7 pr-12 text-base disabled:opacity-60 font-bold text-signal-foreground"
                 >
                   {state === "sending" ? "Odesílám…" : "Chci to mezi prvními"}
                 </button>
