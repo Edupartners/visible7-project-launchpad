@@ -6,6 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { loadProjectKeys } from "@/lib/projectData";
 import { track } from "@/lib/track";
+import { supabase } from "@/integrations/visible7/client";
+import { useAccess } from "@/lib/access";
+import { PremiumLock } from "@/components/access/Locks";
 import {
   CONFIDENCE_LABEL,
   MARKET_KEY,
@@ -40,6 +43,14 @@ export const MarketSizeCard = ({ projectId }: { projectId: string }) => {
   const [region, setRegion] = useState<MarketSize["region"]>("cz");
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const access = useAccess();
+  const [isAdmin, setIsAdmin] = useState(false);
+  // Jen pro placený přístup (bez ohledu na přepínač paywallu) – výpočet stojí reálné peníze. Správce může testovat.
+  const allowed = access.paid || isAdmin;
+
+  useEffect(() => {
+    supabase.rpc("is_admin").then(({ data }) => setIsAdmin(data === true));
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -99,45 +110,57 @@ export const MarketSizeCard = ({ projectId }: { projectId: string }) => {
             AI dohledá na webu aktuální čísla a spočítá, jak velký je váš trh. Každé číslo má výpočet a zdroj, takže ho
             obhájíte před investorem i bankou.
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Zbývá {left} z {MARKET_LIMIT} výpočtů pro tento projekt.
-          </p>
+          {allowed && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Zbývá {left} z {MARKET_LIMIT} výpočtů pro tento projekt.
+            </p>
+          )}
         </div>
-        <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
-          <div role="radiogroup" aria-label="Region trhu" className="inline-flex rounded-xl border border-border p-1">
-            {(Object.keys(REGION_LABEL) as MarketSize["region"][]).map((r) => (
-              <button
-                key={r}
-                role="radio"
-                aria-checked={region === r}
-                onClick={() => setRegion(r)}
-                disabled={busy}
-                className={`rounded-lg px-3 py-1 text-sm font-semibold transition-colors ${
-                  region === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {REGION_LABEL[r]}
-              </button>
-            ))}
+        {allowed && (
+          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+            <div role="radiogroup" aria-label="Region trhu" className="inline-flex rounded-xl border border-border p-1">
+              {(Object.keys(REGION_LABEL) as MarketSize["region"][]).map((r) => (
+                <button
+                  key={r}
+                  role="radio"
+                  aria-checked={region === r}
+                  onClick={() => setRegion(r)}
+                  disabled={busy}
+                  className={`rounded-lg px-3 py-1 text-sm font-semibold transition-colors ${
+                    region === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {REGION_LABEL[r]}
+                </button>
+              ))}
+            </div>
+            <Button
+              variant={market ? "outline" : "default"}
+              className="rounded-[10px]"
+              onClick={run}
+              disabled={busy || left === 0}
+            >
+              {busy ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : market ? (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              ) : (
+                <Globe2 className="mr-2 h-4 w-4" />
+              )}
+              {busy ? "Hledám data…" : market ? "Spočítat znovu" : "Spočítat velikost trhu"}
+            </Button>
           </div>
-          <Button
-            variant={market ? "outline" : "default"}
-            className="rounded-[10px]"
-            onClick={run}
-            disabled={busy || left === 0}
-          >
-            {busy ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : market ? (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            ) : (
-              <Globe2 className="mr-2 h-4 w-4" />
-            )}
-            {busy ? "Hledám data…" : market ? "Spočítat znovu" : "Spočítat velikost trhu"}
-          </Button>
-        </div>
+        )}
       </div>
-      <AiPrivacyNote className="mt-3" />
+      {allowed ? (
+        <AiPrivacyNote className="mt-3" />
+      ) : (
+        !access.loading && (
+          <div className="mt-4">
+            <PremiumLock feature="market" compact />
+          </div>
+        )
+      )}
 
       {busy && (
         <p className="mt-4 rounded-xl bg-leaf-50 p-4 text-sm text-leaf-800 ring-1 ring-leaf-200">

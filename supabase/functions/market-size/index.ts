@@ -2,7 +2,7 @@
 //
 // Proč samostatná funkce: potřebuje web search a delší běh, ai-assist zůstává beze změny.
 // Náklady drží na uzdě:
-//  - jen přihlášený vlastník projektu, při zapnutém paywallu jen placený přístup (stejně jako pitch),
+//  - jen přihlášený vlastník projektu s placeným přístupem (vždy, i při vypnutém paywallu) nebo správce,
 //  - 2 výpočty na projekt, sdílí denní limit AI uživatele a celkový denní strop aplikace (tabulka ai_outputs),
 //  - max. 6 vyhledávání na výpočet, pevný strop max_tokens.
 // Zdroje: do výstupu pouštíme jen odkazy, které vyhledávání opravdu vrátilo (AI nemůže zdroj vymyslet).
@@ -18,7 +18,6 @@ const MODEL = Deno.env.get("MARKET_MODEL") ?? "claude-sonnet-5";
 const GLOBAL_DAILY = Number(Deno.env.get("AI_GLOBAL_DAILY_LIMIT") ?? "2000");
 const PER_PROJECT = 2;
 const USER_DAILY = 20;
-const USER_DAILY_FREE = 5;
 const PHASE = "m";
 const STORE_KEY = "market_size";
 
@@ -243,15 +242,16 @@ Deno.serve(async (req) => {
     .maybeSingle();
   if (!project || project.user_id !== user.id) return json({ error: "Projekt nenalezen" }, 404);
 
-  const [{ data: pwRow }, { data: accRow }] = await Promise.all([
-    admin.from("app_settings").select("value").eq("key", "paywall_enabled").maybeSingle(),
+  // Jen placený přístup, bez ohledu na přepínač paywallu (výpočet stojí reálné peníze). Správce může testovat.
+  const [{ data: accRow }, { data: adminRow }] = await Promise.all([
     admin.from("user_access").select("plan, access_until").eq("user_id", user.id).maybeSingle(),
+    admin.from("admins").select("user_id").eq("user_id", user.id).maybeSingle(),
   ]);
-  const paywall = pwRow?.value === true;
   const paid =
-    ["mesic", "ctvrtleti", "rok", "kod", "clenstvi"].includes(accRow?.plan ?? "") &&
-    (!accRow?.access_until || new Date(accRow.access_until).getTime() > Date.now());
-  if (paywall && !paid) {
+    (["mesic", "ctvrtleti", "rok", "kod", "clenstvi"].includes(accRow?.plan ?? "") &&
+      (!accRow?.access_until || new Date(accRow.access_until).getTime() > Date.now())) ||
+    !!adminRow;
+  if (!paid) {
     return json({ error: "Velikost trhu je součástí placeného přístupu.", code: "premium" }, 402);
   }
 
@@ -264,7 +264,7 @@ Deno.serve(async (req) => {
   if ((perProject.count ?? 0) >= PER_PROJECT) {
     return json({ error: `Limit ${PER_PROJECT} výpočtů trhu pro tento projekt je vyčerpán.`, code: "limit_project" }, 429);
   }
-  if ((perUser.count ?? 0) >= (paywall && !paid ? USER_DAILY_FREE : USER_DAILY)) {
+  if ((perUser.count ?? 0) >= USER_DAILY) {
     return json({ error: "Dnešní limit AI je vyčerpán. Zkuste to zítra.", code: "limit_daily" }, 429);
   }
   if ((global.count ?? 0) >= GLOBAL_DAILY) {

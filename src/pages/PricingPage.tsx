@@ -28,6 +28,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
       ["Daně podle formy podnikání (OSVČ, paušální daň, s.r.o.)", false, true],
       ["Tři scénáře, maximální PNO a hodnota zákazníka", false, true],
       ["Export finančního plánu do Excelu", false, true],
+      ["Velikost trhu s AI: celý, dostupný a získatelný trh se zdroji z webu", false, true],
       ["Pitch na jednu A4 pro investora, banku nebo partnera", false, true],
     ],
   },

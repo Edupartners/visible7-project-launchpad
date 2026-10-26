@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Award, Check, FileSpreadsheet, FileText, Gift, Loader2, Lock } from "lucide-react";
+import { Award, Check, FileSpreadsheet, FileText, Gift, Globe2, Loader2, Lock } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { GATE_NAMES } from "@/lib/certificates";
@@ -101,6 +101,7 @@ const PREMIUM_COPY = {
   excel: { icon: FileSpreadsheet, title: "Export do Excelu je v placeném přístupu" },
   pitch: { icon: FileText, title: "Pitch na A4 je v placeném přístupu" },
   certificate: { icon: Award, title: "Osvědčení za brány 3–7 je v placeném přístupu" },
+  market: { icon: Globe2, title: "Velikost trhu je v placeném přístupu" },
 };
 
 /** Karta místo prémiové funkce (Excel, pitch, osvědčení 3–7). */
