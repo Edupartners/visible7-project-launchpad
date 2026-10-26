@@ -350,8 +350,9 @@ const Cta = ({
   <button
     type="button"
     onClick={onClick}
-    className={`inline-flex h-14 items-center justify-center gap-2 rounded-xl px-7 text-base font-semibold transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300 ${
-      light ? "bg-white text-primary hover:bg-white/90" : "bg-leaf-500 text-white hover:bg-leaf-600"
+    // Lichoběžník jako uvnitř aplikace (tlačítko „Otevřít bránu“): signální limetková s tmavým textem.
+    className={`v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 ${
+      light ? "focus-visible:ring-signal/60" : "focus-visible:ring-primary/40"
     }`}
   >
     {children}
@@ -431,7 +432,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <Cta onClick={onAccessGranted}>Začít plán zdarma</Cta>
               <a
                 href="#uvnitr"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+                className="inline-flex h-14 items-center justify-center gap-2 border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
               >
                 Jak to funguje
                 <Play className="h-4 w-4" aria-hidden="true" />

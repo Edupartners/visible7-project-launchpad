@@ -212,7 +212,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
           <button
             type="button"
             onClick={start}
-            className="hidden whitespace-nowrap rounded-full bg-leaf-500 px-5 py-2.5 text-white hover:bg-leaf-600 sm:block"
+            className="v7-trap-btn hidden whitespace-nowrap py-2.5 pl-5 pr-9 font-bold text-signal-foreground sm:block"
           >
             Začít zdarma
           </button>
@@ -269,7 +269,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
           <button
             type="button"
             onClick={start}
-            className="mt-6 w-full rounded-full bg-leaf-500 px-5 py-3.5 font-semibold text-white hover:bg-leaf-600"
+            className="v7-trap-btn mt-6 w-full py-3.5 pl-5 pr-9 font-bold text-signal-foreground"
           >
             Začít plán zdarma
           </button>

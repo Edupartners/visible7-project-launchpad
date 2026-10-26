@@ -96,7 +96,7 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
                 <button
                   type="button"
                   onClick={start}
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-leaf-500 px-7 text-base font-semibold text-white transition-colors hover:bg-leaf-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
+                  className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
                 >
                   {d.cta} <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </button>
