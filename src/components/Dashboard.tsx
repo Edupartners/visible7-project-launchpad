@@ -1,3 +1,4 @@
+import { MyBusinessTeaser } from "@/components/business/MyBusinessTeaser";
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { MembershipCard } from "@/components/access/MembershipCta";
 import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
@@ -187,6 +188,9 @@ export const Dashboard = (_props: DashboardProps) => {
 
         {/* Jen naléhavé stavy členství (končí zkušební přístup) */}
         <MembershipCard placement="top" />
+
+        {/* Kdo už podniká: vstup do Můj podnik */}
+        <MyBusinessTeaser />
 
         {/* Bez rentgenu na začátku cesty: rentgen je první krok */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 && <DashboardJourney prominent />}

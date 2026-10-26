@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Area,
@@ -15,105 +15,23 @@ import {
 import { AlertTriangle, ArrowRight, Banknote, CheckCircle2, Landmark, Lock, Mail, ShieldCheck } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
-import { useProject } from "@/contexts/ProjectContext";
 import { useToast } from "@/hooks/use-toast";
-import { loadProjectKeys } from "@/lib/projectData";
-import { type BusinessCaseData, groupOf, simulate } from "@/lib/businessCase";
-import { type Deadline, loadDeadlines, loadProfile, profileTags } from "@/lib/deadlines";
 import { track } from "@/lib/track";
-import {
-  CATEGORY_LABEL,
-  cashAlert,
-  compare,
-  czk,
-  czkShort,
-  demoActual,
-  demoPlan,
-  estimateOutflows,
-  forecast13,
-  lastMonths,
-  planFromCase,
-} from "@/lib/cashflow";
-
-const ALERT_STYLE = {
-  riziko: "bg-red-50 text-red-900 ring-red-200",
-  pozor: "bg-amber-50 text-amber-900 ring-amber-200",
-  ok: "bg-leaf-50 text-leaf-900 ring-leaf-200",
-};
-
-const Kpi = ({ label, value, note, hero = false }: { label: string; value: string; note: string; hero?: boolean }) => (
-  <div className={`rounded-2xl p-5 ${hero ? "bg-leaf-800 text-white" : "bg-card ring-1 ring-border"}`}>
-    <p className={`text-xs font-bold uppercase tracking-[0.12em] ${hero ? "text-white/70" : "text-muted-foreground"}`}>
-      {label}
-    </p>
-    <p className="mt-2 whitespace-nowrap text-3xl font-extrabold tabular-nums tracking-tight sm:text-4xl lg:text-[1.75rem] xl:text-3xl">
-      {value}
-    </p>
-    <p className={`mt-1 text-sm ${hero ? "text-white/75" : "text-muted-foreground"}`}>{note}</p>
-  </div>
-);
+import { ALERT_STYLE, CATEGORY_LABEL, czk, czkShort } from "@/lib/cashflow";
+import { useCashflowDemo } from "@/hooks/useCashflow";
+import { Kpi } from "@/components/business/Kpi";
 
 /**
  * Cash flow: plán vs. skutečnost a výhled hotovosti z napojeného účtu.
  * NÁHLED – běží na ukázkových datech, dokud není hotové napojení přes Sokordia Tech (funkce bank-sync).
  */
 const CashflowPage = () => {
-  const { currentProject } = useProject();
   const { toast } = useToast();
-  const [caseData, setCaseData] = useState<BusinessCaseData | null>(null);
-  const [deadlines, setDeadlines] = useState<Deadline[]>([]);
+  const data = useCashflowDemo();
 
   useEffect(() => {
     document.title = "Cash flow | VISIBLE7 MICEK";
-    let active = true;
-    (async () => {
-      const [raw, profile, list] = await Promise.all([
-        currentProject?.id ? loadProjectKeys(currentProject.id, ["business_case"]) : Promise.resolve({}),
-        loadProfile(),
-        loadDeadlines(100),
-      ]);
-      if (!active) return;
-      const bc = (raw as Record<string, unknown>).business_case as BusinessCaseData | undefined;
-      setCaseData(bc?.revenue && Array.isArray(bc.costs) ? bc : null);
-      // Bez vyplněného profilu ukážeme termíny OSVČ s DPH, aby byl vidět princip.
-      const tags = profile && profile.form !== "nezacal" ? profileTags(profile) : ["osvc_bezny", "dph"];
-      setDeadlines(list.filter((d) => d.verified && d.audience.some((a) => tags.includes(a))));
-    })();
-    return () => {
-      active = false;
-    };
-  }, [currentProject?.id]);
-
-  const data = useMemo(() => {
-    const months = lastMonths(12);
-    const rows = caseData ? simulate(groupOf(currentProject?.business_type), caseData, 1) : null;
-    const plan = rows && rows.some((r) => r.revenue > 0) ? planFromCase(rows, months) : demoPlan(months);
-    const actual = demoActual(plan);
-    const cmp = compare(plan, actual);
-    const outflows = estimateOutflows(deadlines, actual);
-    const weeks = forecast13(actual, outflows);
-    const alert = cashAlert(weeks, actual);
-    const sum = (f: (r: (typeof cmp)[number]) => number) => cmp.reduce((s, r) => s + f(r), 0);
-    const last3 = actual.slice(-3);
-    const categories = Object.entries(
-      last3.reduce<Record<string, number>>((acc, m) => {
-        for (const [k, v] of Object.entries(m.by_category)) if (v < 0) acc[k] = (acc[k] ?? 0) + Math.abs(v) / 3;
-        return acc;
-      }, {}),
-    ).sort((a, b) => b[1] - a[1]);
-    return {
-      fromCase: !!rows,
-      cmp,
-      outflows,
-      weeks,
-      alert,
-      balance: actual.at(-1)?.balance_end ?? 0,
-      planShare: sum((r) => r.planIncome) ? (sum((r) => r.actualIncome) / sum((r) => r.planIncome)) * 100 : 0,
-      avgProfit: last3.reduce((s, m) => s + m.income - m.expense, 0) / Math.max(1, last3.length),
-      low: weeks.reduce((a, b) => (b.balance < a.balance ? b : a), weeks[0]),
-      categories,
-    };
-  }, [caseData, deadlines, currentProject?.business_type]);
+  }, []);
 
   const pilot = () => {
     track("cashflow_pilot_interest", {});

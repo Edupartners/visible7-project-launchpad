@@ -155,7 +155,8 @@ export function estimateOutflows(deadlines: Deadline[], actual: CashMonth[]): Ou
       }
       return null;
     })
-    .filter((x): x is Outflow => !!x && x.amount > 0);
+    .filter((x): x is Outflow => !!x && x.amount > 0)
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export interface WeekPoint {
@@ -233,5 +234,12 @@ export const czkShort = (v: number) => {
   return `${sign}${Math.round(a).toLocaleString("cs-CZ")}`;
 };
 export const czk = (v: number) => `${v < 0 ? "−" : ""}${Math.round(Math.abs(v)).toLocaleString("cs-CZ")} Kč`;
+
+/** Barvy upozornění podle úrovně. */
+export const ALERT_STYLE = {
+  riziko: "bg-red-50 text-red-900 ring-red-200",
+  pozor: "bg-amber-50 text-amber-900 ring-amber-200",
+  ok: "bg-leaf-50 text-leaf-900 ring-leaf-200",
+};
 
 export type { BusinessCaseData };

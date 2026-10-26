@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   Award,
   Briefcase,
+  CalendarClock,
   Crown,
   PanelLeftClose,
   PanelLeftOpen,
@@ -21,8 +22,10 @@ import {
   Menu,
   Plus,
   Presentation,
+  ScanSearch,
   Settings,
   ShieldCheck,
+  Store,
   Users,
   Wallet,
   X,
@@ -38,6 +41,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { AppHeader } from "./AppHeader";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { FREE_GATES, useAccess } from "@/lib/access";
+import { loadProfile } from "@/lib/deadlines";
 
 const GATE_ROUTES = [
   { name: "Vize", route: "/vision" },
@@ -95,6 +99,51 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
   const done = new Set(completedPhases);
   const nextGate = [1, 2, 3, 4, 5, 6, 7].find((n) => !done.has(n));
   const pitchReady = [1, 2, 3].every((n) => done.has(n));
+  // Kdo už podniká, má „Můj podnik“ nad branami; ostatní ho mají pod nimi.
+  const [businessFirst, setBusinessFirst] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    loadProfile().then((p) => alive && setBusinessFirst(!!p && p.form !== "nezacal"));
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const businessBlock = (
+    <>
+      <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Můj podnik</p>
+      <ul className="space-y-0.5">
+        {(
+          [
+            ["Přehled podniku", "/muj-podnik", Store, false],
+            ["Cash flow", "/cash-flow", Wallet, true],
+            ["Termíny", "/muj-podnik#terminy", CalendarClock, false],
+            ["Úřady a nástroje", "/digitalni-kancelar", Briefcase, false],
+            ["Rentgen podniku", "/rentgen?rezim=podnik", ScanSearch, false],
+          ] as const
+        ).map(([label, path, Icon, soon]) => {
+          const active = pathname === path.split(/[#?]/)[0] && !path.includes("#");
+          return (
+            <li key={path}>
+              <button
+                type="button"
+                onClick={() => go(path)}
+                aria-current={active ? "page" : undefined}
+                className={itemCls(active)}
+              >
+                <Icon className="h-4 w-4 text-muted-foreground" /> {label}
+                {soon && (
+                  <span className="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
+                    brzy
+                  </span>
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
 
   const go = (path: string) => {
     navigate(path);
@@ -220,6 +269,8 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
           </li>
         </ul>
 
+        {businessFirst && businessBlock}
+
         <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Moje cesta</p>
         <ol className="space-y-0.5">
           {GATE_ROUTES.map((g, i) => {
@@ -255,6 +306,8 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
           })}
         </ol>
 
+        {!businessFirst && businessBlock}
+
         <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Nástroje</p>
         <ul className="space-y-0.5">
           <li>
@@ -265,14 +318,6 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
               className={itemCls(pathname === "/strategy")}
             >
               <Calculator className="h-4 w-4 text-muted-foreground" /> Finanční plán
-            </button>
-          </li>
-          <li>
-            <button type="button" onClick={() => go("/cash-flow")} className={itemCls(pathname === "/cash-flow")}>
-              <Wallet className="h-4 w-4 text-muted-foreground" /> Cash flow
-              <span className="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
-                brzy
-              </span>
             </button>
           </li>
           <li>
@@ -470,6 +515,8 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
       </button>
       <div className="flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto">
         {icon("Přehled", "/home", LayoutDashboard)}
+        {icon("Můj podnik", "/muj-podnik", Store)}
+        {icon("Cash flow", "/cash-flow", Wallet)}
         <span className="my-1 h-px w-8 bg-border" />
         {GATE_ROUTES.map((g, i) => {
           const n = i + 1;
@@ -499,7 +546,6 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
         })}
         <span className="my-1 h-px w-8 bg-border" />
         {icon("Finanční plán", "/strategy", Calculator)}
-        {icon("Cash flow", "/cash-flow", Wallet)}
         {icon("Mapa cesty A → D", "/mapa-cesty", Map)}
         {icon("Rentgen trhu", "/rentgen-trhu", Globe2)}
         {icon("Marketingové kanály", "/benchmarking-phase", Megaphone)}
