@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ArrowUpRight, Globe2, Loader2, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { loadProjectKeys } from "@/lib/projectData";
@@ -23,15 +24,75 @@ import {
 } from "@/lib/market";
 
 const LEVELS = [
-  { key: "tam", label: "Celý trh", abbr: "TAM", hint: "roční útrata za celou kategorii" },
-  { key: "sam", label: "Dostupný trh", abbr: "SAM", hint: "část, kterou obsloužíte svým modelem" },
-  { key: "som", label: "Získatelný trh", abbr: "SOM", hint: "realistický podíl za 2–3 roky" },
+  {
+    key: "tam",
+    label: "Celý trh",
+    abbr: "TAM",
+    hint: "roční útrata za celou kategorii",
+    full: "Total Addressable Market",
+    explain:
+      "Kolik lidé a firmy v regionu ročně utratí za celou kategorii, do které váš produkt patří. Strop, který by měl projekt, kdyby vyhrál všechno.",
+  },
+  {
+    key: "sam",
+    label: "Dostupný trh",
+    abbr: "SAM",
+    hint: "část, kterou obsloužíte svým modelem",
+    full: "Serviceable Available Market",
+    explain: "Část celého trhu, na kterou opravdu dosáhnete: váš zákaznický segment, kanál a forma produktu.",
+  },
+  {
+    key: "som",
+    label: "Získatelný trh",
+    abbr: "SOM",
+    hint: "realistický podíl za 2–3 roky",
+    full: "Serviceable Obtainable Market",
+    explain:
+      "Kolik z dostupného trhu realisticky získáte za 2–3 roky. U malého projektu obvykle jednotky procent. Na tohle číslo se investor dívá nejvíc.",
+  },
 ] as const;
 
 const CONFIDENCE_STYLE: Record<MarketSize["confidence"], string> = {
   nizka: "bg-orange-50 text-orange-800 ring-orange-200",
   stredni: "bg-amber-50 text-amber-800 ring-amber-200",
   vysoka: "bg-leaf-50 text-leaf-700 ring-leaf-200",
+};
+
+/** Zkratka s vysvětlením: na počítači po najetí myší, na mobilu po klepnutí (zavře se klepnutím mimo). */
+const AbbrTip = ({ abbr, full, explain, dark }: { abbr: string; full: string; explain: string; dark?: boolean }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          // Klepnutí na mobilu vyvolá i „najetí myší“; klik proto jen otevírá, zavře se klepnutím mimo.
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(true);
+          }}
+          className={`cursor-help underline decoration-dotted underline-offset-[3px] ${
+            dark ? "decoration-white/60" : "decoration-leaf-400"
+          }`}
+          aria-label={`${abbr}: ${full}`}
+        >
+          {abbr}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="top"
+        className="w-[260px] p-3 text-left normal-case tracking-normal"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <p className="text-sm font-semibold">
+          {abbr} = {full}
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{explain}</p>
+      </PopoverContent>
+    </Popover>
+  );
 };
 
 /** Velikost trhu s AI a vyhledáváním na webu (brána 2). Výsledek bere i pitch. */
@@ -205,7 +266,7 @@ export const MarketSizeCard = ({ projectId }: { projectId: string }) => {
                   <p
                     className={`text-xs font-bold uppercase tracking-[0.12em] ${i === 2 ? "text-white/80" : "text-leaf-700"}`}
                   >
-                    {l.abbr} · {l.label}
+                    <AbbrTip abbr={l.abbr} full={l.full} explain={l.explain} dark={i === 2} /> · {l.label}
                   </p>
                   <p className="mt-2 flex items-baseline gap-1.5 tabular-nums">
                     <span className="text-4xl font-extrabold tracking-tight">{s.num}</span>
