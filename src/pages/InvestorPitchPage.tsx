@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/visible7/client";
 import { AI_LIMITS, callAi, loadAiUsage } from "@/lib/ai";
 import { loadProjectKeys } from "@/lib/projectData";
+import { type BusinessCaseData, type MonthRow, groupOf, simulate } from "@/lib/businessCase";
 
 /** Texty pitche (z AI, uživatel je může upravit přímo na stránce). */
 export interface PitchTexts {
@@ -52,9 +53,136 @@ interface Basics {
 }
 
 const STORE_KEY = "pitch_onepager";
-const czk = (v?: number) => (v === undefined || v === null ? "—" : `${Math.round(v).toLocaleString("cs-CZ")} Kč`);
-const month = (v?: number | null) =>
-  v === null || v === undefined ? "mimo 24 měs." : v === 0 ? "hned" : `${v}. měsíc`;
+
+/** Částka zkráceně pro velká čísla: { num: "1,1", unit: "mil. Kč" }. */
+const short = (v?: number | null) => {
+  if (v === undefined || v === null || !Number.isFinite(v)) return { num: "—", unit: "" };
+  const a = Math.abs(v);
+  if (a >= 1_000_000) return { num: (Math.round(v / 100_000) / 10).toLocaleString("cs-CZ"), unit: "mil. Kč" };
+  if (a >= 10_000) return { num: Math.round(v / 1000).toLocaleString("cs-CZ"), unit: "tis. Kč" };
+  return { num: Math.round(v).toLocaleString("cs-CZ"), unit: "Kč" };
+};
+const shortText = (v?: number | null) => {
+  const s = short(v);
+  return `${s.num} ${s.unit}`.trim();
+};
+const monthKpi = (v?: number | null) =>
+  v === null || v === undefined
+    ? { num: "—", unit: "" }
+    : v === 0
+      ? { num: "0.", unit: "měsíc" }
+      : { num: `${v}.`, unit: "měsíc" };
+
+/** Jedno velké číslo v pásu. */
+const Kpi = ({
+  label,
+  value,
+  note,
+  hero = false,
+}: {
+  label: string;
+  value: { num: string; unit: string };
+  note: string;
+  hero?: boolean;
+}) => (
+  <div className={`flex flex-col px-[4mm] py-[3.2mm] ${hero ? "bg-leaf-500 text-white" : "bg-white"}`}>
+    <dt className={`text-[7pt] font-bold uppercase tracking-[0.14em] ${hero ? "text-white/80" : "text-slate-500"}`}>
+      {label}
+    </dt>
+    <dd className="mt-[1.2mm] flex items-baseline gap-[1.2mm] tabular-nums">
+      <span
+        className={`text-[30pt] font-extrabold leading-[0.9] tracking-[-0.04em] ${hero ? "text-white" : "text-leaf-800"}`}
+      >
+        {value.num}
+      </span>
+      {value.unit && (
+        <span className={`text-[9pt] font-bold ${hero ? "text-white/85" : "text-leaf-700"}`}>{value.unit}</span>
+      )}
+    </dd>
+    <p className={`mt-[1.4mm] text-[7.2pt] leading-snug ${hero ? "text-white/80" : "text-slate-500"}`}>{note}</p>
+  </div>
+);
+
+/** Kumulovaný cash flow 24 měsíců: dno = potřebný kapitál, průchod nulou = návratnost. */
+const CashCurve = ({ rows }: { rows: MonthRow[] }) => {
+  const W = 400;
+  const H = 128;
+  const pad = { l: 6, r: 6, t: 16, b: 26 };
+  const vals = rows.map((r) => r.cumulative);
+  const max = Math.max(0, ...vals);
+  const min = Math.min(0, ...vals);
+  const span = max - min || 1;
+  const x = (i: number) => pad.l + (i / (rows.length - 1)) * (W - pad.l - pad.r);
+  const y = (v: number) => pad.t + ((max - v) / span) * (H - pad.t - pad.b);
+  const y0 = y(0);
+  const line = rows.map((r, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(r.cumulative).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(rows.length - 1).toFixed(1)},${y0.toFixed(1)} L${x(0).toFixed(1)},${y0.toFixed(1)} Z`;
+  const lowIdx = vals.indexOf(min);
+  const payIdx = min < 0 ? rows.findIndex((r, i) => i > lowIdx && r.cumulative >= 0) : -1;
+  const end = rows[rows.length - 1];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label="Kumulovaný cash flow">
+      <defs>
+        <clipPath id="pitch-up">
+          <rect x="0" y="0" width={W} height={y0} />
+        </clipPath>
+        <clipPath id="pitch-down">
+          <rect x="0" y={y0} width={W} height={H - y0} />
+        </clipPath>
+      </defs>
+      <path d={area} fill="#C2DFCB" clipPath="url(#pitch-up)" />
+      <path d={area} fill="#EBDDD0" clipPath="url(#pitch-down)" />
+      <line x1={pad.l} x2={W - pad.r} y1={y0} y2={y0} stroke="#94a3b8" strokeWidth="0.8" />
+      <path d={line} fill="none" stroke="#1B4D33" strokeWidth="2.2" strokeLinejoin="round" />
+      {[0, 6, 12, 18, 24].map((m) => (
+        <text
+          key={m}
+          x={x(m)}
+          y={H - 3}
+          textAnchor={m === 0 ? "start" : m === 24 ? "end" : "middle"}
+          fontSize="8.5"
+          fill="#64748b"
+        >
+          {m === 0 ? "start" : `${m}. m`}
+        </text>
+      ))}
+      {min < 0 && (
+        <g>
+          <circle cx={x(lowIdx)} cy={y(min)} r="3.4" fill="#9A4F1E" />
+          <text
+            x={x(lowIdx)}
+            y={y(min) + 13}
+            textAnchor={lowIdx < 3 ? "start" : "middle"}
+            fontSize="9.5"
+            fontWeight="700"
+            fill="#9A4F1E"
+          >
+            −{shortText(-min)}
+          </text>
+        </g>
+      )}
+      {payIdx > 0 && (
+        <g>
+          <circle cx={x(payIdx)} cy={y0} r="3.4" fill="#1B4D33" stroke="white" strokeWidth="1.2" />
+          <text x={x(payIdx)} y={y0 - 6} textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#1B4D33">
+            návratnost
+          </text>
+        </g>
+      )}
+      <text
+        x={W - pad.r}
+        y={Math.max(y(end.cumulative) - 6, 10)}
+        textAnchor="end"
+        fontSize="9.5"
+        fontWeight="700"
+        fill="#1B4D33"
+      >
+        {end.cumulative >= 0 ? "+" : "−"}
+        {shortText(Math.abs(end.cumulative))}
+      </text>
+    </svg>
+  );
+};
 
 /** Text, který jde na stránce rovnou přepsat (obsah drží prohlížeč, React ho jen nastaví). */
 const Editable = ({
@@ -87,14 +215,10 @@ const Editable = ({
   );
 };
 
-const Block = ({ title, children, accent = false }: { title: string; children: React.ReactNode; accent?: boolean }) => (
-  <section className={accent ? "rounded-md bg-[#fff4e8] p-[3mm] ring-1 ring-[#e9a46a]" : ""}>
-    <h3
-      className={`mb-[1mm] text-[7.5pt] font-bold uppercase tracking-[0.12em] ${accent ? "text-[#a8541d]" : "text-[#1f3a5f]"}`}
-    >
-      {title}
-    </h3>
-    <div className="text-[8.8pt] leading-[1.36] text-slate-800">{children}</div>
+const Block = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <section className="border-t-[1.5px] border-leaf-800 pt-[1.6mm]">
+    <h3 className="mb-[1mm] text-[7.5pt] font-extrabold uppercase tracking-[0.14em] text-leaf-700">{title}</h3>
+    <div className="text-[8.6pt] leading-[1.36] text-slate-800">{children}</div>
   </section>
 );
 
@@ -107,6 +231,7 @@ const InvestorPitchPage = () => {
   const [loaded, setLoaded] = useState(false);
   const [basics, setBasics] = useState<Basics>({});
   const [numbers, setNumbers] = useState<Numbers | null>(null);
+  const [rows, setRows] = useState<MonthRow[] | null>(null);
   const [pitch, setPitch] = useState<PitchTexts | null>(null);
   const [audience, setAudience] = useState<Audience>("investor");
   const [used, setUsed] = useState(0);
@@ -122,13 +247,18 @@ const InvestorPitchPage = () => {
     if (!projectId) return;
     let active = true;
     Promise.all([
-      loadProjectKeys(projectId, ["vision_project_data", "business_case_summary", STORE_KEY]),
+      loadProjectKeys(projectId, ["vision_project_data", "business_case_summary", "business_case", STORE_KEY]),
       loadAiUsage(projectId, "p"),
     ]).then(([raw, usage]) => {
       if (!active) return;
       setBasics((raw.vision_project_data as Basics) ?? {});
       const summary = raw.business_case_summary as { scenare?: { realisticky?: Numbers } } | undefined;
       setNumbers(summary?.scenare?.realisticky ?? null);
+      const bc = raw.business_case as BusinessCaseData | undefined;
+      if (bc?.revenue && Array.isArray(bc.costs)) {
+        const r = simulate(groupOf(currentProject?.business_type), bc, 1);
+        setRows(r.some((x) => x.revenue > 0) ? r : null);
+      }
       const saved = (raw[STORE_KEY] as PitchTexts | undefined) ?? (usage.latest.navrh as unknown as PitchTexts | null);
       if (saved?.oneLiner) {
         setPitch(saved);
@@ -140,7 +270,7 @@ const InvestorPitchPage = () => {
     return () => {
       active = false;
     };
-  }, [projectId]);
+  }, [projectId, currentProject?.business_type]);
 
   const save = useCallback(
     async (next: PitchTexts) => {
@@ -288,14 +418,14 @@ const InvestorPitchPage = () => {
       {pitch && numbers && (
         <div className="mx-auto max-w-full overflow-x-auto print:overflow-visible">
           <div className="pitch-sheet mx-auto flex h-[297mm] w-[210mm] flex-col bg-white font-sans text-slate-900 shadow-xl print:shadow-none">
-            <header className="bg-[#1f3a5f] px-[13mm] pb-[5mm] pt-[7.5mm] text-white">
+            <header className="bg-leaf-900 px-[13mm] pb-[5mm] pt-[7mm] text-white">
               <div className="flex items-start justify-between gap-6">
                 <div className="min-w-0">
-                  <h2 className="text-[20pt] font-extrabold leading-tight tracking-tight">{name}</h2>
-                  {basics.slogan && <p className="mt-[1mm] text-[11pt] text-white/80">{basics.slogan}</p>}
+                  <h2 className="text-[22pt] font-extrabold leading-[1.02] tracking-[-0.02em]">{name}</h2>
+                  {basics.slogan && <p className="mt-[1mm] text-[10.5pt] text-white/75">{basics.slogan}</p>}
                 </div>
-                <div className="shrink-0 text-right text-[8pt] leading-snug text-white/75">
-                  <p className="font-semibold uppercase tracking-[0.14em] text-[#f3b27a]">
+                <div className="shrink-0 text-right text-[8pt] leading-snug text-white/70">
+                  <p className="font-bold uppercase tracking-[0.16em] text-leaf-300">
                     Pitch {AUDIENCE_LABEL[pitch.audience ?? audience].sheet}
                   </p>
                   <p>{today}</p>
@@ -304,12 +434,39 @@ const InvestorPitchPage = () => {
               <Editable
                 value={pitch.oneLiner}
                 onChange={edit("oneLiner")}
-                className="mt-[3mm] border-l-[3px] border-[#e9a46a] pl-[3mm] text-[11pt] font-semibold leading-snug text-white hover:bg-white/10 focus:bg-white/10"
+                className="mt-[3mm] max-w-[160mm] text-[11.5pt] font-semibold leading-snug text-white hover:bg-white/10 focus:bg-white/10"
               />
             </header>
 
-            <div ref={bodyRef} className="flex flex-1 flex-col gap-[3.6mm] overflow-hidden px-[13mm] py-[5.5mm]">
-              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[3.6mm]">
+            {/* Čísla z byznys casu – velká, aby byla vidět jako první */}
+            <dl className="grid grid-cols-4 gap-px border-b border-slate-200 bg-slate-200">
+              <Kpi
+                hero
+                label={pitch.audience === "banka" ? "Potřebujeme" : "Hledáme"}
+                value={short(numbers.potrebny_kapital)}
+                note="na start a cestu k zisku"
+              />
+              <Kpi
+                label="Bod zvratu"
+                value={monthKpi(numbers.bod_zvratu_mesic)}
+                note={numbers.bod_zvratu_mesic == null ? "mimo plán 24 měsíců" : "první měsíc v zisku"}
+              />
+              <Kpi
+                label="Návratnost"
+                value={monthKpi(numbers.navratnost_mesic)}
+                note={numbers.navratnost_mesic == null ? "mimo plán 24 měsíců" : "vložené peníze zpět"}
+              />
+              <Kpi
+                label="Tržby za 2 roky"
+                value={short(numbers.obrat_24m)}
+                note={`zisk ${shortText(numbers.zisk_24m)}${
+                  numbers.hruba_marze_pct ? ` · marže ${Math.round(numbers.hruba_marze_pct)} %` : ""
+                }`}
+              />
+            </dl>
+
+            <div ref={bodyRef} className="flex flex-1 flex-col gap-[3.4mm] overflow-hidden px-[13mm] py-[4.5mm]">
+              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[3.2mm]">
                 <Block title="Problém">
                   <Editable value={pitch.problem} onChange={edit("problem")} />
                 </Block>
@@ -329,28 +486,29 @@ const InvestorPitchPage = () => {
                 </Block>
               </div>
 
-              {/* Čísla z byznys casu */}
-              <section className="rounded-md bg-slate-50 px-[4mm] py-[3mm] ring-1 ring-slate-200">
-                <h3 className="mb-[2mm] text-[7.5pt] font-bold uppercase tracking-[0.12em] text-[#1f3a5f]">
-                  Čísla – realistický plán na 24 měsíců
-                </h3>
-                <dl className="grid grid-cols-5 gap-[3mm]">
-                  {[
-                    ["Tržby", czk(numbers.obrat_24m)],
-                    ["Zisk před zdaněním", czk(numbers.zisk_24m)],
-                    ["Potřebný kapitál", czk(numbers.potrebny_kapital)],
-                    ["Bod zvratu", month(numbers.bod_zvratu_mesic)],
-                    ["Návratnost investice", month(numbers.navratnost_mesic)],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <dt className="text-[7pt] leading-tight text-slate-500">{label}</dt>
-                      <dd className="mt-[0.5mm] text-[11pt] font-bold leading-tight text-[#1f3a5f]">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
+              <div className={`grid gap-x-[7mm] ${rows ? "grid-cols-[1.25fr_1fr]" : "grid-cols-1"}`}>
+                {rows && (
+                  <section className="border-t-[1.5px] border-leaf-800 pt-[1.6mm]">
+                    <h3 className="text-[7.5pt] font-extrabold uppercase tracking-[0.14em] text-leaf-700">
+                      Peníze v čase
+                    </h3>
+                    <p className="mb-[1mm] text-[7pt] text-slate-500">Kumulovaný cash flow, realistický plán</p>
+                    <CashCurve rows={rows} />
+                  </section>
+                )}
+                <section className="flex flex-col justify-center bg-leaf-50 px-[4mm] py-[3.5mm] ring-1 ring-leaf-200">
+                  <h3 className="mb-[1.2mm] text-[7.5pt] font-extrabold uppercase tracking-[0.14em] text-leaf-700">
+                    Co potřebujeme
+                  </h3>
+                  <Editable
+                    value={pitch.ask}
+                    onChange={edit("ask")}
+                    className="text-[9.6pt] font-semibold leading-[1.36] text-leaf-900"
+                  />
+                </section>
+              </div>
 
-              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[3.6mm]">
+              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[3.2mm]">
                 <Block title="Jak vyděláváme">
                   <Editable value={pitch.businessModel} onChange={edit("businessModel")} />
                 </Block>
@@ -361,7 +519,7 @@ const InvestorPitchPage = () => {
                   <ol className="space-y-[1mm]">
                     {pitch.milestones.map((m, i) => (
                       <li key={i} className="flex gap-[2mm]">
-                        <span className="flex h-[4.5mm] w-[4.5mm] shrink-0 items-center justify-center rounded-full bg-[#1f3a5f] text-[7pt] font-bold text-white">
+                        <span className="w-[4mm] shrink-0 text-[9pt] font-extrabold leading-[1.3] text-leaf-500 tabular-nums">
                           {i + 1}
                         </span>
                         <Editable
@@ -379,10 +537,6 @@ const InvestorPitchPage = () => {
                   <Editable value={pitch.risk} onChange={edit("risk")} />
                 </Block>
               </div>
-
-              <Block title="Co potřebujeme" accent>
-                <Editable value={pitch.ask} onChange={edit("ask")} className="text-[9.5pt] font-semibold" />
-              </Block>
             </div>
 
             <footer className="flex items-end justify-between gap-6 border-t border-slate-200 px-[13mm] pb-[6mm] pt-[3mm] text-[7.5pt] text-slate-500">
