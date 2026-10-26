@@ -92,7 +92,7 @@ Region: ${region}
 3. SAM = část TAM, kterou projekt může obsloužit svým modelem, kanálem a zákaznickým segmentem z canvasu.
 4. SOM = realisticky získatelná část SAM za 2–3 roky pro malý začínající projekt (obvykle jednotky procent SAM). Porovnej ji s plánem z byznys casu.
 5. U každé úrovně napiš výpočet s konkrétními čísly. Čísla ze zdroje uveď ve zdroji, čísla odhadnutá tebou dej do předpokladů.
-6. Výsledek zapiš nástrojem market_size. Do zdrojů dej jen stránky, které jsi skutečně našel.`;
+6. Výsledek zapiš nástrojem market_size. Do zdrojů dej jen stránky, které jsi skutečně našel.\nMimo nástroj piš co nejméně textu, rozbor patří do výpočtů a předpokladů v nástroji.`;
 }
 
 type Block = Record<string, unknown> & { type: string };
@@ -103,7 +103,7 @@ async function call(messages: unknown[], forceTool: boolean) {
     headers: { "x-api-key": API_KEY!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 4000,
+      max_tokens: 16000,
       system: SYSTEM,
       tools: [
         {
@@ -133,8 +133,9 @@ async function run(userPrompt: string) {
   const messages: unknown[] = [{ role: "user", content: userPrompt }];
   const seen = new Map<string, string>();
   const usage = { input_tokens: 0, output_tokens: 0, web_search_requests: 0 };
+  let force = false;
   for (let round = 0; round < 4; round++) {
-    const data = await call(messages, round === 3);
+    const data = await call(messages, force || round === 3);
     usage.input_tokens += data.usage?.input_tokens ?? 0;
     usage.output_tokens += data.usage?.output_tokens ?? 0;
     usage.web_search_requests += data.usage?.server_tool_use?.web_search_requests ?? 0;
@@ -146,12 +147,19 @@ async function run(userPrompt: string) {
       }
     }
     const tool = (data.content ?? []).find((b) => b.type === "tool_use" && b.name === "market_size");
-    if (tool) return { output: tool.input as Record<string, unknown>, seen, usage };
-    if (data.stop_reason === "max_tokens") throw new Error("AI odpověď byla useknutá");
-    messages.push({ role: "assistant", content: data.content });
-    // pause_turn: stačí poslat obsah zpět a pokračovat; jinak si o zápis výsledku řekneme.
+    if (tool && data.stop_reason !== "max_tokens") return { output: tool.input as Record<string, unknown>, seen, usage };
+    // Useknutý rozpracovaný nástroj se nedá dokončit – zahodíme ho a o výsledek si řekneme znovu.
+    const done = new Set(
+      (data.content ?? []).filter((b) => b.type === "web_search_tool_result").map((b) => String(b.tool_use_id)),
+    );
+    const content = (data.content ?? []).filter(
+      (b) => b.type !== "tool_use" && (b.type !== "server_tool_use" || done.has(String(b.id)) || data.stop_reason === "pause_turn"),
+    );
+    messages.push({ role: "assistant", content: content.length ? content : [{ type: "text", text: "…" }] });
+    // pause_turn: stačí poslat obsah zpět a pokračovat; jinak (i po useknutí) si o zápis výsledku řekneme.
     if (data.stop_reason !== "pause_turn") {
-      messages.push({ role: "user", content: "Teď prosím zapiš výsledek nástrojem market_size." });
+      messages.push({ role: "user", content: "Teď prosím rovnou zapiš výsledek nástrojem market_size, bez dalšího textu." });
+      force = true;
     }
   }
   throw new Error("AI nevrátila výsledek");
