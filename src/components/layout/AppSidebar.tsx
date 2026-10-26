@@ -24,6 +24,7 @@ import {
   Settings,
   ShieldCheck,
   Users,
+  Wallet,
   X,
 } from "lucide-react";
 import { loadSeminars, sortSeminars } from "@/lib/seminars";
@@ -267,6 +268,14 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
             </button>
           </li>
           <li>
+            <button type="button" onClick={() => go("/cash-flow")} className={itemCls(pathname === "/cash-flow")}>
+              <Wallet className="h-4 w-4 text-muted-foreground" /> Cash flow
+              <span className="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
+                brzy
+              </span>
+            </button>
+          </li>
+          <li>
             <button type="button" onClick={() => go("/mapa-cesty")} className={itemCls(pathname === "/mapa-cesty")}>
               <Map className="h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
             </button>
@@ -490,6 +499,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
         })}
         <span className="my-1 h-px w-8 bg-border" />
         {icon("Finanční plán", "/strategy", Calculator)}
+        {icon("Cash flow", "/cash-flow", Wallet)}
         {icon("Mapa cesty A → D", "/mapa-cesty", Map)}
         {icon("Rentgen trhu", "/rentgen-trhu", Globe2)}
         {icon("Marketingové kanály", "/benchmarking-phase", Megaphone)}

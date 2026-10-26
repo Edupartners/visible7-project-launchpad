@@ -3,7 +3,7 @@ import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { useAccess } from "@/lib/access";
 import { useEffect, useMemo, useState } from "react";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
   Line,
@@ -50,7 +50,18 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, FileSpreadsheet, Loader2, Lock, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  FileSpreadsheet,
+  Loader2,
+  Lock,
+  Plus,
+  RefreshCw,
+  Sparkles,
+  Trash2,
+  Wallet,
+} from "lucide-react";
 import { downloadBusinessCaseExcel } from "@/lib/businessCaseExcel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { MethodFigures } from "@/components/MethodFigures";
@@ -1319,6 +1330,29 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
           </div>
         )}
       </Card>
+
+      {/* Plán vs. skutečnost z napojeného účtu (zatím náhled) */}
+      <Link
+        to="/cash-flow"
+        className="group flex items-center gap-4 rounded-2xl border border-leaf-200 bg-leaf-50 p-5 transition-colors hover:border-leaf-400"
+      >
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-leaf-500 text-white">
+          <Wallet className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <span className="flex-1">
+          <span className="flex items-center gap-2 font-bold">
+            Plán a skutečnost z vašeho účtu
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">brzy</span>
+          </span>
+          <span className="block text-sm text-muted-foreground">
+            Po napojení podnikatelského účtu porovnáme tento plán se skutečnými příjmy a výdaji a hlídáme hotovost.
+          </span>
+        </span>
+        <ArrowRight
+          className="h-5 w-5 shrink-0 text-leaf-700 transition-transform group-hover:translate-x-0.5"
+          aria-hidden="true"
+        />
+      </Link>
 
       <MethodFigures ids={["08_bod_zvratu", "09_ltv_cac"]} />
 
