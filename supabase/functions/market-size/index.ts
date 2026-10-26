@@ -110,7 +110,6 @@ async function call(messages: unknown[], forceTool: boolean) {
           type: "web_search_20250305",
           name: "web_search",
           max_uses: 6,
-          user_location: { type: "approximate", country: "CZ", timezone: "Europe/Prague" },
         },
         MARKET_TOOL,
       ],
