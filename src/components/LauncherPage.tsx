@@ -412,7 +412,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </ul>
             <p className="mt-9 inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
-              Kompletní podnikatelský plán · vše pro start na jednom místě
+              Kompletní kurz podnikání od nápadu po první zákazníky
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
               <span className="block">
