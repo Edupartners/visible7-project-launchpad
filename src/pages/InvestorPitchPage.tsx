@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/visible7/client";
 import { AI_LIMITS, callAi, loadAiUsage } from "@/lib/ai";
 import { loadProjectKeys } from "@/lib/projectData";
+import { MARKET_KEY, type MarketSize, REGION_LABEL, sharePct, shortCzk, shortCzkText } from "@/lib/market";
 import { type BusinessCaseData, type MonthRow, groupOf, simulate } from "@/lib/businessCase";
 
 /** Texty pitche (z AI, uživatel je může upravit přímo na stránce). */
@@ -54,18 +55,8 @@ interface Basics {
 
 const STORE_KEY = "pitch_onepager";
 
-/** Částka zkráceně pro velká čísla: { num: "1,1", unit: "mil. Kč" }. */
-const short = (v?: number | null) => {
-  if (v === undefined || v === null || !Number.isFinite(v)) return { num: "—", unit: "" };
-  const a = Math.abs(v);
-  if (a >= 1_000_000) return { num: (Math.round(v / 100_000) / 10).toLocaleString("cs-CZ"), unit: "mil. Kč" };
-  if (a >= 10_000) return { num: Math.round(v / 1000).toLocaleString("cs-CZ"), unit: "tis. Kč" };
-  return { num: Math.round(v).toLocaleString("cs-CZ"), unit: "Kč" };
-};
-const shortText = (v?: number | null) => {
-  const s = short(v);
-  return `${s.num} ${s.unit}`.trim();
-};
+const short = shortCzk;
+const shortText = shortCzkText;
 const monthKpi = (v?: number | null) =>
   v === null || v === undefined
     ? { num: "—", unit: "" }
@@ -85,7 +76,7 @@ const Kpi = ({
   note: string;
   hero?: boolean;
 }) => (
-  <div className={`flex flex-col px-[4mm] py-[3.2mm] ${hero ? "bg-leaf-500 text-white" : "bg-white"}`}>
+  <div className={`flex flex-col px-[4mm] py-[2.8mm] ${hero ? "bg-leaf-500 text-white" : "bg-white"}`}>
     <dt className={`text-[7pt] font-bold uppercase tracking-[0.14em] ${hero ? "text-white/80" : "text-slate-500"}`}>
       {label}
     </dt>
@@ -106,7 +97,7 @@ const Kpi = ({
 /** Kumulovaný cash flow 24 měsíců: dno = potřebný kapitál, průchod nulou = návratnost. */
 const CashCurve = ({ rows }: { rows: MonthRow[] }) => {
   const W = 400;
-  const H = 128;
+  const H = 112;
   const pad = { l: 6, r: 6, t: 16, b: 26 };
   const vals = rows.map((r) => r.cumulative);
   const max = Math.max(0, ...vals);
@@ -232,6 +223,7 @@ const InvestorPitchPage = () => {
   const [basics, setBasics] = useState<Basics>({});
   const [numbers, setNumbers] = useState<Numbers | null>(null);
   const [rows, setRows] = useState<MonthRow[] | null>(null);
+  const [market, setMarket] = useState<MarketSize | null>(null);
   const [pitch, setPitch] = useState<PitchTexts | null>(null);
   const [audience, setAudience] = useState<Audience>("investor");
   const [used, setUsed] = useState(0);
@@ -247,13 +239,21 @@ const InvestorPitchPage = () => {
     if (!projectId) return;
     let active = true;
     Promise.all([
-      loadProjectKeys(projectId, ["vision_project_data", "business_case_summary", "business_case", STORE_KEY]),
+      loadProjectKeys(projectId, [
+        "vision_project_data",
+        "business_case_summary",
+        "business_case",
+        MARKET_KEY,
+        STORE_KEY,
+      ]),
       loadAiUsage(projectId, "p"),
     ]).then(([raw, usage]) => {
       if (!active) return;
       setBasics((raw.vision_project_data as Basics) ?? {});
       const summary = raw.business_case_summary as { scenare?: { realisticky?: Numbers } } | undefined;
       setNumbers(summary?.scenare?.realisticky ?? null);
+      const m = raw[MARKET_KEY] as MarketSize | undefined;
+      setMarket(m?.tam ? m : null);
       const bc = raw.business_case as BusinessCaseData | undefined;
       if (bc?.revenue && Array.isArray(bc.costs)) {
         const r = simulate(groupOf(currentProject?.business_type), bc, 1);
@@ -406,6 +406,15 @@ const InvestorPitchPage = () => {
             </p>
           )}
           {numbers && <AiPrivacyNote className="mt-2" />}
+          {numbers && !market && (
+            <p className="mt-3 rounded-lg bg-leaf-50 p-3 text-sm text-leaf-800 ring-1 ring-leaf-200">
+              Investor se skoro vždy zeptá, jak velký je trh.{" "}
+              <Link to="/ideation" className="font-semibold underline">
+                Spočítejte velikost trhu ve fázi 2
+              </Link>{" "}
+              a čísla se do pitche doplní sama.
+            </p>
+          )}
           {overflow && (
             <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800 ring-1 ring-red-200">
               Text je delší, než se vejde na jednu stránku. Zkraťte některý odstavec.
@@ -418,7 +427,7 @@ const InvestorPitchPage = () => {
       {pitch && numbers && (
         <div className="mx-auto max-w-full overflow-x-auto print:overflow-visible">
           <div className="pitch-sheet mx-auto flex h-[297mm] w-[210mm] flex-col bg-white font-sans text-slate-900 shadow-xl print:shadow-none">
-            <header className="bg-leaf-900 px-[13mm] pb-[5mm] pt-[7mm] text-white">
+            <header className="bg-leaf-900 px-[13mm] pb-[4.5mm] pt-[6mm] text-white">
               <div className="flex items-start justify-between gap-6">
                 <div className="min-w-0">
                   <h2 className="text-[22pt] font-extrabold leading-[1.02] tracking-[-0.02em]">{name}</h2>
@@ -465,8 +474,47 @@ const InvestorPitchPage = () => {
               />
             </dl>
 
-            <div ref={bodyRef} className="flex flex-1 flex-col gap-[3.4mm] overflow-hidden px-[13mm] py-[4.5mm]">
-              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[3.2mm]">
+            {market && (
+              <section className="flex items-center gap-[5mm] border-b border-slate-200 bg-leaf-50 px-[13mm] py-[2.6mm]">
+                <div className="w-[34mm] shrink-0">
+                  <h3 className="text-[7pt] font-extrabold uppercase tracking-[0.14em] text-leaf-700">Velikost trhu</h3>
+                  <p className="text-[6.8pt] leading-tight text-slate-500">
+                    {REGION_LABEL[market.region ?? "cz"]}, ročně · {market.sources.length}{" "}
+                    {market.sources.length === 1 ? "zdroj" : market.sources.length < 5 ? "zdroje" : "zdrojů"}
+                  </p>
+                </div>
+                <dl className="grid flex-1 grid-cols-3 gap-[4mm]">
+                  {(
+                    [
+                      ["Celý trh", market.tam.value_czk, null],
+                      ["Dostupný", market.sam.value_czk, market.tam.value_czk],
+                      ["Získatelný", market.som.value_czk, market.sam.value_czk],
+                    ] as const
+                  ).map(([label, v, parent]) => {
+                    const s = short(v);
+                    return (
+                      <div key={label}>
+                        <dt className="text-[6.8pt] font-bold uppercase tracking-[0.1em] text-slate-500">
+                          {label}
+                          {parent ? (
+                            <span className="font-semibold normal-case tracking-normal"> · {sharePct(v, parent)}</span>
+                          ) : null}
+                        </dt>
+                        <dd className="flex items-baseline gap-[1mm] tabular-nums">
+                          <span className="text-[16pt] font-extrabold leading-tight tracking-[-0.03em] text-leaf-800">
+                            {s.num}
+                          </span>
+                          <span className="text-[7.5pt] font-bold text-leaf-700">{s.unit}</span>
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              </section>
+            )}
+
+            <div ref={bodyRef} className="flex flex-1 flex-col gap-[3mm] overflow-hidden px-[13mm] py-[3.6mm]">
+              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[2.8mm]">
                 <Block title="Problém">
                   <Editable value={pitch.problem} onChange={edit("problem")} />
                 </Block>
@@ -508,7 +556,7 @@ const InvestorPitchPage = () => {
                 </section>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[3.2mm]">
+              <div className="grid grid-cols-2 gap-x-[7mm] gap-y-[2.8mm]">
                 <Block title="Jak vyděláváme">
                   <Editable value={pitch.businessModel} onChange={edit("businessModel")} />
                 </Block>

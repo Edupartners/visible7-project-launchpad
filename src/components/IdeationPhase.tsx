@@ -27,6 +27,7 @@ import {
   X,
 } from "lucide-react";
 import { MethodFigures } from "@/components/MethodFigures";
+import { MarketSizeCard } from "@/components/MarketSizeCard";
 
 interface LeanCanvasData {
   problem: string;
@@ -559,6 +560,8 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
           )}
         </Card>
       </div>
+
+      {currentProject?.id && <MarketSizeCard projectId={currentProject.id} />}
 
       <MethodFigures ids={["07_lean_canvas"]} />
 
