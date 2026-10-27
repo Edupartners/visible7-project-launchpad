@@ -223,6 +223,13 @@ export const NAV_MENUS: NavMenu[] = [
           },
           { title: "Začít podnikat", hint: "Od živnosti po prvního zákazníka", icon: Target, to: "/zacit-podnikat" },
           { title: "Už podnikám offline", hint: "Kde vám online přinese zákazníky", icon: Store, to: "/uz-podnikam" },
+          {
+            title: "Reálná čísla z banky",
+            hint: "Přehled peněz a cash flow z vašeho účtu (PSD2)",
+            icon: Landmark,
+            to: "/napojeni-banky",
+            badge: "Připravujeme",
+          },
         ],
       },
       {
