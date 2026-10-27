@@ -426,30 +426,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               .
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              Ověřený nápad, reálná čísla a AI, která za vás udělá tu nejtěžší práci.
+              Ověřený nápad, reálná čísla a AI, která za vás udělá tu nejtěžší práci. Vše na jednom místě: plán, výuka i
+              vytvoření projektu svépomocí.
             </p>
-            {/* Vše na jednom místě: tři pilíře */}
-            <ul
-              aria-label="Vše na jednom místě"
-              className="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-sm font-semibold text-foreground sm:text-base"
-            >
-              <li className="w-full text-muted-foreground sm:mr-1 sm:w-auto">Vše na jednom místě:</li>
-              {(
-                [
-                  [ClipboardList, "Plán"],
-                  [GraduationCap, "Výuka"],
-                  [Wrench, "Projekt postavíte sami"],
-                ] as const
-              ).map(([Icon, label]) => (
-                <li
-                  key={label}
-                  className="v7-para-sm inline-flex items-center gap-1.5 bg-leaf-50 px-3 py-1.5 text-leaf-800 sm:px-4"
-                >
-                  <Icon className="h-4 w-4 text-leaf-600" aria-hidden="true" />
-                  {label}
-                </li>
-              ))}
-            </ul>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta onClick={onAccessGranted}>Začít plán zdarma</Cta>
               <a
