@@ -21,6 +21,7 @@ import {
   LogOut,
   Menu,
   Plus,
+  PieChart,
   Presentation,
   ScanSearch,
   Settings,
@@ -116,6 +117,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
         {(
           [
             ["Přehled podniku", "/muj-podnik", Store, false],
+            ["Finanční report", "/financni-report", PieChart, true],
             ["Cash flow", "/cash-flow", Wallet, true],
             ["Termíny", "/muj-podnik#terminy", CalendarClock, false],
             ["Úřady a nástroje", "/digitalni-kancelar", Briefcase, false],

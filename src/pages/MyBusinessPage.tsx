@@ -7,6 +7,7 @@ import {
   Bell,
   Briefcase,
   CheckCircle2,
+  PieChart,
   Presentation,
   ScanSearch,
   Wallet,
@@ -18,6 +19,13 @@ import { useCashflowDemo } from "@/hooks/useCashflow";
 import { ALERT_STYLE, czk, czkShort } from "@/lib/cashflow";
 
 const TILES = [
+  {
+    to: "/financni-report",
+    icon: PieChart,
+    title: "Finanční report",
+    text: "Za co utrácíte, odkud jdou peníze, pravidelné platby a kde ušetřit.",
+    soon: true,
+  },
   {
     to: "/cash-flow",
     icon: Wallet,

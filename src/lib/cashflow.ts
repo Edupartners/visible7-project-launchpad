@@ -230,7 +230,8 @@ export const czkShort = (v: number) => {
   const a = Math.abs(v);
   const sign = v < 0 ? "−" : "";
   if (a >= 1e6) return `${sign}${(Math.round(a / 1e5) / 10).toLocaleString("cs-CZ")} mil.`;
-  if (a >= 1e4) return `${sign}${Math.round(a / 1000).toLocaleString("cs-CZ")} tis.`;
+  if (a >= 1e5) return `${sign}${Math.round(a / 1000).toLocaleString("cs-CZ")} tis.`;
+  if (a >= 1e4) return `${sign}${(Math.round(a / 100) / 10).toLocaleString("cs-CZ")} tis.`;
   return `${sign}${Math.round(a).toLocaleString("cs-CZ")}`;
 };
 export const czk = (v: number) => `${v < 0 ? "−" : ""}${Math.round(Math.abs(v)).toLocaleString("cs-CZ")} Kč`;
