@@ -305,7 +305,7 @@ const TRUST: [string, string][] = [
  * Měnící se slovo v nadpisu. Místo má šířku prvního slova, takže „Začněte podnikat.“ je přesně na středu
  * a „Začněte“ se nehýbe; delší slova přesahují doprava. Čtečka obrazovky i vyhledávače vidí jen „podnikat“.
  */
-const HERO_WORDS = ["podnikat", "vydělávat", "být svobodní", "se učit", "tvořit"];
+const HERO_WORDS = ["podnikat", "vydělávat", "se učit", "tvořit"];
 
 const RotatingWord = () => {
   const [i, setI] = useState(0);
