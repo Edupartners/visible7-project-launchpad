@@ -460,7 +460,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Váš nápad zůstává jen váš. Nikomu ho neukazujeme a AI se na něm neučí.
             </Link>
           </div>
-          <div id="video" className="mx-auto mt-14 max-w-6xl scroll-mt-24">
+          <div id="video" className="mx-auto mt-12 max-w-2xl scroll-mt-24">
             <HeroVideo photo={author?.photo} />
           </div>
         </section>
