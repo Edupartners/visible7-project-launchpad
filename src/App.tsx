@@ -36,6 +36,7 @@ import BankConnectPage from "./pages/features/BankConnectPage";
 import StartBusinessPage from "./pages/features/StartBusinessPage";
 import ExistingBusinessPage from "./pages/features/ExistingBusinessPage";
 import WhyDifferentPage from "./pages/features/WhyDifferentPage";
+import CaseStudyWebSpecialistPage from "./pages/CaseStudyWebSpecialistPage";
 import SecurityPage from "./pages/SecurityPage";
 import SchoolsPage from "./pages/features/SchoolsPage";
 import OfficePage from "./pages/OfficePage";
@@ -182,6 +183,7 @@ const App = () => (
           <Route path="/zacit-podnikat" element={<StartBusinessPage />} />
           <Route path="/uz-podnikam" element={<ExistingBusinessPage />} />
           <Route path="/cim-jsme-jini" element={<WhyDifferentPage />} />
+          <Route path="/pripadova-studie/webovy-specialista-s-ai" element={<CaseStudyWebSpecialistPage />} />
           <Route path="/bezpecnost" element={<SecurityPage />} />
           <Route path="/pro-skoly" element={<SchoolsPage />} />
           <Route path="/digitalni-kancelar" element={<OfficePage />} />

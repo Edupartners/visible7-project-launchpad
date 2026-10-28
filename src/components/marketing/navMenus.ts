@@ -74,6 +74,12 @@ export const NAV_MENUS: NavMenu[] = [
           },
           { title: "Metodika VISIBLE7 MICEK®", hint: "Sedm bran od nápadu po růst", icon: Compass, to: "/#jak" },
           { title: "Poradci z praxe", hint: "Když se zaseknete, zavoláte člověku", icon: UserRound, to: "/#poradci" },
+          {
+            title: "Případová studie",
+            hint: "Webový specialista s AI: 4 weby za den",
+            icon: Award,
+            to: "/pripadova-studie/webovy-specialista-s-ai",
+          },
         ],
       },
       {
