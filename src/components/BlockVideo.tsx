@@ -11,7 +11,7 @@ import {
   videosLabel,
   vimeoSrc,
 } from "@/lib/blockVideos";
-import { videoCover } from "@/lib/videoCovers";
+import { lectureName, videoCover } from "@/lib/videoCovers";
 
 const PLACEHOLDER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(216_45%_32%)]";
 const POSTER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)]";
@@ -165,7 +165,7 @@ function VideoPlaylist({
         <Poster
           cover={cover}
           title={current.title}
-          label={videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title}
+          label={[lectureName(current.vimeo_id) && `Přednáška: ${lectureName(current.vimeo_id)}`, videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title].filter(Boolean).join(" · ")}
           minutes={current.minutes}
           onPlay={() => start(current)}
         />
