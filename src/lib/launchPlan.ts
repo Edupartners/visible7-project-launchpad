@@ -99,6 +99,21 @@ export const LAUNCH_BLOCKS: (BuildBlock & { optional?: boolean })[] = [
     optional: true,
   }),
   B({
+    id: "znacka",
+    title: "Ochranná známka a doména",
+    goal: "Víte, že váš název nikomu nepatří a jak si ho ochránit.",
+    steps: [
+      "Než název začnete propagovat, prověřte ho v databázi Úřadu průmyslového vlastnictví",
+      "Nevolte název, který jen popisuje, co prodáváte – takový úřad nezapíše",
+      "Přihlaste známku pro Česko u ÚPV, pro celou EU u EUIPO; přednost má, kdo podá dřív",
+      "Seznam výrobků a služeb (třídy) sestavte pečlivě, tady se chybuje nejčastěji",
+      "Doménu si registrujte až po kontrole, že nekoliduje s cizí známkou nebo firmou",
+    ],
+    tip: "Bez zapsané známky může konkurence použít stejný název a o investici do marketingu přijdete. Na přihlášku bývají pro malé podnikatele dotace – ověřte aktuální výzvu.",
+    minutes: 40,
+    optional: true,
+  }),
+  B({
     id: "spusteni",
     title: "Tichý start a první zákazník",
     goal: "Máte prvního platícího zákazníka a jeho zpětnou vazbu.",
