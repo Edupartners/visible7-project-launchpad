@@ -104,7 +104,7 @@ const StartBusinessPage = () => {
       },
       {
         title: "Živé semináře",
-        text: "Každých 14 dní online s lektory Edu Partners, s prostorem na vaše otázky.",
+        text: "Jednou měsíčně online s lektory Edu Partners, s prostorem na vaše otázky.",
       },
     ],
     finalTitle: "Začněte malým krokem. Prvních pět minut je zdarma.",

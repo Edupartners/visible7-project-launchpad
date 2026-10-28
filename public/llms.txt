@@ -23,7 +23,7 @@
 - Videonávody (přes 100 krátkých videí: tvorba webu ve WordPressu a Elementoru, WooCommerce, SEO, PPC a další)
 - AI asistent napojený na data projektu
 - Kalkulačky: finanční plán, daně, PNO, cash-flow, nábor
-- Živé online semináře každých 14 dní (90 minut): AI nástroje pro zrychlení práce, Google Analytics 4, SEO/GEO/AIO a AI trendy, Facebook reklama, WordPress + MCP AI, byznysové strategie (Modrý oceán, Hooked)
+- Živé online semináře jednou měsíčně (90 minut): AI nástroje pro zrychlení práce, Google Analytics 4, SEO/GEO/AIO a AI trendy, Facebook reklama, WordPress + MCP AI, byznysové strategie (Modrý oceán, Hooked)
 
 ## Cena
 - Rentgen nápadu a první dvě fáze: zdarma, bez platební karty.

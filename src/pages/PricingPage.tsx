@@ -102,7 +102,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
       ["Úvodní video ke každé bráně", "brány 1–2", true],
       ["Videonávody krok za krokem (100+ videí)", false, true],
       ["Pracovní listy k vyplnění a tisku", "13 listů", "všechny"],
-      ["Živé online semináře každých 14 dní a jejich záznamy", "vybrané", true],
+      ["Živé online semináře jednou měsíčně a jejich záznamy", "vybrané", true],
     ],
   },
   {
@@ -144,7 +144,7 @@ const CellMark = ({ v }: { v: Cell }) =>
 
 const MEMBER_ITEMS = [
   "Všech 7 bran a přes 100 videonávodů",
-  "Živé online semináře každých 14 dní a jejich záznamy",
+  "Živé online semináře jednou měsíčně a jejich záznamy",
   "AI asistent u každé brány",
   "Byznys case, Excel a pitch na A4",
   "Osvědčení za každou bránu",
@@ -286,7 +286,7 @@ const PricingPage = () => {
               <div className="flex items-center justify-between gap-2">
                 <h2 className="font-semibold text-muted-foreground">Akademie s lektory</h2>
                 <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">
-                  Top nabídka
+                  Top nabídka s lektory
                 </span>
               </div>
               <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(academy.price)}</p>

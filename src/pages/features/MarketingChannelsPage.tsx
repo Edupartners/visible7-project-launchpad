@@ -93,7 +93,7 @@ const MarketingChannelsPage = () => {
         title: "Poradci na konkrétní kanál",
         text: "Specialisté na Facebook, PPC, SEO nebo e-mail z Edu Partners, na online konzultaci.",
       },
-      { title: "Živé semináře", text: "Každých 14 dní online: reklama, SEO, AI a další, s prostorem na vaše otázky." },
+      { title: "Živé semináře", text: "Jednou měsíčně online: reklama, SEO, AI a další, s prostorem na vaše otázky." },
     ],
     finalTitle: "Utraťte za marketing jen tolik, kolik se vrátí.",
     faq: [

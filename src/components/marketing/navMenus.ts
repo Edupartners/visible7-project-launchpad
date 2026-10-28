@@ -189,7 +189,7 @@ export const NAV_MENUS: NavMenu[] = [
             icon: ClipboardList,
             to: "/pracovni-listy",
           },
-          { title: "Živé semináře", hint: "Každých 14 dní online s lektory", icon: Radio, to: "/clenstvi" },
+          { title: "Živé semináře", hint: "Jednou měsíčně online s lektory", icon: Radio, to: "/clenstvi" },
         ],
       },
       {

@@ -62,7 +62,7 @@ const PILLARS: Pillar[] = [
   {
     icon: GraduationCap,
     title: "E-learning",
-    text: "100+ videí, pracovní listy a živé semináře každých 14 dní.",
+    text: "100+ videí, pracovní listy a živé semináře jednou měsíčně.",
     to: "/pracovni-listy",
   },
   {
@@ -292,7 +292,7 @@ const WhyDifferentPage = () => {
       },
       {
         title: "Živé semináře",
-        text: "Každých 14 dní online s lektory Edu Partners, s prostorem na vaše otázky.",
+        text: "Jednou měsíčně online s lektory Edu Partners, s prostorem na vaše otázky.",
       },
     ],
     finalTitle: "Jedna aplikace místo deseti. Začněte zdarma.",

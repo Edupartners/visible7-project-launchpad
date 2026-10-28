@@ -123,7 +123,7 @@ const FinancialPlanPage = () => {
       },
       {
         title: "Živé semináře",
-        text: "Každých 14 dní online s lektory Edu Partners. Na otázky k vašemu plánu je čas.",
+        text: "Jednou měsíčně online s lektory Edu Partners. Na otázky k vašemu plánu je čas.",
       },
     ],
     finalTitle: "Vězte, kolik potřebujete, dřív než utratíte první korunu.",

@@ -226,7 +226,7 @@ const SeminarsPage = () => {
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Živé semináře</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            Každých 14 dní 90 minut online: výklad, práce na projektech účastníků a vaše otázky. Záznamy najdete tady.
+            Jednou měsíčně 90 minut online: výklad, práce na projektech účastníků a vaše otázky. Záznamy najdete tady.
           </p>
         </header>
 

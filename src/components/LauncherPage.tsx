@@ -194,7 +194,7 @@ const FAQ = [
   ],
   [
     "Co jsou živé semináře?",
-    "Každých 14 dní 90 minut online s lektory Edu Partners: AI, SEO, reklama, WordPress, affiliate a další. Výklad, práce na projektech účastníků a otázky. Jsou součástí členství, záznamy najdete v aplikaci.",
+    "Jednou měsíčně 90 minut online s lektory Edu Partners: AI, SEO, reklama, WordPress, affiliate a další. Výklad, práce na projektech účastníků a otázky. Jsou součástí členství, záznamy najdete v aplikaci.",
   ],
   ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
@@ -218,7 +218,7 @@ const LEARNING = [
   {
     icon: Radio,
     title: "Živé semináře",
-    text: "Každých 14 dní 90 minut online s lektory. Záznamy najdete v aplikaci.",
+    text: "Jednou měsíčně 90 minut online s lektory. Záznamy najdete v aplikaci.",
     to: "/clenstvi",
     cta: "Program seminářů",
   },
@@ -774,7 +774,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
                 Test nápadu a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
-                semináře každých 14 dní. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
+                semináře jednou měsíčně. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
                 {shop.anchor}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
