@@ -64,7 +64,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
         "12 marketingových kanálů seřazených podle vašeho typu byznysu a rozpočtu",
         false,
         true,
-        "Meta Ads (Facebook a Instagram), Google Ads, Sklik, srovnávače zboží, firemní profil na Googlu, e-mail marketing, ChatGPT Ads, SEO a obsah, LinkedIn, influenceři a PR, marketplace a katalogy, SMS.",
+        "Meta Ads (Facebook a Instagram), Google Ads, Sklik, srovnávače zboží, firemní profil na Googlu, e-mail marketing, ChatGPT Ads, SEO a obsah, LinkedIn, influenceři a PR, marketplace a katalogy, affiliate program, SMS.",
       ],
       [
         "Postup nastavení krok za krokem s testovacím rozpočtem",
