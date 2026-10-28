@@ -1,8 +1,13 @@
 /**
- * Náhledové fotky k videím. Jedna fotka na kartu, soubor public/video-covers/<oblast>-<karta>.webp
- * (např. marketing-meta_kampan.webp). Karta bez fotky má barevný přechod jako dřív.
+ * Náhledové obrázky k videím v public/video-covers/:
+ * - podle přednášky: <vimeo_id>.webp (např. 1190043020.webp) – mají přednost, kapitoly jedné přednášky sdílí obrázek,
+ * - podle karty: <oblast>-<karta>.webp (např. marketing-meta_kampan.webp).
+ * Bez obrázku zůstane barevný přechod. Nový soubor je potřeba zapsat do seznamu níže.
  */
-const COVERS = new Set<string>([]);
+const LECTURE_COVERS = new Set<string>([]);
+const CARD_COVERS = new Set<string>([]);
 
-export const videoCover = (key: string): string | null =>
-  COVERS.has(key) ? `/video-covers/${key.replace(":", "-")}.webp` : null;
+export const videoCover = (key: string, vimeoId?: string | null): string | null => {
+  if (vimeoId && LECTURE_COVERS.has(vimeoId)) return `/video-covers/${vimeoId}.webp`;
+  return CARD_COVERS.has(key) ? `/video-covers/${key.replace(":", "-")}.webp` : null;
+};

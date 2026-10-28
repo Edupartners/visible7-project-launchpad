@@ -149,7 +149,7 @@ function VideoPlaylist({
   const idx = videos.indexOf(current);
   const seen = videos.filter((v) => watched.has(v.id)).length;
   const total = videos.reduce((s, v) => s + (v.minutes ?? 0), 0);
-  const cover = videoCover(blockKey(area, block.id));
+  const cover = videoCover(blockKey(area, block.id), current.vimeo_id);
 
   const start = (v: BlockVideoRow) => {
     track("video_play", { where: "block", block: block.id, video: v.vimeo_id });
