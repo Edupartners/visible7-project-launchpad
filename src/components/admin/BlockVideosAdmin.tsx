@@ -13,7 +13,9 @@ import {
   deleteVideo,
   loadAdminVideos,
   parseBulk,
+  parseRange,
   parseVimeo,
+  rangeLabel,
   refreshBlockVideos,
   reorderVideos,
   toMinutes,
@@ -44,6 +46,7 @@ export function BlockVideosAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editMin, setEditMin] = useState("");
+  const [editRange, setEditRange] = useState("");
   const [dragId, setDragId] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -155,6 +158,7 @@ export function BlockVideosAdmin() {
     setEditing(v.id);
     setEditTitle(v.title);
     setEditMin(v.minutes ? String(v.minutes) : "");
+    setEditRange(rangeLabel(v).replace("konec", ""));
   };
 
   const current = ALL_BLOCKS.find((b) => b.key === key);
@@ -233,11 +237,13 @@ export function BlockVideosAdmin() {
               value={bulk}
               onChange={(e) => setBulk(e.target.value)}
               placeholder={
-                "Jeden řádek = jedno video: Název | odkaz | délka\nGoogle Search Console | https://vimeo.com/1135476364 | 1:49\nSEO a titulek | https://vimeo.com/1135476918 | 1:43"
+                "Jeden řádek = jedno video: Název | odkaz | délka\nGoogle Search Console | https://vimeo.com/1135476364 | 1:49\nKapitola z přednášky: Název | odkaz | od–do\nCo je affiliate | https://vimeo.com/1189761843 | 0:00–12:30"
               }
             />
             <p className="text-xs text-muted-foreground">
               Můžete zkopírovat sloupce přímo z Excelu (název, odkaz, délka). Videa se přidají na konec v tomto pořadí.
+              Kapitoly z dlouhé přednášky: stejný odkaz na více řádcích, místo délky úsek od–do – video začne a skončí
+              ve správný čas, nic se nestříhá.
             </p>
             {bulkParsed.bad.length > 0 && (
               <p className="text-xs text-destructive">
@@ -297,6 +303,13 @@ export function BlockVideosAdmin() {
                       placeholder="min"
                       aria-label="Délka"
                     />
+                    <Input
+                      value={editRange}
+                      onChange={(e) => setEditRange(e.target.value)}
+                      className="h-8 w-32"
+                      placeholder="úsek 12:30–25:10"
+                      aria-label="Úsek videa (kapitola): od–do"
+                    />
                     <Button
                       size="icon"
                       variant="ghost"
@@ -304,7 +317,15 @@ export function BlockVideosAdmin() {
                       aria-label="Uložit"
                       onClick={() =>
                         run(async () => {
-                          await updateVideo(v.id, { title: editTitle.trim() || v.title, minutes: toMinutes(editMin) });
+                          const r = editRange.trim() ? parseRange(editRange) : null;
+                          if (editRange.trim() && !r) throw new Error("Úsek zadejte jako od–do, např. 12:30–25:10.");
+                          const min = r?.end ? Math.max(1, Math.round((r.end - r.start) / 60)) : toMinutes(editMin);
+                          await updateVideo(v.id, {
+                            title: editTitle.trim() || v.title,
+                            minutes: min,
+                            start_sec: r?.start ?? null,
+                            end_sec: r?.end ?? null,
+                          });
                           setEditing(null);
                         }, "Uloženo.")
                       }
@@ -328,6 +349,11 @@ export function BlockVideosAdmin() {
                     >
                       {v.title}
                     </span>
+                    {rangeLabel(v) && (
+                      <span className="shrink-0 rounded bg-muted px-1.5 text-xs tabular-nums text-muted-foreground">
+                        {rangeLabel(v)}
+                      </span>
+                    )}
                     {v.minutes && (
                       <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{v.minutes} min</span>
                     )}

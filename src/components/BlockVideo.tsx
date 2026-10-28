@@ -28,24 +28,37 @@ function PlayerFrame({ video, title, onEnded }: { video: BlockVideoRow; title: s
   const ended = useRef(onEnded);
   ended.current = onEnded;
   useEffect(() => {
+    // Kapitola z dlouhé přednášky: na konci úseku video zastavit a označit jako zhlédnuté.
+    const end = video.end_sec;
+    let done = false;
+    const send = (method: string, value?: unknown) =>
+      ref.current?.contentWindow?.postMessage(JSON.stringify({ method, value }), "https://player.vimeo.com");
+    const finish = () => {
+      if (done) return;
+      done = true;
+      ended.current();
+    };
     const onMsg = (e: MessageEvent) => {
       if (e.origin !== "https://player.vimeo.com" || e.source !== ref.current?.contentWindow) return;
-      let d: { event?: string } | null = null;
+      let d: { event?: string; data?: { seconds?: number } } | null = null;
       try {
         d = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
       } catch {
         return;
       }
-      if (d?.event === "ready")
-        ref.current?.contentWindow?.postMessage(
-          JSON.stringify({ method: "addEventListener", value: "ended" }),
-          "https://player.vimeo.com",
-        );
-      if (d?.event === "ended") ended.current();
+      if (d?.event === "ready") {
+        send("addEventListener", "ended");
+        if (end) send("addEventListener", "timeupdate");
+      }
+      if (d?.event === "ended") finish();
+      if (end && d?.event === "timeupdate" && (d.data?.seconds ?? 0) >= end && !done) {
+        send("pause");
+        finish();
+      }
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
-  }, []);
+  }, [video.id, video.end_sec]);
   return (
     <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
       <iframe

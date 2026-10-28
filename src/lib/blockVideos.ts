@@ -48,7 +48,19 @@ export interface BlockVideoRow {
   minutes: number | null;
   position: number;
   published: boolean;
+  /** Úsek dlouhé přednášky (kapitola bez střihu), v sekundách. Prázdné = celé video. */
+  start_sec: number | null;
+  end_sec: number | null;
 }
+
+type NewVideo = {
+  title: string;
+  vimeo_id: string;
+  vimeo_hash: string | null;
+  minutes: number | null;
+  start_sec?: number | null;
+  end_sec?: number | null;
+};
 
 /**
  * Z odkazu Vimea vytáhne číslo videa a případný klíč neveřejného videa.
@@ -74,8 +86,48 @@ export function parseVimeo(input: string): { id: string; hash: string | null } |
   return { id: parts[idx], hash: hash && /^[a-zA-Z0-9]{4,40}$/.test(hash) ? hash : null };
 }
 
-export const vimeoSrc = (v: Pick<BlockVideoRow, "vimeo_id" | "vimeo_hash">, autoplay = false) =>
-  `https://player.vimeo.com/video/${v.vimeo_id}?dnt=1${v.vimeo_hash ? `&h=${v.vimeo_hash}` : ""}${autoplay ? "&autoplay=1" : ""}`;
+export const vimeoSrc = (
+  v: Pick<BlockVideoRow, "vimeo_id" | "vimeo_hash"> & { start_sec?: number | null },
+  autoplay = false,
+) =>
+  `https://player.vimeo.com/video/${v.vimeo_id}?dnt=1${v.vimeo_hash ? `&h=${v.vimeo_hash}` : ""}${autoplay ? "&autoplay=1" : ""}${
+    v.start_sec ? `#t=${v.start_sec}s` : ""
+  }`;
+
+/** „1:02:30“ → 3750, „12:30“ → 750, „90“ → 90 s */
+export function toSeconds(s: string | undefined | null): number | null {
+  if (!s) return null;
+  const t = s.trim();
+  if (!/^\d{1,5}(:\d{1,2}){0,2}$/.test(t)) return null;
+  const p = t.split(":").map(Number);
+  if (p.length > 1 && p.slice(1).some((n) => n > 59)) return null;
+  return p.reduce((acc, n) => acc * 60 + n, 0);
+}
+
+/** 750 → „12:30“, 3750 → „1:02:30“ */
+export function fmtTime(sec: number): string {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+
+/** Úsek „12:30–25:10“ (pomlčka, spojovník nebo „-“). Konec je nepovinný: „12:30–“. */
+export function parseRange(s: string | undefined | null): { start: number; end: number | null } | null {
+  if (!s) return null;
+  const m = s.trim().match(/^(\d{1,5}(?::\d{1,2}){0,2})\s*[–—-]\s*(\d{1,5}(?::\d{1,2}){0,2})?$/);
+  if (!m) return null;
+  const start = toSeconds(m[1]);
+  const end = m[2] ? toSeconds(m[2]) : null;
+  if (start === null || (m[2] && end === null) || (end !== null && end <= start)) return null;
+  return { start, end };
+}
+
+export const rangeLabel = (v: Pick<BlockVideoRow, "start_sec" | "end_sec">) =>
+  v.start_sec == null && v.end_sec == null ? "" : `${fmtTime(v.start_sec ?? 0)}–${v.end_sec ? fmtTime(v.end_sec) : "konec"}`;
+
+const minutesOf = (start: number, end: number | null) => (end ? Math.max(1, Math.round((end - start) / 60)) : null);
 
 const sortVideos = (list: BlockVideoRow[]) => [...list].sort((a, b) => a.position - b.position);
 
@@ -155,7 +207,7 @@ export async function loadAdminVideos(): Promise<BlockVideoRow[]> {
 
 export async function addVideos(
   key: string,
-  items: { title: string; vimeo_id: string; vimeo_hash: string | null; minutes: number | null }[],
+  items: NewVideo[],
   startPosition: number,
 ) {
   const rows = items.map((it, i) => ({ ...it, block_key: key, position: startPosition + i + 1 }));
@@ -181,9 +233,10 @@ export async function reorderVideos(key: string, ids: string[]) {
 /**
  * Hromadné vložení: jeden řádek = jedno video, „Název | odkaz | minuty“ (minuty nepovinné),
  * nebo jen odkaz. Oddělovač | nebo tabulátor (vložení z Excelu).
+ * Kapitola z dlouhé přednášky: místo minut úsek „Název | odkaz | 12:30–25:10“.
  */
 export function parseBulk(text: string) {
-  const ok: { title: string; vimeo_id: string; vimeo_hash: string | null; minutes: number | null }[] = [];
+  const ok: NewVideo[] = [];
   const bad: string[] = [];
   for (const line of text
     .split("\n")
@@ -201,9 +254,18 @@ export function parseBulk(text: string) {
     const v = parseVimeo(cells[linkIdx])!;
     // Z Excelu může přijít „https://vimeo.com/“ a číslo v samostatných buňkách – odkazy do názvu nepatří.
     const rest = cells.filter((c, i) => i !== linkIdx && !/^https?:\/\//i.test(c) && !/^\d{6,15}$/.test(c));
-    const minCell = rest.find((c) => /^\d{1,3}(:\d{2}){0,2}$/.test(c));
-    const title = rest.find((c) => c !== minCell) ?? `Video ${v.id}`;
-    ok.push({ title: title.slice(0, 160), vimeo_id: v.id, vimeo_hash: v.hash, minutes: toMinutes(minCell) });
+    const rangeCell = rest.find((c) => parseRange(c));
+    const minCell = rest.find((c) => c !== rangeCell && /^\d{1,3}(:\d{2}){0,2}$/.test(c));
+    const title = rest.find((c) => c !== minCell && c !== rangeCell) ?? `Video ${v.id}`;
+    const range = parseRange(rangeCell);
+    ok.push({
+      title: title.slice(0, 160),
+      vimeo_id: v.id,
+      vimeo_hash: v.hash,
+      minutes: range ? minutesOf(range.start, range.end) ?? toMinutes(minCell) : toMinutes(minCell),
+      start_sec: range?.start ?? null,
+      end_sec: range?.end ?? null,
+    });
   }
   return { ok, bad };
 }
