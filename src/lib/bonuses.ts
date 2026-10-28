@@ -34,6 +34,22 @@ export const BONUSES: Bonus[] = [
       "Odpovědnost za výstupy a sankce za porušení",
     ],
   },
+  {
+    id: "grafika",
+    title: "Grafika zdarma ve Photopea",
+    lead: "Dva celodenní workshopy krok za krokem: reklamní banner a produktový vizuál v bezplatné kopii Photoshopu.",
+    why: "Banner do reklamy nebo obrázek na web si upravíte sami, bez grafika a bez placeného Photoshopu.",
+    certificateFor: "za absolvování workshopu grafiky ve Photopea (tvorba bannerů a úprava fotografií)",
+    skills: ["úprava fotografií", "tvorba reklamních bannerů", "práce s vrstvami a maskami"],
+    topics: [
+      "Fotobanky, ikony a písma zdarma i placené a jejich licence",
+      "Prostředí Photopea: vrstvy, nástroje, rozměry a rozlišení",
+      "Banner krok za krokem: fotka, text, tlačítko, efekty",
+      "Export pro Google Ads a Sklik: rozměr a datová velikost",
+      "Odstranění pozadí, masky a nástroje výběru",
+      "Vrstvy úprav, pero, přechody, stíny a filtry",
+    ],
+  },
 ];
 
 export const bonusById = (id: string | null | undefined) => BONUSES.find((b) => b.id === id) ?? null;
