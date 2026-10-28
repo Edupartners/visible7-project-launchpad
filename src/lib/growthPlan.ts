@@ -184,6 +184,20 @@ export const GROWTH_BLOCKS: (BuildBlock & { optional?: boolean })[] = [
     minutes: 60,
   },
   {
+    id: "data",
+    title: "Data a přehledy: tržby a marketing v jednom grafu",
+    goal: "Na jednom místě vidíte, kolik vás stojí marketing a co vám přináší.",
+    steps: [
+      "Vyexportujte objednávky z e-shopu a náklady na marketing po měsících",
+      "Data vyčistěte: jeden řádek = jedna objednávka, kanály pod sebou místo vedle sebe",
+      "Propojte objednávky a marketing přes měsíc (Excel nebo Power BI)",
+      "Sledujte 2–3 čísla: tržby, náklady na marketing a jejich podíl na obratu",
+    ],
+    tip: "Jedno velké číslo, na kterém vám opravdu záleží, řekne víc než deset grafů.",
+    minutes: 120,
+    optional: true,
+  },
+  {
     id: "novy-trh",
     title: "Nový produkt nebo trh",
     goal: "Rostete do šířky, až když základ běží sám.",
