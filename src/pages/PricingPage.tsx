@@ -286,7 +286,7 @@ const PricingPage = () => {
               <div className="flex items-center justify-between gap-2">
                 <h2 className="font-semibold text-muted-foreground">Akademie s lektory</h2>
                 <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">
-                  Nejvíc za peníze
+                  Top nabídka
                 </span>
               </div>
               <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(academy.price)}</p>
