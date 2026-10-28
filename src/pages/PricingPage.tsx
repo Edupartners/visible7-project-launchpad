@@ -297,7 +297,7 @@ const PricingPage = () => {
               </p>
               <p className="mt-3 text-sm">
                 <b>{ACADEMY.name}</b>. Start {czDate(ACADEMY.start)}, {ACADEMY.sessions} online setkání za{" "}
-                {ACADEMY.months} měsíců. Jednotlivě by kurzy stály {kc(ACADEMY.separateValue)}.
+                {ACADEMY.months} měsíců. Jednotlivě by kurzy stály přes {kc(ACADEMY.separateValue)}.
               </p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {ACADEMY_ITEMS.map((it) => (

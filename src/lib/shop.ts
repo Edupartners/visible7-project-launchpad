@@ -18,7 +18,7 @@ export const SHOP_DEFAULT: ShopSettings = {
   months: 6,
   days: 183,
   checkout_url: "",
-  anchor: "Kurz Specialista internetového obchodu s lektorem stojí 49 000 Kč.",
+  anchor: "Kurzy Specialista internetového obchodu s lektorem stojí jednotlivě přes 60 000 Kč.",
   form_id: "",
 };
 

@@ -5,7 +5,7 @@ import { track } from "@/lib/track";
 
 /**
  * Kalkulačka úspory na úvodní stránce: kolik člověk ušetří, když web, marketing a plán zvládne sám.
- * Ceny jsou orientační z praxe (Michal, 10/2026); kurz s lektorem 49 000 Kč je cena Edu Partners.
+ * Ceny jsou orientační z praxe (Michal, 10/2026); kurzy s lektorem jednotlivě přes 60 000 Kč (Edu Partners).
  */
 const WEB = 25_000;
 const CARE_MONTHLY = 1_000;

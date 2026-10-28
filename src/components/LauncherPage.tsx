@@ -803,7 +803,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                     </Link>
                     <span className="block text-sm text-muted-foreground">
                       Start {czDate(ACADEMY.start)}
-                      {academy.early ? `, cena do ${czDate(ACADEMY.earlyUntil)}` : ""}. Jednotlivě{" "}
+                      {academy.early ? `, cena do ${czDate(ACADEMY.earlyUntil)}` : ""}. Jednotlivě přes{" "}
                       {kc(ACADEMY.separateValue)}.
                     </span>
                   </dt>
