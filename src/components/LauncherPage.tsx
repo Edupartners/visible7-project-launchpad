@@ -387,14 +387,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <a
-        href="#poradci"
+        href="#cenik"
         className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary/90"
       >
         <Store className="hidden h-4 w-4 shrink-0 text-leaf-300 sm:block" aria-hidden="true" />
-        <span className="sm:hidden">Už podnikáte? Získejte zákazníky i online</span>
-        <span className="hidden sm:inline">
-          Už podnikáte offline? Poradci vám ukážou, kde vám online přinese nové zákazníky
-        </span>
+        <span>Ušetřete až 100 000 Kč. Postavte si vlastní byznys sami.</span>
         <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
       </a>
       <PublicHeader onStart={onAccessGranted} />
