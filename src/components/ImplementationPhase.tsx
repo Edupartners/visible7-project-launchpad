@@ -85,7 +85,7 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
         >
           <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_1fr]">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1 text-sm font-semibold">
+              <span className="v7-para-sm inline-flex items-center gap-1.5 bg-signal px-4 py-1 text-sm font-bold text-signal-foreground">
                 <Star className="h-3.5 w-3.5 fill-current" /> Váš typ z fáze 2
               </span>
               <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">{mine.name}</h2>
@@ -97,7 +97,7 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Button
                   onClick={() => onSelectBusinessType(mine.id)}
-                  className="h-12 rounded-xl bg-orange-500 px-6 text-base font-semibold text-white hover:bg-orange-600"
+                  className="v7-trap-btn h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
                 >
                   {progressOf(mine, all) > 0 ? "Pokračovat v plánu" : "Otevřít plán tvorby"}
                   <ArrowRight className="ml-2 h-5 w-5" />

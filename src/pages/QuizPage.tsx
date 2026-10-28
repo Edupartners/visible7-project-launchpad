@@ -291,7 +291,7 @@ const QuizPage = () => {
             <Button
               onClick={submit}
               disabled={busy}
-              className="mt-6 h-14 w-full rounded-xl bg-orange-500 text-lg font-semibold text-white hover:bg-orange-600"
+              className="v7-trap-btn mt-6 h-14 w-full text-lg pr-9 font-bold text-signal-foreground"
             >
               {busy ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               Ukázat můj typ

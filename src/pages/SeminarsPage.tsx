@@ -170,10 +170,7 @@ const SeminarsPage = () => {
         <div className="flex-1" />
         <div className="mt-5 flex flex-wrap items-center gap-2">
           {locked ? (
-            <Button
-              onClick={() => navigate("/clenstvi")}
-              className="rounded-[10px] bg-orange-500 font-semibold text-white hover:bg-orange-600"
-            >
+            <Button onClick={() => navigate("/clenstvi")} className="v7-trap-btn pr-9 font-bold text-signal-foreground">
               <Crown className="mr-2 h-4 w-4" /> Získat členství
             </Button>
           ) : (
@@ -186,7 +183,7 @@ const SeminarsPage = () => {
                   ? highlight
                     ? "border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
                     : ""
-                  : "bg-orange-500 text-white hover:bg-orange-600"
+                  : "v7-trap-btn pr-9 font-bold text-signal-foreground"
               }`}
             >
               {busy === s.id ? (
