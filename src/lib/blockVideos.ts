@@ -9,17 +9,19 @@ import { BLOCKS } from "@/lib/buildPlans";
 import { MKT_BLOCKS } from "@/lib/marketingPlans";
 import { LAUNCH_BLOCKS } from "@/lib/launchPlan";
 import { GROWTH_BLOCKS } from "@/lib/growthPlan";
+import { BONUSES } from "@/lib/bonuses";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
-export type BlockArea = "tvorba" | "marketing" | "start" | "rust";
+export type BlockArea = "tvorba" | "marketing" | "start" | "rust" | "bonus";
 
 export const AREA_NAMES: Record<BlockArea, string> = {
   tvorba: "Fáze 4 – Implementace",
   marketing: "Fáze 5 – Budování poptávky",
   start: "Fáze 6 – Launch",
   rust: "Fáze 7 – Expanze",
+  bonus: "Bonusy",
 };
 
 /** 1 video, 2–4 videa, 5+ videí */
@@ -37,6 +39,7 @@ export const ALL_BLOCKS: { key: string; area: BlockArea; title: string }[] = [
   })),
   ...LAUNCH_BLOCKS.map((b) => ({ key: blockKey("start", b.id), area: "start" as const, title: b.title })),
   ...GROWTH_BLOCKS.map((b) => ({ key: blockKey("rust", b.id), area: "rust" as const, title: b.title })),
+  ...BONUSES.map((b) => ({ key: blockKey("bonus", b.id), area: "bonus" as const, title: b.title })),
 ];
 
 export interface BlockVideoRow {

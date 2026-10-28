@@ -103,10 +103,10 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
               >
                 <div className="min-w-0">
                   <Link to={`/osvedceni/${c.code}`} className="font-semibold hover:underline">
-                    {certificateTitle(c.kind, c.phase)}
+                    {certificateTitle(c.kind, c.phase, c.bonus_key)}
                   </Link>
                   <p className="truncate text-sm text-muted-foreground">
-                    {c.project_name}, vystaveno {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
+                    {c.kind === "bonus" ? "Bonus" : c.project_name}, vystaveno {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">

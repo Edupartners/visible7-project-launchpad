@@ -14,6 +14,7 @@ import {
   Check,
   FileText,
   FlaskConical,
+  Gift,
   FolderOpen,
   Globe,
   Globe2,
@@ -399,6 +400,16 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
           <li>
             <button
               type="button"
+              onClick={() => go("/bonusy")}
+              aria-current={pathname === "/bonusy" ? "page" : undefined}
+              className={itemCls(pathname === "/bonusy")}
+            >
+              <Gift className="h-4 w-4 text-muted-foreground" /> Bonusy
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
               onClick={() => go("/settings#osvedceni")}
               aria-current={pathname === "/settings#osvedceni" ? "page" : undefined}
               className={itemCls(pathname === "/settings#osvedceni")}
@@ -556,6 +567,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
         <span className="my-1 h-px w-8 bg-border" />
         {icon("Seniorní poradci", "/poradci", Users)}
         {icon("Živé semináře", "/seminare", Presentation)}
+        {icon("Bonusy", "/bonusy", Gift)}
       </div>
       <div className="flex flex-col items-center gap-1 border-t border-border pt-2">
         {done.size >= 2 && !access.loading && !access.paid && icon("Získat členství", "/clenstvi", Crown)}

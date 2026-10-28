@@ -1,10 +1,11 @@
 import { supabase } from "@/integrations/visible7/client";
+import { bonusById } from "@/lib/bonuses";
 
-export type CertificateKind = "phase" | "zamer" | "gold";
+export type CertificateKind = "phase" | "zamer" | "gold" | "bonus";
 
 export interface Certificate {
   code: string;
-  project_id?: string;
+  project_id?: string | null;
   kind: CertificateKind;
   phase: number | null;
   holder_name: string;
@@ -13,6 +14,8 @@ export interface Certificate {
   issued_at: string;
   /** Ověřené IČO (jen Gold) */
   ico?: string | null;
+  /** Jen u osvědčení za bonus (např. "ai_act") */
+  bonus_key?: string | null;
 }
 
 export const GATE_NAMES: Record<number, string> = {
@@ -29,13 +32,15 @@ export const ISSUER_LINE = "Edu Partners s.r.o. | Partner: World eCommerce Busin
 export const ISSUER_ORG = "Edu Partners s.r.o.";
 
 /** Název osvědčení tak, jak se zobrazí na osvědčení a na LinkedInu. */
-export const certificateTitle = (kind: CertificateKind, phase: number | null) => {
+export const certificateTitle = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
+  if (kind === "bonus") return `VISIBLE7 Bonus – ${bonusById(bonusKey)?.title ?? "videokurz"}`;
   if (kind === "gold") return "VISIBLE7 Gold – Spuštěný projekt";
   if (kind === "zamer") return "Certifikovaný marketingový a projektový specialista";
   return `VISIBLE7 MICEK® – Fáze ${phase}: ${GATE_NAMES[phase ?? 0] ?? ""}`;
 };
 
-export const certificateDescription = (kind: CertificateKind, phase: number | null) => {
+export const certificateDescription = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
+  if (kind === "bonus") return bonusById(bonusKey)?.certificateFor ?? "za absolvování videokurzu";
   if (kind === "gold")
     return "za projití všech sedmi bran metodiky VISIBLE7 MICEK® a spuštění vlastního projektu na trh";
   if (kind === "zamer")
@@ -126,12 +131,19 @@ const phasesOf = (kind: CertificateKind, phase: number | null) =>
   kind === "gold" ? [1, 2, 3, 4, 5, 6, 7] : kind === "zamer" ? [1, 2, 3, 4, 5] : phase ? [phase] : [];
 
 /** Krátký výčet dovedností na přední stranu osvědčení. */
-export const certificateSkills = (kind: CertificateKind, phase: number | null) =>
-  phasesOf(kind, phase).flatMap((p) => PHASE_CONTENT[p]?.skills.slice(0, kind === "phase" ? 2 : 1) ?? []);
+export const certificateSkills = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) =>
+  kind === "bonus"
+    ? (bonusById(bonusKey)?.skills ?? [])
+    : phasesOf(kind, phase).flatMap((p) => PHASE_CONTENT[p]?.skills.slice(0, kind === "phase" ? 2 : 1) ?? []);
 
 /** Obsah po fázích pro přílohu osvědčení. */
-export const certificateSyllabus = (kind: CertificateKind, phase: number | null) =>
-  phasesOf(kind, phase).map((p) => ({ phase: p, name: GATE_NAMES[p], ...PHASE_CONTENT[p] }));
+export const certificateSyllabus = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
+  if (kind === "bonus") {
+    const b = bonusById(bonusKey);
+    return b ? [{ phase: 0, name: b.title, skills: b.skills, topics: b.topics, outputs: [] as string[] }] : [];
+  }
+  return phasesOf(kind, phase).map((p) => ({ phase: p, name: GATE_NAMES[p], ...PHASE_CONTENT[p] }));
+};
 
 /** Krátký název celkového osvědčení pro texty na webu. */
 export const SPECIALIST_TITLE = "Certifikovaný marketingový a projektový specialista";
@@ -142,7 +154,7 @@ export const linkedInAddUrl = (c: Certificate) => {
   const d = new Date(c.issued_at);
   const params = new URLSearchParams({
     startTask: "CERTIFICATION_NAME",
-    name: certificateTitle(c.kind, c.phase),
+    name: certificateTitle(c.kind, c.phase, c.bonus_key),
     organizationName: ISSUER_ORG,
     issueYear: String(d.getFullYear()),
     issueMonth: String(d.getMonth() + 1),
@@ -170,6 +182,17 @@ export async function issueCertificate(args: {
   return { code: data as string };
 }
 
+/** Osvědčení za bonus: server ověří, že má člověk zhlédnutá všechna videa bonusu. */
+export async function issueBonusCertificate(bonusId: string, holderName: string): Promise<{ code?: string; error?: string }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc("issue_bonus_certificate", {
+    p_bonus: bonusId,
+    p_holder_name: holderName,
+  });
+  if (error) return { error: error.message };
+  return { code: data as string };
+}
+
 export async function verifyCertificate(code: string): Promise<Certificate | null> {
   const { data, error } = await supabase.rpc("verify_certificate", { p_code: code });
   if (error || !Array.isArray(data) || data.length === 0) return null;
@@ -179,7 +202,7 @@ export async function verifyCertificate(code: string): Promise<Certificate | nul
 export async function listMyCertificates(): Promise<Certificate[]> {
   const { data, error } = await supabase
     .from("certificates")
-    .select("code, project_id, kind, phase, holder_name, project_name, launch_url, issued_at, ico")
+    .select("code, project_id, kind, phase, holder_name, project_name, launch_url, issued_at, ico, bonus_key")
     .order("issued_at", { ascending: false });
   if (error || !data) return [];
   return data as Certificate[];
