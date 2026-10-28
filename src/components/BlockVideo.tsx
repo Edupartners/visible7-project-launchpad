@@ -11,6 +11,7 @@ import {
   videosLabel,
   vimeoSrc,
 } from "@/lib/blockVideos";
+import { videoCover } from "@/lib/videoCovers";
 
 const PLACEHOLDER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(216_45%_32%)]";
 const POSTER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)]";
@@ -19,9 +20,65 @@ const POSTER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)
 export const BlockVideo = ({ block, area }: { block: BuildBlock; area: BlockArea }) => {
   const key = blockKey(area, block.id);
   const { videos, watched } = useBlockVideos(key);
-  if (videos.length > 0) return <VideoPlaylist block={block} videos={videos} watched={watched} />;
+  if (videos.length > 0) return <VideoPlaylist block={block} area={area} videos={videos} watched={watched} />;
   return <SingleVideo block={block} />;
 };
+
+/** Náhled před spuštěním: fotka karty (když je), přes ni název dílu a tlačítko přehrát. */
+function Poster({
+  cover,
+  title,
+  label,
+  minutes,
+  onPlay,
+}: {
+  cover: string | null;
+  title: string;
+  label: string;
+  minutes: number | null | undefined;
+  onPlay: () => void;
+}) {
+  const [broken, setBroken] = useState(false);
+  const img = cover && !broken ? cover : null;
+  return (
+    <button
+      type="button"
+      onClick={onPlay}
+      className={`group relative block aspect-video w-full overflow-hidden rounded-xl text-left text-white ${POSTER_BG}`}
+      aria-label={`Přehrát video: ${title}`}
+    >
+      {img && (
+        <img
+          src={img}
+          alt=""
+          loading="lazy"
+          onError={() => setBroken(true)}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+      )}
+      <span
+        aria-hidden
+        className={`absolute inset-0 ${img ? "bg-gradient-to-r from-black/80 via-black/45 to-black/5" : ""}`}
+      />
+      <span className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4 sm:gap-4 sm:p-6">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg transition-transform group-hover:scale-110 sm:h-14 sm:w-14">
+          <PlayCircle className="h-7 w-7 sm:h-8 sm:w-8" />
+        </span>
+        <span className="min-w-0 max-w-xl">
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-white/70">{label}</span>
+          <span className="mt-0.5 line-clamp-2 block text-lg font-bold leading-snug [text-shadow:0_1px_8px_rgba(0,0,0,.45)] sm:text-2xl">
+            {title}
+          </span>
+        </span>
+      </span>
+      {minutes ? (
+        <span className="absolute right-3 top-3 rounded-md bg-black/60 px-2 py-0.5 text-xs font-semibold">
+          {minutes} min
+        </span>
+      ) : null}
+    </button>
+  );
+}
 
 function PlayerFrame({ video, title, onEnded }: { video: BlockVideoRow; title: string; onEnded: () => void }) {
   const ref = useRef<HTMLIFrameElement>(null);
@@ -76,10 +133,12 @@ function PlayerFrame({ video, title, onEnded }: { video: BlockVideoRow; title: s
 
 function VideoPlaylist({
   block,
+  area,
   videos,
   watched,
 }: {
   block: BuildBlock;
+  area: BlockArea;
   videos: BlockVideoRow[];
   watched: Set<string>;
 }) {
@@ -90,6 +149,7 @@ function VideoPlaylist({
   const idx = videos.indexOf(current);
   const seen = videos.filter((v) => watched.has(v.id)).length;
   const total = videos.reduce((s, v) => s + (v.minutes ?? 0), 0);
+  const cover = videoCover(blockKey(area, block.id));
 
   const start = (v: BlockVideoRow) => {
     track("video_play", { where: "block", block: block.id, video: v.vimeo_id });
@@ -102,25 +162,13 @@ function VideoPlaylist({
       {play ? (
         <PlayerFrame video={current} title={current.title} onEnded={() => setWatched(current.id, true)} />
       ) : (
-        <button
-          type="button"
-          onClick={() => start(current)}
-          className={`group relative flex aspect-video w-full flex-col items-center justify-center rounded-xl px-6 text-center text-white ${POSTER_BG}`}
-          aria-label={`Přehrát video: ${current.title}`}
-        >
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg transition-transform group-hover:scale-110">
-            <PlayCircle className="h-9 w-9" />
-          </span>
-          <span className="mt-3 line-clamp-2 font-semibold">
-            {videos.length > 1 && <span className="text-white/60">{idx + 1}. </span>}
-            {current.title}
-          </span>
-          {current.minutes && (
-            <span className="absolute bottom-3 right-3 rounded-md bg-black/60 px-2 py-0.5 text-xs font-semibold">
-              {current.minutes} min
-            </span>
-          )}
-        </button>
+        <Poster
+          cover={cover}
+          title={current.title}
+          label={videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title}
+          minutes={current.minutes}
+          onPlay={() => start(current)}
+        />
       )}
 
       {videos.length > 1 && (
