@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
+import { ACADEMY, ACADEMY_ITEMS, academyOffer, czDate } from "@/lib/academy";
 
 /** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
 type Cell = boolean | string;
@@ -183,12 +184,13 @@ const PricingPage = () => {
   ];
 
   const buy = canBuy(shop);
+  const academy = academyOffer();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PublicHeader onStart={start} />
       <main>
-        <section className="mx-auto max-w-5xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
+        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
           <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
             Začněte zdarma. Plaťte, až budete chtít dál.
           </h1>
@@ -196,7 +198,7 @@ const PricingPage = () => {
             Jedno členství, žádné předplatné, které by se samo obnovovalo. Ceny jsou konečné, včetně DPH.
           </p>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-[1fr_1.3fr]">
+          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr_1.15fr_1.15fr]">
             <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
               <h2 className="font-semibold text-muted-foreground">Zdarma</h2>
               <p className="mt-3 text-4xl font-extrabold tracking-tight">0 Kč</p>
@@ -275,6 +277,54 @@ const PricingPage = () => {
                     : "Při objednávce použijte e-mail, kterým se přihlašujete do aplikace – členství se zapne samo."}
                 </p>
               )}
+            </div>
+
+            <div
+              id="akademie"
+              className="flex scroll-mt-24 flex-col rounded-2xl border-2 border-leaf-500 bg-card p-6 md:col-span-2 lg:col-span-1"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="font-semibold text-muted-foreground">Akademie s lektory</h2>
+                <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">
+                  Nejvíc za peníze
+                </span>
+              </div>
+              <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(academy.price)}</p>
+              <p className="text-sm text-muted-foreground">
+                {academy.early
+                  ? `cena při přihlášení do ${czDate(ACADEMY.earlyUntil)}, pak ${kc(ACADEMY.price)}`
+                  : `nebo ve splátkách ${ACADEMY.installments}`}
+              </p>
+              <p className="mt-3 text-sm">
+                <b>{ACADEMY.name}</b>. Start {czDate(ACADEMY.start)}, {ACADEMY.sessions} online setkání za{" "}
+                {ACADEMY.months} měsíců. Jednotlivě by kurzy stály {kc(ACADEMY.separateValue)}.
+              </p>
+              <ul className="mt-6 flex-1 space-y-2.5 text-sm">
+                {ACADEMY_ITEMS.map((it) => (
+                  <li key={it} className="flex gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+              {academy.open ? (
+                <a
+                  href={ACADEMY.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track("academy_click", { source: "cenik", price: academy.price })}
+                  className="mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
+                >
+                  Přihlásit se do akademie <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </a>
+              ) : (
+                <p className="mt-6 rounded-xl bg-muted p-3 text-center text-sm font-semibold">
+                  Další běh akademie připravujeme.
+                </p>
+              )}
+              <p className="mt-3 text-xs text-muted-foreground">
+                Přihláška a platba probíhá na webu Edu Partners s.r.o. Akademie se otevírá od 7 účastníků.
+              </p>
             </div>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">

@@ -5,6 +5,7 @@ import { ADVISORS, CONSULTATION } from "@/lib/advisors";
 import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useFounderOffer, useShop } from "@/lib/shop";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
+import { ACADEMY, academyOffer, czDate } from "@/lib/academy";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { BankWaitlist } from "@/components/marketing/BankWaitlist";
@@ -365,6 +366,7 @@ const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
   const offer = useFounderOffer();
+  const academy = academyOffer();
   const author = ADVISORS.find((a) => a.name.includes("Míček"));
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
@@ -793,6 +795,21 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{price}</dd>
                 </div>
               ))}
+              {academy.open && (
+                <div className="flex items-baseline justify-between gap-4 px-5 py-4">
+                  <dt className="min-w-0">
+                    <Link to="/cenik#akademie" className="block font-semibold hover:text-primary">
+                      {ACADEMY.name}: členství + {ACADEMY.sessions} živých setkání s lektory
+                    </Link>
+                    <span className="block text-sm text-muted-foreground">
+                      Start {czDate(ACADEMY.start)}
+                      {academy.early ? `, cena do ${czDate(ACADEMY.earlyUntil)}` : ""}. Jednotlivě{" "}
+                      {kc(ACADEMY.separateValue)}.
+                    </span>
+                  </dt>
+                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(academy.price)}</dd>
+                </div>
+              )}
               <div className="flex items-center justify-between gap-4 bg-leaf-50 px-5 py-4">
                 <dt className="min-w-0">
                   <span className="block font-semibold">Úvodní konzultace s expertem, 20 minut</span>
