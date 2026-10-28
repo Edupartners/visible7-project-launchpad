@@ -12,6 +12,7 @@ import {
   Calculator,
   LayoutDashboard,
   Check,
+  ChevronRight,
   FileText,
   FlaskConical,
   Gift,
@@ -85,6 +86,25 @@ const SidebarSeminars = ({ onClick }: { onClick: () => void }) => {
   );
 };
 
+const SECTIONS_KEY = "v7_sidebar_sections";
+const SECTION_PATHS: Record<string, string[]> = {
+  cesta: GATE_ROUTES.map((g) => g.route),
+  podnik: ["/muj-podnik", "/cash-flow", "/financni-report"],
+  nastroje: ["/mapa-cesty", "/rentgen-trhu", "/investor-pitch", "/listy", "/testovaci-stranka"],
+  pomoc: ["/poradci", "/bonusy", "/settings"],
+};
+const sectionOf = (path: string) =>
+  Object.keys(SECTION_PATHS).find((id) => SECTION_PATHS[id].some((p) => path === p || path.startsWith(`${p}/`)));
+const readSections = (): Record<string, boolean> => {
+  try {
+    const v = JSON.parse(localStorage.getItem(SECTIONS_KEY) ?? "null");
+    if (v && typeof v === "object") return v;
+  } catch {
+    /* ignore */
+  }
+  return { cesta: true };
+};
+
 /** Obsah postranního panelu – projekty nahoře, odkazy a účet s ozubeným kolem dole (jako ChatGPT/Claude). */
 const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCollapse?: () => void }) => {
   const navigate = useNavigate();
@@ -100,6 +120,36 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
   const done = new Set(completedPhases);
   const nextGate = [1, 2, 3, 4, 5, 6, 7].find((n) => !done.has(n));
   const pitchReady = [1, 2, 3].every((n) => done.has(n));
+  // Rozbalovací sekce menu. Stav si pamatujeme; sekce s otevřenou stránkou se rozbalí sama.
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(readSections);
+  useEffect(() => {
+    const id = sectionOf(pathname);
+    if (id) setOpenSections((s) => (s[id] ? s : { ...s, [id]: true }));
+  }, [pathname]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(SECTIONS_KEY, JSON.stringify(openSections));
+    } catch {
+      /* soukromé okno – nevadí */
+    }
+  }, [openSections]);
+  const isOpen = (id: string) => !!openSections[id];
+  const SectionHead = ({ id, label, note }: { id: string; label: string; note?: string }) => (
+    <button
+      type="button"
+      onClick={() => setOpenSections((s) => ({ ...s, [id]: !s[id] }))}
+      aria-expanded={isOpen(id)}
+      className="flex w-full items-center gap-1.5 rounded-md px-2 pb-1 pt-5 text-left text-xs font-semibold text-muted-foreground hover:text-foreground"
+    >
+      <ChevronRight
+        className={`h-3.5 w-3.5 shrink-0 transition-transform ${isOpen(id) ? "rotate-90" : ""}`}
+        aria-hidden="true"
+      />
+      <span className="flex-1">{label}</span>
+      {note && !isOpen(id) && <span className="font-normal">{note}</span>}
+    </button>
+  );
+
   // Kdo už podniká, má „Můj podnik“ nad branami; ostatní ho mají pod nimi.
   const [businessFirst, setBusinessFirst] = useState(false);
   useEffect(() => {
@@ -112,37 +162,39 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
 
   const businessBlock = (
     <>
-      <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Můj podnik</p>
-      <ul className="space-y-0.5">
-        {(
-          [
-            ["Přehled podniku", "/muj-podnik", Store, false],
-            ["Cash flow", "/cash-flow", Wallet, true],
-            ["Termíny", "/muj-podnik#terminy", CalendarClock, false],
-            ["Úřady a nástroje", "/digitalni-kancelar", Briefcase, false],
-            ["Rentgen podniku", "/rentgen?rezim=podnik", ScanSearch, false],
-          ] as const
-        ).map(([label, path, Icon, soon]) => {
-          const active = pathname === path.split(/[#?]/)[0] && !path.includes("#");
-          return (
-            <li key={path}>
-              <button
-                type="button"
-                onClick={() => go(path)}
-                aria-current={active ? "page" : undefined}
-                className={itemCls(active)}
-              >
-                <Icon className="h-4 w-4 text-muted-foreground" /> {label}
-                {soon && (
-                  <span className="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
-                    brzy
-                  </span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <SectionHead id="podnik" label="Můj podnik" />
+      {isOpen("podnik") && (
+        <ul className="space-y-0.5">
+          {(
+            [
+              ["Přehled podniku", "/muj-podnik", Store, false],
+              ["Cash flow", "/cash-flow", Wallet, true],
+              ["Termíny", "/muj-podnik#terminy", CalendarClock, false],
+              ["Úřady a nástroje", "/digitalni-kancelar", Briefcase, false],
+              ["Rentgen podniku", "/rentgen?rezim=podnik", ScanSearch, false],
+            ] as const
+          ).map(([label, path, Icon, soon]) => {
+            const active = pathname === path.split(/[#?]/)[0] && !path.includes("#");
+            return (
+              <li key={path}>
+                <button
+                  type="button"
+                  onClick={() => go(path)}
+                  aria-current={active ? "page" : undefined}
+                  className={itemCls(active)}
+                >
+                  <Icon className="h-4 w-4 text-muted-foreground" /> {label}
+                  {soon && (
+                    <span className="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
+                      brzy
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </>
   );
 
@@ -272,152 +324,162 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
 
         {businessFirst && businessBlock}
 
-        <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Moje cesta</p>
-        <ol className="space-y-0.5">
-          {GATE_ROUTES.map((g, i) => {
-            const n = i + 1;
-            const isDone = done.has(n);
-            const locked = !isDone && !FREE_GATES.includes(n) && !access.full;
-            const isNext = !isDone && n === nextGate;
-            const active = pathname === g.route;
-            return (
-              <li key={g.route}>
-                <button
-                  type="button"
-                  onClick={() => go(g.route)}
-                  aria-current={active ? "page" : undefined}
-                  className={itemCls(active)}
-                >
-                  <span
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
-                      isDone
-                        ? "bg-emerald-500 text-white"
-                        : isNext
-                          ? "bg-signal text-signal-foreground ring-1 ring-primary/40"
-                          : "border border-border text-muted-foreground"
-                    }`}
+        <SectionHead id="cesta" label="Moje cesta" note={`${done.size} ze 7`} />
+        {isOpen("cesta") && (
+          <ol className="space-y-0.5">
+            {GATE_ROUTES.map((g, i) => {
+              const n = i + 1;
+              const isDone = done.has(n);
+              const locked = !isDone && !FREE_GATES.includes(n) && !access.full;
+              const isNext = !isDone && n === nextGate;
+              const active = pathname === g.route;
+              return (
+                <li key={g.route}>
+                  <button
+                    type="button"
+                    onClick={() => go(g.route)}
+                    aria-current={active ? "page" : undefined}
+                    className={itemCls(active)}
                   >
-                    {isDone ? <Check className="h-3 w-3" /> : n}
-                  </span>
-                  <span className={`truncate ${locked ? "text-muted-foreground" : ""}`}>{g.name}</span>
-                  {locked && <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                        isDone
+                          ? "bg-emerald-500 text-white"
+                          : isNext
+                            ? "bg-signal text-signal-foreground ring-1 ring-primary/40"
+                            : "border border-border text-muted-foreground"
+                      }`}
+                    >
+                      {isDone ? <Check className="h-3 w-3" /> : n}
+                    </span>
+                    <span className={`truncate ${locked ? "text-muted-foreground" : ""}`}>{g.name}</span>
+                    {locked && <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        )}
 
         {!businessFirst && businessBlock}
 
-        <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Nástroje</p>
-        <ul className="space-y-0.5">
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/strategy")}
-              aria-current={pathname === "/strategy" ? "page" : undefined}
-              className={itemCls(pathname === "/strategy")}
-            >
-              <Calculator className="h-4 w-4 text-muted-foreground" /> Finanční plán
-            </button>
-          </li>
-          <li>
-            <button type="button" onClick={() => go("/mapa-cesty")} className={itemCls(pathname === "/mapa-cesty")}>
-              <Map className="h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
-            </button>
-          </li>
-          <li>
-            <button type="button" onClick={() => go("/rentgen-trhu")} className={itemCls(pathname === "/rentgen-trhu")}>
-              <Globe2 className="h-4 w-4 text-muted-foreground" /> Rentgen trhu
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/benchmarking-phase")}
-              aria-current={pathname === "/benchmarking-phase" ? "page" : undefined}
-              className={itemCls(pathname === "/benchmarking-phase")}
-            >
-              <Megaphone className="h-4 w-4 text-muted-foreground" /> Marketingové kanály
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/investor-pitch")}
-              aria-current={pathname === "/investor-pitch" ? "page" : undefined}
-              className={itemCls(pathname === "/investor-pitch")}
-              title={pitchReady ? undefined : "Dostupné po dokončení bran 1–3"}
-            >
-              <Presentation className="h-4 w-4 text-muted-foreground" />
-              <span className={pitchReady ? "" : "text-muted-foreground"}>Pitch pro investory</span>
-              {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/listy")}
-              aria-current={pathname === "/listy" ? "page" : undefined}
-              className={itemCls(pathname === "/listy")}
-            >
-              <FileText className="h-4 w-4 text-muted-foreground" /> Pracovní listy
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/testovaci-stranka")}
-              aria-current={pathname === "/testovaci-stranka" ? "page" : undefined}
-              className={itemCls(pathname === "/testovaci-stranka")}
-            >
-              <FlaskConical className="h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/digitalni-kancelar")}
-              className={itemCls(pathname === "/digitalni-kancelar")}
-            >
-              <Briefcase className="h-4 w-4 text-muted-foreground" /> Digitální kancelář
-            </button>
-          </li>
-        </ul>
+        <SectionHead id="nastroje" label="Nástroje" />
+        {isOpen("nastroje") && (
+          <ul className="space-y-0.5">
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/strategy")}
+                aria-current={pathname === "/strategy" ? "page" : undefined}
+                className={itemCls(pathname === "/strategy")}
+              >
+                <Calculator className="h-4 w-4 text-muted-foreground" /> Finanční plán
+              </button>
+            </li>
+            <li>
+              <button type="button" onClick={() => go("/mapa-cesty")} className={itemCls(pathname === "/mapa-cesty")}>
+                <Map className="h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/rentgen-trhu")}
+                className={itemCls(pathname === "/rentgen-trhu")}
+              >
+                <Globe2 className="h-4 w-4 text-muted-foreground" /> Rentgen trhu
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/benchmarking-phase")}
+                aria-current={pathname === "/benchmarking-phase" ? "page" : undefined}
+                className={itemCls(pathname === "/benchmarking-phase")}
+              >
+                <Megaphone className="h-4 w-4 text-muted-foreground" /> Marketingové kanály
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/investor-pitch")}
+                aria-current={pathname === "/investor-pitch" ? "page" : undefined}
+                className={itemCls(pathname === "/investor-pitch")}
+                title={pitchReady ? undefined : "Dostupné po dokončení bran 1–3"}
+              >
+                <Presentation className="h-4 w-4 text-muted-foreground" />
+                <span className={pitchReady ? "" : "text-muted-foreground"}>Pitch pro investory</span>
+                {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/listy")}
+                aria-current={pathname === "/listy" ? "page" : undefined}
+                className={itemCls(pathname === "/listy")}
+              >
+                <FileText className="h-4 w-4 text-muted-foreground" /> Pracovní listy
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/testovaci-stranka")}
+                aria-current={pathname === "/testovaci-stranka" ? "page" : undefined}
+                className={itemCls(pathname === "/testovaci-stranka")}
+              >
+                <FlaskConical className="h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/digitalni-kancelar")}
+                className={itemCls(pathname === "/digitalni-kancelar")}
+              >
+                <Briefcase className="h-4 w-4 text-muted-foreground" /> Digitální kancelář
+              </button>
+            </li>
+          </ul>
+        )}
 
-        <p className="px-2 pb-1 pt-5 text-xs font-semibold text-muted-foreground">Pomoc a výsledky</p>
-        <ul className="space-y-0.5">
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/poradci")}
-              aria-current={pathname === "/poradci" ? "page" : undefined}
-              className={itemCls(pathname === "/poradci")}
-            >
-              <Users className="h-4 w-4 text-muted-foreground" /> Seniorní poradci
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/bonusy")}
-              aria-current={pathname === "/bonusy" ? "page" : undefined}
-              className={itemCls(pathname === "/bonusy")}
-            >
-              <Gift className="h-4 w-4 text-muted-foreground" /> Bonusy
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => go("/settings#osvedceni")}
-              aria-current={pathname === "/settings#osvedceni" ? "page" : undefined}
-              className={itemCls(pathname === "/settings#osvedceni")}
-            >
-              <Award className="h-4 w-4 text-muted-foreground" /> Moje osvědčení
-            </button>
-          </li>
-        </ul>
+        <SectionHead id="pomoc" label="Pomoc a výsledky" />
+        {isOpen("pomoc") && (
+          <ul className="space-y-0.5">
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/poradci")}
+                aria-current={pathname === "/poradci" ? "page" : undefined}
+                className={itemCls(pathname === "/poradci")}
+              >
+                <Users className="h-4 w-4 text-muted-foreground" /> Seniorní poradci
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/bonusy")}
+                aria-current={pathname === "/bonusy" ? "page" : undefined}
+                className={itemCls(pathname === "/bonusy")}
+              >
+                <Gift className="h-4 w-4 text-muted-foreground" /> Bonusy
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/settings#osvedceni")}
+                aria-current={pathname === "/settings#osvedceni" ? "page" : undefined}
+                className={itemCls(pathname === "/settings#osvedceni")}
+              >
+                <Award className="h-4 w-4 text-muted-foreground" /> Moje osvědčení
+              </button>
+            </li>
+          </ul>
+        )}
 
         <ul className="mt-3 space-y-0.5 border-t border-border pt-3">
           <li>
