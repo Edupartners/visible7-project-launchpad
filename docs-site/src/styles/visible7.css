@@ -1,0 +1,24 @@
+/* Barvy a písmo podle aplikace visible7.io (tmavě zelená, Rethink Sans) */
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --sl-font: 'Rethink Sans', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --sl-color-accent-low: #0b2a20;
+  --sl-color-accent: #3fa37a;
+  --sl-color-accent-high: #cfeee0;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e6f3ec;
+  --sl-color-accent: #0f3d2e;
+  --sl-color-accent-high: #0b2a20;
+  --sl-color-bg-nav: #ffffff;
+}
+
+.sl-markdown-content table {
+  font-size: 0.9rem;
+}
+
+.sl-markdown-content code {
+  font-size: 0.85em;
+}
