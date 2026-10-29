@@ -51,6 +51,7 @@ import BonusesPage from "./pages/BonusesPage";
 import JourneyMapPage from "./pages/JourneyMapPage";
 import MarketRentgenPage from "./pages/MarketRentgenPage";
 import CashflowPage from "./pages/CashflowPage";
+import MockBankPage from "./pages/MockBankPage";
 import MyBusinessPage from "./pages/MyBusinessPage";
 import TestPageEditor from "./pages/TestPageEditor";
 import TestPagePublic from "./pages/TestPagePublic";
@@ -79,6 +80,7 @@ const ProtectedRoutes = () => (
       <Route path="/mapa-cesty" element={<JourneyMapPage />} />
       <Route path="/rentgen-trhu" element={<MarketRentgenPage />} />
       <Route path="/cash-flow" element={<CashflowPage />} />
+      <Route path="/cvicna-banka" element={<MockBankPage />} />
       <Route path="/muj-podnik" element={<MyBusinessPage />} />
       <Route path="/listy" element={<MemberWorksheetsPage />} />
       <Route

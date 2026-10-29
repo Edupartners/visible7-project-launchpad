@@ -32,6 +32,8 @@ export function BankConnectPanel({
   const [busy, setBusy] = useState<string | null>(null);
   const [providers, setProviders] = useState<BankProviderInfo[] | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [testMode, setTestMode] = useState(false);
+  const isTest = testMode || connections.some((c) => c.bank_name.endsWith("(test)"));
   const [pdfPassword, setPdfPassword] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const handled = useRef(false);
@@ -64,6 +66,7 @@ export function BankConnectPanel({
     const r = await bankSync("providers");
     setBusy(null);
     if (r.error) return fail(r);
+    setTestMode(r.test === true);
     setProviders((r.providers as BankProviderInfo[]) ?? []);
   };
 
@@ -141,12 +144,19 @@ export function BankConnectPanel({
             Přihlásíte se přímo u banky. Ukládáme jen měsíční souhrny, jednotlivé platby ani protistrany ne.
           </p>
         </div>
-        <Landmark className="h-7 w-7 text-leaf-700" aria-hidden="true" />
+        <Landmark className="hidden h-7 w-7 text-leaf-700 sm:block" aria-hidden="true" />
       </div>
 
       {busy === "callback" && (
         <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold">
           <Loader2 className="h-4 w-4 animate-spin" /> Dokončuji připojení a stahuji pohyby z banky…
+        </p>
+      )}
+
+      {isTest && (
+        <p className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
+          <strong>Testovací režim.</strong> Přístupy od Goodveri zatím nejsou nastavené, proto banky, přihlášení i data
+          jsou cvičné. Až vložíte přístupy do Supabase, režim se vypne sám. Testovací připojení pak odpojte.
         </p>
       )}
 
@@ -157,7 +167,7 @@ export function BankConnectPanel({
         <ul className="mt-5 space-y-2">
           {connections.map((c) => (
             <li key={c.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-3 ring-1 ring-border">
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 basis-full sm:basis-0">
                 <p className="font-semibold">
                   {c.bank_name || c.bank_code || "Účet"} {c.account_mask && <span className="text-muted-foreground">{c.account_mask}</span>}
                 </p>

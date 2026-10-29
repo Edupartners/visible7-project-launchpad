@@ -10,6 +10,9 @@
 //    žádné jednotlivé transakce, texty plateb ani protistrany.
 //  - Pilot: jen správce (BANK_SYNC_ACCESS=admins, výchozí). Později „paid“ = placený přístup.
 //  - Klíče jen v Supabase secrets (GOODVERI_*), nikdy v repozitáři.
+//  - Testovací režim: dokud nejsou přístupy nastavené, funkce místo Goodveri vrací vymyšlená data
+//    ve stejném formátu (mockGv) a „přihlášení v bance“ je cvičná stránka /cvicna-banka.
+//    Jakmile se vloží GOODVERI_API_URL + CLIENT_ID + SECRET, testovací režim se sám vypne.
 // verify_jwt je vypnuté – uživatele ověřujeme sami přes auth.getUser() (stejně jako ostatní funkce).
 //
 // Akce (POST { action, ... }):
@@ -30,7 +33,7 @@ const CRON_SECRET = Deno.env.get("CRON_SECRET");
 const APP_URL = Deno.env.get("APP_URL") ?? "https://visible7.io";
 const ACCESS = Deno.env.get("BANK_SYNC_ACCESS") ?? "admins"; // „admins“ (pilot) | „paid“
 
-// Goodveri – přístupy dodá SokordiaTech (Petr Bartošek). Bez nich funkce vrací „not_configured“.
+// Goodveri – přístupy dodá SokordiaTech (Petr Bartošek). Bez nich běží testovací režim (mockGv).
 const GV_API = (Deno.env.get("GOODVERI_API_URL") ?? "").replace(/\/+$/, ""); // např. https://…/ (bez /api)
 const GV_IDENTITY = Deno.env.get("GOODVERI_IDENTITY_URL") ?? "https://identity.goodveri.online/connect/token";
 const GV_CLIENT_ID = Deno.env.get("GOODVERI_CLIENT_ID") ?? "";
@@ -103,6 +106,7 @@ async function gvToken(): Promise<string> {
 }
 
 async function gv<T>(method: string, body: Record<string, unknown>): Promise<T> {
+  if (!configured()) return mockGv(method, body) as T;
   const call = async () =>
     fetch(`${GV_API}/api/${method}`, {
       method: "POST",
@@ -160,6 +164,106 @@ interface GvAccount {
   ibanCode?: string | null;
   accountNumber?: string | null;
   balance?: GvAmount;
+}
+
+
+// ---------------------------------------------------------------------------------------------
+// Testovací režim – vymyšlená data ve formátu Finspector API (jen dokud nejsou přístupy)
+// ---------------------------------------------------------------------------------------------
+
+const MOCK_BANKS = [
+  { providerCode: "MOCK_A", name: "Cvičná banka", logo: null },
+  { providerCode: "MOCK_B", name: "Cvičná spořitelna", logo: null },
+  { providerCode: "MOCK_C", name: "Testovací fintech", logo: null },
+];
+
+/** Rok pohybů podnikatelského účtu se štítky Goodveri, deterministicky podle seed. */
+function mockStatement(seed: string, days: number, accountNumber: string): GvStatement {
+  let x = [...seed].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 233280, 7);
+  const rnd = () => (x = (x * 9301 + 49297) % 233280) / 233280;
+  const end = new Date();
+  const start = new Date(end.getTime() - days * 86_400_000);
+  const txs: GvTransaction[] = [];
+  const add = (d: Date, value: number, tags: string[]) => {
+    if (d < start || d > end) return;
+    txs.push({ date: d.toISOString().slice(0, 19), amount: { value: Math.round(value), currency: "CZK" }, tags });
+  };
+  const months = Math.ceil(days / 30) + 1;
+  for (let i = months; i >= 0; i--) {
+    const y = end.getFullYear();
+    const m = end.getMonth() - i;
+    const day = (n: number) => new Date(y, m, n, 10);
+    const growth = 1 + (months - i) * 0.03; // podnik pomalu roste
+    // tržby: 6–10 úhrad faktur, jedna pravidelná od stálého klienta
+    const invoices = 5 + Math.floor(rnd() * 4);
+    for (let k = 0; k < invoices; k++)
+      add(day(2 + Math.floor(rnd() * 26)), (4_500 + rnd() * 6_000) * growth, ["credit", "transfer", "invoicecredit"]);
+    add(day(5), 15_000, ["credit", "transfer", "invoicecredit", "credit10in12"]);
+    // výdaje
+    add(day(1), -12_000, ["debit", "transfer", "rentdebit", "debit10in12"]);
+    add(day(8), -890, ["debit", "transfer", "telcodebit", "debit10in12"]);
+    add(day(9), -1_250, ["debit", "card", "otheritservicesdebit"]);
+    add(day(12), -490, ["debit", "card", "subscriptiondebit", "debit10in12"]);
+    add(day(14), -(6_000 + rnd() * 6_000) * growth, ["debit", "card", "otherretaildebit"]);
+    add(day(18), -(1_500 + rnd() * 2_000), ["debit", "card", "fueldebit"]);
+    add(day(20), -3_143, ["debit", "transfer", "healthinsurancedebit", "debit10in12"]);
+    add(day(20), -4_759, ["debit", "transfer", "pension_con_debit", "debit10in12"]);
+    // bez štítku účelu – typicky reklama nebo spolupracovník (Goodveri je nepozná)
+    add(day(16), -(4_000 + rnd() * 4_000), ["debit", "card"]);
+    add(day(25), -(7_000 + rnd() * 3_000), ["debit", "transfer"]);
+    // výběr majitele na osobní účet
+    add(day(27), -10_000, ["debit", "transfer", "ownersaccountdebit"]);
+    // DPH čtvrtletně
+    if (((m % 12) + 12) % 12 % 3 === 0) add(day(24), -(9_000 + rnd() * 6_000) * growth, ["debit", "transfer", "taxes_DPH"]);
+  }
+  txs.sort((a, b) => a.date.localeCompare(b.date));
+  const movement = txs.reduce((s, t) => s + (t.amount?.value ?? 0), 0);
+  const endBalance = 140_000 + Math.round(rnd() * 20_000);
+  return {
+    accountNumber,
+    bankCode: "0000",
+    accountName: "Podnikatelský účet (test)",
+    productName: "Cvičný účet",
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
+    startBalance: { value: endBalance - movement, currency: "CZK" },
+    endBalance: { value: endBalance, currency: "CZK" },
+    transactions: txs,
+  };
+}
+
+function mockGv(method: string, body: Record<string, unknown>): unknown {
+  const client = String(body.clientCode ?? body.refNo ?? "test");
+  switch (method) {
+    case "ProviderList":
+      return { providers: MOCK_BANKS };
+    case "AccountAuth": {
+      const url = new URL(`${APP_URL}/cvicna-banka`);
+      url.searchParams.set("bank", String(body.providerCode ?? ""));
+      url.searchParams.set("return", String(body.returnUrl ?? `${APP_URL}/cash-flow`));
+      return { authenticated: false, authenticationUrl: url.toString(), message: "test" };
+    }
+    case "AccountList":
+      return {
+        resultCode: 0,
+        accounts: [
+          {
+            id: `acc-${client.slice(0, 8)}`,
+            accountName: "Podnikatelský účet (test)",
+            accountNumber: `19-${String(client.replace(/\D/g, "").slice(0, 6)).padEnd(6, "4")}8211/0000`,
+            balance: { value: 90_000, currency: "CZK" },
+          },
+        ],
+      };
+    case "AccountInfo":
+      return { resultCode: 0, statements: [mockStatement(client, Number(body.days ?? 180), "123456821")] };
+    case "Statement":
+      return { resultCode: 0, statements: [mockStatement(client, 92, "987654321")] };
+    case "RevokeAuth":
+      return { code: 0, message: "OK" };
+    default:
+      throw new GoodveriError(735, `Testovací režim: metoda ${method} není`);
+  }
 }
 
 const mask = (acc?: string | null) => {
@@ -449,15 +553,8 @@ Deno.serve(async (req) => {
   const allowed = !!adminRow || (ACCESS === "paid" && paid);
   if (!allowed) return json({ error: "Napojení účtu zatím testujeme v uzavřeném pilotu.", code: "pilot" }, 403);
 
-  if (!configured()) {
-    return json(
-      {
-        error: "Napojení na Goodveri ještě není nastavené (chybí přístupové údaje v Supabase).",
-        code: "not_configured",
-      },
-      503,
-    );
-  }
+  // Bez přístupů běží testovací režim (mockGv) – vidí ho jen správce, protože ostatní sem nepustíme.
+  const test = !configured();
 
   try {
     if (action === "providers") {
@@ -465,6 +562,7 @@ Deno.serve(async (req) => {
         countryCode: GV_COUNTRY,
       });
       return json({
+        test,
         providers: (r.providers ?? [])
           .filter((p) => p.providerCode)
           .map((p) => ({ code: p.providerCode, name: p.name ?? p.providerCode, logo: p.logo ?? null })),
@@ -483,7 +581,7 @@ Deno.serve(async (req) => {
           provider: "goodveri",
           provider_ref: clientCode,
           bank_code: providerCode,
-          bank_name: String(body.bankName ?? providerCode).slice(0, 80),
+          bank_name: `${String(body.bankName ?? providerCode).slice(0, 70)}${test ? " (test)" : ""}`,
           status: "pending",
         })
         .select("id, user_id, provider, provider_ref, bank_code")
@@ -545,7 +643,7 @@ Deno.serve(async (req) => {
           provider: "goodveri_pdf",
           provider_ref: ref,
           bank_code: first.bankCode ?? null,
-          bank_name: `PDF výpisy${first.bankCode ? ` (${first.bankCode})` : ""}`,
+          bank_name: test ? "PDF výpisy (test)" : `PDF výpisy${first.bankCode ? ` (${first.bankCode})` : ""}`,
           account_mask: mask(first.accountNumber),
           status: "active",
           last_sync_at: new Date().toISOString(),
