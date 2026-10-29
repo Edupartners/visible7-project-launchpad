@@ -393,7 +393,10 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         className="flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary/90"
       >
         <Store className="hidden h-4 w-4 shrink-0 text-leaf-300 sm:block" aria-hidden="true" />
-        <span>Ušetřete až 100 000 Kč. Postavte si vlastní byznys sami.</span>
+        <span>
+          Ušetřete až 100 000 Kč. Postavte si vlastní byznys sami
+          <span className="hidden sm:inline">, od nápadu po funkční produkt</span>.
+        </span>
         <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
       </a>
       <PublicHeader onStart={onAccessGranted} />
