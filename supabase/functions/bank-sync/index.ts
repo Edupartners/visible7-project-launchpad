@@ -1,21 +1,24 @@
-// VISIBLE7 – Cash flow z bankovního účtu (PSD2). NÁVRH – zatím NENASAZENO.
+// VISIBLE7 – Cash flow z bankovního účtu přes Goodveri Finspector (PSD2).
 //
-// Řetězec: banka → Finbricks (licencovaný AISP) → Sokordia Tech (API) → tato funkce → VISIBLE7.
-// Napojení na Sokordia Tech je za rozhraním BankProvider. Teď funguje poskytovatel „demo“
-// (ukázková data), adaptér SokordiaProvider se doplní podle jejich dokumentace API.
+// Řetězec: banka → Finbricks (licencovaný AISP) → Goodveri / SokordiaTech (Finspector API) → tato funkce → VISIBLE7.
+// Dokumentace: „Goodveri FINSPECTOR – Popis API“ (5. 3. 2026), „Goodveri identity – získání přístupu“,
+// swagger gv-finspector-swagger20251011.json, „Finspector – Status code“, „ST Classification cycles 1.1“.
 //
 // Zásady:
-//  - Přístupové údaje do banky VISIBLE7 nikdy nevidí. Uživatel se přihlásí u banky v okně poskytovatele.
-//  - Ukládáme jen měsíční souhrny podle kategorií, žádné jednotlivé transakce ani protistrany.
-//  - Jen přihlášený majitel; zápis do tabulek jen tady (service role).
-//  - Souhlas v bance platí cca 180 dní – hlídáme consent_expires_at a posíláme upozornění.
+//  - Přístupové údaje do banky VISIBLE7 nikdy nevidí. Uživatel se přihlásí u banky na stránce, kam ho pošle Goodveri.
+//  - Transakce zpracujeme jen v paměti. Ukládáme jen měsíční souhrny podle kategorií a štítků Goodveri,
+//    žádné jednotlivé transakce, texty plateb ani protistrany.
+//  - Pilot: jen správce (BANK_SYNC_ACCESS=admins, výchozí). Později „paid“ = placený přístup.
+//  - Klíče jen v Supabase secrets (GOODVERI_*), nikdy v repozitáři.
 // verify_jwt je vypnuté – uživatele ověřujeme sami přes auth.getUser() (stejně jako ostatní funkce).
 //
 // Akce (POST { action, ... }):
-//  connect     → { url }        adresa připojovacího okna poskytovatele
-//  callback    → { connection }  po návratu z banky uloží připojení a stáhne souhrny
-//  sync        → { months }      ruční aktualizace souhrnů jednoho připojení
-//  disconnect  → { ok }          odvolá souhlas u poskytovatele a smaže připojení i souhrny
+//  providers   → { providers }           seznam bank (Goodveri ProviderList)
+//  connect     → { url } | { connection } { providerCode, userAgent } – adresa přihlášení do banky
+//  callback    → { connection, months }  { clientId } – po návratu z banky uloží účet a stáhne souhrny
+//  sync        → { months }              { connectionId } – ruční aktualizace
+//  disconnect  → { ok }                  { connectionId } – odvolá souhlas u Goodveri a smaže data
+//  statement   → { connection, months }  { files: [{ name, content(base64), password? }] } – PDF výpisy
 //  sync_all    (jen plánovač s CRON_SECRET) – denní aktualizace všech aktivních připojení
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
@@ -24,9 +27,17 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const CRON_SECRET = Deno.env.get("CRON_SECRET");
-const PROVIDER = Deno.env.get("BANK_PROVIDER") ?? "demo"; // „sokordia“ po podpisu smlouvy
 const APP_URL = Deno.env.get("APP_URL") ?? "https://visible7.io";
-const MONTHS_BACK = 12;
+const ACCESS = Deno.env.get("BANK_SYNC_ACCESS") ?? "admins"; // „admins“ (pilot) | „paid“
+
+// Goodveri – přístupy dodá SokordiaTech (Petr Bartošek). Bez nich funkce vrací „not_configured“.
+const GV_API = (Deno.env.get("GOODVERI_API_URL") ?? "").replace(/\/+$/, ""); // např. https://…/ (bez /api)
+const GV_IDENTITY = Deno.env.get("GOODVERI_IDENTITY_URL") ?? "https://identity.goodveri.online/connect/token";
+const GV_CLIENT_ID = Deno.env.get("GOODVERI_CLIENT_ID") ?? "";
+const GV_CLIENT_SECRET = Deno.env.get("GOODVERI_CLIENT_SECRET") ?? "";
+const GV_SCOPE = Deno.env.get("GOODVERI_SCOPE") ?? "";
+const GV_COUNTRY = "CZE";
+const HISTORY_DAYS = 365; // maximum podle dokumentace
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -40,173 +51,380 @@ const json = (body: unknown, status = 200) =>
 export const CATEGORIES = [
   "trzby",
   "ostatni_prijmy",
+  "vklady_prevody",
   "naklady_zbozi",
   "marketing",
   "provoz",
   "mzdy",
   "dane_odvody",
   "ostatni_vydaje",
+  "vybery_prevody",
 ] as const;
+type Category = (typeof CATEGORIES)[number];
+/** Převody mezi vlastními účty a vklady/výběry majitele mění hotovost, ale nejsou tržba ani náklad. */
+const TRANSFERS: Category[] = ["vklady_prevody", "vybery_prevody"];
+
+// ---------------------------------------------------------------------------------------------
+// Goodveri Finspector – klient
+// ---------------------------------------------------------------------------------------------
+
+class GoodveriError extends Error {
+  constructor(
+    public code: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+/** Kódy, kdy je potřeba znovu udělit souhlas v bance (Finspector – Status code). */
+const CONSENT_CODES = new Set([103, 104, 105, 107, 702, 727, 754, 761, 802]);
+
+const configured = () => !!(GV_API && GV_CLIENT_ID && GV_CLIENT_SECRET);
+
+let token: { value: string; until: number } | null = null;
+async function gvToken(): Promise<string> {
+  if (token && token.until > Date.now() + 60_000) return token.value;
+  const form = new URLSearchParams({
+    grant_type: "client_credentials",
+    client_id: GV_CLIENT_ID,
+    client_secret: GV_CLIENT_SECRET,
+  });
+  if (GV_SCOPE) form.set("scope", GV_SCOPE);
+  const res = await fetch(GV_IDENTITY, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: form,
+  });
+  if (!res.ok) throw new GoodveriError(101, `Goodveri identity ${res.status}`);
+  const data = await res.json();
+  // expires_in je v sekundách; token používáme většinu doby platnosti (doporučení Goodveri)
+  token = { value: data.access_token, until: Date.now() + Number(data.expires_in ?? 600) * 1000 };
+  return token.value;
+}
+
+async function gv<T>(method: string, body: Record<string, unknown>): Promise<T> {
+  const call = async () =>
+    fetch(`${GV_API}/api/${method}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${await gvToken()}` },
+      body: JSON.stringify({ requestId: crypto.randomUUID(), ...body }),
+    });
+  let res = await call();
+  if (res.status === 401) {
+    token = null; // token mohl vypršet dřív, zkusíme jednou znovu
+    res = await call();
+  }
+  const text = await res.text();
+  let data: Record<string, unknown> = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    /* ne-JSON odpověď */
+  }
+  if (!res.ok) {
+    const code = Number((data as { resultCode?: number }).resultCode ?? res.status);
+    throw new GoodveriError(code, `${method} ${res.status}: ${String(data.detail ?? data.title ?? data.message ?? text).slice(0, 200)}`);
+  }
+  const rc = (data as { resultCode?: number }).resultCode;
+  if (typeof rc === "number" && rc !== 0) {
+    throw new GoodveriError(rc, `${method} resultCode ${rc}: ${String(data.message ?? "").slice(0, 200)}`);
+  }
+  return data as T;
+}
+
+interface GvAmount {
+  value: number;
+  currency: string;
+}
+interface GvTransaction {
+  date: string;
+  amount?: GvAmount;
+  tags?: string[] | null;
+}
+interface GvStatement {
+  accountNumber?: string | null;
+  bankCode?: string | null;
+  accountName?: string | null;
+  productName?: string | null;
+  name?: string | null;
+  startDate?: string;
+  endDate?: string;
+  startBalance?: GvAmount;
+  endBalance?: GvAmount;
+  transactions?: GvTransaction[] | null;
+}
+interface GvAccount {
+  id?: string | null;
+  accountName?: string | null;
+  productName?: string | null;
+  ibanCode?: string | null;
+  accountNumber?: string | null;
+  balance?: GvAmount;
+}
+
+const mask = (acc?: string | null) => {
+  const digits = (acc ?? "").replace(/[^0-9]/g, "");
+  return digits ? `•••• ${digits.slice(-4)}` : "";
+};
+
+// ---------------------------------------------------------------------------------------------
+// Mapování štítků Goodveri (ST Classification cycles 1.1) na kategorie VISIBLE7
+// Klasifikace Goodveri je stavěná hlavně na osobní účty (scoring). Mzdy a marketing zatím neumí –
+// ty zůstanou v „ostatních výdajích“, dokud se nedomluví vlastní štítky (cyklus 8 Custom tag).
+// ---------------------------------------------------------------------------------------------
+
+const has = (tags: Set<string>, ...names: string[]) => names.some((n) => tags.has(n));
+const hasPrefix = (tags: Set<string>, prefix: string) => [...tags].some((t) => t.startsWith(prefix));
+
+function categorize(tagList: string[], value: number): Category {
+  const t = new Set(tagList.map((x) => x.trim()));
+  const credit = t.has("credit") ? true : t.has("debit") ? false : value >= 0;
+
+  if (credit) {
+    if (has(t, "ownersaccountcredit", "familyaccountcredit", "cashdeposit", "depositcredit")) return "vklady_prevody";
+    if (has(t, "invoicecredit", "factoringcredit")) return "trzby";
+    if (
+      has(
+        t,
+        "loan",
+        "kontokorentcredit",
+        "microloan",
+        "loanhypo",
+        "refundscredit",
+        "taxescredit",
+        "insurancecredit",
+        "investmentcredit",
+        "wrongpaymentcredit",
+        "errorpaymentcredit",
+        "verificationcredit",
+        "salary",
+        "pensioncredit",
+        "sickpaycredit",
+        "socialbenefits",
+      ) ||
+      [...t].some((x) => /(telco|energy|electricity|water|gas|utilities|internet|entertainment|transport|healthinsurance)credit$/.test(x))
+    )
+      return "ostatni_prijmy";
+    // Na podnikatelském účtu je běžná příchozí platba nejčastěji úhrada od zákazníka.
+    return "trzby";
+  }
+
+  if (has(t, "ownersaccountdebit", "familyaccountdebit")) return "vybery_prevody";
+  if (
+    hasPrefix(t, "taxes_") ||
+    has(t, "othertaxesdebit", "healthinsurancedebit", "sickness_insurance_con_debit", "pension_con_debit", "opt_pension_con_debit")
+  )
+    return "dane_odvody";
+  if (
+    has(
+      t,
+      "rentdebit",
+      "electricitydebit",
+      "sipodebit",
+      "waterdebit",
+      "utilitiesdebit",
+      "energydebit",
+      "gasdebit",
+      "telcodebit",
+      "internetdebit",
+      "otheritservicesdebit",
+      "subscriptiondebit",
+      "insurancedebit",
+      "fueldebit",
+      "publictransportdebit",
+      "transportdebit",
+      "tollsvignettesdebit",
+      "educationdebit",
+    )
+  )
+    return "provoz";
+  if (
+    has(
+      t,
+      "electrostoredebit",
+      "drugstoresdebit",
+      "otherretaildebit",
+      "furnituredebit",
+      "fashiondebit",
+      "foodgroceries",
+      "hobbydebit",
+      "giftsandflowersdebit",
+    )
+  )
+    return "naklady_zbozi";
+  return "ostatni_vydaje";
+}
 
 export interface MonthSummary {
   month: string; // YYYY-MM-01
   income: number;
   expense: number; // kladné číslo
-  by_category: Partial<Record<(typeof CATEGORIES)[number], number>>;
+  by_category: Partial<Record<Category, number>>;
+  tags: Record<string, number>;
+  tx_count: number;
   balance_end: number | null;
 }
 
-interface ConnectResult {
-  url: string;
-}
-interface CallbackResult {
-  provider_ref: string;
-  bank_name: string;
-  account_mask: string;
-  consent_expires_at: string | null;
-}
+const monthOf = (d: string) => `${d.slice(0, 7)}-01`;
+const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** Rozhraní poskytovatele. Výměnou adaptéru se zbytek aplikace nemění. */
-interface BankProvider {
-  connect(state: string, redirectUrl: string): Promise<ConnectResult>;
-  callback(params: Record<string, string>): Promise<CallbackResult>;
-  monthly(providerRef: string, from: string, to: string): Promise<MonthSummary[]>;
-  revoke(providerRef: string): Promise<void>;
-}
-
-const firstOfMonth = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
-const iso = (d: Date) => d.toISOString().slice(0, 10);
-
-/** Ukázková data – deterministická podle provider_ref, aby se při každé synchronizaci neměnila. */
-const DemoProvider: BankProvider = {
-  connect(state, redirectUrl) {
-    const url = new URL(redirectUrl);
-    url.searchParams.set("state", state);
-    url.searchParams.set("ref", `demo-${state.slice(0, 8)}`);
-    return Promise.resolve({ url: url.toString() });
-  },
-  callback(params) {
-    return Promise.resolve({
-      provider_ref: params.ref ?? `demo-${crypto.randomUUID().slice(0, 8)}`,
-      bank_name: "Ukázková banka",
-      account_mask: "•••• 4821",
-      consent_expires_at: new Date(Date.now() + 180 * 86_400_000).toISOString(),
-    });
-  },
-  monthly(ref, from, to) {
-    let seed = [...ref].reduce((a, c) => a + c.charCodeAt(0), 0);
-    const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
-    const out: MonthSummary[] = [];
-    let balance = 40_000;
-    for (let d = new Date(from); d <= new Date(to); d.setUTCMonth(d.getUTCMonth() + 1)) {
-      const i = out.length;
-      const trzby = Math.round((35_000 + i * 6_000) * (0.8 + rnd() * 0.4));
-      const zbozi = Math.round(trzby * 0.35);
-      const marketing = Math.round(6_000 + rnd() * 3_000);
-      const provoz = 9_000;
-      const dane = d.getUTCMonth() % 3 === 0 ? Math.round(trzby * 0.12) : 4_500;
-      const expense = zbozi + marketing + provoz + dane;
-      balance += trzby - expense;
-      out.push({
-        month: iso(d),
-        income: trzby,
-        expense,
-        by_category: { trzby, naklady_zbozi: -zbozi, marketing: -marketing, provoz: -provoz, dane_odvody: -dane },
-        balance_end: balance,
-      });
+/** Z výpisů Goodveri spočítá měsíční souhrny (jen CZK). Transakce se nikam neukládají. */
+function summarize(statements: GvStatement[]): MonthSummary[] {
+  const months = new Map<string, MonthSummary>();
+  const get = (m: string) => {
+    let s = months.get(m);
+    if (!s) {
+      s = { month: m, income: 0, expense: 0, by_category: {}, tags: {}, tx_count: 0, balance_end: null };
+      months.set(m, s);
     }
-    return Promise.resolve(out);
-  },
-  revoke() {
-    return Promise.resolve();
-  },
-};
+    return s;
+  };
+  // zůstatek ke konci měsíce: od konečného zůstatku výpisu odečítáme pohyby pozdějších měsíců
+  const balanceByMonth = new Map<string, number>();
 
-/**
- * Sokordia Tech – DOPLNIT podle dokumentace API (čeká se na ni).
- * Potřebujeme: ověření VISIBLE7 vůči API, adresu připojovacího okna, návratové parametry,
- * souhrny po měsících (ideálně už s kategoriemi), odvolání souhlasu a upozornění (webhook).
- * Klíče jen v Supabase secrets (SOKORDIA_API_URL, SOKORDIA_API_KEY), nikdy v repozitáři.
- */
-const SokordiaProvider: BankProvider = {
-  connect() {
-    throw new Error("Napojení Sokordia Tech čeká na dokumentaci API");
-  },
-  callback() {
-    throw new Error("Napojení Sokordia Tech čeká na dokumentaci API");
-  },
-  monthly() {
-    throw new Error("Napojení Sokordia Tech čeká na dokumentaci API");
-  },
-  revoke() {
-    throw new Error("Napojení Sokordia Tech čeká na dokumentaci API");
-  },
-};
+  for (const st of statements) {
+    const txs = (st.transactions ?? []).filter((x) => (x.amount?.currency ?? "CZK") === "CZK" && x.date);
+    for (const tx of txs) {
+      const value = Number(tx.amount?.value ?? 0);
+      const tags = (tx.tags ?? []).filter(Boolean);
+      const cat = categorize(tags, value);
+      const s = get(monthOf(tx.date));
+      s.tx_count++;
+      s.by_category[cat] = (s.by_category[cat] ?? 0) + value;
+      if (!TRANSFERS.includes(cat)) {
+        if (value >= 0) s.income += value;
+        else s.expense += -value;
+      }
+      for (const tag of tags) {
+        // směr, formu a periodicitu nesčítáme, nic neříkají o účelu platby
+        if (/^(debit|credit|transfer|card|cash|norepeat|debitd?\d|creditd?\d)$|^(debit|credit)d?\d|^norepeat/.test(tag)) continue;
+        s.tags[tag] = (s.tags[tag] ?? 0) + value;
+      }
+    }
 
-const provider = (name: string): BankProvider => (name === "sokordia" ? SokordiaProvider : DemoProvider);
+    if (st.endBalance && (st.endBalance.currency ?? "CZK") === "CZK" && st.endDate) {
+      const endMonth = monthOf(st.endDate);
+      const byMonth = new Map<string, number>();
+      for (const tx of txs) byMonth.set(monthOf(tx.date), (byMonth.get(monthOf(tx.date)) ?? 0) + Number(tx.amount?.value ?? 0));
+      const all = [...new Set([...byMonth.keys(), endMonth])].sort().reverse();
+      let bal = Number(st.endBalance.value);
+      for (const m of all) {
+        if (m > endMonth) continue;
+        balanceByMonth.set(m, (balanceByMonth.get(m) ?? 0) + bal);
+        bal -= byMonth.get(m) ?? 0;
+      }
+    }
+  }
+
+  return [...months.values()]
+    .sort((a, b) => a.month.localeCompare(b.month))
+    .map((s) => ({
+      ...s,
+      income: round2(s.income),
+      expense: round2(s.expense),
+      by_category: Object.fromEntries(Object.entries(s.by_category).map(([k, v]) => [k, round2(v as number)])),
+      tags: Object.fromEntries(Object.entries(s.tags).map(([k, v]) => [k, round2(v)])),
+      balance_end: balanceByMonth.has(s.month) ? round2(balanceByMonth.get(s.month)!) : null,
+    }));
+}
+
+// ---------------------------------------------------------------------------------------------
+// Uložení
+// ---------------------------------------------------------------------------------------------
 
 type Admin = ReturnType<typeof createClient>;
+interface Conn {
+  id: string;
+  user_id: string;
+  provider: string;
+  provider_ref: string;
+  bank_code: string | null;
+}
 
-/** Stáhne souhrny za posledních 12 měsíců a uloží je (přepíše stejné měsíce). */
-async function syncConnection(
-  admin: Admin,
-  conn: { id: string; user_id: string; provider: string; provider_ref: string },
-) {
-  const to = firstOfMonth(new Date());
-  const from = new Date(to);
-  from.setUTCMonth(from.getUTCMonth() - (MONTHS_BACK - 1));
-  const months = await provider(conn.provider).monthly(conn.provider_ref, iso(from), iso(to));
+async function saveMonths(admin: Admin, conn: Conn, months: MonthSummary[]) {
   const rows = months.map((m) => ({
     connection_id: conn.id,
     user_id: conn.user_id,
     month: m.month,
-    income: Math.round(m.income * 100) / 100,
-    expense: Math.round(m.expense * 100) / 100,
-    by_category: Object.fromEntries(
-      Object.entries(m.by_category).filter(([k]) => (CATEGORIES as readonly string[]).includes(k)),
-    ),
+    income: m.income,
+    expense: m.expense,
+    by_category: m.by_category,
+    tags: m.tags,
+    tx_count: m.tx_count,
     balance_end: m.balance_end,
     updated_at: new Date().toISOString(),
   }));
-  if (rows.length) await admin.from("cashflow_months").upsert(rows, { onConflict: "connection_id,month" });
-  await admin
-    .from("bank_connections")
-    .update({ last_sync_at: new Date().toISOString(), status: "active", last_error: null })
-    .eq("id", conn.id);
+  if (rows.length) {
+    const { error } = await admin.from("cashflow_months").upsert(rows, { onConflict: "connection_id,month" });
+    if (error) throw new Error(`Uložení souhrnů: ${error.message}`);
+  }
   return rows.length;
 }
+
+async function syncGoodveri(admin: Admin, conn: Conn) {
+  try {
+    const info = await gv<{ statements?: GvStatement[] }>("AccountInfo", {
+      clientCode: conn.provider_ref,
+      providerCode: conn.bank_code,
+      refNo: conn.id,
+      countryCode: GV_COUNTRY,
+      days: HISTORY_DAYS,
+      calcLogic: 0,
+    });
+    const n = await saveMonths(admin, conn, summarize(info.statements ?? []));
+    await admin
+      .from("bank_connections")
+      .update({ last_sync_at: new Date().toISOString(), status: "active", last_error: null })
+      .eq("id", conn.id);
+    return n;
+  } catch (e) {
+    const expired = e instanceof GoodveriError && CONSENT_CODES.has(e.code);
+    await admin
+      .from("bank_connections")
+      .update({ status: expired ? "expired" : "error", last_error: String(e).slice(0, 300) })
+      .eq("id", conn.id);
+    throw e;
+  }
+}
+
+/** IP uživatele pro AccountAuth (Goodveri ji vyžaduje, banka ji vidí při přihlášení). */
+const userIp = (req: Request) =>
+  (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
+  req.headers.get("cf-connecting-ip") ||
+  req.headers.get("x-real-ip") ||
+  "127.0.0.1";
+
+// ---------------------------------------------------------------------------------------------
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Metoda není povolena" }, 405);
 
-  let body: Record<string, string>;
+  let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
     return json({ error: "Neplatný požadavek" }, 400);
   }
+  const action = String(body.action ?? "");
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
 
-  // Plánovač: denní aktualizace všech aktivních připojení a označení prošlých souhlasů.
-  if (body.action === "sync_all") {
+  // Plánovač: denní aktualizace všech aktivních PSD2 připojení.
+  if (action === "sync_all") {
     if (!CRON_SECRET || req.headers.get("x-cron-secret") !== CRON_SECRET) return json({ error: "Zakázáno" }, 403);
-    await admin
-      .from("bank_connections")
-      .update({ status: "expired" })
-      .eq("status", "active")
-      .lt("consent_expires_at", new Date().toISOString());
+    if (!configured()) return json({ synced: 0, total: 0, note: "not_configured" });
     const { data: conns } = await admin
       .from("bank_connections")
-      .select("id, user_id, provider, provider_ref")
+      .select("id, user_id, provider, provider_ref, bank_code")
+      .eq("provider", "goodveri")
       .eq("status", "active");
     let ok = 0;
     for (const c of conns ?? []) {
       try {
-        await syncConnection(admin, c);
+        await syncGoodveri(admin, c as Conn);
         ok++;
-      } catch (e) {
-        await admin.from("bank_connections").update({ status: "error", last_error: String(e).slice(0, 300) }).eq("id", c.id);
+      } catch {
+        /* stav už je uložený u připojení */
       }
     }
     return json({ synced: ok, total: conns?.length ?? 0 });
@@ -220,79 +438,181 @@ Deno.serve(async (req) => {
   const user = userData?.user;
   if (!user) return json({ error: "Přihlaste se prosím znovu." }, 401);
 
-  // Pilot: jen placený přístup nebo správce (stejně jako velikost trhu).
-  const [{ data: accRow }, { data: adminRow }] = await Promise.all([
-    admin.from("user_access").select("plan, access_until").eq("user_id", user.id).maybeSingle(),
+  // Pilot: jen správce. Po pilotu BANK_SYNC_ACCESS=paid pustí i placený přístup.
+  const [{ data: adminRow }, { data: accRow }] = await Promise.all([
     admin.from("admins").select("user_id").eq("user_id", user.id).maybeSingle(),
+    admin.from("user_access").select("plan, access_until").eq("user_id", user.id).maybeSingle(),
   ]);
   const paid =
-    (["mesic", "ctvrtleti", "rok", "kod", "clenstvi"].includes(accRow?.plan ?? "") &&
-      (!accRow?.access_until || new Date(accRow.access_until).getTime() > Date.now())) ||
-    !!adminRow;
-  if (!paid) return json({ error: "Napojení účtu je součástí placeného přístupu.", code: "premium" }, 402);
+    ["mesic", "ctvrtleti", "rok", "kod", "clenstvi"].includes(accRow?.plan ?? "") &&
+    (!accRow?.access_until || new Date(accRow.access_until).getTime() > Date.now());
+  const allowed = !!adminRow || (ACCESS === "paid" && paid);
+  if (!allowed) return json({ error: "Napojení účtu zatím testujeme v uzavřeném pilotu.", code: "pilot" }, 403);
+
+  if (!configured()) {
+    return json(
+      {
+        error: "Napojení na Goodveri ještě není nastavené (chybí přístupové údaje v Supabase).",
+        code: "not_configured",
+      },
+      503,
+    );
+  }
 
   try {
-    if (body.action === "connect") {
-      // state svazuje návrat z banky s uživatelem (ochrana proti podvržení)
-      const state = crypto.randomUUID();
-      await admin.from("bank_connections").insert({
-        user_id: user.id,
-        project_id: body.projectId ?? null,
-        provider: PROVIDER,
-        provider_ref: `pending-${state}`,
-        status: "pending",
+    if (action === "providers") {
+      const r = await gv<{ providers?: { providerCode?: string; name?: string; logo?: string }[] }>("ProviderList", {
+        countryCode: GV_COUNTRY,
       });
-      const res = await provider(PROVIDER).connect(state, `${APP_URL}/cash-flow?pripojeno=1`);
-      return json(res);
+      return json({
+        providers: (r.providers ?? [])
+          .filter((p) => p.providerCode)
+          .map((p) => ({ code: p.providerCode, name: p.name ?? p.providerCode, logo: p.logo ?? null })),
+      });
     }
 
-    if (body.action === "callback") {
-      const state = String(body.state ?? "");
-      const { data: pending } = await admin
+    if (action === "connect") {
+      const providerCode = String(body.providerCode ?? "");
+      if (!providerCode) return json({ error: "Vyberte banku." }, 400);
+      const clientCode = crypto.randomUUID();
+      const { data: conn, error } = await admin
         .from("bank_connections")
-        .select("id, user_id, provider")
-        .eq("provider_ref", `pending-${state}`)
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (!pending) return json({ error: "Připojení nenalezeno nebo vypršelo." }, 404);
-      const r = await provider(pending.provider).callback(body);
-      await admin
-        .from("bank_connections")
-        .update({
-          provider_ref: r.provider_ref,
-          bank_name: r.bank_name,
-          account_mask: r.account_mask,
-          consent_expires_at: r.consent_expires_at,
-          status: "active",
+        .insert({
+          user_id: user.id,
+          project_id: body.projectId ?? null,
+          provider: "goodveri",
+          provider_ref: clientCode,
+          bank_code: providerCode,
+          bank_name: String(body.bankName ?? providerCode).slice(0, 80),
+          status: "pending",
         })
-        .eq("id", pending.id);
-      const months = await syncConnection(admin, {
-        id: pending.id,
-        user_id: user.id,
-        provider: pending.provider,
-        provider_ref: r.provider_ref,
-      });
-      return json({ connection: { id: pending.id, bank_name: r.bank_name, account_mask: r.account_mask }, months });
+        .select("id, user_id, provider, provider_ref, bank_code")
+        .single();
+      if (error || !conn) throw new Error(`Založení připojení: ${error?.message}`);
+      const r = await gv<{ authenticated?: boolean; authenticationUrl?: string | null; message?: string }>(
+        "AccountAuth",
+        {
+          clientCode,
+          providerCode,
+          refNo: conn.id,
+          countryCode: GV_COUNTRY,
+          returnUrl: `${APP_URL}/cash-flow?clientId=${clientCode}`,
+          userIp: userIp(req),
+          userBrowserAgent: String(body.userAgent ?? req.headers.get("user-agent") ?? "Mozilla/5.0").slice(0, 400),
+        },
+      );
+      if (r.authenticationUrl) return json({ url: r.authenticationUrl });
+      // Banka uživatele už zná (platné silné přihlášení) – rovnou dokončíme.
+      return json(await finishConnect(admin, conn as Conn));
     }
 
-    if (body.action === "sync" || body.action === "disconnect") {
+    if (action === "callback") {
+      const clientId = String(body.clientId ?? "");
       const { data: conn } = await admin
         .from("bank_connections")
-        .select("id, user_id, provider, provider_ref")
-        .eq("id", body.connectionId)
+        .select("id, user_id, provider, provider_ref, bank_code")
+        .eq("provider", "goodveri")
+        .eq("provider_ref", clientId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!conn) return json({ error: "Připojení nenalezeno nebo patří jinému účtu." }, 404);
+      return json(await finishConnect(admin, conn as Conn));
+    }
+
+    if (action === "statement") {
+      const files = Array.isArray(body.files) ? (body.files as { name?: string; content?: string; password?: string }[]) : [];
+      if (!files.length || files.length > 12) return json({ error: "Nahrajte 1 až 12 PDF výpisů." }, 400);
+      const ref = crypto.randomUUID();
+      const r = await gv<{ statements?: GvStatement[] }>("Statement", {
+        refNo: ref,
+        countryCode: GV_COUNTRY,
+        calcLogic: 0,
+        files: files.map((f, i) => ({
+          name: `${i + 1}-${String(f.name ?? "vypis.pdf").replace(/[^\w.\-]/g, "_")}`,
+          type: "application/pdf",
+          content: String(f.content ?? ""),
+          password: f.password || null,
+        })),
+      });
+      const statements = r.statements ?? [];
+      if (!statements.length) return json({ error: "Z výpisů se nepodařilo načíst žádné transakce." }, 422);
+      const first = statements[0];
+      const { data: conn, error } = await admin
+        .from("bank_connections")
+        .insert({
+          user_id: user.id,
+          project_id: body.projectId ?? null,
+          provider: "goodveri_pdf",
+          provider_ref: ref,
+          bank_code: first.bankCode ?? null,
+          bank_name: `PDF výpisy${first.bankCode ? ` (${first.bankCode})` : ""}`,
+          account_mask: mask(first.accountNumber),
+          status: "active",
+          last_sync_at: new Date().toISOString(),
+        })
+        .select("id, user_id, provider, provider_ref, bank_code")
+        .single();
+      if (error || !conn) throw new Error(`Uložení výpisů: ${error?.message}`);
+      const months = await saveMonths(admin, conn as Conn, summarize(statements));
+      return json({ connection: { id: conn.id }, months });
+    }
+
+    if (action === "sync" || action === "disconnect") {
+      const { data: conn } = await admin
+        .from("bank_connections")
+        .select("id, user_id, provider, provider_ref, bank_code, status")
+        .eq("id", String(body.connectionId ?? ""))
         .eq("user_id", user.id)
         .maybeSingle();
       if (!conn) return json({ error: "Připojení nenalezeno." }, 404);
-      if (body.action === "sync") return json({ months: await syncConnection(admin, conn) });
-      // Nejdřív odvolat souhlas u poskytovatele, pak smazat (souhrny kaskádou).
-      if (!conn.provider_ref.startsWith("pending-")) await provider(conn.provider).revoke(conn.provider_ref);
+      if (action === "sync") {
+        if (conn.provider !== "goodveri") return json({ error: "PDF výpisy se aktualizují novým nahráním." }, 400);
+        return json({ months: await syncGoodveri(admin, conn as Conn) });
+      }
+      // Nejdřív odvolat souhlas u Goodveri, pak smazat (souhrny jdou kaskádou).
+      if (conn.provider === "goodveri" && conn.status !== "pending") {
+        try {
+          await gv("RevokeAuth", { clientCode: conn.provider_ref, refNo: conn.id });
+        } catch (e) {
+          // 400 = nic k odvolání (souhlas už neplatí) – smažeme i tak
+          if (!(e instanceof GoodveriError && (e.code === 400 || CONSENT_CODES.has(e.code)))) throw e;
+        }
+      }
       await admin.from("bank_connections").delete().eq("id", conn.id);
       return json({ ok: true });
     }
   } catch (e) {
-    console.error("bank-sync failed", body.action, String(e));
-    return json({ error: "Napojení účtu teď nefunguje. Zkuste to prosím za chvíli." }, 502);
+    console.error("bank-sync failed", action, String(e));
+    if (e instanceof GoodveriError && CONSENT_CODES.has(e.code)) {
+      return json({ error: "Souhlas v bance vypršel nebo ještě nebyl udělen. Připojte účet znovu.", code: "consent" }, 409);
+    }
+    return json({ error: "Napojení účtu teď nefunguje. Zkuste to prosím za chvíli.", detail: String(e).slice(0, 300) }, 502);
   }
 
   return json({ error: "Neplatný požadavek" }, 400);
 });
+
+/** Po přihlášení v bance: načte účty (název, maska), aktivuje připojení a stáhne souhrny. */
+async function finishConnect(admin: Admin, conn: Conn) {
+  const list = await gv<{ accounts?: GvAccount[] }>("AccountList", {
+    clientCode: conn.provider_ref,
+    providerCode: conn.bank_code,
+    refNo: conn.id,
+    countryCode: GV_COUNTRY,
+  });
+  const accounts = list.accounts ?? [];
+  const a = accounts[0];
+  await admin
+    .from("bank_connections")
+    .update({
+      account_mask: accounts.length > 1 ? `${accounts.length} účty` : mask(a?.accountNumber ?? a?.ibanCode),
+      currency: a?.balance?.currency ?? "CZK",
+      status: "active",
+      // Goodveri platnost souhlasu nevrací; PSD2 souhlas typicky platí 180 dní.
+      consent_expires_at: new Date(Date.now() + 180 * 86_400_000).toISOString(),
+      last_error: null,
+    })
+    .eq("id", conn.id);
+  const months = await syncGoodveri(admin, conn);
+  return { connection: { id: conn.id }, months, accounts: accounts.length };
+}

@@ -20,14 +20,18 @@ import { track } from "@/lib/track";
 import { ALERT_STYLE, CATEGORY_LABEL, czk, czkShort } from "@/lib/cashflow";
 import { useCashflowDemo } from "@/hooks/useCashflow";
 import { Kpi } from "@/components/business/Kpi";
+import { BankConnectPanel } from "@/components/business/BankConnectPanel";
+import { useIsAdmin } from "@/lib/admin";
 
 /**
  * Cash flow: plán vs. skutečnost a výhled hotovosti z napojeného účtu.
- * NÁHLED – běží na ukázkových datech, dokud není hotové napojení přes Sokordia Tech (funkce bank-sync).
+ * Skutečná data z účtu přes Goodveri Finspector (funkce bank-sync), jinak ukázková.
+ * Pilot: připojit účet může zatím jen správce (panel BankConnectPanel).
  */
 const CashflowPage = () => {
   const { toast } = useToast();
   const data = useCashflowDemo();
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     document.title = "Cash flow | VISIBLE7 MICEK";
@@ -45,18 +49,32 @@ const CashflowPage = () => {
     <SidebarLayout>
       <main className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
         <header>
-          <p className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.1em] text-amber-800 ring-1 ring-amber-200">
-            Ukázková data · připravujeme
-          </p>
+          {data.real ? (
+            <p className="inline-flex items-center gap-2 rounded-full bg-leaf-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.1em] text-leaf-800 ring-1 ring-leaf-200">
+              Data z vašeho účtu
+            </p>
+          ) : (
+            <p className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.1em] text-amber-800 ring-1 ring-amber-200">
+              Ukázková data · připravujeme
+            </p>
+          )}
           <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Cash flow: plán a skutečnost</h1>
           <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
             Po napojení podnikatelského účtu porovnáme váš byznys case se skutečnými příjmy a výdaji a upozorníme vás
             dřív, než dojde hotovost.
-            {data.fromCase
-              ? " Plán níže je z vašeho byznys casu, skutečnost je zatím ukázková."
-              : " Plán i skutečnost jsou zatím ukázkové. Po vyplnění byznys casu se plán propíše sám."}
+            {data.real
+              ? data.fromCase
+                ? " Plán je z vašeho byznys casu, skutečnost z napojeného účtu."
+                : " Skutečnost je z napojeného účtu, plán je zatím ukázkový. Po vyplnění byznys casu se propíše sám."
+              : data.fromCase
+                ? " Plán níže je z vašeho byznys casu, skutečnost je zatím ukázková."
+                : " Plán i skutečnost jsou zatím ukázkové. Po vyplnění byznys casu se plán propíše sám."}
           </p>
         </header>
+
+        {isAdmin && (
+          <BankConnectPanel connections={data.connections} months={data.bankMonths} onChange={data.reloadBank} />
+        )}
 
         {/* Velká čísla */}
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

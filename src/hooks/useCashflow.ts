@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { type BankConnection, type BankMonth, loadBankData, mergeMonths } from "@/lib/bank";
 import { useProject } from "@/contexts/ProjectContext";
 import { loadProjectKeys } from "@/lib/projectData";
 import { type BusinessCaseData, groupOf, simulate } from "@/lib/businessCase";
@@ -12,17 +13,26 @@ import {
   forecast13,
   lastMonths,
   planFromCase,
+  TRANSFER_CATEGORIES,
 } from "@/lib/cashflow";
 
 /**
- * Data pro Můj podnik a Cash flow. Dokud není napojení přes Sokordia Tech (funkce bank-sync),
- * je skutečnost ukázková; plán se bere z byznys casu aktuálního projektu, když existuje.
+ * Data pro Můj podnik a Cash flow. Skutečnost je z napojeného účtu (Goodveri, funkce bank-sync),
+ * bez něj ukázková; plán se bere z byznys casu aktuálního projektu, když existuje.
  */
 export function useCashflowDemo() {
   const { currentProject } = useProject();
   const [caseData, setCaseData] = useState<BusinessCaseData | null>(null);
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [bank, setBank] = useState<{ connections: BankConnection[]; months: BankMonth[] }>({
+    connections: [],
+    months: [],
+  });
+  const reloadBank = useCallback(async () => setBank(await loadBankData()), []);
+  useEffect(() => {
+    reloadBank();
+  }, [reloadBank]);
 
   useEffect(() => {
     let active = true;
@@ -50,7 +60,9 @@ export function useCashflowDemo() {
     const rows = caseData ? simulate(groupOf(currentProject?.business_type), caseData, 1) : null;
     const fromCase = !!rows && rows.some((r) => r.revenue > 0);
     const plan = fromCase && rows ? planFromCase(rows, months) : demoPlan(months);
-    const actual = demoActual(plan);
+    const activeIds = new Set(bank.connections.filter((c) => c.status !== "pending").map((c) => c.id));
+    const real = bank.months.some((m) => activeIds.has(m.connection_id) && months.includes(m.month));
+    const actual = real ? mergeMonths(bank.months, months, activeIds) : demoActual(plan);
     const cmp = compare(plan, actual);
     const outflows = estimateOutflows(deadlines, actual);
     const weeks = forecast13(actual, outflows);
@@ -59,12 +71,17 @@ export function useCashflowDemo() {
     const last3 = actual.slice(-3);
     const categories = Object.entries(
       last3.reduce<Record<string, number>>((acc, m) => {
-        for (const [k, v] of Object.entries(m.by_category)) if (v < 0) acc[k] = (acc[k] ?? 0) + Math.abs(v) / 3;
+        for (const [k, v] of Object.entries(m.by_category))
+          if (v < 0 && !TRANSFER_CATEGORIES.includes(k)) acc[k] = (acc[k] ?? 0) + Math.abs(v) / 3;
         return acc;
       }, {}),
     ).sort((a, b) => b[1] - a[1]);
     return {
       loaded,
+      real,
+      connections: bank.connections,
+      bankMonths: bank.months,
+      reloadBank,
       fromCase,
       cmp,
       outflows,
@@ -76,5 +93,5 @@ export function useCashflowDemo() {
       low: weeks.reduce((a, b) => (b.balance < a.balance ? b : a), weeks[0]),
       categories,
     };
-  }, [caseData, deadlines, currentProject?.business_type, loaded]);
+  }, [caseData, deadlines, currentProject?.business_type, loaded, bank, reloadBank]);
 }

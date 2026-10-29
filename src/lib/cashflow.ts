@@ -2,9 +2,9 @@ import { type BusinessCaseData, type MonthRow } from "@/lib/businessCase";
 import { type Deadline } from "@/lib/deadlines";
 
 /**
- * Cash flow z bankovního účtu (PSD2 přes Sokordia Tech → Finbricks).
+ * Cash flow z bankovního účtu (PSD2 přes Goodveri Finspector → Finbricks, funkce bank-sync).
  * Do VISIBLE7 jdou jen měsíční souhrny podle kategorií, žádné jednotlivé transakce.
- * Dokud není podepsaná smlouva a nasazená funkce bank-sync, stránka běží na ukázkových datech.
+ * Bez napojeného účtu stránka běží na ukázkových datech (pilot zatím jen pro správce).
  */
 
 export const CATEGORY_LABEL: Record<string, string> = {
@@ -16,7 +16,12 @@ export const CATEGORY_LABEL: Record<string, string> = {
   mzdy: "Mzdy a spolupracovníci",
   dane_odvody: "Daně a odvody",
   ostatni_vydaje: "Ostatní výdaje",
+  vklady_prevody: "Vklady a převody z vlastních účtů",
+  vybery_prevody: "Výběry a převody na vlastní účty",
 };
+
+/** Převody mezi vlastními účty mění hotovost, ale nejsou tržba ani náklad. */
+export const TRANSFER_CATEGORIES = ["vklady_prevody", "vybery_prevody"];
 
 export interface CashMonth {
   month: string; // YYYY-MM-01
