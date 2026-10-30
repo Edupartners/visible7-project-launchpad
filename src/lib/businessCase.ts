@@ -6,6 +6,11 @@
  * a ve 2. roce dál o zadané procento. Scénáře násobí objem.
  * Hranice PNO se nepočítá z pevné tabulky, ale z marže projektu:
  *   max. PNO = hrubá marže − ostatní náklady v % obratu − cílový zisk.
+ * Marketing má dvě části: pevnou měsíční částku (náklady druhu „marketing“) a nepovinnou
+ * proměnnou část v % z tržeb (revenue.marketingPct, např. provize srovnávačů, výkonnostní reklama).
+ *   marketing(m) = pevný marketing + tržby(m) × marketingPct
+ *   PNO = marketing(12) / tržby(12) · CAC = marketing(12) / noví zákazníci(12)
+ * S marketingPct = 0 (výchozí, starší projekty pole nemají) vychází model stejně jako dřív.
  */
 
 export type RevenueGroup = "commerce" | "subscription" | "leads" | "content" | "marketplace" | "generic";
@@ -48,6 +53,8 @@ export interface RevenueInputs {
   commission: number;
   /** Růst objemu ve 2. roce v % */
   growthYear2: number;
+  /** Marketing jako % z tržeb (PNO), roste s prodeji. Nepovinné, výchozí 0 (starší projekty pole nemají). */
+  marketingPct?: number;
 }
 
 export type CostKind = "jednorazove" | "mesicni" | "marketing";
@@ -91,6 +98,7 @@ export const EMPTY_REVENUE: RevenueInputs = {
   rpm: 0,
   commission: 0,
   growthYear2: 20,
+  marketingPct: 0,
 };
 
 export const EMPTY_CASE: BusinessCaseData = {
@@ -117,7 +125,12 @@ export interface MonthRow {
   revenue: number;
   grossProfit: number;
   fixed: number;
+  /** Marketing celkem = pevný + proměnný */
   marketing: number;
+  /** Pevný marketing (měsíční částky z nákladů) */
+  marketingFixed: number;
+  /** Proměnný marketing = tržby × marketingPct */
+  marketingVar: number;
   oneOff: number;
   profit: number;
   cumulative: number;
@@ -125,15 +138,33 @@ export interface MonthRow {
 
 const pct = (v: number) => (Number.isFinite(v) ? v : 0) / 100;
 
+/** Marketing jako podíl z tržeb (0–1); chybějící nebo neplatná hodnota = 0. */
+export const marketingShare = (r: Pick<RevenueInputs, "marketingPct"> | null | undefined) =>
+  Math.min(Math.max(pct(Number(r?.marketingPct ?? 0)), 0), 1);
+
 export function simulate(group: RevenueGroup, data: BusinessCaseData, factor = 1, horizon = HORIZON): MonthRow[] {
   const r = data.revenue;
   const oneOff = data.costs.filter((c) => c.kind === "jednorazove").reduce((s, c) => s + (c.amount || 0), 0);
   const fixed = data.costs.filter((c) => c.kind === "mesicni").reduce((s, c) => s + (c.amount || 0), 0);
   const marketing = data.costs.filter((c) => c.kind === "marketing").reduce((s, c) => s + (c.amount || 0), 0);
   const gm = group === "content" && !r.grossMargin ? 1 : pct(r.grossMargin);
+  const mShare = marketingShare(r);
 
   const rows: MonthRow[] = [
-    { month: 0, volume: 0, newCustomers: 0, revenue: 0, grossProfit: 0, fixed: 0, marketing: 0, oneOff, profit: -oneOff, cumulative: -oneOff },
+    {
+      month: 0,
+      volume: 0,
+      newCustomers: 0,
+      revenue: 0,
+      grossProfit: 0,
+      fixed: 0,
+      marketing: 0,
+      marketingFixed: 0,
+      marketingVar: 0,
+      oneOff,
+      profit: -oneOff,
+      cumulative: -oneOff,
+    },
   ];
   let active = 0;
   let cumulative = -oneOff;
@@ -167,9 +198,24 @@ export function simulate(group: RevenueGroup, data: BusinessCaseData, factor = 1
         revenue = volume * r.price;
     }
     const grossProfit = revenue * gm;
-    const profit = grossProfit - fixed - marketing;
+    const marketingVar = revenue * mShare;
+    const marketingTotal = marketing + marketingVar;
+    const profit = grossProfit - fixed - marketingTotal;
     cumulative += profit;
-    rows.push({ month: m, volume, newCustomers, revenue, grossProfit, fixed, marketing, oneOff: 0, profit, cumulative });
+    rows.push({
+      month: m,
+      volume,
+      newCustomers,
+      revenue,
+      grossProfit,
+      fixed,
+      marketing: marketingTotal,
+      marketingFixed: marketing,
+      marketingVar,
+      oneOff: 0,
+      profit,
+      cumulative,
+    });
   }
   return rows;
 }
@@ -535,6 +581,14 @@ export function revenueFieldsFor(group: RevenueGroup): RevenueFieldDef[] {
       help: "Kolik procent z každého zprostředkovaného prodeje si necháte vy.",
     });
   fields.push({
+    key: "marketingPct",
+    label: "Marketing jako % z tržeb (PNO)",
+    suffix: "%",
+    placeholder: "např. 10",
+    max: 100,
+    help: "Část rozpočtu, která roste s prodeji (např. provize srovnávačů, výkonnostní reklama). Pevné částky zadejte v nákladech jako Marketing.",
+  });
+  fields.push({
     key: "growthYear2",
     label: "Růst ve 2. roce (%)",
     suffix: "%",
@@ -564,7 +618,7 @@ export const HELP = {
   navratnost: "Měsíc, kdy se vám vrátí všechny vložené peníze včetně ztrát z rozjezdu.",
   obrat12: "Měsíční příjmy rok po spuštění – ukazuje, kam se projekt dostane.",
   zisk12: "Měsíční zisk rok po spuštění, po odečtení zboží, provozu i marketingu.",
-  pno: "Podíl nákladů na obratu: kolik procent z tržeb utratíte za marketing. Když je vyšší než maximum pro váš projekt, marketing vám sní zisk.",
+  pno: "Podíl nákladů na obratu: kolik procent z tržeb utratíte za marketing (pevné měsíční částky i část v % z tržeb). Když je vyšší než maximum pro váš projekt, marketing vám sní zisk.",
   ltv: "Kolik na jednom zákazníkovi vyděláte (po odečtení přímých nákladů) za celou dobu, co u vás nakupuje.",
   cac: "Kolik vás stojí marketing na získání jednoho nového zákazníka. Měl by být alespoň třikrát nižší než LTV.",
   dan:

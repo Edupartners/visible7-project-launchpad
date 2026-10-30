@@ -36,6 +36,7 @@ import {
   computeMetrics,
   costsFromCanvas,
   groupOf,
+  marketingShare,
   newId,
   ratingLabel,
   simulate,
@@ -423,6 +424,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       obrat_12_mesic: Math.round(x.revenue12),
       pno_12_pct: x.pno12,
       max_pno_pct: x.maxPno,
+      marketing_12_mesic: Math.round(results[id].rows[12].marketing),
+      marketing_12_promenny: Math.round(results[id].rows[12].marketingVar),
       ltv: x.ltv,
       cac: x.cac,
       ltv_cac: x.ltvCac,
@@ -433,6 +436,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     typ: currentProject?.business_type,
     cilovy_zisk_pct: data.targetProfit,
     dan_z_prijmu_pct: data.taxRate ?? 0,
+    marketing_pct_z_trzeb: data.revenue.marketingPct ?? 0,
     prijmy: data.revenue,
     naklady: data.costs.filter((c) => c.amount > 0).map((c) => ({ polozka: c.name, castka: c.amount, druh: c.kind })),
     scenare: Object.fromEntries(SCENARIOS.map((s) => [s.id, summaryFor(s.id)])),
@@ -594,6 +598,9 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       `Potřebný kapitál: ${czk(s.potrebny_kapital)}`,
       `Bod zvratu: ${monthLabel(s.bod_zvratu_mesic)}`,
       `PNO ve 12. měsíci: ${pct(s.pno_12_pct)} (max. ${pct(s.max_pno_pct)})`,
+      ...(marketingShare(data.revenue) > 0
+        ? [`Marketing jako % z tržeb: ${pct(data.revenue.marketingPct ?? 0)} (ve 12. měsíci ${czk(s.marketing_12_promenny)})`]
+        : []),
     ];
   };
 
@@ -725,7 +732,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               suffix={f.suffix}
               placeholder={f.placeholder}
               help={f.help}
-              value={data.revenue[f.key]}
+              value={data.revenue[f.key] ?? 0}
               onChange={(v) =>
                 setRevenue({
                   [f.key]: f.max ? Math.min(v, f.max) : v,
@@ -1182,6 +1189,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                 <p className="text-sm text-muted-foreground">
                   ve 12. měsíci, maximum pro váš projekt je {pct(m.maxPno)}
                 </p>
+                {marketingShare(data.revenue) > 0 && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Z toho pevný marketing {czk(current.rows[12]?.marketingFixed ?? 0)} a{" "}
+                    {pct(data.revenue.marketingPct ?? 0)} z tržeb {czk(current.rows[12]?.marketingVar ?? 0)} měsíčně.
+                  </p>
+                )}
                 <p className="mt-3 text-sm text-muted-foreground">
                   Maximum počítáme z vaší marže: hrubá marže {pct(m.grossMargin)} − ostatní náklady v % obratu − cílový
                   zisk {pct(data.targetProfit)}. Kurz s vysokou marží unese PNO kolem 20 %, prodej elektroniky jen pár

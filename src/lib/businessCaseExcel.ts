@@ -96,6 +96,12 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
   if (group === "content")
     input_("rpm", "Výnos na 1 000 návštěv (Kč)", r.rpm || 0, "Příjem z reklamy a provizí na 1 000 návštěv.", KC);
   if (group === "marketplace") input_("comm", "Provize (%)", r.commission || 0, "Kolik % z prodeje si necháváte.");
+  input_(
+    "mpct",
+    "Marketing % z tržeb (PNO)",
+    r.marketingPct ?? 0,
+    "Část marketingu, která roste s prodeji (provize srovnávačů, výkonnostní reklama). Pevné částky jsou v nákladech jako marketing měsíčně.",
+  );
   input_("factor", "Násobek scénáře", factor, "1 = realistický plán, 0,6 = opatrný, 1,4 = optimistický.", NUM1);
   input_("target", "Cílový zisk (% z tržeb)", data.targetProfit || 0, "Používá se pro výpočet maximálního PNO.");
   input_("tax", "Daň z příjmu (%)", data.taxRate ?? 0, "Počítá se zvlášť za 1. a 2. rok, jen z kladného zisku.");
@@ -127,7 +133,8 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
       "Tržby",
       "Hrubý zisk",
       "Provoz",
-      "Marketing",
+      "Marketing pevný",
+      "Marketing % z tržeb",
       "Jednorázově",
       "Zisk",
       "Kumulativně",
@@ -143,9 +150,10 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
       { v: 0, z: KC },
       { v: 0, z: KC },
       { v: 0, z: KC },
+      { v: 0, z: KC },
       { f: addr.oneOff, z: KC },
-      { f: "-I2", z: KC },
-      { f: "J2", z: KC },
+      { f: "-J2", z: KC },
+      { f: "K2", z: KC },
       0,
       0,
     ],
@@ -190,11 +198,12 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
       { f: `E${row}*${addr.gm}/100`, z: KC },
       { f: addr.fixed, z: KC },
       { f: addr.mkt, z: KC },
+      { f: `E${row}*${addr.mpct}/100`, z: KC },
       { v: 0, z: KC },
-      { f: `F${row}-G${row}-H${row}-I${row}`, z: KC },
-      { f: `K${prev}+J${row}`, z: KC },
-      { f: `IF(AND(E${row}>0,J${row}>=0),1,0)` },
-      { f: `IF(AND(K${row}>=0,A${row}>=${S}$B$14),1,0)` },
+      { f: `F${row}-G${row}-H${row}-I${row}-J${row}`, z: KC },
+      { f: `L${prev}+K${row}`, z: KC },
+      { f: `IF(AND(E${row}>0,K${row}>=0),1,0)` },
+      { f: `IF(AND(L${row}>=0,A${row}>=${S}$B$14),1,0)` },
     ]);
   }
   const last = HORIZON + 2;
@@ -204,24 +213,27 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
   const sRows: Cell[][] = [
     ["Souhrn za 2 roky", "Hodnota"],
     ["Tržby celkem", { f: `SUM(${col("E")})`, z: KC }], // B2
-    ["Náklady celkem", { f: `${M}$I$2+SUM(${col("E")})-SUM(${col("F")})+SUM(${col("G")})+SUM(${col("H")})`, z: KC }], // B3
+    [
+      "Náklady celkem",
+      { f: `${M}$J$2+SUM(${col("E")})-SUM(${col("F")})+SUM(${col("G")})+SUM(${col("H")})+SUM(${col("I")})`, z: KC },
+    ], // B3
     ["Zisk před zdaněním", { f: "B2-B3", z: KC }], // B4
     [
       "Daň z příjmu",
-      { f: `(MAX(0,SUM(${col("J", 2, 14)}))+MAX(0,SUM(${col("J", 15, last)})))*${addr.tax}/100`, z: KC },
+      { f: `(MAX(0,SUM(${col("K", 2, 14)}))+MAX(0,SUM(${col("K", 15, last)})))*${addr.tax}/100`, z: KC },
     ], // B5
     ["Zisk po zdanění", { f: "B4-B5", z: KC }], // B6
-    ["Potřebný kapitál", { f: `-MIN(0,MIN(${col("K", 2)}))`, z: KC }], // B7
+    ["Potřebný kapitál", { f: `-MIN(0,MIN(${col("L", 2)}))`, z: KC }], // B7
     ["Návratnost investice (ROI)", { f: `IF(B7>0,B4/B7,"—")`, z: PCT }], // B8
-    ["Bod zvratu (měsíc)", { f: `IFERROR(INDEX(${col("A")},MATCH(1,${col("L")},0)),"nedosaženo")` }], // B9
+    ["Bod zvratu (měsíc)", { f: `IFERROR(INDEX(${col("A")},MATCH(1,${col("M")},0)),"nedosaženo")` }], // B9
     [
       "Investice se vrátí (měsíc)",
-      { f: `IF(B7=0,IF(B2>0,0,"—"),IFERROR(INDEX(${col("A")},MATCH(1,${col("M")},0)),"nedosaženo"))` },
+      { f: `IF(B7=0,IF(B2>0,0,"—"),IFERROR(INDEX(${col("A")},MATCH(1,${col("N")},0)),"nedosaženo"))` },
     ], // B10
     ["Tržby ve 12. měsíci", { f: `${M}$E$14`, z: KC }], // B11
-    ["PNO ve 12. měsíci", { f: `IF(${M}$E$14>0,${M}$H$14/${M}$E$14,"—")`, z: PCT }], // B12
+    ["PNO ve 12. měsíci", { f: `IF(${M}$E$14>0,(${M}$H$14+${M}$I$14)/${M}$E$14,"—")`, z: PCT }], // B12
     ["Maximální PNO", { f: `IF(${M}$E$14>0,(${addr.gm}-${M}$G$14/${M}$E$14*100-${addr.target})/100,"—")`, z: PCT }], // B13
-    ["Měsíc nejnižšího stavu peněz", { f: `INDEX(${col("A", 2)},MATCH(MIN(${col("K", 2)}),${col("K", 2)},0))` }], // B14
+    ["Měsíc nejnižšího stavu peněz", { f: `INDEX(${col("A", 2)},MATCH(MIN(${col("L", 2)}),${col("L", 2)},0))` }], // B14
     [],
     [
       "Scénáře (spočítáno v aplikaci při exportu)",
@@ -250,7 +262,7 @@ export function buildBusinessCaseWorkbook(XLSX: typeof import("xlsx"), input: Ex
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, sheet(sRows, [42, 20, 20, 20]), "Souhrn");
   XLSX.utils.book_append_sheet(wb, sheet(pRows, [44, 16, 70]), "Předpoklady");
-  XLSX.utils.book_append_sheet(wb, sheet(mRows, [8, 9, 10, 18, 14, 14, 12, 12, 13, 14, 14, 9, 11]), "Po měsících");
+  XLSX.utils.book_append_sheet(wb, sheet(mRows, [8, 9, 10, 18, 14, 14, 12, 14, 18, 13, 14, 14, 9, 11]), "Po měsících");
   return wb;
 }
 

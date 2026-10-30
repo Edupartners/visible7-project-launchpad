@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { loadAiUsage } from "@/lib/ai";
 import { loadProjectKeys } from "@/lib/projectData";
-import { BusinessCaseData, CostItem, groupOf } from "@/lib/businessCase";
+import { BusinessCaseData, CostItem, groupOf, marketingShare } from "@/lib/businessCase";
 import { buildType } from "@/lib/buildPlans";
 import type { Fit } from "@/lib/marketingPlans";
 
 /** Data z předchozích fází, která fáze 5 potřebuje: rozpočet, max. PNO, hodnocení kanálů AI, cesta zákazníka. */
 export interface MarketingContext {
   loaded: boolean;
+  /** Pevný měsíční rozpočet na marketing (náklady druhu „marketing“) */
   monthlyBudget: number;
+  /** Proměnný marketing v % z tržeb (byznys case, revenue.marketingPct) */
+  marketingPct: number;
   maxPno: number | null;
   /** Hodnota jedné konverze (objednávka / poptávka přepočtená konverzí / prodej) */
   valuePerConversion: number;
@@ -22,6 +25,7 @@ export interface MarketingContext {
 const EMPTY: MarketingContext = {
   loaded: false,
   monthlyBudget: 0,
+  marketingPct: 0,
   maxPno: null,
   valuePerConversion: 0,
   conversionLabel: "konverzí",
@@ -67,6 +71,7 @@ export function useMarketingContext(projectId: string | undefined, businessType:
       setCtx({
         loaded: true,
         monthlyBudget: marketing.reduce((s, c) => s + (c.amount || 0), 0),
+        marketingPct: marketingShare(r) * 100,
         maxPno: summary?.scenare?.realisticky?.max_pno_pct ?? null,
         valuePerConversion: value,
         conversionLabel: group === "leads" ? "poptávek" : group === "subscription" ? "nových zákazníků" : "objednávek",

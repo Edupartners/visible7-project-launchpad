@@ -6,7 +6,7 @@
  *  - pravidlo 30 % času na růst a připravenost na růst.
  */
 import type { BuildBlock } from "@/lib/buildPlans";
-import { BusinessCaseData, groupOf, simulate } from "@/lib/businessCase";
+import { BusinessCaseData, groupOf, marketingShare, simulate } from "@/lib/businessCase";
 
 /** Odvody zaměstnavatele 2026: sociální 24,8 % + zdravotní 9 %. */
 export const EMPLOYER_LEVY = 0.338;
@@ -16,11 +16,16 @@ export const HOURS_MONTH = 166.67;
 export interface Base {
   revenue: number;
   grossProfit: number;
+  /** Marketing celkem ve 12. měsíci (pevný + % z tržeb) */
   marketing: number;
+  /** Část marketingu, která roste s tržbami (tržby × marketingPct) */
+  marketingVar: number;
   fixed: number;
   profit: number;
   /** Hrubá marže v % */
   gm: number;
+  /** Marketing jako % z tržeb (0 = jen pevný marketing) */
+  marketingPct: number;
   price: number;
   volume: number;
   growthYear2: number;
@@ -35,9 +40,11 @@ export function baseFrom(businessType: string | null | undefined, bc: BusinessCa
     revenue: m12.revenue,
     grossProfit: m12.grossProfit,
     marketing: m12.marketing,
+    marketingVar: m12.marketingVar,
     fixed: m12.fixed,
     profit: m12.profit,
     gm,
+    marketingPct: marketingShare(bc.revenue) * 100,
     price: bc.revenue.price || 0,
     volume: m12.volume,
     growthYear2: bc.revenue.growthYear2 || 0,
@@ -50,14 +57,19 @@ export function levers(b: Base) {
     {
       id: "cena",
       title: "Zdražit o 10 %",
-      gain: b.revenue * 0.1,
-      text: "Každá koruna navíc jde rovnou do zisku – náklady na zboží i marketing zůstávají.",
+      // Proměnný marketing (% z tržeb) roste i se zdražením.
+      gain: b.revenue * 0.1 - b.marketingVar * 0.1,
+      text: b.marketingVar
+        ? "Náklady na zboží zůstávají, ubude jen část marketingu placená procentem z tržeb."
+        : "Každá koruna navíc jde rovnou do zisku – náklady na zboží i marketing zůstávají.",
     },
     {
       id: "vernost",
       title: "O 10 % víc opakovaných nákupů",
-      gain: b.grossProfit * 0.1,
-      text: "Stávající zákazníci nakupují znovu – bez dalších peněz za reklamu.",
+      gain: b.grossProfit * 0.1 - b.marketingVar * 0.1,
+      text: b.marketingVar
+        ? "Stávající zákazníci nakupují znovu – bez pevné reklamy navíc, jen s marketingem placeným procentem z tržeb."
+        : "Stávající zákazníci nakupují znovu – bez dalších peněz za reklamu.",
     },
     {
       id: "zakaznici",
@@ -81,6 +93,7 @@ export function cashTrap(b: Base, i: CashTrapInput) {
   const g = Math.max(0, i.growthPct) / 100;
   const extraRevenue = b.revenue * g;
   const extraCogs = extraRevenue * (1 - b.gm / 100);
+  // Pevný i proměnný marketing (% z tržeb) rostou s objemem prodejů.
   const extraMarketing = b.marketing * g;
   const workingCapital = (extraCogs + extraMarketing) * (Math.max(0, i.cashDays) / 30);
   const buffer = i.newFixed * 3;
@@ -124,7 +137,9 @@ export function hireCalc(b: Base | null, i: HireInput) {
   const ownHourly = i.ownProfit > 0 ? i.ownProfit / HOURS_MONTH : 0;
   const maxRate = ownHourly / 4;
   const rate = i.type === "zamestnanec" ? (i.amount * (1 + EMPLOYER_LEVY)) / HOURS_MONTH : i.amount;
-  const extraRevenue = b && b.gm > 0 ? cost / (b.gm / 100) : null;
+  // Z každé koruny tržeb navíc zbude hrubá marže minus marketing placený procentem z tržeb.
+  const contribution = b ? b.gm - b.marketingPct : 0;
+  const extraRevenue = b && contribution > 0 ? cost / (contribution / 100) : null;
   const extraUnits = extraRevenue !== null && b && b.price > 0 ? extraRevenue / b.price : null;
   const plannedExtraUnits = b ? b.volume * (b.growthYear2 / 100) : null;
   const affordable = rate > 0 && maxRate >= rate;

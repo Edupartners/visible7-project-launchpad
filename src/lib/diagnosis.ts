@@ -13,6 +13,7 @@ import {
   RevenueInputs,
   computeMetrics,
   groupOf,
+  marketingShare,
   simulate,
 } from "@/lib/businessCase";
 import { supabase } from "@/integrations/visible7/client";
@@ -193,9 +194,11 @@ export function journeyMap(businessType: string | null | undefined, bc: Business
     group === "content" ? firstMonth(rows, (r) => r.volume >= 1000) : firstMonth(rows, (_r, cum) => cum >= 10);
   const profitAt = (rows: typeof real, amount: number) => firstMonth(rows, (r) => r.profit >= amount);
   const m12 = real[12];
-  // Tržby za měsíc, při kterých zbude cílový zisk po zaplacení zboží, provozu a marketingu.
-  const gm = metrics.grossMargin / 100;
-  const revenueForTarget = gm > 0 ? Math.ceil((target + m12.fixed + m12.marketing) / gm / 1000) * 1000 : null;
+  // Tržby za měsíc, při kterých zbude cílový zisk po zaplacení zboží, provozu a marketingu:
+  // tržby = (cíl + provoz + pevný marketing) / (marže − marketing v % z tržeb).
+  const contribution = metrics.grossMargin / 100 - marketingShare(bc.revenue);
+  const revenueForTarget =
+    contribution > 0 ? Math.ceil((target + m12.fixed + m12.marketingFixed) / contribution / 1000) * 1000 : null;
 
   const points: MapPoint[] = [
     { id: "A", title: "Dnes", text: "Nápad, čas a rozpočet. Začínáte branou 1.", from: 0, to: 0 },

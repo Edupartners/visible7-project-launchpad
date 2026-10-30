@@ -94,7 +94,13 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
             {
               icon: PiggyBank,
               label: "Marketing v byznys case",
-              value: ctx.monthlyBudget > 0 ? `${czk(ctx.monthlyBudget)} měsíčně` : "zatím nezadaný",
+              value:
+                [
+                  ctx.monthlyBudget > 0 ? `${czk(ctx.monthlyBudget)} měsíčně` : "",
+                  ctx.marketingPct > 0 ? `${Math.round(ctx.marketingPct * 10) / 10} % z tržeb` : "",
+                ]
+                  .filter(Boolean)
+                  .join(" + ") || "zatím nezadaný",
             },
             {
               icon: Gauge,

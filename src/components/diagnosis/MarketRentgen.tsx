@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
-import type { BusinessCaseData } from "@/lib/businessCase";
+import { type BusinessCaseData, marketingShare } from "@/lib/businessCase";
 import { DIAGNOSIS_KEY, Diagnosis, caseFromDiagnosis } from "@/lib/diagnosis";
 import { track } from "@/lib/track";
 
@@ -17,10 +17,13 @@ interface MarketRentgenData {
   savedAt?: string;
 }
 
-/** Kolik prodejů měsíčně je potřeba k pokrytí měsíčních nákladů (provoz + marketing). */
+/**
+ * Kolik prodejů měsíčně je potřeba k pokrytí měsíčních nákladů (provoz + pevný marketing).
+ * Z každého prodeje zbude hrubá marže minus marketing placený procentem z tržeb.
+ */
 export function breakEvenSales(bc: BusinessCaseData): number | null {
   const fixed = bc.costs.filter((c) => c.kind !== "jednorazove").reduce((s, c) => s + (c.amount || 0), 0);
-  const perSale = (bc.revenue.price || 0) * ((bc.revenue.grossMargin || 0) / 100);
+  const perSale = (bc.revenue.price || 0) * ((bc.revenue.grossMargin || 0) / 100 - marketingShare(bc.revenue));
   if (!fixed || perSale <= 0) return null;
   return Math.ceil(fixed / perSale);
 }
