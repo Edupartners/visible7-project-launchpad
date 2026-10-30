@@ -17,3 +17,12 @@ export const qualificationMailto = (name?: string) =>
       name ? `\nProjekt ve VISIBLE7: ${name}` : ""
     }\n\nDěkuji.`,
   )}`;
+
+/** Ceny zkoušky profesní kvalifikace vč. DPH. Platí se zvlášť, nejsou součástí členství. */
+export const EXAM_PRICES = {
+  regular: 5000,
+  /** pro členy VISIBLE7 a absolventy Akademie */
+  member: 3500,
+  /** jeden den přípravy + zkouška */
+  withPrep: 8000,
+};

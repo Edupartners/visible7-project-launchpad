@@ -1,6 +1,6 @@
 # VISIBLE7 MICEK®
 
-> VISIBLE7 je česká online platforma a kompletní kurz online podnikání a marketingu. Provede začínající podnikatele od nápadu po první zákazníky a růst v 7 fázích metodiky V-I-S-I-B-L-E: s videi, AI asistentem, který zná jejich projekt, živými semináři a poradci z praxe. Provozuje ji Edu Partners s.r.o., vzdělávací společnost z Ostravy (od roku 2011). Autor metodiky: Mgr. Michal Míček, LL.M.
+> VISIBLE7 je česká online platforma a kompletní kurz podnikání od nápadu po první zákazníky a růst v 7 branách metodiky V-I-S-I-B-L-E: přes 40 hodin videí od lektorů z praxe, AI asistent, který zná projekt, živé semináře, poradci a možnost zkoušky profesní kvalifikace. Provozuje ji Edu Partners s.r.o., vzdělávací společnost z Ostravy (od roku 2011). Autor metodiky: Mgr. Michal Míček, LL.M.
 
 ## Pro koho
 - Lidé, kteří chtějí začít podnikat online (e-shop, služby, kurzy, aplikace) a nemají na drahé agentury a konzultanty.
@@ -8,31 +8,42 @@
 - Vše v češtině, svépomocí, krok za krokem.
 
 ## Jak to funguje
-1. Rentgen nápadu zdarma: 4 otázky, do 5 minut AI řekne, jestli nápad obstojí, kolik bude stát a kdy může podnikatele uživit.
-2. Cesta 7 fázemi (bránami) metodiky V-I-S-I-B-L-E:
+1. Test nápadu zdarma: 4 otázky, do 5 minut AI řekne, jestli nápad obstojí, kolik bude stát a kdy může podnikatele uživit.
+2. Cesta 7 branami metodiky V-I-S-I-B-L-E:
    - V – Vize: Strategie modrého oceánu a Hooked (jak nesoutěžit cenou a mít zákazníky, kteří se vracejí)
    - I – Ideace: byznys model na jedné stránce (Lean Canvas)
    - S – Strategie a čísla: byznys case na 24 měsíců, bod zvratu, ROI
    - I – Implementace: 12+1 modelů online byznysu s hotovým postupem, web nebo e-shop postavený svépomocí podle videí
-   - B – Budování poptávky: měření (GA4) a placené i neplacené marketingové kanály
+   - B – Budování poptávky: placené i neplacené marketingové kanály
    - L – Launch: MVP, první zákazníci, KPI, živnost a úřady
    - E – Expanze: tým, automatizace, růst
-3. Za každou fázi osvědčení. Cesta navazuje na státní kvalifikaci NSK Specialista internetového obchodu.
+3. Za každou bránu osvědčení. Na konci lze složit zkoušku profesní kvalifikace Specialista/specialistka internetového obchodu (kód 66-043-N, Národní soustava kvalifikací) podle zákona č. 179/2006 Sb. Edu Partners je autorizovaná osoba (autorizující orgán: Ministerstvo průmyslu a obchodu), zkouška se skládá přímo u nás. Osvědčení je uznané státem a platí v celé ČR. https://www.narodnikvalifikace.cz/kvalifikace-1469
 
 ## Co je v ceně
-- Videonávody (přes 100 krátkých videí: tvorba webu ve WordPressu a Elementoru, WooCommerce, SEO, PPC a další)
+- Kurzy s videi od lektorů z praxe, celkem přes 40 hodin, seřazené podle bran (samostatně se prodávají za 3 780 Kč za kus):
+  - Web a e-shop na WordPressu (brána 4)
+  - Copywriting: texty, které prodávají (brány 4–5)
+  - Affiliate: partnerské programy (brány 4–5)
+  - Google Ads a Sklik (brána 5)
+  - Facebook a Instagram reklama (brána 5)
+  - SEO: základ a obsah (brána 5)
+  - Ochranná známka a legislativa (brána 6)
+  - Data a Power BI (brána 7)
+  - Bonusy: Grafika zdarma ve Photopea, AI Act v praxi s osvědčením
 - AI asistent napojený na data projektu
 - Kalkulačky: finanční plán, daně, PNO, cash-flow, nábor
 - Živé online semináře jednou měsíčně (90 minut): AI nástroje pro zrychlení práce, Google Analytics 4, SEO/GEO/AIO a AI trendy, Facebook reklama, WordPress + MCP AI, byznysové strategie (Modrý oceán, Hooked)
 
 ## Cena
-- Rentgen nápadu a první dvě fáze: zdarma, bez platební karty.
-- Členství na 6 měsíců (všech 7 fází a živé semináře): 2 990 Kč vč. DPH jednorázově, nic se samo neobnovuje. Startovací cena pro prvních 50 členů, poté 5 990 Kč.
-- 20minutová konzultace projektu zdarma (pilotní provoz). Další konzultace se seniorními poradci se platí zvlášť.
-- Pro srovnání: kurz Specialista internetového obchodu s lektorem stojí v Edu Partners 49 000 Kč.
+- Test nápadu a první dvě brány: zdarma, bez platební karty.
+- Členství na 6 měsíců (všech 7 bran, kurzy a živé semináře): 2 990 Kč vč. DPH jednorázově, nic se samo neobnovuje. Startovací cena pro prvních 50 členů, poté 5 990 Kč.
+- Konzultace se seniorním poradcem se platí zvlášť: 45 minut, orientačně 1 500 Kč.
+- Zkouška profesní kvalifikace (nepovinná, platí se zvlášť, vč. DPH): 5 000 Kč; pro členy VISIBLE7 a absolventy Akademie 3 500 Kč; jeden den přípravy + zkouška 8 000 Kč.
+- Akademie online podnikání s AI (20 online setkání s lektory, včetně členství): 14 990 Kč, https://www.edu-partners.cz/akademie-online-podnikani-s-ai/
+- Pro srovnání: kurzy s lektorem jednotlivě stojí minimálně 60 000 Kč; celý kurz Specialista internetového obchodu s lektorem stojí v Edu Partners 49 000 Kč.
 
 ## Odkazy
-- [Úvodní stránka a rentgen nápadu](https://visible7.io/)
+- [Úvodní stránka a test nápadu](https://visible7.io/)
 - [Ceník](https://visible7.io/cenik)
 - [Členství a semináře](https://visible7.io/clenstvi)
 - [Pracovní listy ke stažení: modrý oceán, ERRC, Lean Canvas, SWOT, checklist AI-first webu a další](https://visible7.io/pracovni-listy)

@@ -5,7 +5,7 @@ import { track } from "@/lib/track";
 
 /**
  * Kalkulačka úspory na úvodní stránce: kolik člověk ušetří, když web, marketing a plán zvládne sám.
- * Ceny jsou orientační z praxe (Michal, 10/2026); kurzy s lektorem jednotlivě přes 60 000 Kč (Edu Partners).
+ * Ceny jsou orientační z praxe (Michal, 10/2026); celý kurz Specialista internetového obchodu s lektorem 49 000 Kč (Edu Partners); kotva „přes 60 000 Kč“ patří k ceně členství.
  */
 const WEB = 25_000;
 const CARE_MONTHLY = 1_000;

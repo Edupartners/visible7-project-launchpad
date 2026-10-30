@@ -8,20 +8,19 @@ import { track } from "@/lib/track";
 import { ACADEMY, academyOffer, czDate } from "@/lib/academy";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
-import { BankWaitlist } from "@/components/marketing/BankWaitlist";
+import { TrustBand } from "@/components/marketing/TrustBand";
+import { FeaturedCourses } from "@/components/marketing/FeaturedCourses";
+import { OwnNumbers } from "@/components/marketing/OwnNumbers";
+import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 import {
   ArrowRight,
   Award,
   BarChart3,
   Check,
-  ClipboardList,
-  GraduationCap,
   Layers,
   Lock,
   Lightbulb,
   Play,
-  PlayCircle,
-  Radio,
   Rocket,
   Store,
   Target,
@@ -98,21 +97,6 @@ const STEPS = [
   { title: "Otestujte nápad do 5 minut", meta: "zdarma", text: "Zjistíte, jestli o to někdo stojí a zaplatí." },
   { title: "Čísla, která sedí", meta: "zdarma", text: "Tržby, náklady, daně a bod zvratu spočítané za vás." },
   { title: "Hotový plán", meta: "PRICE", text: "Sedm fází od vize po škálování, s videi, AI a poradci." },
-];
-
-const FAIL_REASONS: [string, string][] = [
-  [
-    "Chybí technické dovednosti",
-    "Videa krok za krokem, kde je vidět každé kliknutí. Většinu technické práce udělá AI.",
-  ],
-  [
-    "Nevědí, jak nastavit marketing",
-    "Kanály vybrané pro váš typ byznysu, testovací rozpočet a postup ke každému z nich.",
-  ],
-  [
-    "Mají mylnou představu o velikosti podnikání",
-    "Plán z vašich čísel: kolik opravdu potřebujete a kdy vás projekt uživí.",
-  ],
 ];
 
 const SHOWCASE = [
@@ -196,39 +180,16 @@ const FAQ = [
     "Co jsou živé semináře?",
     "Jednou měsíčně 90 minut online s lektory Edu Partners: AI, SEO, reklama, WordPress, affiliate a další. Výklad, práce na projektech účastníků a otázky. Jsou součástí členství, záznamy najdete v aplikaci.",
   ],
+  [
+    "Co mi osvědčení dá?",
+    "Za každou bránu dostanete osvědčení VISIBLE7 s ověřovacím kódem. Kdo chce doklad uznaný státem, může na konci složit zkoušku profesní kvalifikace Specialista internetového obchodu (66-043-N) podle zákona č. 179/2006 Sb. Osvědčení o profesní kvalifikaci platí v celé ČR a hodí se při hledání práce, změně kariéry i jako doklad pro klienty.",
+  ],
+  [
+    "Kolik stojí zkouška profesní kvalifikace?",
+    "Zkouška je nepovinná a platí se zvlášť: 5 000 Kč, pro členy VISIBLE7 a absolventy Akademie 3 500 Kč. Jeden den přípravy se zkouškou stojí 8 000 Kč. Ceny jsou včetně DPH. Zkoušku pořádá Edu Partners jako autorizovaná osoba (autorizující orgán: Ministerstvo průmyslu a obchodu).",
+  ],
   ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
-];
-
-const LEARNING = [
-  {
-    icon: PlayCircle,
-    title: "E-learning",
-    text: "100+ videí krok za krokem ke každé fázi. Vidíte každé kliknutí.",
-    to: "/certifikace",
-    cta: "Obsah kurzu",
-  },
-  {
-    icon: ClipboardList,
-    title: "Pracovní listy",
-    text: "Hotové šablony k vyplnění a tisku, ať máte každý krok černé na bílém.",
-    to: "/pracovni-listy",
-    cta: "Pracovní listy",
-  },
-  {
-    icon: Radio,
-    title: "Živé semináře",
-    text: "Jednou měsíčně 90 minut online s lektory. Záznamy najdete v aplikaci.",
-    to: "/clenstvi",
-    cta: "Program seminářů",
-  },
-  {
-    icon: GraduationCap,
-    title: "Certifikace se zkouškou",
-    text: `Osvědčení za každou bránu, certifikace ${SPECIALIST_TITLE} a volitelně státní zkouška.`,
-    to: "/certifikace",
-    cta: "Certifikace",
-  },
 ];
 
 /** Kontrolní body mezi branami (volně podle modelu Stage-Gate R. G. Coopera). */
@@ -465,6 +426,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
+        <TrustBand />
+
         {/* Jak to funguje */}
         <section id="uvnitr" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
@@ -488,160 +451,14 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </ol>
               <p className="mt-6 border-t border-border pt-5 text-sm text-muted-foreground">
                 Od tvůrců kurzů Edu Partners: přes 1 000 absolventů kurzů podnikání, vzděláváme od roku 2011, akreditace
-                MŠMT a MPO. Metodika vyrostla z kurzů, ne od stolu.
+                MŠMT pro rekvalifikace a autorizace MPO pro zkoušku profesní kvalifikace. Metodika vyrostla z kurzů, ne
+                od stolu.
               </p>
             </div>
           </div>
         </section>
 
-        <BankWaitlist />
-
-        {/* Proč projekty krachují + slovo autora */}
-        <section id="proc-krachuji" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 sm:px-8 md:py-24 lg:px-12">
-          <div className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
-            <div>
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Proč projekty krachují</h2>
-              <p className="mt-3 text-lg text-muted-foreground">A jak tomu předejít.</p>
-              <ul className="mt-8 space-y-5">
-                {FAIL_REASONS.map(([why, fix]) => (
-                  <li key={why} className="border-l-4 border-leaf-400 pl-4">
-                    <p className="font-bold">{why}</p>
-                    <p className="mt-1 text-muted-foreground">{fix}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <figure className="self-start rounded-3xl bg-primary p-7 text-white sm:p-9">
-              <blockquote className="text-lg leading-relaxed text-white/90">
-                „Lidé k nám přicházejí s představou, že podnikání není pro ně. Odcházejí s tím, že vědí, jak začít, a
-                zvládnou to sami. Většina kurzů má osnovu a všichni se jí musí podřídit. U nás je to naopak: cesta se
-                ohne podle vás. A nejde o to mít peníze na velkou věc. Začněte s málem, škálujte až potom.“
-              </blockquote>
-              <figcaption className="mt-6 flex items-center gap-4">
-                {author?.photo && (
-                  <img
-                    src={author.photo}
-                    alt=""
-                    loading="lazy"
-                    className="h-14 w-14 rounded-full bg-white/10 object-cover object-top"
-                  />
-                )}
-                <span>
-                  <span className="block font-bold">Michal Míček</span>
-                  <span className="block text-sm text-white/70">autor metodiky VISIBLE7 MICEK®</span>
-                </span>
-              </figcaption>
-            </figure>
-          </div>
-        </section>
-
-        {/* Poradci */}
-        <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
-              <div>
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Když se zaseknete, zavoláte člověku
-                </h2>
-                <p className="mt-4 text-lg text-muted-foreground">
-                  16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
-                  i AI. Konzultace {CONSULTATION.minutes} minut, orientačně {CONSULTATION.price.toLocaleString("cs-CZ")}{" "}
-                  Kč.
-                </p>
-              </div>
-              <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
-                {photos.map((a) => (
-                  <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
-                    <img
-                      src={a.photo}
-                      alt=""
-                      loading="lazy"
-                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
-                    />
-                    <p className="mt-1.5 truncate text-xs font-semibold">
-                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Ukázky z aplikace */}
-        <section id="ukazky" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Od prvního nápadu k hotovému plánu. A dál.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Podnikatelský plán, kterému můžete věřit. Bez Excelu a bez teorie, každý krok je hotový výstup.
-            </p>
-          </div>
-          {SHOWCASE.map((b, i) => (
-            <div
-              key={b.title}
-              className="mt-16 grid grid-cols-1 items-center gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16"
-            >
-              <div className={i % 2 ? "lg:order-2" : ""}>
-                <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">{b.eyebrow}</p>
-                <h3 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
-                  {b.title}
-                </h3>
-                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{b.text}</p>
-                <button
-                  type="button"
-                  onClick={onAccessGranted}
-                  className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 font-semibold text-primary hover:bg-primary hover:text-white"
-                >
-                  {b.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </button>
-              </div>
-              <figure className={i % 2 ? "lg:order-1" : ""}>
-                <img
-                  src={b.image}
-                  alt={b.alt}
-                  width={b.width}
-                  height={b.height}
-                  loading="lazy"
-                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(160_61%_15%/0.5)]"
-                />
-                <figcaption className="mt-2 text-center text-xs text-muted-foreground">Ukázka z aplikace</figcaption>
-              </figure>
-            </div>
-          ))}
-        </section>
-
-        {/* Víc než plánovač: vzdělávání a certifikace */}
-        <section id="vzdelavani" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 md:py-28 lg:px-12">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Víc než plánovač</h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Šablonu plánu vám dá kdekoli. U nás se k tomu naučíte, jak plán opravdu provést, a doložíte to
-              certifikátem.
-            </p>
-          </div>
-          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {LEARNING.map(({ icon: Icon, title, text, to, cta }) => (
-              <li key={title}>
-                <Link
-                  to={to}
-                  className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/40"
-                >
-                  <Icon className="h-7 w-7 text-leaf-600" aria-hidden="true" />
-                  <span className="mt-4 text-lg font-bold">{title}</span>
-                  <span className="mt-2 flex-1 text-muted-foreground">{text}</span>
-                  <span className="mt-5 inline-flex items-center gap-1.5 font-semibold text-primary group-hover:underline group-hover:underline-offset-4">
-                    {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <SavingsCalculator onStart={onAccessGranted} />
+        <FeaturedCourses />
 
         {/* Proces: 7 bran */}
         <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
@@ -651,7 +468,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
                   <p className="mt-4 text-lg text-white/70">
-                    Jdete krok za krokem. Mezi branami je vždy kontrolní otázka: dál jdete, až když na ni umíte
+                    Projekty nejčastěji krachují na chybějících dovednostech, marketingu a mylné představě o číslech.
+                    Proto jdete krok za krokem a mezi branami je vždy kontrolní otázka: dál jdete, až když na ni umíte
                     odpovědět.
                   </p>
                 </div>
@@ -735,6 +553,86 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
+        {/* Ukázky z aplikace */}
+        <section id="ukazky" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Od prvního nápadu k hotovému plánu. A dál.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Podnikatelský plán, kterému můžete věřit. Bez Excelu a bez teorie, každý krok je hotový výstup.
+            </p>
+          </div>
+          {SHOWCASE.map((b, i) => (
+            <div
+              key={b.title}
+              className="mt-16 grid grid-cols-1 items-center gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16"
+            >
+              <div className={i % 2 ? "lg:order-2" : ""}>
+                <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">{b.eyebrow}</p>
+                <h3 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
+                  {b.title}
+                </h3>
+                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{b.text}</p>
+                <button
+                  type="button"
+                  onClick={onAccessGranted}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 font-semibold text-primary hover:bg-primary hover:text-white"
+                >
+                  {b.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+              <figure className={i % 2 ? "lg:order-1" : ""}>
+                <img
+                  src={b.image}
+                  alt={b.alt}
+                  width={b.width}
+                  height={b.height}
+                  loading="lazy"
+                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(160_61%_15%/0.5)]"
+                />
+                <figcaption className="mt-2 text-center text-xs text-muted-foreground">Ukázka z aplikace</figcaption>
+              </figure>
+            </div>
+          ))}
+        </section>
+
+        <OwnNumbers />
+
+        {/* Poradci */}
+        <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Když se zaseknete, zavoláte člověku
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
+                  i AI. Konzultace {CONSULTATION.minutes} minut, orientačně {CONSULTATION.price.toLocaleString("cs-CZ")}{" "}
+                  Kč.
+                </p>
+              </div>
+              <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
+                {photos.map((a) => (
+                  <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
+                    <img
+                      src={a.photo}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
+                    />
+                    <p className="mt-1.5 truncate text-xs font-semibold">
+                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
         {/* Certifikace – krátce, celý program je na /certifikace */}
         <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-leaf-500 text-white">
@@ -743,8 +641,26 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <p className="font-semibold text-white/80">Certifikace</p>
                 <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{SPECIALIST_TITLE}</h2>
                 <p className="mt-4 text-lg text-white/85">
-                  Za každou bránu osvědčení, po bráně 5 certifikace s přílohou obsahu programu. A kdo chce víc, může
-                  složit zkoušku státem uznané profesní kvalifikace.
+                  Za každou bránu osvědčení, po bráně 5 certifikace s přílohou obsahu programu.
+                </p>
+                <p className="mt-4 text-white/85">
+                  Na konci můžete složit zkoušku profesní kvalifikace{" "}
+                  <a
+                    href={NSK_QUALIFICATION.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-white underline underline-offset-4 hover:no-underline"
+                  >
+                    Specialista internetového obchodu ({NSK_QUALIFICATION.code})
+                  </a>{" "}
+                  podle zákona č. 179/2006 Sb. Edu Partners je autorizovaná osoba, zkoušku složíte přímo u nás.
+                  Osvědčení je uznané státem a platí v celé ČR.
+                </p>
+                <p className="mt-4 rounded-xl bg-leaf-700 px-4 py-3 text-sm">
+                  <span className="font-bold">Zkouška (nepovinná, platí se zvlášť):</span>{" "}
+                  <s className="text-white/60">{kc(EXAM_PRICES.regular)}</s>{" "}
+                  <span className="font-bold">{kc(EXAM_PRICES.member)} pro členy</span> · s jednodenní přípravou{" "}
+                  {kc(EXAM_PRICES.withPrep)}
                 </p>
                 <Link
                   to="/certifikace"
@@ -764,6 +680,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
           </div>
         </section>
+
+        <SavingsCalculator onStart={onAccessGranted} />
 
         {/* Ceník – krátce, celý ceník je na /cenik */}
         <section id="cenik" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 lg:px-12 md:py-28">
@@ -810,6 +728,15 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(academy.price)}</dd>
                 </div>
               )}
+              <div className="flex items-baseline justify-between gap-4 px-5 py-4">
+                <dt className="min-w-0">
+                  <span className="block font-semibold">Zkouška profesní kvalifikace (nepovinná)</span>
+                  <span className="block text-sm text-muted-foreground">
+                    Cena pro členy. Běžně {kc(EXAM_PRICES.regular)}, s jednodenní přípravou {kc(EXAM_PRICES.withPrep)}.
+                  </span>
+                </dt>
+                <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(EXAM_PRICES.member)}</dd>
+              </div>
               <div className="flex items-center justify-between gap-4 bg-leaf-50 px-5 py-4">
                 <dt className="min-w-0">
                   <span className="block font-semibold">Úvodní konzultace s expertem, 20 minut</span>

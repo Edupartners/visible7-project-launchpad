@@ -87,7 +87,8 @@ const CertificationPage = () => {
             </Link>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Vydává Edu Partners s.r.o., vzdělávací společnost s akreditacemi MŠMT a MPO, vzděláváme od roku 2011.
+            Vydává Edu Partners s.r.o., vzdělávací společnost s akreditací MŠMT pro rekvalifikace a autorizovaná osoba
+            MPO pro zkoušku profesní kvalifikace, vzděláváme od roku 2011.
           </p>
         </section>
 

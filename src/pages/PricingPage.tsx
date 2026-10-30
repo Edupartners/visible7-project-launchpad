@@ -9,6 +9,7 @@ import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { ACADEMY, ACADEMY_ITEMS, academyOffer, czDate } from "@/lib/academy";
+import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 
 /** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
 type Cell = boolean | string;
@@ -119,7 +120,12 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
       ["Osvědčení za brány 3–5", false, true],
       [`${specialist}: certifikace po bráně 5`, false, true],
       ["VISIBLE7 Gold za spuštěný projekt", false, true],
-      ["Zkouška státem uznané profesní kvalifikace", false, "za poplatek"],
+      [
+        "Zkouška profesní kvalifikace Specialista internetového obchodu (66-043-N), nepovinná",
+        "5 000 Kč",
+        "3 500 Kč",
+        "Platí se zvlášť, ceny vč. DPH. Pro členy VISIBLE7 a absolventy Akademie 3 500 Kč místo 5 000 Kč. Jeden den přípravy se zkouškou 8 000 Kč. Zkoušku pořádá Edu Partners jako autorizovaná osoba, autorizující orgán je Ministerstvo průmyslu a obchodu.",
+      ],
     ],
   },
   {
@@ -171,6 +177,10 @@ const PricingPage = () => {
     [
       "Co se stane, když členství skončí?",
       "Vaše projekty i data zůstanou uložené. Placené brány a výstupy se zamknou do dalšího zaplacení.",
+    ],
+    [
+      "Kolik stojí zkouška profesní kvalifikace?",
+      `Je nepovinná a platí se zvlášť: ${kc(EXAM_PRICES.regular)}, pro členy a absolventy Akademie ${kc(EXAM_PRICES.member)}. Jeden den přípravy se zkouškou ${kc(EXAM_PRICES.withPrep)}. Osvědčení je uznané státem a platí v celé ČR.`,
     ],
     ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
     [
@@ -328,8 +338,10 @@ const PricingPage = () => {
             </div>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Konzultace se seniorním poradcem se platí zvlášť: {CONSULTATION.minutes} minut, orientačně{" "}
-            {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+            Zkouška profesní kvalifikace {NSK_QUALIFICATION.code} (nepovinná): <s>{kc(EXAM_PRICES.regular)}</s>{" "}
+            <b className="text-foreground">{kc(EXAM_PRICES.member)} pro členy</b> · s jednodenní přípravou{" "}
+            {kc(EXAM_PRICES.withPrep)}. Konzultace se seniorním poradcem se platí zvlášť: {CONSULTATION.minutes} minut,
+            orientačně {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
           </p>
         </section>
 
