@@ -57,7 +57,7 @@ export const FEATURED_COURSES: FeaturedCourse[] = [
     id: "ppc",
     title: "Google Ads a Sklik",
     gate: "Brána 5",
-    lecturer: "",
+    lecturer: "Veronika Miklová",
     cover: "/video-covers/ppc.webp",
     keys: ["marketing:google_klic", "marketing:google_kampan", "marketing:sklik_kampan"],
   },
