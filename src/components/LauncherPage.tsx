@@ -257,12 +257,6 @@ const HeroVideo = ({ photo }: { photo?: string }) => {
   );
 };
 
-const TRUST: [string, string][] = [
-  ["Od roku 2011", "učíme podnikat (Edu Partners)"],
-  ["1 000+ absolventů", "kurzů podnikání"],
-  ["16+ poradců", "seniorních, z praxe"],
-];
-
 /**
  * Měnící se slovo v nadpisu. Místo má šířku prvního slova, takže „Začněte podnikat.“ je přesně na středu
  * a „Začněte“ se nehýbe; delší slova přesahují doprava. Čtečka obrazovky i vyhledávače vidí jen „podnikat“.
@@ -363,15 +357,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         {/* Hero: na střed, důvěra nahoře, pod ním velké video s Michalem */}
         <section className="bg-muted/50 px-4 pb-16 pt-10 sm:px-8 sm:pt-12 md:pb-24">
           <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-            <ul className="flex flex-wrap justify-center gap-x-10 gap-y-3" aria-label="Proč nám věřit">
-              {TRUST.map(([strong, rest]) => (
-                <li key={strong} className="flex flex-col items-center leading-tight">
-                  <span className="font-bold text-primary">{strong}</span>
-                  <span className="text-sm text-muted-foreground">{rest}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-9 inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
+            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
               Kompletní kurz podnikání od nápadu po první zákazníky
             </p>
