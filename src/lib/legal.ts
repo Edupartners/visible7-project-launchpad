@@ -3,7 +3,7 @@
  * NÁVRH k právní kontrole – verze se mění při každé věcné změně; uživatelé ji pak potvrdí znovu.
  */
 
-export const LEGAL_VERSION = "2026-10-09";
+export const LEGAL_VERSION = "2026-10-30";
 
 export const OPERATOR = {
   name: "Edu partners s.r.o.",
@@ -51,9 +51,12 @@ export const TERMS: LegalDoc = {
     {
       title: "3. Bezplatná a placená část",
       paragraphs: [
-        "Fáze 1 a 2 metodiky jsou dostupné zdarma. Fáze 3 až 7 jsou dostupné po zaplacení časového přístupu: 1 měsíc za 350 Kč, 3 měsíce za 499 Kč, 1 rok za 990 Kč. Ceny jsou konečné, včetně DPH.",
-        "Přístup se platí jednorázově a automaticky se neobnovuje. Platby a faktury zajišťuje provozovatel prostřednictvím služby SimpleShop.",
-        "Po skončení placeného přístupu zůstávají data projektu uložena; placené fáze jsou do dalšího zaplacení jen pro čtení.",
+        "Rentgen nápadu a brány 1 a 2 metodiky jsou dostupné zdarma. Brány 3 až 7 a placené výstupy (např. export do Excelu, osvědčení za brány 3 až 7, investorský pitch) jsou dostupné v rámci placeného členství.",
+        "Členství na 6 měsíců stojí 2 990 Kč včetně DPH. Jde o startovací cenu pro prvních 50 členů; poté členství na 6 měsíců stojí 5 990 Kč včetně DPH. Platná cena je vždy uvedena v ceníku aplikace v okamžiku objednávky. Ceny jsou konečné.",
+        "Členství se platí jednorázově a automaticky se neobnovuje. Po jeho skončení se uživatel sám rozhodne, zda si ho prodlouží. Platby a daňové doklady zajišťuje provozovatel prostřednictvím služby SimpleShop. Členství se aktivuje automaticky po zaplacení, pokud uživatel při objednávce použije e-mail, kterým se přihlašuje do aplikace.",
+        "Po vyplnění kvízu „Jaký jste typ podnikatele“ může uživatel jednou získat zkušební přístup ke všem branám na 3 dny zdarma. Zkušební přístup nezahrnuje placené výstupy a po uplynutí doby skončí sám, bez jakékoli platby.",
+        "Konzultace se seniorními poradci nejsou součástí členství a platí se zvlášť (viz čl. 5).",
+        "Po skončení členství nebo zkušebního přístupu zůstávají data projektu uložena; placené brány a výstupy jsou do dalšího zaplacení uzamčeny.",
         "Spotřebitel má u digitálního obsahu právo odstoupit od smlouvy do 14 dnů. Pokud výslovně požádá o zpřístupnění obsahu před uplynutím této lhůty a bere na vědomí, že tím právo na odstoupení ztrácí, právo odstoupit zaniká okamžikem zpřístupnění.",
       ],
     },
@@ -68,7 +71,7 @@ export const TERMS: LegalDoc = {
     {
       title: "5. Seniorní poradci",
       paragraphs: [
-        "Konzultace se seniorními poradci se objednávají a platí zvlášť. Uvedená cena je orientační; konkrétní cena a termín se potvrzují před konzultací.",
+        "Konzultace se seniorními poradci nejsou součástí členství; objednávají se a platí zvlášť. Uvedená cena je orientační; konkrétní cena a termín se potvrzují před konzultací.",
         "Poradci poskytují konzultaci podle svých zkušeností. Odpovědnost za rozhodnutí přijatá na jejím základě nese uživatel.",
       ],
     },
@@ -104,7 +107,8 @@ export const TERMS: LegalDoc = {
     {
       title: "10. Ukončení účtu a změny podmínek",
       paragraphs: [
-        `Uživatel může účet kdykoli zrušit žádostí na ${OPERATOR.email}. Provozovatel může účet zrušit při porušení těchto podmínek.`,
+        "Uživatel může účet kdykoli smazat sám v Nastavení aplikace (oddíl Smazání účtu) potvrzením slovem SMAZAT. Smazáním se ihned odstraní účet, všechny jeho projekty a data; tento krok nelze vrátit. Daňové doklady provozovatel uchovává po dobu, kterou ukládá zákon.",
+        `Smazání účtu lze také požádat e-mailem na ${OPERATOR.email}. Provozovatel může účet zrušit při porušení těchto podmínek.`,
         "Provozovatel může podmínky měnit. O podstatné změně uživatele informuje v aplikaci a požádá o nový souhlas; pokud uživatel nesouhlasí, může účet zrušit.",
       ],
     },
