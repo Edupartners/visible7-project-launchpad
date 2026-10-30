@@ -35,6 +35,13 @@ Typ byznysu z brány 2 určuje, jak se počítají tržby:
 | **Konverze poptávky na zákazníka** (%) | web pro zakázky |
 | **Provize z prodeje** (%) | marketplace |
 | **Růst ve 2. roce** (%, výchozí 20) | všechny |
+| **Marketing jako % z tržeb (PNO)** (%, 0–100, výchozí 0, nepovinné) | všechny včetně obsahového webu |
+
+**Marketing jako % z tržeb** je část rozpočtu, která roste s prodeji: provize srovnávačů zboží, výkonnostní reklama placená podílem z objednávky, affiliate provize. Pevné měsíční částky (např. 5 000 Kč na Google Ads) zadávejte dál v nákladech jako *Marketing*. Obě části se sčítají.
+
+:::note[Připravená změna]
+Části o **marketingu jako % z tržeb** platí až po nasazení větve `nahled-noc-podminky-pno`. Do té doby aplikace počítá jen s pevnou měsíční částkou na marketing.
+:::
 
 Ceny zadávejte **bez DPH**. Orientační hrubé marže v nápovědě: e-shop 20–40 %, digitální obsah 80–95 %, marketplace 80–95 %.
 
@@ -80,18 +87,19 @@ Projekt se nerozjede hned. Objem v měsíci *m*:
 
 ### Zisk a peníze
 - **Hrubý zisk** = tržby × hrubá marže
-- **Zisk v měsíci** = hrubý zisk − měsíční provoz − marketing
+- **Marketing v měsíci** = pevný marketing + tržby × marketing v % z tržeb
+- **Zisk v měsíci** = hrubý zisk − měsíční provoz − marketing v měsíci
 - **Měsíc 0**: zisk = − jednorázové náklady
 - **Kumulativně** = součet zisků od měsíce 0
 
-Náklady na provoz a marketing jsou v modelu **stejné každý měsíc**, nerostou s objemem.
+Provoz a pevný marketing jsou v modelu **stejné každý měsíc**, nerostou s objemem. S objemem roste jen marketing zadaný jako % z tržeb (je-li vyplněný).
 
 ### Ukazatele za 24 měsíců
 
 | Ukazatel | Vzorec |
 |---|---|
 | **Obrat** | součet tržeb za měsíce 1–24 |
-| **Náklady celkem** | jednorázové + variabilní (tržby − hrubý zisk) + 24 × provoz + 24 × marketing |
+| **Náklady celkem** | jednorázové + variabilní (tržby − hrubý zisk) + 24 × provoz + 24 × pevný marketing + marketing v % z tržeb za 24 měsíců |
 | **Zisk před daní** | obrat − náklady celkem |
 | **Marže zisku** | zisk / obrat |
 | **Daň** | (zisk 1. roku, je-li kladný + zisk 2. roku, je-li kladný) × sazba. 1. rok zahrnuje i investici v měsíci 0. Přenos ztráty se nemodeluje. |
@@ -102,7 +110,7 @@ Náklady na provoz a marketing jsou v modelu **stejné každý měsíc**, nerost
 | **Návratnost** | první měsíc po nejnižším bodě, kdy je kumulativně ≥ 0 („hned“, nebo „přes 2 roky“) |
 
 ### Marketing: PNO
-- **PNO ve 12. měsíci** = marketing / tržby ve 12. měsíci. Počítá **jen marketingové náklady**.
+- **PNO ve 12. měsíci** = (pevný marketing + marketing v % z tržeb ve 12. měsíci) / tržby ve 12. měsíci. Počítá **jen marketingové náklady**. Bez marketingu v % z tržeb je to pevný marketing / tržby.
 - **Maximální PNO** = hrubá marže − provoz / tržby ve 12. měsíci − cílový zisk. Tolik procent z tržeb si můžete dovolit dát do reklamy, aby vám zbyl cílový zisk.
 - **Hodnocení:** *v pořádku* (PNO ≤ maximum), *na hraně* (do 5 procentních bodů nad), *rizikové* (víc).
 
@@ -112,7 +120,7 @@ Zdravé PNO se liší podle oboru (vzdělávací kurzy unesou výrazně vyšší
 
 | Ukazatel | Vzorec |
 |---|---|
-| **CAC** (cena získání zákazníka) | marketing / noví zákazníci ve 12. měsíci |
+| **CAC** (cena získání zákazníka) | (pevný marketing + marketing v % z tržeb ve 12. měsíci) / noví zákazníci ve 12. měsíci |
 | **LTV** e-shop | cena × marže / (1 − opakované nákupy) |
 | **LTV** předplatné | cena × marže / odchodovost |
 | **LTV** zakázky a vlastní model | cena × marže |
@@ -155,6 +163,8 @@ Ilustrativní e-shop: objednávka 900 Kč, marže 35 %, 150 objednávek ve 12. m
 
 Příklad ukazuje i hranici modelu: marketing je pevná částka, takže PNO s rostoucími prodeji klesá. Ve skutečnosti s objemem obvykle roste i rozpočet na reklamu.
 
+**Varianta s marketingem 10 % z tržeb** (vše ostatní stejné): obrat zůstává 2 512 324 Kč, zisk před daní klesne z 657 313 Kč na 406 081 Kč, potřebný kapitál vzroste na 48 178 Kč (nejníž ve 4. měsíci), bod zvratu se posune do 5. měsíce a návratnost do 10. měsíce. PNO ve 12. měsíci je 13,7 % (5 000 Kč pevně + 13 500 Kč z tržeb) při maximu 22,8 %, tedy stále v pořádku; CAC vychází 154 Kč a LTV : CAC 2,6 : 1 (na hraně). *(Platí po nasazení větve `nahled-noc-podminky-pno`.)*
+
 ## 7. Jak čísla používají další brány
 
 | Kde | Co se počítá |
@@ -169,7 +179,7 @@ Příklad ukazuje i hranici modelu: marketing je pevná částka, takže PNO s r
 - Náklad zaměstnance = hrubá mzda × 1,338 (odvody zaměstnavatele 24,8 % + 9 %), u OSVČ / DPP hodinovka × hodiny.
 - Hodnota vaší hodiny = váš zisk / 166,67 hodin.
 - Delegovat se vyplatí, když hodinová sazba pomocníka ≤ čtvrtina hodnoty vaší hodiny.
-- Potřebné tržby navíc = náklad / hrubá marže.
+- Potřebné tržby navíc = náklad / hrubá marže (po nasazení větve `nahled-noc-podminky-pno`: náklad / (hrubá marže − marketing v % z tržeb)).
 
 ## Pitch pro investory
 
@@ -187,7 +197,7 @@ Každá funkce je 3× na projekt. Výpočet samotný AI nedělá.
 
 ## Export do Excelu
 
-Byznys case jde stáhnout jako .xlsx s **živými vzorci**: listy *Souhrn*, *Předpoklady* a *Po měsících*. Když změníte předpoklad, přepočítá se vše kromě tabulky scénářů. Export je v placeném přístupu.
+Byznys case jde stáhnout jako .xlsx s **živými vzorci**: listy *Souhrn*, *Předpoklady* a *Po měsících*. Po nasazení větve `nahled-noc-podminky-pno` má list *Předpoklady* i řádek „Marketing % z tržeb“ a list *Po měsících* sloupce *Marketing pevný* a *Marketing % z tržeb*. Když změníte předpoklad, přepočítá se vše kromě tabulky scénářů. Export je v placeném přístupu.
 
 ## Kdy je brána hotová
 

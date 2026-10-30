@@ -22,7 +22,7 @@ Ve spuštění je VISIBLE7 v pilotním provozu a všechny funkce jsou odemčené
 | AI za den | 5 | 5 | 20 |
 | Aktivní projekty | 1 | 1 | 5 |
 
-**Zkušební přístup** (7 dní) dostanete jednou za vyplnění kvízu „Jaký jsi typ začínajícího podnikatele?“.
+**Zkušební přístup** (3 dny) dostanete jednou za vyplnění kvízu „Jaký jsi typ začínajícího podnikatele?“.
 
 ## Cena
 
