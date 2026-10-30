@@ -40,7 +40,11 @@ const GV_CLIENT_ID = Deno.env.get("GOODVERI_CLIENT_ID") ?? "";
 const GV_CLIENT_SECRET = Deno.env.get("GOODVERI_CLIENT_SECRET") ?? "";
 const GV_SCOPE = Deno.env.get("GOODVERI_SCOPE") ?? "";
 const GV_COUNTRY = "CZE";
-const HISTORY_DAYS = 365; // maximum podle dokumentace
+// Historie: hned po přihlášení v bance (silné ověření) jde stáhnout až 365 dní. Dalších 180 dní
+// (dokud klient souhlas neodvolá) se smí ptát jen na 90 dní zpět (Petr Bartošek, 30. 10. 2026).
+const HISTORY_DAYS_FIRST = 365;
+const HISTORY_DAYS_REFRESH = 89;
+const CONSENT_DAYS = 180;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -83,6 +87,8 @@ class GoodveriError extends Error {
 const CONSENT_CODES = new Set([103, 104, 105, 107, 702, 727, 754, 761, 802]);
 
 const configured = () => !!(GV_API && GV_CLIENT_ID && GV_CLIENT_SECRET);
+/** Sandbox Goodveri (https://sandbox-finspector.goodveri.online, scope sc:demo:finspector) – data nejsou skutečná. */
+const SANDBOX = /sandbox/i.test(GV_API) || /demo/i.test(GV_SCOPE);
 
 let token: { value: string; until: number } | null = null;
 async function gvToken(): Promise<string> {
@@ -465,17 +471,23 @@ async function saveMonths(admin: Admin, conn: Conn, months: MonthSummary[]) {
   return rows.length;
 }
 
-async function syncGoodveri(admin: Admin, conn: Conn) {
+/** Jen celé měsíce uvnitř okna – neúplný nejstarší měsíc by přepsal dřív uložená úplná data. */
+const fullMonths = (months: MonthSummary[], days: number) => {
+  const from = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  return months.filter((m) => m.month >= from);
+};
+
+async function syncGoodveri(admin: Admin, conn: Conn, days = HISTORY_DAYS_REFRESH) {
   try {
     const info = await gv<{ statements?: GvStatement[] }>("AccountInfo", {
       clientCode: conn.provider_ref,
       providerCode: conn.bank_code,
       refNo: conn.id,
       countryCode: GV_COUNTRY,
-      days: HISTORY_DAYS,
+      days,
       calcLogic: 0,
     });
-    const n = await saveMonths(admin, conn, summarize(info.statements ?? []));
+    const n = await saveMonths(admin, conn, fullMonths(summarize(info.statements ?? []), days));
     await admin
       .from("bank_connections")
       .update({ last_sync_at: new Date().toISOString(), status: "active", last_error: null })
@@ -517,6 +529,13 @@ Deno.serve(async (req) => {
   if (action === "sync_all") {
     if (!CRON_SECRET || req.headers.get("x-cron-secret") !== CRON_SECRET) return json({ error: "Zakázáno" }, 403);
     if (!configured()) return json({ synced: 0, total: 0, note: "not_configured" });
+    // Po 180 dnech od přihlášení v bance souhlas neplatí – připojení označíme a nesynchronizujeme.
+    await admin
+      .from("bank_connections")
+      .update({ status: "expired" })
+      .eq("provider", "goodveri")
+      .eq("status", "active")
+      .lt("consent_expires_at", new Date().toISOString());
     const { data: conns } = await admin
       .from("bank_connections")
       .select("id, user_id, provider, provider_ref, bank_code")
@@ -555,6 +574,7 @@ Deno.serve(async (req) => {
 
   // Bez přístupů běží testovací režim (mockGv) – vidí ho jen správce, protože ostatní sem nepustíme.
   const test = !configured();
+  const label = test ? " (test)" : SANDBOX ? " (sandbox)" : "";
 
   try {
     if (action === "providers") {
@@ -563,6 +583,7 @@ Deno.serve(async (req) => {
       });
       return json({
         test,
+        sandbox: !test && SANDBOX,
         providers: (r.providers ?? [])
           .filter((p) => p.providerCode)
           .map((p) => ({ code: p.providerCode, name: p.name ?? p.providerCode, logo: p.logo ?? null })),
@@ -581,7 +602,7 @@ Deno.serve(async (req) => {
           provider: "goodveri",
           provider_ref: clientCode,
           bank_code: providerCode,
-          bank_name: `${String(body.bankName ?? providerCode).slice(0, 70)}${test ? " (test)" : ""}`,
+          bank_name: `${String(body.bankName ?? providerCode).slice(0, 70)}${label}`,
           status: "pending",
         })
         .select("id, user_id, provider, provider_ref, bank_code")
@@ -643,7 +664,7 @@ Deno.serve(async (req) => {
           provider: "goodveri_pdf",
           provider_ref: ref,
           bank_code: first.bankCode ?? null,
-          bank_name: test ? "PDF výpisy (test)" : `PDF výpisy${first.bankCode ? ` (${first.bankCode})` : ""}`,
+          bank_name: `PDF výpisy${first.bankCode && !test ? ` ${first.bankCode}` : ""}${label}`,
           account_mask: mask(first.accountNumber),
           status: "active",
           last_sync_at: new Date().toISOString(),
@@ -665,6 +686,8 @@ Deno.serve(async (req) => {
       if (!conn) return json({ error: "Připojení nenalezeno." }, 404);
       if (action === "sync") {
         if (conn.provider !== "goodveri") return json({ error: "PDF výpisy se aktualizují novým nahráním." }, 400);
+        if (conn.status === "expired")
+          return json({ error: "Souhlas v bance vypršel (platí 180 dní). Odpojte účet a připojte ho znovu.", code: "consent" }, 409);
         return json({ months: await syncGoodveri(admin, conn as Conn) });
       }
       // Nejdřív odvolat souhlas u Goodveri, pak smazat (souhrny jdou kaskádou).
@@ -706,11 +729,11 @@ async function finishConnect(admin: Admin, conn: Conn) {
       account_mask: accounts.length > 1 ? `${accounts.length} účty` : mask(a?.accountNumber ?? a?.ibanCode),
       currency: a?.balance?.currency ?? "CZK",
       status: "active",
-      // Goodveri platnost souhlasu nevrací; PSD2 souhlas typicky platí 180 dní.
-      consent_expires_at: new Date(Date.now() + 180 * 86_400_000).toISOString(),
+      // Souhlas platí 180 dní od přihlášení v bance (Goodveri ho v API nevrací).
+      consent_expires_at: new Date(Date.now() + CONSENT_DAYS * 86_400_000).toISOString(),
       last_error: null,
     })
     .eq("id", conn.id);
-  const months = await syncGoodveri(admin, conn);
+  const months = await syncGoodveri(admin, conn, HISTORY_DAYS_FIRST);
   return { connection: { id: conn.id }, months, accounts: accounts.length };
 }

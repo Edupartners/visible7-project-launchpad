@@ -33,7 +33,9 @@ export function BankConnectPanel({
   const [providers, setProviders] = useState<BankProviderInfo[] | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [testMode, setTestMode] = useState(false);
+  const [sandboxMode, setSandboxMode] = useState(false);
   const isTest = testMode || connections.some((c) => c.bank_name.endsWith("(test)"));
+  const isSandbox = !isTest && (sandboxMode || connections.some((c) => c.bank_name.endsWith("(sandbox)")));
   const [pdfPassword, setPdfPassword] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const handled = useRef(false);
@@ -67,6 +69,7 @@ export function BankConnectPanel({
     setBusy(null);
     if (r.error) return fail(r);
     setTestMode(r.test === true);
+    setSandboxMode(r.sandbox === true);
     setProviders((r.providers as BankProviderInfo[]) ?? []);
   };
 
@@ -157,6 +160,14 @@ export function BankConnectPanel({
         <p className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900 ring-1 ring-amber-200">
           <strong>Testovací režim.</strong> Přístupy od Goodveri zatím nejsou nastavené, proto banky, přihlášení i data
           jsou cvičné. Až vložíte přístupy do Supabase, režim se vypne sám. Testovací připojení pak odpojte.
+        </p>
+      )}
+
+      {isSandbox && (
+        <p className="mt-4 rounded-2xl bg-sky-50 p-3 text-sm text-sky-900 ring-1 ring-sky-200">
+          <strong>Sandbox Goodveri.</strong> Napojení běží přes skutečné API Goodveri, ale v testovacím prostředí – banky
+          a data jsou ukázkové. Pro ostrý provoz změňte v Supabase adresu API a scope na produkční a sandboxová
+          připojení odpojte.
         </p>
       )}
 
