@@ -372,6 +372,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               .
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
+              <strong className="font-semibold text-foreground">Učíte se tím, že rovnou stavíte svůj byznys.</strong>{" "}
               Ověřený nápad, reálná čísla a AI, která za vás udělá tu nejtěžší práci. Vše na jednom místě: plán, výuka i
               vytvoření projektu svépomocí.
             </p>
