@@ -12,6 +12,7 @@ import { TrustBand } from "@/components/marketing/TrustBand";
 import { FeaturedCourses } from "@/components/marketing/FeaturedCourses";
 import { OwnNumbers } from "@/components/marketing/OwnNumbers";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
+import { useLessonStats } from "@/lib/courses";
 import {
   ArrowRight,
   Award,
@@ -257,43 +258,6 @@ const HeroVideo = ({ photo }: { photo?: string }) => {
   );
 };
 
-/**
- * Měnící se slovo v nadpisu. Místo má šířku prvního slova, takže „Začněte podnikat.“ je přesně na středu
- * a „Začněte“ se nehýbe; delší slova přesahují doprava. Čtečka obrazovky i vyhledávače vidí jen „podnikat“.
- */
-const HERO_WORDS = ["podnikat", "vydělávat", "se učit", "tvořit"];
-
-const RotatingWord = () => {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((n) => (n + 1) % HERO_WORDS.length), 3200);
-    return () => clearInterval(t);
-  }, []);
-
-  const fade = (n: number) =>
-    `text-leaf-500 transition-[opacity,transform] duration-700 ease-in-out ${
-      n === i ? "translate-y-0 opacity-100 delay-300" : "translate-y-[0.2em] opacity-0"
-    }`;
-
-  return (
-    <>
-      <span className="sr-only">podnikat.</span>
-      <span aria-hidden="true" className="relative block whitespace-nowrap sm:inline-block sm:text-left">
-        <span className={`inline-block ${fade(0)}`}>{HERO_WORDS[0]}.</span>
-        {HERO_WORDS.slice(1).map((w, k) => (
-          <span
-            key={w}
-            className={`absolute inset-x-0 top-0 text-center sm:left-0 sm:right-auto sm:text-left ${fade(k + 1)}`}
-          >
-            {w}.
-          </span>
-        ))}
-      </span>
-    </>
-  );
-};
-
 const Cta = ({
   onClick,
   children,
@@ -316,6 +280,31 @@ const Cta = ({
   </button>
 );
 
+/** Rozcestník pod hero: každý začíná jinde. */
+const PATHS: { pill: string; title: string; text: string; cta: string; to?: string; highlight?: boolean }[] = [
+  {
+    pill: "Nejčastější start",
+    title: "Mám podnikatelský nápad.",
+    text: "Chci zjistit, jestli o něj bude zájem, co bude stát a jestli se vyplatí ho rozvíjet.",
+    cta: "Začít ověřením nápadu",
+    highlight: true,
+  },
+  {
+    pill: "Hledám směr",
+    title: "Chci podnikat, ale nevím v čem.",
+    text: "Chci najít příležitost, která dává smysl vzhledem k mým zkušenostem, možnostem a času.",
+    cta: "Prohlédnout první dvě brány",
+    to: "/zacit-podnikat",
+  },
+  {
+    pill: "Chci se posunout",
+    title: "Už podnikám. Chci zákazníky online.",
+    text: "Potřebuji pochopit, jak postavit web nebo e-shop a lépe zvládat marketing svépomocí.",
+    cta: "Co se mohu naučit",
+    to: "/uz-podnikam",
+  },
+];
+
 const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
@@ -323,6 +312,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const offer = useFounderOffer();
   const academy = academyOffer();
   const author = ADVISORS.find((a) => a.name.includes("Míček"));
+  const { lessons } = useLessonStats();
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
     const id = window.location.hash.slice(1);
@@ -359,25 +349,31 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
-              Kompletní kurz podnikání od nápadu po první zákazníky
+              Kompletní průvodce online podnikáním s certifikací
             </p>
-            <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
-              <span className="block">
-                Začněte <RotatingWord />
-              </span>
-              Vytvořte si plán, který vám{" "}
+            <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.04] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
+              <span className="block">Máte nápad?</span>
+              Ověřte ho a rozjeďte{" "}
               <span className="whitespace-nowrap text-leaf-500 underline decoration-leaf-200 decoration-[0.12em] underline-offset-[0.14em]">
-                vydělá peníze
+                svépomocí
               </span>
               .
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              <strong className="font-semibold text-foreground">Učíte se tím, že rovnou stavíte svůj byznys.</strong>{" "}
-              Ověřený nápad, reálná čísla a AI, která za vás udělá tu nejtěžší práci. Vše na jednom místě: plán, výuka i
-              vytvoření projektu svépomocí.
+              <strong className="font-semibold text-foreground">
+                {lessons.toLocaleString("cs-CZ")} krátkých lekcí, AI asistenti a seniorní poradci.
+              </strong>{" "}
+              Od prvního plánu po první zákazníky.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <Cta onClick={onAccessGranted}>Začít plán zdarma</Cta>
+              <Cta
+                onClick={() => {
+                  track("hero_idea_test_click", {});
+                  onAccessGranted();
+                }}
+              >
+                Otestovat nápad zdarma
+              </Cta>
               <a
                 href="#uvnitr"
                 className="inline-flex h-14 items-center justify-center gap-2 border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
@@ -386,17 +382,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <Play className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                track("hero_idea_test_click", {});
-                onAccessGranted();
-              }}
-              className="mt-5 inline-flex items-center gap-2 font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary"
-            >
-              <Lightbulb className="h-4 w-4 text-leaf-600" aria-hidden="true" />
-              Nebo nejdřív otestujte nápad do 5 minut, zdarma
-            </button>
             <p className="mt-3 text-sm text-muted-foreground">
               Pro registraci stačí e-mail. Platební kartu nezadáváte.
             </p>
@@ -414,6 +399,64 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
         </section>
 
         <TrustBand />
+
+        {/* Rozcestník: každý začíná jinde */}
+        <section id="cesty" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 md:py-24 lg:px-12">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+              Každý začíná jinde.
+              <br />
+              Vyberte cestu pro sebe.
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Nemusíte mít zkušenosti s marketingem, weby ani finančním plánováním. Důležité je vědět, co právě
+              potřebujete.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {PATHS.map((p) => {
+              const inner = (
+                <>
+                  <span
+                    className={`text-xs font-bold uppercase tracking-[0.12em] ${
+                      p.highlight ? "text-leaf-700" : "text-muted-foreground"
+                    }`}
+                  >
+                    {p.pill}
+                  </span>
+                  <h3 className="mt-5 text-xl font-bold tracking-tight">{p.title}</h3>
+                  <p className="mt-2 flex-1 text-muted-foreground">{p.text}</p>
+                  <span className="mt-6 inline-flex items-center gap-2 font-semibold text-primary group-hover:underline group-hover:underline-offset-4">
+                    {p.cta}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                </>
+              );
+              const cls = `group flex h-full flex-col rounded-2xl border p-6 text-left transition-colors ${
+                p.highlight
+                  ? "border-leaf-300 bg-leaf-50 hover:border-leaf-500"
+                  : "border-border bg-background hover:border-primary/40"
+              }`;
+              return p.to ? (
+                <Link key={p.title} to={p.to} className={cls} onClick={() => track("landing_path_click", { path: p.pill })}>
+                  {inner}
+                </Link>
+              ) : (
+                <button
+                  key={p.title}
+                  type="button"
+                  className={cls}
+                  onClick={() => {
+                    track("landing_path_click", { path: p.pill });
+                    onAccessGranted();
+                  }}
+                >
+                  {inner}
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
         {/* Jak to funguje */}
         <section id="uvnitr" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
