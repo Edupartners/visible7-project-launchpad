@@ -24,10 +24,11 @@ const LECTURES: Record<string, { topic: Topic; name: string }> = {
   "1192302865": { topic: "znacka", name: "Ochranná známka a právo" },
   "1191513624": { topic: "copywriting", name: "Copywriting, 1. část" },
   "1191518085": { topic: "copywriting", name: "Copywriting, 2. část" },
-  "1190043020": { topic: "facebook", name: "Reklama na Facebooku a Instagramu, 1. část (Martina)" },
-  "1190052995": { topic: "facebook", name: "Reklama na Facebooku a Instagramu, 2. část (Martina)" },
+  "1190043020": { topic: "facebook", name: "Reklama na Facebooku a Instagramu, 1. část (Renata)" },
+  "1190052995": { topic: "facebook", name: "Reklama na Facebooku a Instagramu, 2. část (Renata)" },
+  "1241969229": { topic: "seo", name: "Buď vidět pro lidi i AI (Michal)" },
   "1241968251": { topic: "data", name: "Google Analytics 4 a Tag Manager (Patrik)" },
-  "1240183101": { topic: "facebook", name: "Reklama, kreativy a video na Facebooku (Renata a Štěpán)" },
+  "1240183101": { topic: "facebook", name: "Reklama, kreativy a video na Facebooku (Martina a Štěpán)" },
   "1189858739": { topic: "data", name: "Data a přehledy, 1. část" },
   "1189984574": { topic: "data", name: "Data a Power BI, 2. část" },
   "1191484977": { topic: "grafika", name: "Grafika ve Photopea, 1. část" },
@@ -64,6 +65,7 @@ const CARDS: Record<string, Topic> = {
   "tvorba:woo": "eshop",
   "tvorba:kurz": "kurz",
   "bonus:ai_act": "ai",
+  "bonus:ai_viditelnost": "seo",
 };
 
 const src = (t: Topic) => `/video-covers/${t}.webp`;

@@ -50,6 +50,22 @@ export const BONUSES: Bonus[] = [
       "Vrstvy úprav, pero, přechody, stíny a filtry",
     ],
   },
+  {
+    id: "ai_viditelnost",
+    title: "Buď vidět pro lidi i AI",
+    lead: "Jak se dostat do odpovědí ChatGPT, Gemini a Perplexity: osobní autoritní web, data pro roboty a digitální stopa.",
+    why: "Lidé se čím dál častěji ptají AI místo Googlu. Kdo v jejích odpovědích není, toho zákazník nenajde.",
+    certificateFor: "za absolvování videokurzu o viditelnosti webu a značky ve vyhledávání s umělou inteligencí",
+    skills: ["optimalizace webu pro AI vyhledávání", "budování digitální autority"],
+    topics: [
+      "Proč být vidět v AI a model E-E-A-T",
+      "Jak AI čte web: schema.org, nadpisy a tvrdá data před textem",
+      "Vlastní doména, odkazy, recenze, PR a Wikidata",
+      "Sekce osobního webu, USP a časté dotazy (FAQ)",
+      "Soubory pro roboty: sitemap, robots.txt, llms.txt",
+      "Kdy se v AI objevíte a jak to měřit",
+    ],
+  },
 ];
 
 export const bonusById = (id: string | null | undefined) => BONUSES.find((b) => b.id === id) ?? null;
