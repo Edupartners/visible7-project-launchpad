@@ -38,6 +38,14 @@ export const FEATURED_COURSES: FeaturedCourse[] = [
     ],
   },
   {
+    id: "shoptet",
+    title: "E-shop na Shoptetu krok za krokem",
+    gate: "Brána 4",
+    lecturer: "Lukáš",
+    cover: "/video-covers/eshop.webp",
+    keys: ["tvorba:shoptet", "tvorba:produkty", "tvorba:platby"],
+  },
+  {
     id: "copy",
     title: "Copywriting: texty, které prodávají",
     gate: "Brány 4–5",
