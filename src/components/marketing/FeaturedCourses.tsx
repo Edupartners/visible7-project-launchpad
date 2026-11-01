@@ -1,18 +1,19 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock } from "lucide-react";
-import { COURSE_PRICE, FEATURED_COURSES, durationLabel, hoursFloor10, useCourseHours } from "@/lib/courses";
+import { COURSE_PRICE, FEATURED_COURSES, durationLabel, hoursFloor10, useCourseHours, useLessonStats } from "@/lib/courses";
 import { kc, useShop } from "@/lib/shop";
 
 /** Vybrané kurzy: skutečná videa v aplikaci, seřazená podle brány, kde je člověk potřebuje. */
 export const FeaturedCourses = () => {
   const shop = useShop();
-  const { course, totalHours } = useCourseHours();
+  const { course } = useCourseHours();
+  const { hours, lessons } = useLessonStats();
   return (
     <section id="kurzy" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 md:py-24 lg:px-12">
       <div className="max-w-3xl">
         <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">Vybrané kurzy</p>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Kompletní kurz. Přes {hoursFloor10(totalHours)} hodin videí od lektorů z praxe.
+          Kompletní kurz. Přes {hoursFloor10(hours)} hodin videí v {lessons.toLocaleString("cs-CZ")} krátkých lekcích od lektorů z praxe.
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
           Samostatně se tyto kurzy prodávají za {kc(COURSE_PRICE)} za kus. V členství máte všechny za {kc(shop.price)},

@@ -185,6 +185,22 @@ export function useCourseHours() {
   return { course, totalHours: Math.floor(allMinutes / 60) };
 }
 
+/** Lekce a hodiny bez zdvojení (kapitola ve dvou kartách se počítá jednou). Funkce lesson_stats, stav 1. 11. 2026 jako záloha. */
+const LESSONS_SNAPSHOT = { lessons: 438, minutes: 3115 };
+
+async function loadLessons() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc("lesson_stats");
+  const r = Array.isArray(data) ? data[0] : null;
+  if (error || !r) return LESSONS_SNAPSHOT;
+  return { lessons: Number(r.lessons) || LESSONS_SNAPSHOT.lessons, minutes: Number(r.minutes) || LESSONS_SNAPSHOT.minutes };
+}
+
+export function useLessonStats() {
+  const s = useQuery({ queryKey: ["lesson_stats"], queryFn: loadLessons, staleTime: 60 * 60_000 }).data ?? LESSONS_SNAPSHOT;
+  return { lessons: s.lessons, hours: Math.floor(s.minutes / 60) };
+}
+
 /** „6,4 h“, „25 min“; když některá videa nemají délku, přidá „+“. */
 export const durationLabel = ({ minutes, missing }: { minutes: number; missing: number }) => {
   const base =

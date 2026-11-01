@@ -1,10 +1,10 @@
 import { Award, BadgeCheck, GraduationCap, PlayCircle, Users, UserCheck } from "lucide-react";
 import { NSK_QUALIFICATION } from "@/lib/qualification";
-import { hoursFloor10, useCourseHours } from "@/lib/courses";
+import { hoursFloor10, useLessonStats } from "@/lib/courses";
 
 /** Úzký pás důvěry pod hero. Jen doložitelná tvrzení; loga partnerů až se souhlasem dané firmy. */
 export const TrustBand = () => {
-  const { totalHours } = useCourseHours();
+  const { hours, lessons } = useLessonStats();
   const items = [
     {
       icon: BadgeCheck,
@@ -16,7 +16,7 @@ export const TrustBand = () => {
     { icon: Award, strong: "Od roku 2011", rest: "učíme podnikat (Edu Partners)" },
     { icon: Users, strong: "1 000+ absolventů", rest: "kurzů podnikání" },
     { icon: UserCheck, strong: "16+ poradců", rest: "seniorních, z praxe" },
-    { icon: PlayCircle, strong: `Přes ${hoursFloor10(totalHours)} hodin videí`, rest: "od lektorů z praxe" },
+    { icon: PlayCircle, strong: `Přes ${hoursFloor10(hours)} hodin videí`, rest: `${lessons.toLocaleString("cs-CZ")} krátkých lekcí od lektorů z praxe` },
   ];
   return (
     <section aria-label="Proč nám věřit" className="border-y border-border bg-background px-4 py-5 sm:px-8">
