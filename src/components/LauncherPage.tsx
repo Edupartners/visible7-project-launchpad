@@ -352,12 +352,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Kompletní průvodce online podnikáním s certifikací
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.04] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
-              <span className="block">Máte nápad?</span>
-              Ověřte ho a rozjeďte{" "}
-              <span className="whitespace-nowrap text-leaf-500 underline decoration-leaf-200 decoration-[0.12em] underline-offset-[0.14em]">
-                svépomocí
-              </span>
-              .
+              <span className="block">Máte nápad na podnikání?</span>
+              <span className="text-leaf-500">Začněte tím, že ho ověříte.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
               <strong className="font-semibold text-foreground">
