@@ -85,7 +85,7 @@ function CourseRow({ row, onPick }: { row: Row; onPick: (where: string) => void 
             <button
               type="button"
               onClick={() => onPick(c.id)}
-              className="group relative block aspect-video w-full overflow-hidden rounded-lg bg-[hsl(216_45%_20%)] text-left ring-signal transition duration-300 hover:z-10 hover:scale-[1.04] hover:ring-2 focus:outline-none focus-visible:ring-2"
+              className="group relative block aspect-video w-full overflow-hidden rounded-lg bg-[hsl(158_40%_15%)] text-left ring-signal transition duration-300 hover:z-10 hover:scale-[1.04] hover:ring-2 focus:outline-none focus-visible:ring-2"
               aria-label={`${l.title} – lekce pro členy`}
             >
               <img src={c.cover} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-55 transition-opacity group-hover:opacity-40" />
@@ -149,7 +149,7 @@ export default function ELearningPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(216_62%_9%)] text-white">
+    <div className="min-h-screen bg-[hsl(158_58%_7%)] text-white">
       <div className="bg-background text-foreground">
         <PublicHeader onStart={() => start("header")} />
       </div>
@@ -157,8 +157,8 @@ export default function ELearningPage() {
         {/* Úvod */}
         <section className="relative overflow-hidden">
           <img src="/video-covers/kurz.webp" alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-          <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-[hsl(216_62%_9%)] via-[hsl(216_62%_9%/0.85)] to-[hsl(216_62%_9%/0.3)]" />
-          <span aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[hsl(216_62%_9%)] to-transparent" />
+          <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-[hsl(158_58%_7%)] via-[hsl(158_58%_7%/0.85)] to-[hsl(158_58%_7%/0.3)]" />
+          <span aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[hsl(158_58%_7%)] to-transparent" />
           <div className="relative mx-auto max-w-[90rem] px-4 pb-16 pt-14 sm:px-8 lg:px-12 lg:pb-24 lg:pt-20">
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-signal">E-learning VISIBLE7</p>
             <h1 className="mt-4 max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-6xl">
