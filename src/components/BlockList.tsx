@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, ChevronDown, Lightbulb, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BlockVideo } from "@/components/BlockVideo";
+import { useDeepLinkBlock } from "@/lib/deepLink";
 import { stepId, type BuildBlock } from "@/lib/buildPlans";
 import type { BlockArea } from "@/lib/blockVideos";
 
@@ -23,6 +24,10 @@ const czk = (v: number) => `${v.toLocaleString("cs-CZ")} Kč`;
 export const BlockList = ({ area, blocks, steps, done, onToggleStep, onFinish, onAddCosts }: BlockListProps) => {
   const [open, setOpen] = useState<string | null>(null);
   const [added, setAdded] = useState<string[]>([]);
+  useDeepLinkBlock(
+    blocks.map((b) => b.id),
+    setOpen,
+  );
   const current = open ?? blocks.find((b) => !done.includes(b.id) && !b.optional)?.id ?? null;
   const nextOpen = (except: string) => blocks.find((x) => x.id !== except && !done.includes(x.id) && !x.optional)?.id;
 
@@ -35,7 +40,8 @@ export const BlockList = ({ area, blocks, steps, done, onToggleStep, onFinish, o
         return (
           <li
             key={b.id}
-            className={`overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
+            id={`blok-${b.id}`}
+            className={`scroll-mt-24 overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
           >
             <button
               type="button"

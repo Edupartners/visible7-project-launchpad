@@ -179,6 +179,20 @@ export function useBlockVideos(key: string) {
   return { videos, watched: store.watched, ready: store.ready };
 }
 
+/** Všechna zveřejněná videa (pro hledání v lekcích). */
+export function useAllBlockVideos() {
+  const [, force] = useState(0);
+  useEffect(() => {
+    const l = () => force((n) => n + 1);
+    listeners.add(l);
+    if (!loading) loading = loadStore().catch(() => undefined);
+    return () => {
+      listeners.delete(l);
+    };
+  }, []);
+  return { videos: store.videos, watched: store.watched, ready: store.ready };
+}
+
 export async function setWatched(videoId: string, value: boolean) {
   const next = new Set(store.watched);
   if (value) next.add(videoId);

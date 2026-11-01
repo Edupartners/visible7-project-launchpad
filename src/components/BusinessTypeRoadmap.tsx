@@ -9,6 +9,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { BlockVideo } from "@/components/BlockVideo";
+import { useDeepLinkBlock } from "@/lib/deepLink";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
 import { CustomerJourney } from "@/components/CustomerJourney";
 import {
@@ -42,6 +43,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
   const [open, setOpen] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState(false);
   const [addedCosts, setAddedCosts] = useState<string[]>([]);
+  useDeepLinkBlock(t?.blocks ?? [], setOpen);
 
   if (!t) {
     return <p className="mx-auto max-w-3xl px-4 py-10 text-muted-foreground">Tento typ byznysu neznáme.</p>;
@@ -204,7 +206,8 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
           return (
             <li
               key={b.id}
-              className={`overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
+              id={`blok-${b.id}`}
+              className={`scroll-mt-24 overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
             >
               <button
                 type="button"

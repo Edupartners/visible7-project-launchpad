@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { LessonSearch } from "@/components/LessonSearch";
 import { NotificationBell } from "@/components/announcements/NotificationBell";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
@@ -240,6 +241,7 @@ export const AppHeader = ({
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
+            <LessonSearch />
             <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger

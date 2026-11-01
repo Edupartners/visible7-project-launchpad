@@ -12,6 +12,7 @@ import {
   vimeoSrc,
 } from "@/lib/blockVideos";
 import { lectureName, videoCover } from "@/lib/videoCovers";
+import { useDeepLinkLesson } from "@/lib/deepLink";
 
 const PLACEHOLDER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(216_45%_32%)]";
 const POSTER_BG = "bg-gradient-to-br from-[hsl(216_62%_22%)] to-[hsl(28_58%_38%)]";
@@ -145,6 +146,17 @@ function VideoPlaylist({
   const firstOpen = videos.find((v) => !watched.has(v.id)) ?? videos[0];
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [play, setPlay] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const linked = useDeepLinkLesson(videos.map((v) => v.id));
+
+  // Příchod z hledání: vybrat a spustit konkrétní lekci a posunout se k ní.
+  useEffect(() => {
+    if (!linked) return;
+    setCurrentId(linked);
+    setPlay(true);
+    const t = setTimeout(() => boxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
+    return () => clearTimeout(t);
+  }, [linked]);
   const current = videos.find((v) => v.id === currentId) ?? firstOpen;
   const idx = videos.indexOf(current);
   const seen = videos.filter((v) => watched.has(v.id)).length;
@@ -158,7 +170,7 @@ function VideoPlaylist({
   };
 
   return (
-    <div className="min-w-0 space-y-3">
+    <div ref={boxRef} className="min-w-0 scroll-mt-24 space-y-3">
       {play ? (
         <PlayerFrame video={current} title={current.title} onEnded={() => setWatched(current.id, true)} />
       ) : (

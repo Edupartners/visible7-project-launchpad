@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { BlockVideo } from "@/components/BlockVideo";
+import { useDeepLinkBlock } from "@/lib/deepLink";
 import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useMarketingContext } from "@/lib/marketingContext";
@@ -56,6 +57,8 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
           },
     );
   }, [saved]);
+
+  useDeepLinkBlock(c?.blocks ?? [], setOpen);
 
   if (!c) return <p className="mx-auto max-w-3xl px-4 py-10 text-muted-foreground">Tento kanál neznáme.</p>;
 
@@ -146,7 +149,8 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
           return (
             <li
               key={b.id}
-              className={`overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
+              id={`blok-${b.id}`}
+              className={`scroll-mt-24 overflow-hidden rounded-2xl border bg-card ${expanded ? "border-primary/40 shadow-md" : "border-border"}`}
             >
               <button
                 type="button"
