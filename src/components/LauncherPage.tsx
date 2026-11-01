@@ -299,7 +299,7 @@ const PATHS: { pill: string; title: string; text: string; cta: string; to?: stri
   {
     pill: "Chci se posunout",
     title: "Už podnikám. Chci zákazníky online.",
-    text: "Potřebuji pochopit, jak postavit web nebo e-shop a lépe zvládat marketing svépomocí.",
+    text: "Potřebuji pochopit, jak postavit web nebo e-shop a lépe zvládat marketing.",
     cta: "Co se mohu naučit",
     to: "/uz-podnikam",
   },
@@ -356,10 +356,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <span className="text-leaf-500">Začněte tím, že ho ověříte.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              <strong className="font-semibold text-foreground">
-                {lessons.toLocaleString("cs-CZ")} krátkých lekcí, AI asistenti a seniorní poradci.
-              </strong>{" "}
-              Od prvního plánu po první zákazníky.
+              <strong className="font-semibold text-foreground">Nejste na to sami.</strong>{" "}
+              {lessons.toLocaleString("cs-CZ")} krátkých návodů, AI asistenti a seniorní poradci. Od prvního plánu po
+              první zákazníky.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta
