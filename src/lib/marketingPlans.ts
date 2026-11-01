@@ -66,6 +66,19 @@ export const MKT_BLOCKS: Record<string, BuildBlock> = {
     ],
     minutes: 60,
   }),
+  meta_strategie: B({
+    id: "meta_strategie",
+    title: "Meta: strategie a rozpočet",
+    goal: "Víte, co a komu reklamou prodáváte a kolik si můžete dovolit utratit.",
+    steps: [
+      "Sepište zákazníka, USP a jednu jasně pojmenovanou nabídku",
+      "Spočítejte z marže, kolik smí stát jedna objednávka nebo poptávka",
+      "Rozhodněte, jestli teď budujete značku, nebo prodáváte (aktivační reklama)",
+      "Začněte malým testem: stovky korun denně, lokálně, ať sbíráte data",
+    ],
+    tip: "Nepovinný blok. Kdo má strategii z bran 1–3 jasnou, může rovnou k účtu.",
+    minutes: 45,
+  }),
   meta_ucet: B({
     id: "meta_ucet",
     title: "Meta: účet a publikum",
@@ -89,6 +102,18 @@ export const MKT_BLOCKS: Record<string, BuildBlock> = {
       "Po 3 dnech zkontrolujte, že se utrácí a měří",
     ],
     minutes: 60,
+  }),
+  meta_kreativy: B({
+    id: "meta_kreativy",
+    title: "Meta: kreativy a video",
+    goal: "Máte 2 krátká videa a 3 bannery připravené k testu.",
+    steps: [
+      "Projděte reklamy konkurence v Knihovně reklam Mety",
+      "Bannery v Canvě: jedno sdělení, krátké vysvětlení a výrazná výzva k akci",
+      "Video na telefon: zaujmout do 3 vteřin, krátké věty, na konci výzva a logo",
+      "Při exportu vypněte AI vylepšení a přidejte titulky",
+    ],
+    minutes: 120,
   }),
   google_klic: B({
     id: "google_klic",
@@ -321,7 +346,7 @@ export const CHANNELS: Channel[] = [
       "konverzni-web",
     ],
     costNames: ["meta", "facebook", "instagram"],
-    blocks: ["mereni", "rozpocet", "meta_ucet", "texty", "meta_kampan"],
+    blocks: ["mereni", "rozpocet", "meta_strategie", "meta_ucet", "texty", "meta_kreativy", "meta_kampan"],
   },
   {
     id: "google-ads",
@@ -472,6 +497,12 @@ export const CHANNELS: Channel[] = [
     minor: true,
   },
 ];
+
+/** Nepovinné bloky: zobrazí se, ale do postupu kanálu se nepočítají. */
+export const OPTIONAL_MKT_BLOCKS = new Set(["meta_strategie"]);
+
+/** Bloky kanálu, které se počítají do postupu. */
+export const requiredBlocks = (c: Channel) => c.blocks.filter((id) => !OPTIONAL_MKT_BLOCKS.has(id));
 
 export const channelById = (id: string | undefined) => CHANNELS.find((c) => c.id === id) ?? null;
 

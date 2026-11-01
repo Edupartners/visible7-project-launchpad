@@ -14,6 +14,7 @@ import {
   ChannelTest,
   MKT_BLOCKS,
   VERDICT_COPY,
+  OPTIONAL_MKT_BLOCKS,
   channelById,
   evaluateTest,
 } from "@/lib/marketingPlans";
@@ -60,7 +61,8 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
 
   const p = all[c.id] ?? EMPTY;
   const blocks = c.blocks.map((id) => MKT_BLOCKS[id]);
-  const doneBlocks = blocks.filter((b) => p.blocks.includes(b.id)).length;
+  const counted = blocks.filter((b) => !OPTIONAL_MKT_BLOCKS.has(b.id));
+  const doneBlocks = counted.filter((b) => p.blocks.includes(b.id)).length;
   const current = open ?? blocks.find((b) => !p.blocks.includes(b.id))?.id ?? null;
 
   const update = (fn: (prev: ChannelProgress) => ChannelProgress) =>
@@ -129,11 +131,11 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
         <div className="mt-5">
           <div className="mb-1.5 flex justify-between text-sm">
             <span className="font-semibold">
-              Nastaveno {doneBlocks} z {blocks.length} bloků
+              Nastaveno {doneBlocks} z {counted.length} bloků
             </span>
             {result && <span className="font-semibold">Test: {VERDICT_COPY[result.verdict].title}</span>}
           </div>
-          <Progress value={(doneBlocks / blocks.length) * 100} className="h-2.5" />
+          <Progress value={(doneBlocks / counted.length) * 100} className="h-2.5" />
         </div>
       </header>
 
@@ -157,14 +159,21 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
                     done
                       ? "bg-emerald-600 text-white"
                       : expanded
-                        ? "bg-orange-500 text-white"
+                        ? "bg-signal text-signal-foreground"
                         : "border-2 border-foreground"
                   }`}
                 >
                   {done ? <Check className="h-5 w-5" strokeWidth={3} /> : i + 1}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block font-bold">{b.title}</span>
+                  <span className="block font-bold">
+                    {b.title}
+                    {OPTIONAL_MKT_BLOCKS.has(b.id) && (
+                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 align-middle text-xs font-semibold text-muted-foreground">
+                        nepovinné
+                      </span>
+                    )}
+                  </span>
                   <span className="block truncate text-sm text-muted-foreground">{b.goal}</span>
                 </span>
                 <ChevronDown className={`h-5 w-5 shrink-0 transition-transform ${expanded ? "rotate-180" : ""}`} />

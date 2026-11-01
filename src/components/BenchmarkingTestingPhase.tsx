@@ -16,6 +16,7 @@ import {
   VERDICT_COPY,
   evaluateTest,
   rankChannels,
+  requiredBlocks,
 } from "@/lib/marketingPlans";
 import { stepId } from "@/lib/buildPlans";
 import { MethodFigures } from "@/components/MethodFigures";
@@ -259,8 +260,9 @@ const ChannelCard = ({
   featured?: boolean;
   notRecommended?: boolean;
 }) => {
-  const done = (progress?.blocks ?? []).filter((b) => c.blocks.includes(b)).length;
-  const pct = Math.round((done / c.blocks.length) * 100);
+  const req = requiredBlocks(c);
+  const done = (progress?.blocks ?? []).filter((b) => req.includes(b)).length;
+  const pct = Math.round((done / req.length) * 100);
   const verdict = progress?.test ? evaluateTest(progress.test, value, maxPno).verdict : null;
   return (
     <button
