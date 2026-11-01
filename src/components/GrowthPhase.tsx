@@ -134,7 +134,8 @@ export const GrowthPhase = () => {
     evaluateTest(marketing[c.id]!.test!, price, maxPno),
   );
   const scaling = tests.some((t) => t.verdict === "skalovat");
-  const measured = CHANNELS.some((c) => marketing[c.id]?.blocks?.includes("mereni"));
+  const measured =
+    !!marketing["_mereni"]?.blocks?.includes("mereni") || CHANNELS.some((c) => marketing[c.id]?.blocks?.includes("mereni"));
   const totalHours = s.growthHours + s.opsHours;
   const growthShare = totalHours > 0 ? (s.growthHours / totalHours) * 100 : 0;
   const readiness = [

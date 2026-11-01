@@ -20,6 +20,7 @@ import {
 } from "@/lib/marketingPlans";
 import { stepId } from "@/lib/buildPlans";
 import { MethodFigures } from "@/components/MethodFigures";
+import { BlockVideo } from "@/components/BlockVideo";
 
 interface BenchmarkingTestingPhaseProps {
   onChannelSelect: (channelId: string) => void;
@@ -27,6 +28,7 @@ interface BenchmarkingTestingPhaseProps {
 
 const czk = (v: number) => `${Math.round(v).toLocaleString("cs-CZ")} Kč`;
 const COMPETITION_KEY = "_konkurence";
+const MEASURE_KEY = "_mereni";
 
 /** Fáze 5: kanály seřazené pro projekt, benchmark konkurence, testy a dokončení fáze. */
 export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestingPhaseProps) {
@@ -59,6 +61,22 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
       const id = stepId("konkurence", i);
       const steps = cur.steps.includes(id) ? cur.steps.filter((s) => s !== id) : [...cur.steps, id];
       return { ...prev, [COMPETITION_KEY]: { ...cur, steps } };
+    });
+
+  // Měření: jednou pro všechny kanály. Kdo ho dřív odškrtl v některém kanálu, má ho hotové i tady.
+  const measureBlock = MKT_BLOCKS.mereni;
+  const legacyMeasure = Object.entries(progress)
+    .filter(([k]) => !k.startsWith("_"))
+    .flatMap(([, v]) => (v?.steps ?? []).filter((x) => x.startsWith("mereni:")));
+  const measure = progress[MEASURE_KEY] ?? { steps: Array.from(new Set(legacyMeasure)), blocks: [] };
+  const measureDone = measureBlock.steps.every((_, i) => measure.steps.includes(stepId("mereni", i)));
+  const toggleMeasure = (i: number) =>
+    setProgress((prev) => {
+      const cur = prev[MEASURE_KEY] ?? measure;
+      const id = stepId("mereni", i);
+      const steps = cur.steps.includes(id) ? cur.steps.filter((x) => x !== id) : [...cur.steps, id];
+      const done = measureBlock.steps.every((_, j) => steps.includes(stepId("mereni", j)));
+      return { ...prev, [MEASURE_KEY]: { steps, blocks: done ? ["mereni"] : [] } };
     });
 
   const reasons = (r: (typeof ranked)[number]) =>
@@ -117,10 +135,49 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
 
       <TradeLicenseCard placement="gate5" />
 
+      {/* Měření – jednou pro všechny kanály */}
+      <section aria-labelledby="mereni" className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
+          <div>
+            <p className="text-sm font-semibold text-primary">Než spustíte první kanál</p>
+            <h2 id="mereni" className="mt-1 flex items-center gap-2 text-xl font-bold">
+              <Gauge className="h-5 w-5 text-primary" /> {measureBlock.title}
+            </h2>
+            <p className="mt-1 text-muted-foreground">{measureBlock.goal}</p>
+          </div>
+          {measureDone && (
+            <span className="inline-flex shrink-0 items-center gap-1 self-start rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+              <Check className="h-4 w-4" strokeWidth={3} /> Nastaveno
+            </span>
+          )}
+        </div>
+        <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          <BlockVideo block={measureBlock} area="marketing" />
+          <ul className="space-y-2">
+            {measureBlock.steps.map((s, i) => {
+              const checked = measure.steps.includes(stepId("mereni", i));
+              return (
+                <li key={i}>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 hover:bg-muted/60">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleMeasure(i)}
+                      className="mt-0.5 h-5 w-5 shrink-0 accent-[hsl(var(--primary))]"
+                    />
+                    <span className={checked ? "text-muted-foreground line-through" : ""}>{s}</span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
       {/* Doporučené kanály */}
       <section aria-labelledby="zacnete" className="rounded-3xl bg-primary p-6 text-white sm:p-8">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-3 py-1 text-sm font-semibold">
+          <span className="inline-flex items-center gap-1.5 v7-para-sm bg-signal px-4 py-1 text-sm font-bold text-signal-foreground">
             <Star className="h-3.5 w-3.5 fill-current" /> Začněte tady
           </span>
           <p className="text-sm text-white/70">Seřazeno podle vašeho typu byznysu, hodnocení AI a rozpočtu.</p>

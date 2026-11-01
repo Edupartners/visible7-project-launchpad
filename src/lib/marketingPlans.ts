@@ -30,15 +30,15 @@ const B = (b: BuildBlock) => b;
 export const MKT_BLOCKS: Record<string, BuildBlock> = {
   mereni: B({
     id: "mereni",
-    title: "Měření konverzí",
-    goal: "Víte, kolik prodejů nebo poptávek přinesl každý kanál.",
+    title: "Měření: Google Analytics 4 a Tag Manager",
+    goal: "Víte, kolik prodejů nebo poptávek přinesl každý kanál. Nastavíte jednou pro všechny kanály.",
     steps: [
-      "Ověřte, že Google Analytics 4 měří objednávku nebo odeslaný formulář",
-      "Vložte měřicí kód reklamního systému (pixel) – jen po souhlasu s cookies",
-      "Odkazy v kampaních označte parametry UTM",
-      "Udělejte zkušební nákup a zkontrolujte, že se konverze zapsala",
+      "Založte Google Tag Manager a vložte jeho kód na web",
+      "Přes Tag Manager nasaďte Google Analytics 4 – jen po souhlasu s cookies",
+      "Nastavte konverzi: objednávka nebo odeslaný formulář (děkovná stránka)",
+      "Odkazy v kampaních označte parametry UTM a udělejte zkušební nákup",
     ],
-    tip: "Bez měření nejde poznat, který kanál vydělává. Tenhle blok nepřeskakujte.",
+    tip: "Bez měření nejde poznat, který kanál vydělává. Stačí jednou, platí pro všechny kanály.",
     minutes: 45,
   }),
   rozpocet: B({
@@ -346,7 +346,7 @@ export const CHANNELS: Channel[] = [
       "konverzni-web",
     ],
     costNames: ["meta", "facebook", "instagram"],
-    blocks: ["mereni", "rozpocet", "meta_strategie", "meta_ucet", "texty", "meta_kreativy", "meta_kampan"],
+    blocks: ["rozpocet", "meta_strategie", "meta_ucet", "texty", "meta_kreativy", "meta_kampan"],
   },
   {
     id: "google-ads",
@@ -358,7 +358,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 4000,
     bestFor: ["web-prezentacni", "konverzni-web", "eshop", "web-eshop", "lms", "dropshipping"],
     costNames: ["google ads"],
-    blocks: ["mereni", "rozpocet", "google_klic", "texty", "google_kampan"],
+    blocks: ["rozpocet", "google_klic", "texty", "google_kampan"],
   },
   {
     id: "sklik",
@@ -370,7 +370,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["web-prezentacni", "konverzni-web", "eshop", "web-eshop", "dropshipping"],
     costNames: ["sklik", "seznam"],
-    blocks: ["mereni", "rozpocet", "google_klic", "sklik_kampan"],
+    blocks: ["rozpocet", "google_klic", "sklik_kampan"],
   },
   {
     id: "srovnavace",
@@ -382,7 +382,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["eshop", "dropshipping", "web-eshop"],
     costNames: ["srovnávač", "heureka", "zboží"],
-    blocks: ["mereni", "srovnavace_feed", "srovnavace_cena"],
+    blocks: ["srovnavace_feed", "srovnavace_cena"],
   },
   {
     id: "google-profil",
@@ -394,7 +394,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 0,
     bestFor: ["web-prezentacni", "konverzni-web"],
     costNames: ["firemní profil", "google business", "mapy"],
-    blocks: ["mereni", "profil"],
+    blocks: ["profil"],
   },
   {
     id: "email",
@@ -406,7 +406,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 0,
     bestFor: ["squeeze-page", "lms", "members", "eshop", "blog", "affiliate", "web-eshop"],
     costNames: ["e-mail", "email", "newsletter", "ecomail", "mailerlite"],
-    blocks: ["mereni", "email_seznam", "email_kampan"],
+    blocks: ["email_seznam", "email_kampan"],
   },
   {
     id: "chatgpt-ads",
@@ -418,7 +418,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["web-prezentacni", "eshop", "lms", "vlastni-napad-app"],
     costNames: ["chatgpt"],
-    blocks: ["mereni", "rozpocet", "texty", "chatgpt_kampan"],
+    blocks: ["rozpocet", "texty", "chatgpt_kampan"],
   },
   {
     id: "seo",
@@ -430,7 +430,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 0,
     bestFor: ["blog", "affiliate", "web-prezentacni", "eshop", "lms"],
     costNames: ["seo", "obsah", "články"],
-    blocks: ["mereni", "seo_zaklad", "seo_obsah"],
+    blocks: ["seo_zaklad", "seo_obsah"],
   },
   {
     id: "linkedin",
@@ -442,7 +442,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 0,
     bestFor: ["konverzni-web", "web-prezentacni", "vlastni-napad-app"],
     costNames: ["linkedin"],
-    blocks: ["mereni", "linkedin"],
+    blocks: ["linkedin"],
   },
   {
     id: "influenceri",
@@ -467,7 +467,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["eshop", "dropshipping"],
     costNames: ["marketplace", "katalog", "allegro", "glami", "favi"],
-    blocks: ["mereni", "katalogy"],
+    blocks: ["katalogy"],
     minor: true,
   },
   {
@@ -480,7 +480,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 1000,
     bestFor: ["eshop", "lms", "members"],
     costNames: ["affiliate", "provize partner"],
-    blocks: ["mereni", "affiliate_program"],
+    blocks: ["affiliate_program"],
     minor: true,
   },
   {
