@@ -1,3 +1,4 @@
+import { MichalCallIcon, MichalCallSidebar } from "@/components/MichalCall";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -508,6 +509,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
       </nav>
 
       <div className="px-3 pb-2">
+        <MichalCallSidebar />
         <SidebarSeminars onClick={() => go("/seminare")} />
         {done.size >= 2 && <SidebarMembership onNavigate={onNavigate} />}
       </div>
@@ -630,6 +632,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
         {icon("Seniorní poradci", "/poradci", Users)}
         {icon("Živé semináře", "/seminare", Presentation)}
         {icon("Bonusy", "/bonusy", Gift)}
+        <MichalCallIcon />
       </div>
       <div className="flex flex-col items-center gap-1 border-t border-border pt-2">
         {done.size >= 2 && !access.loading && !access.paid && icon("Získat členství", "/clenstvi", Crown)}

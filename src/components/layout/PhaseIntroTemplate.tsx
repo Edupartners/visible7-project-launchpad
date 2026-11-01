@@ -92,7 +92,7 @@ export const PhaseIntroTemplate = ({
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-[28px] bg-primary text-white">
-        <div className="relative p-6 sm:p-10">
+        <div className="relative p-5 sm:px-8 sm:py-6">
           {/* Cesta přes 7 bran */}
           <div className="flex flex-wrap items-center gap-3">
             <ol className="flex items-center gap-1.5" aria-label={`Brána ${phaseNumber} ze 7`}>
@@ -115,19 +115,19 @@ export const PhaseIntroTemplate = ({
             <span className="text-sm font-semibold text-white/70">Brána {phaseNumber} ze 7</span>
           </div>
 
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+          <div className="mt-5 grid gap-5 lg:grid-cols-[1.5fr_1fr] lg:items-center">
             <div>
-              <p className="font-semibold text-signal">{greeting}</p>
-              <h1 className="mt-2 flex items-center gap-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
-                <Icon className="h-9 w-9 shrink-0 text-white/80 sm:h-11 sm:w-11" />
+              <p className="text-sm font-semibold text-signal">{greeting}</p>
+              <h1 className="mt-1.5 flex items-center gap-2.5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                <Icon className="h-7 w-7 shrink-0 text-white/80 sm:h-8 sm:w-8" />
                 {name}
               </h1>
-              <p className="mt-2 text-xl text-white/80">{subtitle}</p>
-              <p className="mt-5 max-w-xl text-lg font-medium leading-snug">{HOOK[phaseNumber]}</p>
+              <p className="mt-1 text-lg text-white/80">{subtitle}</p>
+              <p className="mt-2 max-w-xl font-medium leading-snug">{HOOK[phaseNumber]}</p>
               <button
                 type="button"
                 onClick={start}
-                className="mt-7 v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-8 pr-12 text-lg font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
+                className="mt-4 v7-trap-btn inline-flex h-12 items-center justify-center gap-2 pl-7 pr-11 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
               >
                 {ctaLabel}
                 <ArrowRight className="h-5 w-5" />
@@ -135,18 +135,18 @@ export const PhaseIntroTemplate = ({
             </div>
 
             {/* Odměna */}
-            <div className="rounded-2xl bg-white/[0.08] p-5 ring-1 ring-white/15">
+            <div className="rounded-2xl bg-white/[0.08] p-4 ring-1 ring-white/15">
               <p className="text-sm font-semibold text-white/70">
                 {thisDone ? "Za tuhle bránu už máte" : "Za tuhle bránu získáte"}
               </p>
-              <div className="mt-3 flex items-center gap-3">
-                <BadgeIcon level={phaseNumber} size={52} />
+              <div className="mt-2 flex items-center gap-3">
+                <BadgeIcon level={phaseNumber} size={40} />
                 <div>
                   <p className="font-bold">Odznak {level?.name}</p>
                   <p className="text-sm text-white/70">{level?.text}</p>
                 </div>
               </div>
-              <p className="mt-3 flex items-center gap-2 text-sm text-white/80">
+              <p className="mt-2 flex items-center gap-2 text-sm text-white/80">
                 <Award className="h-4 w-4 text-signal" /> Osvědčení s ověřovacím kódem pro LinkedIn
               </p>
             </div>
@@ -154,7 +154,7 @@ export const PhaseIntroTemplate = ({
         </div>
 
         {/* Údaje o bráně */}
-        <dl className="relative flex flex-wrap gap-x-8 gap-y-2 border-t border-white/10 bg-black/10 px-6 py-4 text-sm sm:px-10">
+        <dl className="relative flex flex-wrap gap-x-8 gap-y-2 border-t border-white/10 bg-black/10 px-5 py-2.5 text-sm sm:px-8">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-white/60" />
             <dt className="sr-only">Čas</dt>
