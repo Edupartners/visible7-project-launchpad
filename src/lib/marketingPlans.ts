@@ -30,15 +30,15 @@ const B = (b: BuildBlock) => b;
 export const MKT_BLOCKS: Record<string, BuildBlock> = {
   mereni: B({
     id: "mereni",
-    title: "Měření: Google Analytics 4 a Tag Manager",
-    goal: "Víte, kolik prodejů nebo poptávek přinesl každý kanál.",
+    title: "Google Analytics 4: jak číst data",
+    goal: "Poznáte, který kanál přivádí zákazníky a objednávky.",
     steps: [
-      "Založte Google Tag Manager a vložte jeho kód na web",
-      "Přes Tag Manager nasaďte Google Analytics 4 – jen po souhlasu s cookies",
-      "Nastavte konverzi: objednávka nebo odeslaný formulář (děkovná stránka)",
-      "Odkazy v kampaních označte parametry UTM a udělejte zkušební nákup",
+      "Ověřte, že GA4 z brány 4 měří a konverze se zapisuje",
+      "Odkazy v kampaních označte parametry UTM",
+      "V přehledu Akvizice najděte, odkud lidé přišli a kdo nakoupil",
+      "Jednou týdně porovnejte kanály podle konverzí, ne podle návštěv",
     ],
-    tip: "Bez měření nejde poznat, který kanál vydělává. Stačí jednou, platí pro všechny kanály.",
+    tip: "Měřicí kód a konverze nastavíte už v bráně 4. Tady se učíte z dat rozhodovat.",
     minutes: 45,
   }),
   rozpocet: B({

@@ -384,12 +384,12 @@ export const BLOCKS: Record<string, BuildBlock> = {
   }),
   mereni: B({
     id: "mereni",
-    title: "Měření návštěvnosti",
-    goal: "Víte, kolik lidí přišlo, odkud a kolik jich nakoupilo.",
+    title: "Měření: GA4 a Tag Manager",
+    goal: "Web měří návštěvy a objednávky nebo poptávky.",
     steps: [
-      "Založte účet Google Analytics 4",
-      "Vložte měřicí kód (plugin nebo nastavení platformy)",
-      "Nastavte konverzi: odeslaný formulář nebo objednávka",
+      "Založte Google Tag Manager a vložte jeho kód na web (plugin nebo nastavení platformy)",
+      "Přes Tag Manager nasaďte Google Analytics 4",
+      "Nastavte konverzi: objednávka nebo odeslaný formulář (děkovná stránka)",
       "Ověřte, že měření běží až po souhlasu s cookies",
     ],
     minutes: 45,

@@ -20,6 +20,8 @@ import {
 } from "@/lib/marketingPlans";
 import { stepId } from "@/lib/buildPlans";
 import { MethodFigures } from "@/components/MethodFigures";
+import { BlockVideo } from "@/components/BlockVideo";
+import { useBlockVideos } from "@/lib/blockVideos";
 
 interface BenchmarkingTestingPhaseProps {
   onChannelSelect: (channelId: string) => void;
@@ -36,6 +38,8 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
   const [progress, setProgress] = useSupabaseProgress<Record<string, ChannelProgress>>("marketing_progress", {});
   const [completed, setCompleted] = useSupabaseProgress<number[]>("completed_phases", []);
   const [celebrate, setCelebrate] = useState(false);
+  // Video „jak číst data v GA4“ se ukáže, jakmile ho admin přidá ke kartě marketing:mereni.
+  const { videos: ga4Videos } = useBlockVideos("marketing:mereni");
 
   if (!ctx.loaded) {
     return (
@@ -163,6 +167,11 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
                 )}
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">{block.goal}</p>
+              {block.id === "mereni" && ga4Videos.length > 0 && (
+                <div className="mt-3">
+                  <BlockVideo block={block} area="marketing" />
+                </div>
+              )}
               <ul className="mt-3 space-y-1.5">
                 {block.steps.map((s, i) => {
                   const checked = steps.includes(stepId(block.id, i));
