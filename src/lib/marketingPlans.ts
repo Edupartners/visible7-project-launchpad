@@ -418,7 +418,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["web-prezentacni", "eshop", "lms", "vlastni-napad-app"],
     costNames: ["chatgpt"],
-    blocks: ["texty", "chatgpt_kampan"],
+    blocks: ["chatgpt_kampan"],
   },
   {
     id: "seo",
