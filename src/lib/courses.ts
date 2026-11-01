@@ -201,6 +201,13 @@ export function useLessonStats() {
   return { lessons: s.lessons, hours: Math.floor(s.minutes / 60) };
 }
 
+/** Lektoři jen křestními jmény: „Patrik Zapletal“ → „Patrik“, „Renata Dimitrov, Martina a Štěpán“ → „Renata, Martina a Štěpán“. */
+export const firstNames = (lecturer: string) =>
+  lecturer
+    .split(/(,\s*|\s+a\s+)/)
+    .map((part) => (/^(,\s*|\s+a\s+)$/.test(part) ? part : part.trim().split(/\s+/)[0]))
+    .join("");
+
 /** „6,4 h“, „25 min“; když některá videa nemají délku, přidá „+“. */
 export const durationLabel = ({ minutes, missing }: { minutes: number; missing: number }) => {
   const base =

@@ -179,9 +179,9 @@ export const NAV_MENUS: NavMenu[] = [
         items: [
           {
             title: "E-learning",
-            hint: "100+ videí krok za krokem ke každé fázi",
+            hint: "Přes 50 hodin videí ve 400+ krátkých lekcích",
             icon: PlayCircle,
-            to: "/certifikace",
+            to: "/e-learning",
           },
           {
             title: "Pracovní listy",

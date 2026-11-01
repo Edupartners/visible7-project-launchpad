@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock } from "lucide-react";
-import { COURSE_PRICE, FEATURED_COURSES, durationLabel, hoursFloor10, useCourseHours, useLessonStats } from "@/lib/courses";
+import { COURSE_PRICE, FEATURED_COURSES, durationLabel, firstNames, hoursFloor10, useCourseHours, useLessonStats } from "@/lib/courses";
 import { kc, useShop } from "@/lib/shop";
 
 /** Vybrané kurzy: skutečná videa v aplikaci, seřazená podle brány, kde je člověk potřebuje. */
@@ -31,7 +31,7 @@ export const FeaturedCourses = () => {
             </div>
             <div className="flex flex-1 flex-col p-4">
               <h3 className="font-bold leading-snug">{c.title}</h3>
-              {c.lecturer && <p className="mt-1 text-sm text-muted-foreground">{c.lecturer}</p>}
+              {c.lecturer && <p className="mt-1 text-sm text-muted-foreground">{firstNames(c.lecturer)}</p>}
               <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-leaf-700">
                 <Clock className="h-3.5 w-3.5" aria-hidden="true" />
                 {durationLabel(course(c))}
@@ -47,7 +47,7 @@ export const FeaturedCourses = () => {
         ))}
       </ul>
       <Link
-        to="/certifikace"
+        to="/e-learning"
         className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 font-semibold text-primary hover:bg-primary hover:text-white"
       >
         Zobrazit všechny kurzy <ArrowRight className="h-4 w-4" aria-hidden="true" />

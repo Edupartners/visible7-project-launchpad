@@ -42,6 +42,7 @@ import SchoolsPage from "./pages/features/SchoolsPage";
 import OfficePage from "./pages/OfficePage";
 import CertificationPage from "./pages/CertificationPage";
 import WorksheetsPage from "./pages/WorksheetsPage";
+import ELearningPage from "./pages/ELearningPage";
 import MemberWorksheetsPage from "./pages/MemberWorksheetsPage";
 import AdminPage from "./pages/AdminPage";
 import RentgenPage from "./pages/RentgenPage";
@@ -191,6 +192,7 @@ const App = () => (
           <Route path="/digitalni-kancelar" element={<OfficePage />} />
           <Route path="/certifikace" element={<CertificationPage />} />
           <Route path="/pracovni-listy" element={<WorksheetsPage />} />
+          <Route path="/e-learning" element={<ELearningPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />
           <Route path="/ochrana-osobnich-udaju" element={<LegalPage doc={PRIVACY} />} />
           <Route path="/odhlasit" element={<UnsubscribePage />} />
