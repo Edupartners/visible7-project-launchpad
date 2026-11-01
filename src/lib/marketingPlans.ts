@@ -31,7 +31,7 @@ export const MKT_BLOCKS: Record<string, BuildBlock> = {
   mereni: B({
     id: "mereni",
     title: "Měření: Google Analytics 4 a Tag Manager",
-    goal: "Víte, kolik prodejů nebo poptávek přinesl každý kanál. Nastavíte jednou pro všechny kanály.",
+    goal: "Víte, kolik prodejů nebo poptávek přinesl každý kanál.",
     steps: [
       "Založte Google Tag Manager a vložte jeho kód na web",
       "Přes Tag Manager nasaďte Google Analytics 4 – jen po souhlasu s cookies",
@@ -346,7 +346,7 @@ export const CHANNELS: Channel[] = [
       "konverzni-web",
     ],
     costNames: ["meta", "facebook", "instagram"],
-    blocks: ["rozpocet", "meta_strategie", "meta_ucet", "texty", "meta_kreativy", "meta_kampan"],
+    blocks: ["meta_strategie", "meta_ucet", "texty", "meta_kreativy", "meta_kampan"],
   },
   {
     id: "google-ads",
@@ -358,7 +358,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 4000,
     bestFor: ["web-prezentacni", "konverzni-web", "eshop", "web-eshop", "lms", "dropshipping"],
     costNames: ["google ads"],
-    blocks: ["rozpocet", "google_klic", "texty", "google_kampan"],
+    blocks: ["google_klic", "texty", "google_kampan"],
   },
   {
     id: "sklik",
@@ -370,7 +370,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["web-prezentacni", "konverzni-web", "eshop", "web-eshop", "dropshipping"],
     costNames: ["sklik", "seznam"],
-    blocks: ["rozpocet", "google_klic", "sklik_kampan"],
+    blocks: ["google_klic", "sklik_kampan"],
   },
   {
     id: "srovnavace",
@@ -418,7 +418,7 @@ export const CHANNELS: Channel[] = [
     testBudget: 2000,
     bestFor: ["web-prezentacni", "eshop", "lms", "vlastni-napad-app"],
     costNames: ["chatgpt"],
-    blocks: ["rozpocet", "texty", "chatgpt_kampan"],
+    blocks: ["texty", "chatgpt_kampan"],
   },
   {
     id: "seo",

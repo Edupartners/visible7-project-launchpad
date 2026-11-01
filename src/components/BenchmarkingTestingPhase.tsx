@@ -20,7 +20,6 @@ import {
 } from "@/lib/marketingPlans";
 import { stepId } from "@/lib/buildPlans";
 import { MethodFigures } from "@/components/MethodFigures";
-import { BlockVideo } from "@/components/BlockVideo";
 
 interface BenchmarkingTestingPhaseProps {
   onChannelSelect: (channelId: string) => void;
@@ -28,7 +27,6 @@ interface BenchmarkingTestingPhaseProps {
 
 const czk = (v: number) => `${Math.round(v).toLocaleString("cs-CZ")} Kč`;
 const COMPETITION_KEY = "_konkurence";
-const MEASURE_KEY = "_mereni";
 
 /** Fáze 5: kanály seřazené pro projekt, benchmark konkurence, testy a dokončení fáze. */
 export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestingPhaseProps) {
@@ -63,21 +61,30 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
       return { ...prev, [COMPETITION_KEY]: { ...cur, steps } };
     });
 
-  // Měření: jednou pro všechny kanály. Kdo ho dřív odškrtl v některém kanálu, má ho hotové i tady.
-  const measureBlock = MKT_BLOCKS.mereni;
-  const legacyMeasure = Object.entries(progress)
-    .filter(([k]) => !k.startsWith("_"))
-    .flatMap(([, v]) => (v?.steps ?? []).filter((x) => x.startsWith("mereni:")));
-  const measure = progress[MEASURE_KEY] ?? { steps: Array.from(new Set(legacyMeasure)), blocks: [] };
-  const measureDone = measureBlock.steps.every((_, i) => measure.steps.includes(stepId("mereni", i)));
-  const toggleMeasure = (i: number) =>
-    setProgress((prev) => {
-      const cur = prev[MEASURE_KEY] ?? measure;
-      const id = stepId("mereni", i);
-      const steps = cur.steps.includes(id) ? cur.steps.filter((x) => x !== id) : [...cur.steps, id];
-      const done = measureBlock.steps.every((_, j) => steps.includes(stepId("mereni", j)));
-      return { ...prev, [MEASURE_KEY]: { steps, blocks: done ? ["mereni"] : [] } };
-    });
+  // Společné kroky pro všechny kanály (měření, testovací rozpočet). Kdo je dřív odškrtl v některém kanálu, má je hotové i tady.
+  const shared = (blockId: "mereni" | "rozpocet") => {
+    const key = `_${blockId}`;
+    const block = MKT_BLOCKS[blockId];
+    const legacy = Object.entries(progress)
+      .filter(([k]) => !k.startsWith("_"))
+      .flatMap(([, v]) => (v?.steps ?? []).filter((x) => x.startsWith(`${blockId}:`)));
+    const cur = progress[key] ?? { steps: Array.from(new Set(legacy)), blocks: [] };
+    const toggle = (i: number) =>
+      setProgress((prev) => {
+        const base = prev[key] ?? cur;
+        const id = stepId(blockId, i);
+        const steps = base.steps.includes(id) ? base.steps.filter((x) => x !== id) : [...base.steps, id];
+        const done = block.steps.every((_, j) => steps.includes(stepId(blockId, j)));
+        return { ...prev, [key]: { steps, blocks: done ? [blockId] : [] } };
+      });
+    return {
+      block,
+      steps: cur.steps,
+      done: block.steps.every((_, i) => cur.steps.includes(stepId(blockId, i))),
+      toggle,
+    };
+  };
+  const sharedSteps = [shared("mereni"), shared("rozpocet")];
 
   const reasons = (r: (typeof ranked)[number]) =>
     [
@@ -135,42 +142,47 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
 
       <TradeLicenseCard placement="gate5" />
 
-      {/* Měření – jednou pro všechny kanály */}
-      <section aria-labelledby="mereni" className="rounded-3xl border border-border bg-card p-6 sm:p-8">
-        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
-          <div>
-            <p className="text-sm font-semibold text-primary">Než spustíte první kanál</p>
-            <h2 id="mereni" className="mt-1 flex items-center gap-2 text-xl font-bold">
-              <Gauge className="h-5 w-5 text-primary" /> {measureBlock.title}
-            </h2>
-            <p className="mt-1 text-muted-foreground">{measureBlock.goal}</p>
-          </div>
-          {measureDone && (
-            <span className="inline-flex shrink-0 items-center gap-1 self-start rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
-              <Check className="h-4 w-4" strokeWidth={3} /> Nastaveno
-            </span>
-          )}
-        </div>
-        <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-          <BlockVideo block={measureBlock} area="marketing" />
-          <ul className="space-y-2">
-            {measureBlock.steps.map((s, i) => {
-              const checked = measure.steps.includes(stepId("mereni", i));
-              return (
-                <li key={i}>
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 hover:bg-muted/60">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleMeasure(i)}
-                      className="mt-0.5 h-5 w-5 shrink-0 accent-[hsl(var(--primary))]"
-                    />
-                    <span className={checked ? "text-muted-foreground line-through" : ""}>{s}</span>
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
+      {/* Než spustíte první kanál – jednou pro všechny kanály */}
+      <section aria-labelledby="pred-kanalem" className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <h2 id="pred-kanalem" className="text-xl font-bold">Než spustíte první kanál</h2>
+        <p className="mt-1 text-muted-foreground">Nastavíte jednou a platí pro všechny kanály.</p>
+        <div className="mt-5 grid gap-6 md:grid-cols-2">
+          {sharedSteps.map(({ block, steps, done, toggle }) => (
+            <div key={block.id}>
+              <h3 className="flex items-center gap-2 font-bold">
+                {block.id === "mereni" ? (
+                  <Gauge className="h-5 w-5 text-primary" />
+                ) : (
+                  <PiggyBank className="h-5 w-5 text-primary" />
+                )}
+                {block.title}
+                {done && (
+                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> hotovo
+                  </span>
+                )}
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">{block.goal}</p>
+              <ul className="mt-3 space-y-1.5">
+                {block.steps.map((s, i) => {
+                  const checked = steps.includes(stepId(block.id, i));
+                  return (
+                    <li key={i}>
+                      <label className="flex cursor-pointer items-start gap-3 rounded-lg p-1.5 hover:bg-muted/60">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggle(i)}
+                          className="mt-0.5 h-5 w-5 shrink-0 accent-[hsl(var(--primary))]"
+                        />
+                        <span className={checked ? "text-muted-foreground line-through" : ""}>{s}</span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 
