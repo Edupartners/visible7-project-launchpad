@@ -32,12 +32,12 @@ export const LessonSearch = () => {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-9 items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 text-sm text-muted-foreground hover:border-primary/40 hover:text-foreground sm:w-56 sm:px-3"
+        className="flex h-9 items-center gap-2 rounded-lg border-2 border-signal bg-signal/10 px-2.5 text-sm font-medium text-foreground shadow-[0_0_0_3px_hsl(var(--signal)/0.18)] transition-colors hover:bg-signal/30 sm:w-60 sm:px-3"
         aria-label="Najít návod v lekcích"
       >
-        <Search className="h-4 w-4 shrink-0" />
+        <Search className="h-4 w-4 shrink-0 text-signal-foreground" strokeWidth={2.5} />
         <span className="hidden sm:inline">Najít návod…</span>
-        <kbd className="ml-auto hidden rounded border border-border bg-white px-1.5 text-[10px] font-semibold sm:inline">
+        <kbd className="ml-auto hidden rounded border border-signal bg-white px-1.5 text-[10px] font-semibold sm:inline">
           Ctrl K
         </kbd>
       </button>
