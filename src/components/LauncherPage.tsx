@@ -102,34 +102,24 @@ const STEPS = [
 
 const SHOWCASE = [
   {
-    eyebrow: "Byznys case s AI",
-    title: "Finanční plán na 24 měsíců hotový za odpoledne",
-    text: "AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy jen potvrdíte nebo přepíšete. Spočítáme potřebný kapitál, bod zvratu i maximální cenu za zákazníka.",
-    cta: "Vyzkoušet zdarma",
+    eyebrow: "Finanční plán na 24 měsíců",
+    title: "Zjistěte, kdy začnete vydělávat",
+    text: "AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy jen potvrdíte nebo přepíšete. Uvidíte, kolik potřebujete na start, kdy se vám peníze vrátí a kolik smíte dát za získání zákazníka.",
+    cta: "Spočítat můj plán",
     image: "/landing/ukazka-byznys-case.webp",
     alt: "Byznys case: AI doporučuje marži a odchodovost s vysvětlením",
     width: 985,
     height: 310,
   },
   {
-    eyebrow: "Marketing napojený na AI",
-    title: "12 marketingových kanálů. AI vám řekne, kterými začít",
-    text: "Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Aplikace je seřadí podle vašeho typu byznysu, zákazníka a rozpočtu. Ke každému kanálu máte postup krok za krokem, záznamy z přednášek, testovací rozpočet a maximální PNO z vašeho byznys casu, takže víte, kam dát peníze.",
+    eyebrow: "12 marketingových kanálů",
+    title: "Marketing, který přivede zákazníky",
+    text: "Aplikace vybere kanály podle vašeho byznysu, zákazníka a rozpočtu: Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Ke každému máte postup krok za krokem a záznamy z přednášek. Víte, kam dát peníze, aby se vám vrátily.",
     cta: "Najít moje kanály",
     image: "/landing/ukazka-marketing.webp",
     alt: "Doporučené marketingové kanály seřazené podle typu byznysu, hodnocení AI a rozpočtu",
     width: 1150,
     height: 389,
-  },
-  {
-    eyebrow: "Mapa cesty A → D",
-    title: "Zjistěte, kdy můžete dát výpověď",
-    text: "Aplikace z vašich čísel spočítá, kdy přijdou první zákazníci, kdy vás projekt uživí a kdy unese prvního spolupracovníka. S každou úpravou plánu se mapa zpřesní.",
-    cta: "Spočítat moji cestu",
-    image: "/landing/ukazka-mapa-cesty.webp",
-    alt: "Mapa cesty: dnes, první zákazníci, živí mě to, roste to beze mě",
-    width: 1037,
-    height: 430,
   },
 ];
 
@@ -630,10 +620,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
               <div>
                 <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Když se zaseknete, zavoláte člověku
+                  Po celé cestě máte podporu
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground">
-                  16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
+                  Jednou měsíčně živý seminář s lektory Edu Partners, v ceně členství. A když se zaseknete, zavoláte
+                  člověku: 16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
                   i AI. Konzultace {CONSULTATION.minutes} minut, orientačně {CONSULTATION.price.toLocaleString("cs-CZ")}{" "}
                   Kč.
                 </p>
