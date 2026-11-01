@@ -1,4 +1,5 @@
 import { QuizBonusCard } from "@/components/quiz/QuizCards";
+import { MichalCallCard } from "@/components/MichalCall";
 import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { track } from "@/lib/track";
 import { useEffect, useMemo, useState } from "react";
@@ -300,6 +301,8 @@ export const DiagnosisResult = ({
         </div>
       </section>
 
+      <MichalCallCard from="rentgen_napad" />
+
       <QuizBonusCard />
 
       <MarketRentgen />
@@ -448,6 +451,8 @@ export const BusinessResult = ({
           </ul>
         </section>
       )}
+
+      <MichalCallCard from="rentgen_podnik" title="Probereme váš podnik spolu, osobně" />
 
       <section className="flex flex-col items-start gap-5 rounded-3xl bg-orange-50 p-6 ring-1 ring-orange-200 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
