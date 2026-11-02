@@ -5,6 +5,8 @@
 //    takže zmizí projekty, data, výstupy AI, osvědčení, souhlasy, události i nastavení e-mailů.
 //    Nákupy (shop_purchases) zůstanou bez vazby na účet (ON DELETE SET NULL): doklady musíme
 //    uchovávat podle zákona o účetnictví a o DPH. Smažou se i e-maily na čekací listině a u pracovních listů.
+//  - action "admin_delete_user": totéž pro jiného uživatele, smí jen správce. Potvrzení = e-mail mazaného uživatele.
+//    Správce nejde smazat (ani sám sebe).
 // verify_jwt je vypnuté (nové podpisové klíče) – uživatele ověřujeme přes auth.getUser().
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
@@ -68,7 +70,7 @@ Deno.serve(async (req) => {
   const user = userData?.user;
   if (userErr || !user) return json({ error: "Přihlaste se prosím znovu." }, 401);
 
-  let body: { action?: string; projectId?: string; confirm?: string };
+  let body: { action?: string; projectId?: string; confirm?: string; userId?: string };
   try {
     body = await req.json();
   } catch {
@@ -82,6 +84,31 @@ Deno.serve(async (req) => {
       const { data: project } = await admin.from("projects").select("id, user_id").eq("id", body.projectId).maybeSingle();
       if (!project || project.user_id !== user.id) return json({ error: "Projekt nenalezen" }, 404);
       await purgeProject(admin, user.id, project.id);
+      return json({ ok: true });
+    }
+
+    if (body.action === "admin_delete_user") {
+      const { data: me } = await admin.from("admins").select("user_id").eq("user_id", user.id).maybeSingle();
+      if (!me) return json({ error: "Jen pro správce." }, 403);
+      const targetId = String(body.userId ?? "");
+      if (!targetId || targetId === user.id) return json({ error: "Neplatný požadavek" }, 400);
+      const { data: targetAdmin } = await admin.from("admins").select("user_id").eq("user_id", targetId).maybeSingle();
+      if (targetAdmin) return json({ error: "Účet správce nejde smazat." }, 403);
+      const { data: t, error: tErr } = await admin.auth.admin.getUserById(targetId);
+      const target = t?.user;
+      if (tErr || !target) return json({ error: "Uživatel nenalezen." }, 404);
+      if ((target.email ?? "").toLowerCase() !== String(body.confirm ?? "").trim().toLowerCase())
+        return json({ error: "Pro potvrzení napište přesně e-mail uživatele." }, 400);
+
+      await removeFolder(admin, target.id);
+      if (target.email) {
+        const emails = [...new Set([target.email, target.email.toLowerCase()])];
+        await admin.from("waitlist_bank").delete().in("email", emails);
+        await admin.from("worksheet_leads").delete().in("email", emails);
+      }
+      const { error } = await admin.auth.admin.deleteUser(target.id);
+      if (error) throw new Error(error.message);
+      console.log("admin_delete_user", user.id, "->", target.id);
       return json({ ok: true });
     }
 

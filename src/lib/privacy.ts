@@ -19,3 +19,7 @@ export const purgeProject = (projectId: string) => callPrivacy({ action: "purge_
 
 /** Smaže celý účet se všemi projekty. `confirm` musí být „SMAZAT“. */
 export const deleteAccount = (confirm: string) => callPrivacy({ action: "delete_account", confirm });
+
+/** Správce smaže jiného uživatele. `confirm` = e-mail mazaného uživatele. */
+export const adminDeleteUser = (userId: string, confirm: string) =>
+  callPrivacy({ action: "admin_delete_user", userId, confirm });

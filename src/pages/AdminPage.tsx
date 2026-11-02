@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { Check, ChevronDown, Download, Mail, Phone, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
@@ -32,9 +32,19 @@ import { SeminarsAdmin } from "@/components/admin/SeminarsAdmin";
 import { BlockVideosAdmin } from "@/components/admin/BlockVideosAdmin";
 import { WorksheetsAdmin } from "@/components/admin/WorksheetsAdmin";
 import { TagChip, UserTagEditor } from "@/components/admin/UserTags";
+import { DeleteUserButton } from "@/components/admin/DeleteUser";
 import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/lib/adminExtras";
 
 type Filter = "vse" | "aktivni" | "platici" | "klub";
+
+type Tab = "prehled" | "uzivatele" | "obsah" | "komunikace" | "prodej";
+const TABS: { id: Tab; label: string; hint: string }[] = [
+  { id: "prehled", label: "Přehled", hint: "čísla, brány, události, kdo jsou uživatelé" },
+  { id: "uzivatele", label: "Uživatelé", hint: "hledání, štítky, smazání" },
+  { id: "obsah", label: "Obsah", hint: "videa, pracovní listy, semináře" },
+  { id: "komunikace", label: "Komunikace", hint: "oznámení, připomínky, termíny" },
+  { id: "prodej", label: "Prodej", hint: "ceník, promo kódy" },
+];
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "vse", label: "Všichni" },
   { id: "aktivni", label: "Aktivní 7 dní" },
@@ -113,6 +123,9 @@ const ProjectList = ({ projects }: { projects: AdminProject[] }) =>
 
 const AdminPage = () => {
   const isAdmin = useIsAdmin();
+  const [params, setParams] = useSearchParams();
+  const tab: Tab = TABS.some((t) => t.id === params.get("tab")) ? (params.get("tab") as Tab) : "prehled";
+  const setTab = (t: Tab) => setParams(t === "prehled" ? {} : { tab: t }, { replace: true });
   const [data, setData] = useState<AdminOverview | null>(null);
   const [events, setEvents] = useState<EventStats | null>(null);
   const [quiz, setQuiz] = useState<QuizStats | null>(null);
@@ -242,290 +255,344 @@ const AdminPage = () => {
 
         {data && (
           <>
-            <section className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6" aria-label="Souhrn">
-              <Stat label="Registrace" value={stats.users} hint={`+${stats.new7} za 7 dní`} />
-              <Stat label="Aktivní 7 dní" value={stats.active7} hint="přihlásili se" />
-              <Stat
-                label="Platící"
-                value={stats.paid}
-                hint={`${stats.users ? Math.round((stats.paid / stats.users) * 100) : 0} % registrací`}
-              />
-              <Stat label="Projekty" value={stats.projects} hint="bez archivovaných" />
-              <Stat label="Klub VISIBLE7" value={stats.klub} hint="souhlas" />
-              <Stat label="Marketing" value={stats.marketing} hint="souhlas s e-maily" />
-            </section>
+            <nav
+              className="sticky top-0 z-20 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6"
+              aria-label="Sekce administrace"
+            >
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTab(t.id)}
+                  aria-current={tab === t.id ? "page" : undefined}
+                  title={t.hint}
+                  className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                    tab === t.id ? "bg-primary text-primary-foreground" : "text-foreground/80 hover:bg-muted"
+                  }`}
+                >
+                  {t.label}
+                  {t.id === "uzivatele" && <span className="ml-1.5 opacity-70">{users.length}</span>}
+                </button>
+              ))}
+            </nav>
 
-            <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
-              <h2 className="text-lg font-bold">Kam projekty došly</h2>
-              <p className="text-sm text-muted-foreground">Počet aktivních projektů, které splnily danou bránu.</p>
-              <ol className="mt-4 space-y-2">
-                {stats.funnel.map((f) => (
-                  <li
-                    key={f.gate}
-                    className="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_2.5rem] items-center gap-3 text-sm"
-                  >
-                    <span className="truncate">
-                      {f.gate === 0 ? "0 Rentgen nápadu" : `${f.gate} ${GATE_NAMES[f.gate]}`}
-                    </span>
-                    <span className="h-3 overflow-hidden rounded-full bg-muted">
-                      <span
-                        className="block h-full rounded-full bg-primary"
-                        style={{ width: `${(f.count / maxFunnel) * 100}%` }}
-                      />
-                    </span>
-                    <span className="text-right font-semibold tabular-nums">{f.count}</span>
-                  </li>
-                ))}
-              </ol>
-            </section>
+            {tab === "prehled" && (
+              <>
+                <section className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6" aria-label="Souhrn">
+                  <Stat label="Registrace" value={stats.users} hint={`+${stats.new7} za 7 dní`} />
+                  <Stat label="Aktivní 7 dní" value={stats.active7} hint="přihlásili se" />
+                  <Stat
+                    label="Platící"
+                    value={stats.paid}
+                    hint={`${stats.users ? Math.round((stats.paid / stats.users) * 100) : 0} % registrací`}
+                  />
+                  <Stat label="Projekty" value={stats.projects} hint="bez archivovaných" />
+                  <Stat label="Klub VISIBLE7" value={stats.klub} hint="souhlas" />
+                  <Stat label="Marketing" value={stats.marketing} hint="souhlas s e-maily" />
+                </section>
 
-            {events && (
-              <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
-                <h2 className="text-lg font-bold">Co lidé dělají (posledních {events.days} dní)</h2>
-                <p className="text-sm text-muted-foreground">Počet událostí a kolik různých uživatelů je udělalo.</p>
-                {events.events.length === 0 ? (
-                  <p className="mt-4 text-sm text-muted-foreground">Zatím žádné události.</p>
-                ) : (
-                  <table className="mt-4 w-full text-sm">
-                    <thead className="text-left text-xs text-muted-foreground">
-                      <tr>
-                        <th className="py-2 font-semibold">Událost</th>
-                        <th className="py-2 text-right font-semibold">Počet</th>
-                        <th className="py-2 text-right font-semibold">Uživatelů</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {events.events.map((e) => (
-                        <tr key={e.name} className="border-t border-border">
-                          <td className="py-2">{EVENT_LABELS[e.name] ?? e.name}</td>
-                          <td className="py-2 text-right tabular-nums">{e.count}</td>
-                          <td className="py-2 text-right font-semibold tabular-nums">{e.users}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
+                  <h2 className="text-lg font-bold">Kam projekty došly</h2>
+                  <p className="text-sm text-muted-foreground">Počet aktivních projektů, které splnily danou bránu.</p>
+                  <ol className="mt-4 space-y-2">
+                    {stats.funnel.map((f) => (
+                      <li
+                        key={f.gate}
+                        className="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_2.5rem] items-center gap-3 text-sm"
+                      >
+                        <span className="truncate">
+                          {f.gate === 0 ? "0 Rentgen nápadu" : `${f.gate} ${GATE_NAMES[f.gate]}`}
+                        </span>
+                        <span className="h-3 overflow-hidden rounded-full bg-muted">
+                          <span
+                            className="block h-full rounded-full bg-primary"
+                            style={{ width: `${(f.count / maxFunnel) * 100}%` }}
+                          />
+                        </span>
+                        <span className="text-right font-semibold tabular-nums">{f.count}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+
+                {events && (
+                  <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
+                    <h2 className="text-lg font-bold">Co lidé dělají (posledních {events.days} dní)</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Počet událostí a kolik různých uživatelů je udělalo.
+                    </p>
+                    {events.events.length === 0 ? (
+                      <p className="mt-4 text-sm text-muted-foreground">Zatím žádné události.</p>
+                    ) : (
+                      <table className="mt-4 w-full text-sm">
+                        <thead className="text-left text-xs text-muted-foreground">
+                          <tr>
+                            <th className="py-2 font-semibold">Událost</th>
+                            <th className="py-2 text-right font-semibold">Počet</th>
+                            <th className="py-2 text-right font-semibold">Uživatelů</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {events.events.map((e) => (
+                            <tr key={e.name} className="border-t border-border">
+                              <td className="py-2">{EVENT_LABELS[e.name] ?? e.name}</td>
+                              <td className="py-2 text-right tabular-nums">{e.count}</td>
+                              <td className="py-2 text-right font-semibold tabular-nums">{e.users}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </section>
                 )}
-              </section>
+
+                {quiz && <AudienceSection quiz={quiz} />}
+              </>
             )}
 
-            <BlockVideosAdmin />
+            {tab === "obsah" && (
+              <>
+                <BlockVideosAdmin />
+                <WorksheetsAdmin />
+                <SeminarsAdmin />
+              </>
+            )}
 
-            <WorksheetsAdmin />
+            {tab === "komunikace" && (
+              <>
+                <AnnouncementsAdmin users={stats.users} />
+                <RemindersAdmin />
+                <DeadlinesAdmin />
+              </>
+            )}
 
-            <SeminarsAdmin />
+            {tab === "prodej" && (
+              <>
+                <ShopAdmin />
+                <PromoCodesAdmin emails={Object.fromEntries(users.map((u) => [u.id, u.email]))} />
+              </>
+            )}
 
-            <AnnouncementsAdmin users={stats.users} />
+            {tab === "uzivatele" && (
+              <>
+                <section className="space-y-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Hledat jméno, e-mail, telefon nebo projekt"
+                        className="pl-9"
+                        aria-label="Hledat uživatele"
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtr">
+                      {FILTERS.map((f) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => setFilter(f.id)}
+                          aria-pressed={filter === f.id}
+                          className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+                            filter === f.id
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground/80 hover:bg-muted/70"
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {tags.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filtr podle štítku">
+                      <span className="text-sm text-muted-foreground">Štítek:</span>
+                      {tags.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => setTagFilter(tagFilter === t.id ? null : t.id)}
+                          aria-pressed={tagFilter === t.id}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${
+                            tagFilter === t.id
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground/80 hover:bg-muted/70"
+                          }`}
+                        >
+                          <span className={`h-2 w-2 rounded-full ${TAG_DOT[t.color]}`} /> {t.name} (
+                          {Object.values(tagLinks).filter((l) => l.includes(t.id)).length})
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Zobrazeno {shown.length} z {users.length}
+                  </p>
 
-            <RemindersAdmin />
-
-            <DeadlinesAdmin />
-
-            {quiz && <AudienceSection quiz={quiz} />}
-
-            <ShopAdmin />
-
-            <PromoCodesAdmin emails={Object.fromEntries(users.map((u) => [u.id, u.email]))} />
-
-            <section className="space-y-3">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Hledat jméno, e-mail, telefon nebo projekt"
-                    className="pl-9"
-                    aria-label="Hledat uživatele"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtr">
-                  {FILTERS.map((f) => (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => setFilter(f.id)}
-                      aria-pressed={filter === f.id}
-                      className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
-                        filter === f.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-foreground/80 hover:bg-muted/70"
-                      }`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {tags.length > 0 && (
-                <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filtr podle štítku">
-                  <span className="text-sm text-muted-foreground">Štítek:</span>
-                  {tags.map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setTagFilter(tagFilter === t.id ? null : t.id)}
-                      aria-pressed={tagFilter === t.id}
-                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${
-                        tagFilter === t.id
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-foreground/80 hover:bg-muted/70"
-                      }`}
-                    >
-                      <span className={`h-2 w-2 rounded-full ${TAG_DOT[t.color]}`} /> {t.name} (
-                      {Object.values(tagLinks).filter((l) => l.includes(t.id)).length})
-                    </button>
-                  ))}
-                </div>
-              )}
-              <p className="text-sm text-muted-foreground">
-                Zobrazeno {shown.length} z {users.length}
-              </p>
-
-              <div className="overflow-hidden rounded-2xl border border-border bg-card">
-                <table className="w-full text-sm">
-                  <thead className="hidden bg-muted/50 text-left text-xs font-semibold text-muted-foreground md:table-header-group">
-                    <tr>
-                      <th className="p-3">Uživatel</th>
-                      <th className="p-3">Registrace</th>
-                      <th className="p-3">Naposledy</th>
-                      <th className="p-3">Tarif</th>
-                      <th className="p-3">Projekty a postup</th>
-                      <th className="p-3">Souhlasy</th>
-                      <th className="p-3" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {shown.map((u: AdminUser) => {
-                      const active = u.projects.filter((p) => !p.archived_at);
-                      const best = [...active].sort((a, b) => b.gates.length - a.gates.length)[0];
-                      const expanded = open === u.id;
-                      return (
-                        <Fragment key={u.id}>
-                          <tr
-                            className="cursor-pointer border-t border-border align-top hover:bg-muted/40 max-md:grid max-md:grid-cols-2 max-md:gap-x-3 max-md:gap-y-1 max-md:p-3"
-                            onClick={() => setOpen(expanded ? null : u.id)}
-                          >
-                            <td className="p-3 max-md:col-span-2 max-md:p-0">
-                              <p className="font-semibold">
-                                {u.name ?? "Bez jména"}
-                                {u.is_admin && (
-                                  <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                                    správce
-                                  </span>
-                                )}
-                              </p>
-                              <p className="break-all text-muted-foreground">{u.email}</p>
-                              {!u.confirmed && <p className="text-xs text-amber-700">e-mail nepotvrzen</p>}
-                              {(tagLinks[u.id] ?? []).length > 0 && (
-                                <span className="mt-1 flex flex-wrap gap-1">
-                                  {tags
-                                    .filter((t) => tagLinks[u.id]?.includes(t.id))
-                                    .map((t) => (
-                                      <TagChip key={t.id} tag={t} />
-                                    ))}
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-3 max-md:p-0">
-                              <span className="text-xs text-muted-foreground md:hidden">Registrace </span>
-                              {fmtDate(u.created_at)}
-                            </td>
-                            <td className="p-3 max-md:p-0">
-                              <span className="text-xs text-muted-foreground md:hidden">Naposledy </span>
-                              {ago(u.last_sign_in_at)}
-                            </td>
-                            <td className="p-3 max-md:p-0">
-                              <span
-                                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                  u.paid ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"
-                                }`}
+                  <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                    <table className="w-full text-sm">
+                      <thead className="hidden bg-muted/50 text-left text-xs font-semibold text-muted-foreground md:table-header-group">
+                        <tr>
+                          <th className="p-3">Uživatel</th>
+                          <th className="p-3">Registrace</th>
+                          <th className="p-3">Naposledy</th>
+                          <th className="p-3">Tarif</th>
+                          <th className="p-3">Projekty a postup</th>
+                          <th className="p-3">Souhlasy</th>
+                          <th className="p-3" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {shown.map((u: AdminUser) => {
+                          const active = u.projects.filter((p) => !p.archived_at);
+                          const best = [...active].sort((a, b) => b.gates.length - a.gates.length)[0];
+                          const expanded = open === u.id;
+                          return (
+                            <Fragment key={u.id}>
+                              <tr
+                                className="cursor-pointer border-t border-border align-top hover:bg-muted/40 max-md:grid max-md:grid-cols-2 max-md:gap-x-3 max-md:gap-y-1 max-md:p-3"
+                                onClick={() => setOpen(expanded ? null : u.id)}
                               >
-                                {PLAN[u.plan] ?? u.plan}
-                              </span>
-                              {u.access_until && (
-                                <span className="block text-xs text-muted-foreground">
-                                  do {fmtDate(u.access_until)}
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-3 max-md:col-span-2 max-md:p-0">
-                              {best ? (
-                                <span className="flex flex-wrap items-center gap-2">
-                                  <span className="max-w-[14rem] truncate font-medium">{best.name}</span>
-                                  <GateDots p={best} />
-                                  {active.length > 1 && (
-                                    <span className="text-xs text-muted-foreground">+{active.length - 1} další</span>
+                                <td className="p-3 max-md:col-span-2 max-md:p-0">
+                                  <p className="font-semibold">
+                                    {u.name ?? "Bez jména"}
+                                    {u.is_admin && (
+                                      <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                        správce
+                                      </span>
+                                    )}
+                                  </p>
+                                  <p className="break-all text-muted-foreground">{u.email}</p>
+                                  {!u.confirmed && <p className="text-xs text-amber-700">e-mail nepotvrzen</p>}
+                                  {(tagLinks[u.id] ?? []).length > 0 && (
+                                    <span className="mt-1 flex flex-wrap gap-1">
+                                      {tags
+                                        .filter((t) => tagLinks[u.id]?.includes(t.id))
+                                        .map((t) => (
+                                          <TagChip key={t.id} tag={t} />
+                                        ))}
+                                    </span>
                                   )}
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground">bez projektu</span>
+                                </td>
+                                <td className="p-3 max-md:p-0">
+                                  <span className="text-xs text-muted-foreground md:hidden">Registrace </span>
+                                  {fmtDate(u.created_at)}
+                                </td>
+                                <td className="p-3 max-md:p-0">
+                                  <span className="text-xs text-muted-foreground md:hidden">Naposledy </span>
+                                  {ago(u.last_sign_in_at)}
+                                </td>
+                                <td className="p-3 max-md:p-0">
+                                  <span
+                                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                      u.paid ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"
+                                    }`}
+                                  >
+                                    {PLAN[u.plan] ?? u.plan}
+                                  </span>
+                                  {u.access_until && (
+                                    <span className="block text-xs text-muted-foreground">
+                                      do {fmtDate(u.access_until)}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="p-3 max-md:col-span-2 max-md:p-0">
+                                  {best ? (
+                                    <span className="flex flex-wrap items-center gap-2">
+                                      <span className="max-w-[14rem] truncate font-medium">{best.name}</span>
+                                      <GateDots p={best} />
+                                      {active.length > 1 && (
+                                        <span className="text-xs text-muted-foreground">
+                                          +{active.length - 1} další
+                                        </span>
+                                      )}
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted-foreground">bez projektu</span>
+                                  )}
+                                </td>
+                                <td className="p-3 max-md:p-0">
+                                  <span className="flex gap-2 text-xs">
+                                    <span className={u.klub ? "text-emerald-700" : "text-muted-foreground"}>
+                                      {u.klub ? <Check className="inline h-3 w-3" /> : "–"} klub
+                                    </span>
+                                    <span className={u.marketing ? "text-emerald-700" : "text-muted-foreground"}>
+                                      {u.marketing ? <Check className="inline h-3 w-3" /> : "–"} e-maily
+                                    </span>
+                                  </span>
+                                </td>
+                                <td className="p-3 text-right max-md:hidden">
+                                  <ChevronDown
+                                    className={`ml-auto h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`}
+                                  />
+                                </td>
+                              </tr>
+                              {expanded && (
+                                <tr className="border-t border-border bg-muted/30 max-md:block">
+                                  <td colSpan={7} className="space-y-3 p-4 max-md:block">
+                                    <div className="flex flex-wrap gap-4 text-sm">
+                                      <a
+                                        href={`mailto:${u.email}`}
+                                        className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+                                      >
+                                        <Mail className="h-4 w-4" /> {u.email}
+                                      </a>
+                                      {u.phone && (
+                                        <a
+                                          href={`tel:${u.phone.replace(/\s/g, "")}`}
+                                          className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+                                        >
+                                          <Phone className="h-4 w-4" /> {u.phone}
+                                        </a>
+                                      )}
+                                      {u.promo_code_used && (
+                                        <span className="text-muted-foreground">promo kód: {u.promo_code_used}</span>
+                                      )}
+                                    </div>
+                                    <UserTagEditor
+                                      tags={tags}
+                                      selected={tagLinks[u.id] ?? []}
+                                      onToggle={(tagId, on) => toggleTag(u.id, tagId, on)}
+                                      onCreate={(name, color) => addNewTag(u.id, name, color)}
+                                    />
+                                    <ProjectList projects={u.projects} />
+                                    {!u.is_admin && (
+                                      <div className="flex justify-end border-t border-border pt-3">
+                                        <DeleteUserButton
+                                          userId={u.id}
+                                          email={u.email}
+                                          paid={u.paid}
+                                          onDeleted={() => {
+                                            setOpen(null);
+                                            load();
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
                               )}
-                            </td>
-                            <td className="p-3 max-md:p-0">
-                              <span className="flex gap-2 text-xs">
-                                <span className={u.klub ? "text-emerald-700" : "text-muted-foreground"}>
-                                  {u.klub ? <Check className="inline h-3 w-3" /> : "–"} klub
-                                </span>
-                                <span className={u.marketing ? "text-emerald-700" : "text-muted-foreground"}>
-                                  {u.marketing ? <Check className="inline h-3 w-3" /> : "–"} e-maily
-                                </span>
-                              </span>
-                            </td>
-                            <td className="p-3 text-right max-md:hidden">
-                              <ChevronDown
-                                className={`ml-auto h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`}
-                              />
+                            </Fragment>
+                          );
+                        })}
+                        {shown.length === 0 && (
+                          <tr>
+                            <td colSpan={7} className="p-6 text-center text-muted-foreground">
+                              Nikdo neodpovídá filtru.
                             </td>
                           </tr>
-                          {expanded && (
-                            <tr className="border-t border-border bg-muted/30 max-md:block">
-                              <td colSpan={7} className="space-y-3 p-4 max-md:block">
-                                <div className="flex flex-wrap gap-4 text-sm">
-                                  <a
-                                    href={`mailto:${u.email}`}
-                                    className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
-                                  >
-                                    <Mail className="h-4 w-4" /> {u.email}
-                                  </a>
-                                  {u.phone && (
-                                    <a
-                                      href={`tel:${u.phone.replace(/\s/g, "")}`}
-                                      className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
-                                    >
-                                      <Phone className="h-4 w-4" /> {u.phone}
-                                    </a>
-                                  )}
-                                  {u.promo_code_used && (
-                                    <span className="text-muted-foreground">promo kód: {u.promo_code_used}</span>
-                                  )}
-                                </div>
-                                <UserTagEditor
-                                  tags={tags}
-                                  selected={tagLinks[u.id] ?? []}
-                                  onToggle={(tagId, on) => toggleTag(u.id, tagId, on)}
-                                  onCreate={(name, color) => addNewTag(u.id, name, color)}
-                                />
-                                <ProjectList projects={u.projects} />
-                              </td>
-                            </tr>
-                          )}
-                        </Fragment>
-                      );
-                    })}
-                    {shown.length === 0 && (
-                      <tr>
-                        <td colSpan={7} className="p-6 text-center text-muted-foreground">
-                          Nikdo neodpovídá filtru.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-            <p className="text-xs text-muted-foreground">
-              Přehled ukazuje kontaktní údaje a postup. Obsah projektů (texty, čísla) z ochrany soukromí nezobrazuje.
-            </p>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+                <p className="text-xs text-muted-foreground">
+                  Přehled ukazuje kontaktní údaje a postup. Obsah projektů (texty, čísla) z ochrany soukromí
+                  nezobrazuje.
+                </p>
+              </>
+            )}
           </>
         )}
       </div>
