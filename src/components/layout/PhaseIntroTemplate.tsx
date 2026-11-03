@@ -163,7 +163,9 @@ export const PhaseIntroTemplate = ({
           <div className="flex items-center gap-2">
             <ListChecks className="h-4 w-4 text-white/60" />
             <dt className="sr-only">Kroky</dt>
-            <dd>{steps} kroků</dd>
+            <dd>
+              {steps} {steps === 1 ? "krok" : steps >= 2 && steps <= 4 ? "kroky" : "kroků"}
+            </dd>
           </div>
           {hasAiValidation && (
             <div className="flex items-center gap-2">

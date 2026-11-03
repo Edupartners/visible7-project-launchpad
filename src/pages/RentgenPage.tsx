@@ -72,26 +72,14 @@ const EFFORT: Record<Effort, { label: string; cls: string }> = {
   vysoka: { label: "Náročnost vysoká", cls: "bg-red-100 text-red-800" },
 };
 
-const MODE_KEY = "v7_rentgen_mode";
 const modeFromUrl = (): RentgenMode | null => {
   const r = new URLSearchParams(window.location.search).get("rezim");
   if (r === "podnik") return "business";
   if (r === "start") return "start";
   return null;
 };
-const initialMode = (): RentgenMode | null => {
-  const fromUrl = modeFromUrl();
-  try {
-    if (fromUrl) localStorage.setItem(MODE_KEY, fromUrl);
-    else {
-      const stored = localStorage.getItem(MODE_KEY);
-      if (stored === "business" || stored === "start") return stored;
-    }
-  } catch {
-    /* bez úložiště */
-  }
-  return fromUrl;
-};
+/** Režim bereme jen z adresy (?rezim=start|podnik). Nový projekt tak vždy začne volbou, ne režimem z jiného projektu. */
+const initialMode = (): RentgenMode | null => modeFromUrl();
 
 const toggle = (list: string[], id: string, exclusive: string) =>
   id === exclusive
@@ -515,11 +503,6 @@ const RentgenPage = () => {
   const chooseMode = (m: RentgenMode) => {
     setMode(m);
     setStep(0);
-    try {
-      localStorage.setItem(MODE_KEY, m);
-    } catch {
-      /* bez úložiště */
-    }
     track("rentgen_mode", { mode: m }, currentProject?.id);
   };
 

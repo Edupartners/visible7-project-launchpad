@@ -674,6 +674,7 @@ Dovednosti: ${a.skills.length ? a.skills.map((k) => SKILL_LABELS[k]).join(", ") 
 - businessType: nejvhodnější typ z povoleného seznamu: ${Object.entries(BUSINESS_TYPES).map(([id, n]) => `${id} = ${n}`).join(", ")}.
 - vision a canvas: konkrétně k tomuto nápadu, 1–3 krátké věty na pole. Náklady a příjmy v canvasu jako výčet položek bez částek.
 - revenue: realistická čísla pro typ byznysu, který jsi zvolil. Pole, která se pro tento typ nepoužívají, nastav na 0. Objem ve 12. měsíci odhadni opatrně a s ohledem na ${a.hours} hodin týdně. growthYear2 obvykle 10–40.
+  U předplatného, členství a kurzů (members, lms, forum-komunita) je price cena ZA MĚSÍC: když uživatel uvádí cenu za delší období (např. 2 990 Kč na 6 měsíců), přepočítej ji na měsíc (498 Kč) a churn nastav podle délky období (6 měsíců bez obnovy ≈ 17 % měsíčně).
 - costs: 3–10 položek podle podnikatelského minimalismu, celková jednorázová investice by měla odpovídat rozpočtu, pokud to jde. Nezahrnuj vlastní odměnu podnikatele – tu porovnáváme zvlášť.
 - risks: 3 největší rizika, každé s levným testem do 14 dnů.
 - strengths: 1–3 silné stránky nápadu nebo podnikatele.
