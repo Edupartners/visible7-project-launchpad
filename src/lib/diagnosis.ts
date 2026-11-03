@@ -275,18 +275,23 @@ export async function applyDiagnosis(projectId: string, d: Diagnosis) {
     { project_id: projectId, data_key: DIAGNOSIS_KEY, data_value: d },
   ];
   const prefilled: string[] = [];
-  if (isBlank(existing.vision_project_data)) {
-    rows.push({
-      project_id: projectId,
-      data_key: "vision_project_data",
-      data_value: { name: d.ai.projectName, slogan: d.ai.slogan, ...d.ai.vision },
-    });
-    prefilled.push("vision");
-  }
-  if (isBlank(existing.ideation_lean_canvas)) {
-    rows.push({ project_id: projectId, data_key: "ideation_lean_canvas", data_value: d.ai.canvas });
-    prefilled.push("canvas");
-  }
+  // Doplňujeme po polích: co uživatel (nebo předchozí rentgen) vyplnil, necháme, prázdná pole doplníme.
+  const fillEmpty = (key: string, tag: string, next: Record<string, string>) => {
+    const cur = (existing[key] ?? {}) as Record<string, unknown>;
+    let changed = false;
+    const merged: Record<string, unknown> = { ...cur };
+    for (const [k, v] of Object.entries(next)) {
+      if (isBlank(cur[k]) && v?.trim()) {
+        merged[k] = v;
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    rows.push({ project_id: projectId, data_key: key, data_value: merged });
+    prefilled.push(tag);
+  };
+  fillEmpty("vision_project_data", "vision", { name: d.ai.projectName, slogan: d.ai.slogan, ...d.ai.vision });
+  fillEmpty("ideation_lean_canvas", "canvas", d.ai.canvas as unknown as Record<string, string>);
   const bc = existing.business_case as BusinessCaseData | undefined;
   if (!bc?.revenue?.volume12 && !(bc?.costs ?? []).some((c) => c.amount > 0)) {
     rows.push({ project_id: projectId, data_key: "business_case", data_value: caseFromDiagnosis(d.ai) });

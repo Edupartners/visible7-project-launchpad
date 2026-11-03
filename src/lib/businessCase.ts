@@ -341,7 +341,7 @@ export const GROUP_COPY: Record<
   subscription: {
     title: "Předplatné a kurzy",
     price: "Cena za měsíc (Kč)",
-    priceHint: "např. 490",
+    priceHint: "např. 490 (6 měsíců za 2 990 Kč = 498)",
     volume: "Nových zákazníků za měsíc ve 12. měsíci",
     volumeHint: "např. 30",
     marginHint: "U digitálního obsahu bývá 80–95 % (odečtěte platební bránu a platformu).",

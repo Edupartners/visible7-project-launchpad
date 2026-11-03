@@ -1062,6 +1062,15 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
           </p>
         ) : (
           <>
+            {(m.profitMargin > 50 || (m.roi ?? 0) > 1000) && (
+              <p className="mb-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200" role="status">
+                <b>Čísla vypadají až příliš dobře</b> (marže zisku {pct(m.profitMargin)}
+                {m.roi !== null ? `, návratnost vložených peněz ${pct(m.roi)}` : ""}). Zkontrolujte hlavně cenu a objem.
+                {group === "subscription" &&
+                  " Cena je za měsíc: když prodáváte členství na delší období (např. 2 990 Kč na 6 měsíců), zadejte ji přepočtenou na měsíc (498 Kč)."}{" "}
+                Chybí-li vaše odměna nebo účetní, doplňte je do měsíčních nákladů.
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               <Stat label="Obrat" value={czk(m.revenueTotal)} help={HELP.obrat} />
               <Stat
