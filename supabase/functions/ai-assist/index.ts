@@ -1087,12 +1087,12 @@ Deno.serve(async (req) => {
     output.revenue = Object.fromEntries(
       REVENUE_ALL.map((f) => [f, Math.round(Math.min(Math.max(Number(rv[f]) || 0, 0), max[f] ?? 100) * 10) / 10]),
     );
-    output.costs = ((output.costs as Record<string, unknown>[]) ?? [])
+    output.costs = (Array.isArray(output.costs) ? (output.costs as Record<string, unknown>[]) : [])
       .filter((c) => ["jednorazove", "mesicni", "marketing"].includes(String(c.kind)) && str(c.name, 70))
       .slice(0, 10)
       .map((c) => ({ name: str(c.name, 70), kind: String(c.kind), amount: Math.round(Math.min(Math.max(Number(c.amount) || 0, 0), 10_000_000)) }));
-    output.risks = ((output.risks as Record<string, unknown>[]) ?? []).slice(0, 3).map((r) => ({ risk: str(r.risk, 240), test: str(r.test, 240) }));
-    output.strengths = ((output.strengths as unknown[]) ?? []).slice(0, 3).map((x) => str(x, 240)).filter(Boolean);
+    output.risks = (Array.isArray(output.risks) ? (output.risks as Record<string, unknown>[]) : []).slice(0, 3).map((r) => ({ risk: str(r.risk, 240), test: str(r.test, 240) }));
+    output.strengths = (Array.isArray(output.strengths) ? (output.strengths as unknown[]) : []).slice(0, 3).map((x) => str(x, 240)).filter(Boolean);
     if (answers!.mode === "business") {
       const money = (x: unknown) => Math.round(Math.min(Math.max(Number(x) || 0, 0), 100_000_000));
       output.bottleneck = str(output.bottleneck, 200);
