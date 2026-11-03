@@ -1038,6 +1038,16 @@ Deno.serve(async (req) => {
   }
 
   const output = result.output;
+  // Model občas vrátí vnořený objekt nebo pole jako text s JSON. Rozbalíme ho, jinak by se pole potichu vynulovala.
+  for (const [k, val] of Object.entries(output)) {
+    if (typeof val === "string" && /^\s*[[{]/.test(val)) {
+      try {
+        output[k] = JSON.parse(val);
+      } catch {
+        /* necháme text */
+      }
+    }
+  }
   if (action === "canvas_suggest" && !(String(output.businessType) in BUSINESS_TYPES)) output.businessType = "vlastni-napad-app";
   // Jen povolená pole, rozumné meze, jedno doporučení na pole.
   const cleanRevenue = (list: unknown, allowed: string[]) => {
@@ -1099,6 +1109,15 @@ Deno.serve(async (req) => {
         };
       }).filter((o) => o.title);
       output.verdict = { color: "zelena", headline: output.bottleneck, why: "" };
+    }
+    // Neúplný rentgen neukládáme ani nepočítáme do limitu: uživatel by viděl kapitál 0 Kč a „nenastane“.
+    const rev = output.revenue as Record<string, number>;
+    const canvasFilled = Object.values(output.canvas as Record<string, string>).filter(Boolean).length;
+    const hasNumbers = Object.values(rev).some((x) => x > 0);
+    const hasVerdict = Boolean((output.verdict as Record<string, string>).headline);
+    if (!hasVerdict || !hasNumbers || canvasFilled < 4) {
+      console.error("diagnose incomplete", { hasVerdict, hasNumbers, canvasFilled, keys: Object.keys(result.output) });
+      return json({ error: "AI vrátila neúplný výsledek. Zkuste rentgen prosím spustit znovu, do limitu se nepočítá." }, 502);
     }
   }
   if (action === "landing") {
