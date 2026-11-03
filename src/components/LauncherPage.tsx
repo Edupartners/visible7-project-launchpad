@@ -339,7 +339,10 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
-              Kompletní průvodce online podnikáním s certifikací
+              <span>
+                Kompletní průvodce online podnikáním s certifikací a možností státní zkoušky{" "}
+                <span className="whitespace-nowrap">{NSK_QUALIFICATION.code}</span>
+              </span>
             </p>
             <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.04] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
               <span className="block">Máte nápad na podnikání?</span>
