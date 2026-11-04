@@ -349,9 +349,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <span className="text-leaf-500">Začněte tím, že ho ověříte.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              <strong className="font-semibold text-foreground">Nejste na to sami.</strong>{" "}
-              {lessons.toLocaleString("cs-CZ")} krátkých návodů, AI asistenti a seniorní poradci. Od prvního plánu po
-              první zákazníky.
+              <strong className="font-semibold text-foreground">
+                První místo pro všechny, kteří to myslí s podnikáním vážně.
+              </strong>{" "}
+              Získejte vědomosti z praxe a možnost profesní kvalifikace{" "}
+              <span className="whitespace-nowrap">„Specialista internetového obchodu“</span>.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta
