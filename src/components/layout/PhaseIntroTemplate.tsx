@@ -171,7 +171,7 @@ export const PhaseIntroTemplate = ({
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-white/60" />
               <dt className="sr-only">AI</dt>
-              <dd>AI pomocník</dd>
+              <dd>AI Michal</dd>
             </div>
           )}
           <div className="flex items-center gap-2">

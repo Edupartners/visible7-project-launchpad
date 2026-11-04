@@ -32,7 +32,7 @@ const IdeationPage = () => {
     { text: "Celý byznys na jedné stránce – 8 polí Lean Canvasu", color: "bg-violet-500" },
     { text: "Navázání na modrý oceán: zákazník, problém, USP", color: "bg-emerald-500" },
     { text: "Volba typu online byznysu", color: "bg-orange-500" },
-    { text: "Vyhodnocení canvasu s AI mentorem", color: "bg-cyan-500" },
+    { text: "Vyhodnocení canvasu s AI Michalem", color: "bg-cyan-500" },
   ];
 
   if (showIntro) {
@@ -41,7 +41,7 @@ const IdeationPage = () => {
         <PhaseIntroTemplate
           title="Ideace"
           subtitle="Celý byznys na jedné stránce"
-          description="Z modrého oceánu převezmeme zákazníka, problém a USP. AI pomocník navrhne zbylá pole – řešení, kanály, náklady a příjmy – a odhadne typ online byznysu. Vy rozhodnete, co použijete. Nakonec canvas vyhodnotí AI mentor."
+          description="Z modrého oceánu převezmeme zákazníka, problém a USP. AI Michal navrhne zbylá pole – řešení, kanály, náklady a příjmy – a odhadne typ online byznysu. Vy rozhodnete, co použijete. Nakonec canvas vyhodnotí AI mentor."
           phaseNumber={2}
           icon={Lightbulb}
           learningPoints={learningPoints}

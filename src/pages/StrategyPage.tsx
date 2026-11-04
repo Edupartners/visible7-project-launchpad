@@ -32,7 +32,7 @@ const StrategyPage = () => {
     { text: "Obrat, zisk a marže na dva roky dopředu", color: "bg-emerald-500" },
     { text: "Potřebný kapitál, bod zvratu a návratnost", color: "bg-blue-500" },
     { text: "Kolik smíte dát do marketingu (PNO z vaší marže)", color: "bg-orange-500" },
-    { text: "Tři scénáře a komentář AI mentora", color: "bg-violet-500" },
+    { text: "Tři scénáře a komentář AI Michala", color: "bg-violet-500" },
   ];
 
   if (showIntro) {

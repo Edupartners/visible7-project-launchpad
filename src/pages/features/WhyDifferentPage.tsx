@@ -44,7 +44,7 @@ const PILLARS: Pillar[] = [
   {
     icon: Bot,
     title: "AI asistence",
-    text: "AI pomocník navrhne obsah, AI mentor zhodnotí výsledek.",
+    text: "AI Michal navrhne obsah a zhodnotí výsledek.",
     to: "/test-napadu",
   },
   {

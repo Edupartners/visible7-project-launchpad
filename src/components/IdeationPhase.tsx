@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AI_NAME, AiMichalAvatar, AiMichalNote } from "@/components/AiMichal";
 import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
@@ -316,12 +317,14 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
         </div>
       )}
 
-      {/* AI pomocník */}
+      {/* AI Michal */}
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
+            <AiMichalAvatar />
             <div>
-              <h3 className="text-lg font-semibold">AI pomocník</h3>
+              <h3 className="text-lg font-semibold">{AI_NAME}</h3>
+              <AiMichalNote />
               <p className="text-sm text-muted-foreground">
                 Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u
                 každého pole sami rozhodnete.

@@ -1,4 +1,5 @@
 import { track } from "@/lib/track";
+import { AI_NAME, AiMichalAvatar, AiMichalNote } from "@/components/AiMichal";
 import { AiPrivacyNote } from "@/components/AiPrivacyNote";
 import { useAccess } from "@/lib/access";
 import { useEffect, useMemo, useState } from "react";
@@ -1277,17 +1278,21 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       {/* Komentář AI */}
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h3 className="text-lg font-bold">Komentář AI mentora</h3>
-            <p className="text-sm text-muted-foreground">
-              Projde spočítaná čísla všech tří scénářů a řekne, kde je plán citlivý a co si ověřit. Čísla nevymýšlí.
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {hasRevenue && hasCosts
-                ? `Zbývá ${Math.max(0, AI_LIMITS.vyhodnoceni - commentsUsed)} z ${AI_LIMITS.vyhodnoceni} komentářů pro tento projekt.`
-                : "Nejdřív vyplňte příjmy a alespoň jeden náklad."}
-            </p>
-            <AiPrivacyNote className="mt-2" />
+          <div className="flex items-start gap-3">
+            <AiMichalAvatar />
+            <div>
+              <h3 className="text-lg font-bold">Komentář: {AI_NAME}</h3>
+              <AiMichalNote />
+              <p className="text-sm text-muted-foreground">
+                Projde spočítaná čísla všech tří scénářů a řekne, kde je plán citlivý a co si ověřit. Čísla nevymýšlí.
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {hasRevenue && hasCosts
+                  ? `Zbývá ${Math.max(0, AI_LIMITS.vyhodnoceni - commentsUsed)} z ${AI_LIMITS.vyhodnoceni} komentářů pro tento projekt.`
+                  : "Nejdřív vyplňte příjmy a alespoň jeden náklad."}
+              </p>
+              <AiPrivacyNote className="mt-2" />
+            </div>
           </div>
           <Button
             variant={comment ? "outline" : "default"}

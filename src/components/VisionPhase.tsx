@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
 import { useNavigate } from "react-router-dom";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ReferenceArea,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   AlertTriangle,
   ArrowDown,
@@ -192,13 +202,19 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           .map((i) => ({
             name: shorten(i.text.trim()),
             full: `${q.title}: ${i.text.trim()}`,
+            ocean: q.key === "raise" || q.key === "create",
             "Low-cost konkurence": q.key === "create" ? 0 : i.lowCost,
             "Prémiová konkurence": q.key === "create" ? 0 : i.premium,
             "Můj projekt": q.key === "eliminate" ? 0 : i.mine,
           })),
-      ),
+      ).map((p, x) => ({ ...p, x })),
     [errc],
   );
+  // Modrý oceán = souvislý úsek položek Zvýšit a Vytvořit (v matici jdou za sebou).
+  const ocean = useMemo(() => {
+    const xs = curve.filter((p) => p.ocean).map((p) => p.x);
+    return xs.length ? { from: Math.min(...xs) - 0.45, to: Math.max(...xs) + 0.45 } : null;
+  }, [curve]);
 
   const suggestUsp = () => {
     const created = errcTexts(errc, "create");
@@ -551,7 +567,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           icon={TrendingUp}
           step={4}
           title="Hodnotová křivka"
-          subtitle="Kreslí se sama z matice. Modrý oceán je tam, kde vaše čára vede jinudy než obě konkurence."
+          subtitle="Kreslí se sama z matice. Vaše křivka je zelená. Modrý obdélník ukazuje modrý oceán: co zvyšujete a co vytváříte nového, tedy kde vedete jinudy než obě konkurence."
         />
         {curve.length === 0 ? (
           <p className="rounded-xl bg-muted/60 p-6 text-center text-sm text-muted-foreground">
@@ -563,9 +579,12 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
               <LineChart data={curve} margin={{ top: 10, right: 24, left: -16, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis
-                  dataKey="name"
+                  dataKey="x"
+                  type="number"
+                  domain={[-0.6, Math.max(curve.length - 0.4, 0.4)]}
+                  ticks={curve.map((p) => p.x)}
+                  tickFormatter={(x: number) => curve[x]?.name ?? ""}
                   interval={0}
-                  padding={{ left: 30, right: 30 }}
                   angle={-30}
                   textAnchor="end"
                   height={70}
@@ -576,6 +595,27 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                   ticks={[0, 25, 50, 75, 100]}
                   tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 />
+                {ocean && (
+                  <ReferenceArea
+                    x1={ocean.from}
+                    x2={ocean.to}
+                    y1={0}
+                    y2={100}
+                    fill="#2563eb"
+                    fillOpacity={0.08}
+                    stroke="#2563eb"
+                    strokeDasharray="6 4"
+                    strokeWidth={1.5}
+                    ifOverflow="extendDomain"
+                    label={{
+                      value: "Modrý oceán",
+                      position: "insideTop",
+                      fill: "#1d4ed8",
+                      fontSize: 13,
+                      fontWeight: 700,
+                    }}
+                  />
+                )}
                 <Tooltip labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string })?.full ?? ""} />
                 <Legend verticalAlign="top" height={32} wrapperStyle={{ fontSize: 13 }} />
                 <Line
@@ -601,7 +641,14 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />
-                <Line type="linear" dataKey="Můj projekt" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4 }} />
+                <Line
+                  type="linear"
+                  dataKey="Můj projekt"
+                  stroke="#16a34a"
+                  strokeWidth={4}
+                  dot={{ r: 5, fill: "#16a34a" }}
+                  activeDot={{ r: 7 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>

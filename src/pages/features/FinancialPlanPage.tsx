@@ -92,11 +92,11 @@ const FinancialPlanPage = () => {
         alt: "PNO a poměr hodnoty zákazníka k ceně za jeho získání",
       },
       {
-        eyebrow: "AI mentor",
+        eyebrow: "AI Michal",
         title: "Druhý pohled na vaše čísla",
-        text: "AI mentor projde všechny tři scénáře a řekne, kde je plán citlivý, co si ověřit a co udělat jako první. Čísla nevymýšlí, pracuje jen s tím, co aplikace spočítala.",
+        text: "AI Michal projde všechny tři scénáře a řekne, kde je plán citlivý, co si ověřit a co udělat jako první. Čísla nevymýšlí, pracuje jen s tím, co aplikace spočítala.",
         image: `${IMG}ai-mentor.webp`,
-        alt: "Komentář AI mentora: kde je plán citlivý, co si ověřit a co udělat teď",
+        alt: "Komentář AI Michala: kde je plán citlivý, co si ověřit a co udělat teď",
       },
       {
         eyebrow: "Mapa cesty A → D",

@@ -82,7 +82,7 @@ export const GateLock = ({ gate, children }: { gate: number; children: React.Rea
             {[
               "Všechny brány a videonávody",
               "Byznys case, plán tvorby, marketing, spuštění a růst",
-              "AI asistent u každé brány",
+              "AI Michal u každé brány",
             ].map((t) => (
               <li key={t} className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-emerald-400" strokeWidth={3} /> {t}

@@ -93,7 +93,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
   {
     group: "AI asistence",
     rows: [
-      ["AI pomocník navrhne obsah, AI mentor zhodnotí výsledek", "brány 1–2", true],
+      ["AI Michal navrhne obsah a zhodnotí výsledek", "brány 1–2", true],
       ["AI návrh čísel, nákladů a textů webu projektu", false, true],
     ],
   },
@@ -151,7 +151,7 @@ const CellMark = ({ v }: { v: Cell }) =>
 const MEMBER_ITEMS = [
   "Všech 7 bran a přes 100 videonávodů",
   "Živé online semináře jednou měsíčně a jejich záznamy",
-  "AI asistent u každé brány",
+  "AI Michal u každé brány",
   "Byznys case, Excel a pitch na A4",
   "Osvědčení za každou bránu",
 ];
