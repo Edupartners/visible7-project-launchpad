@@ -10,7 +10,15 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/visible7/client";
 import { AI_LIMITS, callAi, loadAiUsage } from "@/lib/ai";
 import { loadProjectKeys } from "@/lib/projectData";
-import { MARKET_KEY, type MarketSize, REGION_LABEL, sharePct, shortCzk, shortCzkText } from "@/lib/market";
+import {
+  MARKET_KEY,
+  MARKET_SIZE_ENABLED,
+  type MarketSize,
+  REGION_LABEL,
+  sharePct,
+  shortCzk,
+  shortCzkText,
+} from "@/lib/market";
 import { type BusinessCaseData, type MonthRow, groupOf, simulate } from "@/lib/businessCase";
 
 /** Texty pitche (z AI, uživatel je může upravit přímo na stránce). */
@@ -406,7 +414,7 @@ const InvestorPitchPage = () => {
             </p>
           )}
           {numbers && <AiPrivacyNote className="mt-2" />}
-          {numbers && !market && (
+          {MARKET_SIZE_ENABLED && numbers && !market && (
             <p className="mt-3 rounded-lg bg-leaf-50 p-3 text-sm text-leaf-800 ring-1 ring-leaf-200">
               Investor se skoro vždy zeptá, jak velký je trh.{" "}
               <Link to="/ideation" className="font-semibold underline">

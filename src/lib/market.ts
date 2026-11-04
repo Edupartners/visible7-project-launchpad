@@ -84,3 +84,6 @@ export async function marketRunsUsed(projectId: string) {
     .eq("phase", "m");
   return count ?? 0;
 }
+
+/** Velikost trhu (TAM/SAM/SOM) ve fázi 2. Pro pilot vypnuto: výpočet s vyhledáváním trvá dlouho. */
+export const MARKET_SIZE_ENABLED = false;

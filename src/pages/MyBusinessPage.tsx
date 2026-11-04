@@ -41,7 +41,7 @@ const TILES = [
     to: "/investor-pitch",
     icon: Presentation,
     title: "Pitch pro banku nebo investora",
-    text: "Jedna strana A4 s velkými čísly z vašeho plánu a velikostí trhu.",
+    text: "Jedna strana A4 s velkými čísly z vašeho plánu.",
   },
 ];
 
