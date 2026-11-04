@@ -12,7 +12,6 @@ import { TrustBand } from "@/components/marketing/TrustBand";
 import { FeaturedCourses } from "@/components/marketing/FeaturedCourses";
 import { OwnNumbers } from "@/components/marketing/OwnNumbers";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
-import { useLessonStats } from "@/lib/courses";
 import {
   ArrowRight,
   Award,
@@ -302,7 +301,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const offer = useFounderOffer();
   const academy = academyOffer();
   const author = ADVISORS.find((a) => a.name.includes("Míček"));
-  const { lessons } = useLessonStats();
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
     const id = window.location.hash.slice(1);
