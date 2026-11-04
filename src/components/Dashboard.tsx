@@ -9,6 +9,8 @@ import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
 import { DashboardJourney } from "./diagnosis/DashboardJourney";
+import { JourneyGuide } from "./guide/JourneyGuide";
+import { stageFor } from "@/lib/guide";
 import { GrowthBadge } from "./GrowthBadge";
 import { DIAGNOSIS_KEY } from "@/lib/diagnosis";
 import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
@@ -183,6 +185,10 @@ export const Dashboard = (_props: DashboardProps) => {
             <GrowthBadge currentCompleted={doneCount} />
           </div>
         </header>
+
+        {currentProject?.id && !diagnosisLoading && (
+          <JourneyGuide projectId={currentProject.id} stage={stageFor(Boolean(diagnosis), completedPhases)} />
+        )}
 
         <DashboardAnnouncements />
 
