@@ -261,7 +261,7 @@ const Cta = ({
     type="button"
     onClick={onClick}
     // Lichoběžník jako uvnitř aplikace (tlačítko „Otevřít bránu“): signální limetková s tmavým textem.
-    className={`v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 ${
+    className={`v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 ${
       light ? "focus-visible:ring-signal/60" : "focus-visible:ring-primary/40"
     }`}
   >
@@ -364,7 +364,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               </Cta>
               <a
                 href="#uvnitr"
-                className="inline-flex h-14 items-center justify-center gap-2 border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+                className="v7-phi-out inline-flex h-14 items-center justify-center gap-2 border-2 border-primary px-6 text-base font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
               >
                 Jak to funguje
                 <Play className="h-4 w-4" aria-hidden="true" />

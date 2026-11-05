@@ -78,7 +78,7 @@ const CertificationPage = () => {
             <button
               type="button"
               onClick={start}
-              className="v7-trap-btn pl-6 pr-12 py-4 font-bold text-signal-foreground"
+              className="v7-trap-btn v7-phi-lg pl-6 pr-12 py-4 font-bold text-signal-foreground"
             >
               Otestovat nápad zdarma
             </button>
@@ -224,7 +224,7 @@ const CertificationPage = () => {
           <button
             type="button"
             onClick={start}
-            className="v7-trap-btn mt-8 pl-6 pr-12 py-4 font-bold text-signal-foreground"
+            className="v7-trap-btn v7-phi-lg mt-8 pl-6 pr-12 py-4 font-bold text-signal-foreground"
           >
             Otestovat nápad zdarma
           </button>

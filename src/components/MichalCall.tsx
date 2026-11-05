@@ -34,7 +34,7 @@ export const MichalCallCard = ({ from, title }: { from: string; title?: string }
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => open(from)}
-      className="v7-trap-btn inline-flex h-12 shrink-0 items-center justify-center gap-2 pl-6 pr-11 font-bold text-signal-foreground"
+      className="v7-trap-btn v7-phi-sm inline-flex h-12 shrink-0 items-center justify-center gap-2 pl-6 pr-11 font-bold text-signal-foreground"
     >
       <CalendarDays className="h-5 w-5" aria-hidden="true" /> Vybrat termín hovoru
     </a>

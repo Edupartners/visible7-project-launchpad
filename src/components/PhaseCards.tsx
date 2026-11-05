@@ -195,7 +195,7 @@ export const PhaseCards = ({
                     ) : (
                       <Button
                         variant={isCurrent ? "default" : "outline"}
-                        className={isCurrent ? "v7-trap-btn rounded-none font-bold text-signal-foreground" : "rounded-[10px]"}
+                        className={isCurrent ? "v7-trap-btn v7-phi-sm rounded-none font-bold text-signal-foreground" : "rounded-[10px]"}
                         onClick={() => onOpen(phase.route)}
                       >
                         {isDone ? "Otevřít fázi" : isCurrent ? (done.size === 0 ? "Začít" : "Pokračovat") : "Otevřít"}

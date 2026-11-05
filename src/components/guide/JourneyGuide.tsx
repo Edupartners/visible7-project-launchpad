@@ -191,7 +191,7 @@ export const JourneyGuide = ({ projectId, stage }: { projectId: string; stage: s
           <button
             type="button"
             onClick={() => close(true)}
-            className="v7-trap-btn inline-flex h-12 items-center justify-center gap-2 pl-6 pr-11 font-bold text-signal-foreground"
+            className="v7-trap-btn v7-phi-sm inline-flex h-12 items-center justify-center gap-2 pl-6 pr-11 font-bold text-signal-foreground"
           >
             {step.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>

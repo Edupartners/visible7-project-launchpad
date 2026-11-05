@@ -226,7 +226,7 @@ export const Dashboard = (_props: DashboardProps) => {
             </div>
             <Button
               onClick={() => navigate(next.route)}
-              className="v7-trap-btn h-12 shrink-0 self-start rounded-none pl-6 text-base font-bold text-signal-foreground focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-auto"
+              className="v7-trap-btn v7-phi-sm h-12 shrink-0 self-start rounded-none pl-6 text-base font-bold text-signal-foreground focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-auto"
             >
               {doneCount === 0 ? "Začít" : "Pokračovat"}
               <ArrowRight className="ml-2 h-5 w-5" />

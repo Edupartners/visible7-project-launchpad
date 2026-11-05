@@ -15,7 +15,7 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
       {!trialUsed && (
         <Button
           onClick={() => navigate("/kviz")}
-          className="v7-trap-btn h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
+          className="v7-trap-btn v7-phi-sm h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
         >
           <Gift className="mr-2 h-5 w-5" /> Jaký jste typ podnikatele? 3 dny zdarma
         </Button>
@@ -24,7 +24,7 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
         to="/cenik"
         className={`inline-flex h-12 items-center justify-center rounded-[10px] px-6 text-base font-semibold ${
           trialUsed
-            ? "v7-trap-btn pr-9 font-bold text-signal-foreground"
+            ? "v7-trap-btn v7-phi-sm pr-9 font-bold text-signal-foreground"
             : "border-2 border-white/40 text-white hover:bg-white/10"
         }`}
       >

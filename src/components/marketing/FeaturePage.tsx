@@ -96,7 +96,7 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
                 <button
                   type="button"
                   onClick={start}
-                  className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
+                  className="v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
                 >
                   {d.cta} <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -266,7 +266,7 @@ export const FeaturePage = ({ d }: { d: FeaturePageData }) => {
           <button
             type="button"
             onClick={start}
-            className="v7-trap-btn mt-8 inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
+            className="v7-trap-btn v7-phi-lg mt-8 inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
           >
             {d.cta} <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </button>

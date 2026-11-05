@@ -61,7 +61,7 @@ export const DashboardJourney = ({ prominent }: { prominent: boolean }) => {
         </div>
         <Button
           onClick={() => navigate("/rentgen")}
-          className="v7-trap-btn h-12 shrink-0 pl-6 pr-12 text-base font-bold text-signal-foreground"
+          className="v7-trap-btn v7-phi-sm h-12 shrink-0 pl-6 pr-12 text-base font-bold text-signal-foreground"
         >
           Udělat rentgen <ArrowRight className="ml-2 h-5 w-5" />
         </Button>

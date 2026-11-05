@@ -200,8 +200,26 @@
     inset: 0;
     z-index: -1;
     background: var(--trap-bg, hsl(var(--signal)));
-    clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, calc(100% - var(--s, 16px)) 100%, 0 100%);
     transition: filter 150ms;
+  }
+  /* Zlatý řez (φ = 1,618), shodně s visible7.cz: odsazení = písmo × φ, výška = písmo × φ²
+     (na mřížce 4 px, min. 44 px), zkosení = výška ÷ φ² – stejný úhel u všech velikostí. */
+  .v7-phi-sm,
+  .v7-phi-lg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  .v7-phi-sm { --s: 17px; height: 44px !important; font-size: 15px !important; padding-left: 24px !important; padding-right: 41px !important; }
+  .v7-phi-lg { --s: 18px; height: 48px !important; font-size: 18px !important; padding-left: 29px !important; padding-right: 47px !important; }
+  .v7-phi-out { height: 48px !important; font-size: 18px !important; padding-left: 29px !important; padding-right: 29px !important; }
+  @media (min-width: 640px) {
+    .v7-phi-out { height: 52px !important; font-size: 20px !important; padding-left: 32px !important; padding-right: 32px !important; }
+    .v7-phi-sm { font-size: 16px !important; padding-left: 26px !important; padding-right: 43px !important; }
+    .v7-phi-lg { --s: 20px; height: 52px !important; font-size: 20px !important; padding-left: 32px !important; padding-right: 52px !important; }
   }
   /* Varianta na světlý podklad (odznak úrovně) */
   .v7-trap-soft {
