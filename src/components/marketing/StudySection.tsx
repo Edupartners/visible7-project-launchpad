@@ -73,7 +73,7 @@ export const StudySection = () => {
   const open = studyOpen();
   return (
     <section id="studium" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-10 sm:px-8 md:pb-12 lg:px-12">
-      <div className="grid overflow-hidden rounded-3xl border border-leaf-200 bg-leaf-50 md:grid-cols-[1.4fr_1fr]">
+      <div className="grid overflow-hidden rounded-3xl border-[3px] border-signal bg-leaf-50 shadow-[0_12px_40px_-12px_rgba(52,132,90,0.35)] md:grid-cols-[1.4fr_1fr]">
         <div className="p-6 sm:p-8 lg:p-10">
           <p className="v7-para-sm inline-block bg-signal px-3 py-1 text-xs font-bold text-signal-foreground">
             Studium s lektory · {STUDY.period}
