@@ -52,6 +52,69 @@ const POSITIONS = [
   },
 ];
 
+const MODULES: { title: string; topics: string[] }[] = [
+  {
+    title: "Start projektu",
+    topics: [
+      "Vize a strategie modrého oceánu",
+      "Plánování na Canvasu",
+      "Vlastnosti startupu a fáze projektu",
+      "12+1 typů online byznysu",
+      "Marketingové strategie",
+      "Metoda VISIBLE7",
+    ],
+  },
+  {
+    title: "Ekonomika online projektu",
+    topics: ["Kalkulace nákladů, tržeb, zisku a ztráty", "Byznys case a návratnost (ROI)"],
+  },
+  {
+    title: "AI master class",
+    topics: ["GPT, Claude, Gemini, Gamma, Google AI Studio", "VibeCoding", "Tvorba agentů a automatizací"],
+  },
+  {
+    title: "Tvorba produktového webu",
+    topics: ["Hosting, doména, SSL", "Konverzní web", "Statický web nebo redakční systém"],
+  },
+  {
+    title: "Vlastní e-shop",
+    topics: ["Krabicové nebo open-source řešení", "Instalace e-shopového systému", "Šablony a úpravy"],
+  },
+  { title: "Další online modely", topics: ["Online kurzy", "Squeeze page", "Fóra", "Web a e-shop dohromady"] },
+  {
+    title: "Online marketing",
+    topics: [
+      "Srovnávače a katalogy",
+      "PPC: Sklik a Google Ads",
+      "Reklama v GPT",
+      "SEO",
+      "Sociální sítě",
+      "E-mail a SMS",
+      "PR a kreativní obsah",
+    ],
+  },
+  {
+    title: "Online analytika",
+    topics: ["Google Analytics 4", "Google Tag Manager", "Google Search Console", "Reporty"],
+  },
+  {
+    title: "Legislativa",
+    topics: ["Volba formy podnikání", "Povinnosti e-shopu", "Jednání s úřady", "GDPR", "Ochrana značky"],
+  },
+];
+
+const LECTURERS: [string, string][] = [
+  ["Andrea Votrubová", "copywriting, SEO, PR"],
+  ["Renata Dimitrov", "placené kampaně na Facebooku a Instagramu"],
+  ["Lukáš Gvuzď", "PPC, SEO, Google Analytics 4"],
+  ["Veronika Miklová", "nastavení a správa PPC kampaní"],
+  ["Patrik Zapletal", "affiliate marketing a kampaně"],
+  ["Hana Antonová", "online grafická reklama"],
+  ["Honza Novák", "data, programování a AI"],
+  ["Tomáš Chára", "AI procesy a automatizace"],
+  ["Ivan Liďák", "WordPress a IT podpora"],
+];
+
 const TIMELINE = [
   {
     when: "11. 2. 2027",
@@ -61,7 +124,7 @@ const TIMELINE = [
   {
     when: "únor–červen",
     title: `${STUDY.sessions} online setkání s lektory`,
-    text: "Mezi setkáními pracujete na svém projektu ve VISIBLE7, s návody, průvodcem a AI Michalem.",
+    text: "Jednou týdně 17:00–20:00 online (Google Meet), celkem asi 60 hodin. Mezi setkáními pracujete na svém projektu ve VISIBLE7.",
   },
   {
     when: "průběžně",
@@ -100,7 +163,7 @@ const CertificationPage = () => {
     {
       icon: Users,
       title: `${STUDY.sessions} online setkání s lektory z praxe`,
-      text: "Živě, s možností ptát se. Od webu a e-shopu přes marketing až po čísla vašeho byznysu.",
+      text: "Jednou týdně 17:00–20:00 online, celkem asi 60 hodin. Živě, s možností ptát se. Devět modulů od nápadu po analytiku.",
     },
     {
       icon: GraduationCap,
@@ -262,6 +325,53 @@ const CertificationPage = () => {
               </ul>
             </div>
           </div>
+        </section>
+
+        {/* Program po modulech */}
+        <section id="program" className="mx-auto max-w-6xl scroll-mt-24 px-4 pt-20 sm:px-8 lg:px-12">
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Program studia: 9 modulů</h2>
+          <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+            {STUDY.sessions} online setkání, jednou týdně 17:00–20:00 přes Google Meet. Celkem asi 60 hodin s lektory z
+            praxe.
+          </p>
+          <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {MODULES.map((m, i) => (
+              <li key={m.title} className="rounded-2xl border border-border bg-card p-6">
+                <p className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-signal text-sm font-extrabold text-signal-foreground">
+                    {i + 1}
+                  </span>
+                  <span className="text-lg font-bold leading-snug">{m.title}</span>
+                </p>
+                <ul className="mt-4 flex flex-wrap gap-1.5">
+                  {m.topics.map((t) => (
+                    <li key={t} className="rounded-full bg-leaf-50 px-2.5 py-1 text-sm text-leaf-800">
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+
+          <h3 className="mt-14 text-2xl font-extrabold tracking-tight">Lektoři z praxe</h3>
+          <p className="mt-2 text-muted-foreground">Garantem studia je Michal Míček.</p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {LECTURERS.map(([name, focus]) => (
+              <li key={name} className="flex items-center gap-3 rounded-xl border border-border p-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                  {name
+                    .split(" ")
+                    .map((w) => w[0])
+                    .join("")}
+                </span>
+                <span>
+                  <span className="block font-semibold">{name}</span>
+                  <span className="block text-sm text-muted-foreground">{focus}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Harmonogram */}
