@@ -8,6 +8,8 @@ import { track } from "@/lib/track";
 import { useLessonStats } from "@/lib/courses";
 import { STUDY, studyOffer, studyOpen } from "@/lib/study";
 import { StudySection } from "@/components/marketing/StudySection";
+import { FearsSection } from "@/components/marketing/FearsSection";
+import { FEARS } from "@/lib/fears";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { TrustBand } from "@/components/marketing/TrustBand";
@@ -176,6 +178,7 @@ const FAQ = [
   ],
   ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
+  ...FEARS.map((f) => [f.faq, f.answer]),
 ];
 
 /** Kontrolní body mezi branami (volně podle modelu Stage-Gate R. G. Coopera). */
@@ -724,6 +727,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
           </div>
         </section>
+
+        <FearsSection from="landing" />
 
         <SavingsCalculator onStart={onAccessGranted} />
 

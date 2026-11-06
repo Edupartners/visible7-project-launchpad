@@ -29,6 +29,7 @@ import { FREE_CONSULT_URL, kc, monthsLabel, useShop } from "@/lib/shop";
 import { STUDY, studyOpen } from "@/lib/study";
 import { track } from "@/lib/track";
 import { ADVISORS } from "@/lib/advisors";
+import { FearsSection } from "@/components/marketing/FearsSection";
 
 const POSITIONS = [
   {
@@ -540,6 +541,8 @@ const CertificationPage = () => {
             </div>
           </div>
         </section>
+
+        <FearsSection from="studium_page" compact />
 
         {/* Závěr */}
         <section className="mx-auto max-w-4xl px-4 py-20 sm:px-8">
