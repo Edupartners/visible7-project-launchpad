@@ -28,6 +28,7 @@ import { hoursFloor10, useLessonStats } from "@/lib/courses";
 import { FREE_CONSULT_URL, kc, monthsLabel, useShop } from "@/lib/shop";
 import { STUDY, studyOpen } from "@/lib/study";
 import { track } from "@/lib/track";
+import { ADVISORS } from "@/lib/advisors";
 
 const POSITIONS = [
   {
@@ -114,6 +115,12 @@ const LECTURERS: [string, string][] = [
   ["Tomáš Chára", "AI procesy a automatizace"],
   ["Ivan Liďák", "WordPress a IT podpora"],
 ];
+
+/** Fotka lektora z karet poradců (podle příjmení). */
+const photoOf = (name: string) => {
+  const surname = name.split(" ").slice(-1)[0];
+  return ADVISORS.find((a) => a.name.includes(surname) && a.photo)?.photo;
+};
 
 const TIMELINE = [
   {
@@ -355,22 +362,47 @@ const CertificationPage = () => {
           </ol>
 
           <h3 className="mt-14 text-2xl font-extrabold tracking-tight">Lektoři z praxe</h3>
-          <p className="mt-2 text-muted-foreground">Garantem studia je Michal Míček.</p>
+          <div className="mt-4 flex items-center gap-4">
+            {photoOf("Michal Míček") && (
+              <img
+                src={photoOf("Michal Míček")}
+                alt="Michal Míček"
+                loading="lazy"
+                className="h-16 w-16 rounded-full object-cover ring-2 ring-signal"
+              />
+            )}
+            <p className="text-muted-foreground">
+              Garantem studia je <span className="font-semibold text-foreground">Michal Míček</span>, zakladatel Edu
+              Partners a autor metodiky VISIBLE7 MICEK®.
+            </p>
+          </div>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {LECTURERS.map(([name, focus]) => (
-              <li key={name} className="flex items-center gap-3 rounded-xl border border-border p-4">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-                  {name
-                    .split(" ")
-                    .map((w) => w[0])
-                    .join("")}
-                </span>
-                <span>
-                  <span className="block font-semibold">{name}</span>
-                  <span className="block text-sm text-muted-foreground">{focus}</span>
-                </span>
-              </li>
-            ))}
+            {LECTURERS.map(([name, focus]) => {
+              const photo = photoOf(name);
+              return (
+                <li key={name} className="flex items-center gap-4 rounded-2xl border border-border p-4">
+                  {photo ? (
+                    <img
+                      src={photo}
+                      alt={name}
+                      loading="lazy"
+                      className="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-signal"
+                    />
+                  ) : (
+                    <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white">
+                      {name
+                        .split(" ")
+                        .map((w) => w[0])
+                        .join("")}
+                    </span>
+                  )}
+                  <span>
+                    <span className="block font-semibold">{name}</span>
+                    <span className="block text-sm text-muted-foreground">{focus}</span>
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </section>
 
