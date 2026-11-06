@@ -38,7 +38,7 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: "Ceník", to: "/cenik" },
       { label: "E-learning", to: "/e-learning" },
-      { label: "Certifikace", to: "/certifikace" },
+      { label: "Studium a certifikace", to: "/studium" },
       { label: "Váš nápad a data", to: "/bezpecnost" },
       { label: "Digitální kancelář", to: "/digitalni-kancelar" },
       { label: "Poradci z praxe", to: "/#poradci" },

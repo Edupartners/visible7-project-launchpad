@@ -197,20 +197,20 @@ export const NAV_MENUS: NavMenu[] = [
         items: [
           { title: "Osvědčení za každou bránu", hint: "S ověřením online podle kódu", icon: Award, to: "/certifikace" },
           {
-            title: "Certifikace se zkouškou",
-            hint: "Volitelně státem uznaná profesní kvalifikace",
+            title: "Studium Specialista internetového obchodu",
+            hint: "Semestr s lektory a státní zkouškou v ceně",
             icon: GraduationCap,
-            to: "/certifikace",
+            to: "/studium",
           },
         ],
         more: { label: "Celý obsah programu", to: "/certifikace" },
       },
     ],
     feature: {
-      title: "Plánovač, kurz a certifikace v jednom",
-      text: "Běžný plánovač vám dá šablonu. U nás se k tomu naučíte, jak plán opravdu provést, a doložíte to certifikátem.",
-      cta: "Certifikace a zkouška",
-      to: "/certifikace",
+      title: "Semestrální studium s lektory",
+      text: "20 online setkání, vlastní projekt, e-learning a státní zkouška profesní kvalifikace v jedné ceně.",
+      cta: "Zobrazit studium",
+      to: "/studium",
     },
   },
   {

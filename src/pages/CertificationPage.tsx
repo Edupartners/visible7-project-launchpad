@@ -1,30 +1,33 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Award, BadgeCheck, Briefcase, Check, FileText, Linkedin, QrCode, Rocket } from "lucide-react";
+import {
+  Award,
+  BadgeCheck,
+  Bot,
+  Briefcase,
+  CalendarDays,
+  Check,
+  Compass,
+  FileText,
+  GraduationCap,
+  Linkedin,
+  MapPin,
+  MessagesSquare,
+  PlayCircle,
+  QrCode,
+  Rocket,
+  Users,
+  Video,
+} from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
+import { StudyCtas, StudyPrice } from "@/components/marketing/StudySection";
 import { SPECIALIST_TITLE, certificateSyllabus } from "@/lib/certificates";
-import { NSK_QUALIFICATION } from "@/lib/qualification";
-
-const LADDER = [
-  {
-    when: "Brány 1–5",
-    title: "Osvědčení za každou fázi",
-    text: "Vize, Ideace, Strategie a čísla, Implementace, Budování poptávky.",
-  },
-  {
-    when: "Po bráně 5",
-    title: SPECIALIST_TITLE,
-    text: "Celková certifikace s přílohou obsahu programu a výčtem prokázaných dovedností.",
-    main: true,
-  },
-  { when: "Brány 6–7", title: "VISIBLE7 Gold", text: "Za spuštěný projekt s ověřeným IČO a odkazem na web." },
-  {
-    when: "Volitelně",
-    title: "Státní profesní kvalifikace",
-    text: `${NSK_QUALIFICATION.name} (${NSK_QUALIFICATION.code}), zkouška u Edu Partners.`,
-  },
-];
+import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
+import { hoursFloor10, useLessonStats } from "@/lib/courses";
+import { FREE_CONSULT_URL, kc, monthsLabel, useShop } from "@/lib/shop";
+import { STUDY, studyOpen } from "@/lib/study";
+import { track } from "@/lib/track";
 
 const POSITIONS = [
   {
@@ -49,11 +52,42 @@ const POSITIONS = [
   },
 ];
 
-/** Veřejná stránka certifikace: cesta k osvědčením, obsah programu a uplatnění. */
+const TIMELINE = [
+  {
+    when: "11. 2. 2027",
+    title: "Start studia",
+    text: "První online setkání. Vyberete si projekt, na kterém budete celé studium pracovat.",
+  },
+  {
+    when: "únor–červen",
+    title: `${STUDY.sessions} online setkání s lektory`,
+    text: "Mezi setkáními pracujete na svém projektu ve VISIBLE7, s návody, průvodcem a AI Michalem.",
+  },
+  {
+    when: "průběžně",
+    title: "Konzultace vašeho byznysu",
+    text: "Lektoři se podívají přímo na váš projekt a poradí, co zlepšit.",
+  },
+  {
+    when: "červen, Praha",
+    title: "Závěrečný den",
+    text: `Obhajoba projektu a zkouška profesní kvalifikace ${NSK_QUALIFICATION.code}.`,
+  },
+  {
+    when: "do 15. 6. 2027",
+    title: "Hotovo",
+    text: "Máte vlastní projekt, certifikaci VISIBLE7 a státem uznané osvědčení.",
+  },
+];
+
+/** Veřejná stránka studia Specialista internetového obchodu (dříve jen certifikace): vše, co studium obsahuje. */
 const CertificationPage = () => {
   const navigate = useNavigate();
+  const shop = useShop();
+  const { hours, lessons } = useLessonStats();
   const start = () => navigate("/home?novy");
   const syllabus = certificateSyllabus("gold", null);
+  const open = studyOpen();
   const { hash } = useLocation();
   useEffect(() => {
     if (!hash) return;
@@ -61,50 +95,191 @@ const CertificationPage = () => {
     return () => clearTimeout(t);
   }, [hash]);
 
+  /** Co všechno je ve studiu. Ceny „samostatně“ jen tam, kde je opravdu prodáváme zvlášť. */
+  const VALUE: { icon: typeof Award; title: string; text: string; alone?: string }[] = [
+    {
+      icon: Users,
+      title: `${STUDY.sessions} online setkání s lektory z praxe`,
+      text: "Živě, s možností ptát se. Od webu a e-shopu přes marketing až po čísla vašeho byznysu.",
+    },
+    {
+      icon: GraduationCap,
+      title: `Státní zkouška ${NSK_QUALIFICATION.code} v ceně`,
+      text: "Osvědčení o profesní kvalifikaci Specialista internetového obchodu, uznané státem a platné v celé ČR.",
+      alone: kc(EXAM_PRICES.regular),
+    },
+    {
+      icon: Rocket,
+      title: "Vlastní projekt",
+      text: "Web nebo e-shop, marketing a čísla. Nestudujete teorii, stavíte svůj byznys a na konci ho obhájíte.",
+    },
+    {
+      icon: MessagesSquare,
+      title: "Konzultace vašeho byznysu",
+      text: "Lektoři projdou přímo váš projekt. Žádné obecné rady, ale co máte udělat vy.",
+    },
+    {
+      icon: PlayCircle,
+      title: "E-learning",
+      text: `${lessons.toLocaleString("cs-CZ")} krátkých návodů a přes ${hoursFloor10(hours)} hodin videí. Kdykoli se k nim vrátíte.`,
+    },
+    {
+      icon: Compass,
+      title: "Plán 7 bran s průvodcem",
+      text: "Metodika VISIBLE7 MICEK® vás vede krok po kroku od nápadu po růst. Vždy víte, co je další krok.",
+    },
+    {
+      icon: Bot,
+      title: "AI Michal u každé brány",
+      text: "Navrhne canvas, předvyplní čísla a okomentuje váš plán. Když nevíte, co napsat.",
+    },
+    {
+      icon: Video,
+      title: "Členství VISIBLE7 v ceně",
+      text: "Všech 7 bran, byznys case s exportem do Excelu, pitch na A4 a živé webináře jednou měsíčně.",
+      alone: `${kc(shop.price)} / ${monthsLabel(shop.months)}`,
+    },
+    {
+      icon: Award,
+      title: "Osvědčení za každou bránu a certifikace",
+      text: `Osvědčení s ověřovacím kódem a certifikace ${SPECIALIST_TITLE}. Do životopisu i na LinkedIn.`,
+    },
+    {
+      icon: MapPin,
+      title: "Závěrečný den v Praze",
+      text: "Osobně: obhajoba projektu před lektory a zkouška profesní kvalifikace.",
+    },
+  ];
+
+  const consult = (
+    <a
+      href={FREE_CONSULT_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => track("free_consult_click", { from: "studium_page_link" })}
+      className="font-semibold text-primary underline underline-offset-4 hover:no-underline"
+    >
+      Probrat studium s Michalem (20 min zdarma)
+    </a>
+  );
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PublicHeader onStart={start} />
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-8 md:pt-16 lg:px-12">
-          <p className="inline-flex items-center gap-2 rounded-full border border-leaf-200 bg-leaf-50 px-3.5 py-1.5 text-sm font-semibold text-leaf-800">
-            <Award className="h-4 w-4" aria-hidden="true" /> Certifikace VISIBLE7 MICEK®
-          </p>
-          <h1 className="mt-5 max-w-4xl text-4xl font-extrabold tracking-tight sm:text-6xl">{SPECIALIST_TITLE}</h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Kompletní program online podnikání a marketingu. Projdete pět bran na vlastním projektu, každou zakončíte
-            výstupem a získáte certifikaci s ověřovacím kódem, kterou přidáte do životopisu i na LinkedIn.
-          </p>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={start}
-              className="v7-trap-btn v7-phi-lg pl-6 pr-12 py-4 font-bold text-signal-foreground"
-            >
-              Otestovat nápad zdarma
-            </button>
-            <Link to="/cenik" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
-              Ceník členství
-            </Link>
+        {/* Hero se studiem a cenou */}
+        <section className="mx-auto grid max-w-6xl gap-10 px-4 pb-16 pt-12 sm:px-8 md:pt-16 lg:grid-cols-[1.25fr_1fr] lg:px-12">
+          <div>
+            <p className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-leaf-200 bg-leaf-50 px-3.5 py-1.5 text-sm font-semibold text-leaf-800">
+                <CalendarDays className="h-4 w-4" aria-hidden="true" /> Semestrální studium · {STUDY.dates}
+              </span>
+              <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-extrabold text-signal-foreground">
+                TOP
+              </span>
+            </p>
+            <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">{STUDY.name}</h1>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+              Za čtyři měsíce si s lektory postavíte vlastní online byznys a zakončíte to státní zkouškou profesní
+              kvalifikace {NSK_QUALIFICATION.code}. Lektoři, e-learning, plán 7 bran, AI i zkouška v jedné ceně.
+            </p>
+            <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
+              {[
+                `${STUDY.sessions} online setkání s lektory`,
+                `Státní zkouška ${NSK_QUALIFICATION.code} v ceně`,
+                "Vlastní projekt s konzultacemi",
+                "E-learning a celé VISIBLE7",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-2.5 font-medium">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-signal text-signal-foreground">
+                    <Check className="h-3 w-3" strokeWidth={3.5} aria-hidden="true" />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-sm text-muted-foreground">
+              Studium pořádá Edu Partners s.r.o., vzdělávací společnost s akreditací MŠMT pro rekvalifikace a
+              autorizovaná osoba MPO pro zkoušku profesní kvalifikace. Vzděláváme od roku 2011.
+            </p>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Vydává Edu Partners s.r.o., vzdělávací společnost s akreditací MŠMT pro rekvalifikace a autorizovaná osoba
-            MPO pro zkoušku profesní kvalifikace, vzděláváme od roku 2011.
-          </p>
+          <div
+            id="cena"
+            className="h-fit scroll-mt-24 rounded-3xl border-[3px] border-signal bg-white p-6 shadow-[0_12px_40px_-12px_rgba(52,132,90,0.35)] sm:p-8"
+          >
+            {open ? (
+              <>
+                <StudyPrice />
+                <div className="mt-6">
+                  <StudyCtas from="studium_page" />
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Platíte při přihlášce a pak za každý měsíc studia. Fakturuje Edu Partners s.r.o.
+                </p>
+              </>
+            ) : (
+              <p className="rounded-xl bg-muted p-4 font-semibold">Další běh studia připravujeme.</p>
+            )}
+          </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-8 lg:px-12">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Cesta k certifikaci</h2>
-          <ol className="mt-8 grid gap-4 md:grid-cols-4">
-            {LADDER.map((s, i) => (
+        {/* Co všechno dostanete */}
+        <section className="px-3 py-2 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-leaf-50 py-16 md:py-20">
+            <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Co všechno ve studiu dostanete</h2>
+              <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+                Všechno, co potřebujete k rozjezdu online podnikání, na jednom místě a za jednu cenu.
+              </p>
+              <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {VALUE.map(({ icon: Icon, title, text, alone }) => (
+                  <li key={title} className="flex flex-col rounded-2xl bg-white p-6 shadow-sm">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-leaf-500 text-white">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-4 text-lg font-bold leading-snug">{title}</h3>
+                    <p className="mt-2 flex-1 text-muted-foreground">{text}</p>
+                    {alone && (
+                      <p className="mt-4 border-t border-border pt-3 text-sm">
+                        Samostatně <span className="font-bold">{alone}</span> ·{" "}
+                        <span className="font-semibold text-leaf-700">ve studiu v ceně</span>
+                      </p>
+                    )}
+                  </li>
+                ))}
+                <li className="flex flex-col justify-center rounded-2xl border-[3px] border-signal bg-white p-6">
+                  <p className="text-sm font-semibold text-leaf-700">Všechno výše</p>
+                  <div className="mt-2">
+                    <StudyPrice />
+                  </div>
+                  <a
+                    href="#cena"
+                    className="mt-4 font-semibold text-primary underline underline-offset-4 hover:no-underline"
+                  >
+                    Přihlásit se
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Harmonogram */}
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12">
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Jak studium probíhá</h2>
+          <ol className="mt-10 grid gap-4 md:grid-cols-5">
+            {TIMELINE.map((s, i) => (
               <li
-                key={s.when}
-                className={`rounded-2xl p-6 ${s.main ? "bg-primary text-white" : "border border-border bg-card"}`}
+                key={s.title}
+                className={`rounded-2xl p-5 ${i === TIMELINE.length - 2 ? "bg-primary text-white" : "border border-border bg-card"}`}
               >
-                <p className={`text-sm font-semibold ${s.main ? "text-white/70" : "text-muted-foreground"}`}>
-                  {i + 1} · {s.when}
+                <p className={`text-sm font-semibold ${i === TIMELINE.length - 2 ? "text-signal" : "text-leaf-700"}`}>
+                  {s.when}
                 </p>
                 <h3 className="mt-2 text-lg font-bold leading-snug">{s.title}</h3>
-                <p className={`mt-2 text-sm leading-relaxed ${s.main ? "text-white/80" : "text-muted-foreground"}`}>
+                <p
+                  className={`mt-2 text-sm leading-relaxed ${i === TIMELINE.length - 2 ? "text-white/80" : "text-muted-foreground"}`}
+                >
                   {s.text}
                 </p>
               </li>
@@ -112,83 +287,23 @@ const CertificationPage = () => {
           </ol>
         </section>
 
-        <section className="px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-muted/50 py-16 md:py-20">
-            <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Co budete umět</h2>
-              <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-                Brány 1–5 vedou k certifikaci, brány 6–7 k VISIBLE7 Gold. Stejný obsah uvádí příloha osvědčení.
-              </p>
-              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {syllabus.map((s) => (
-                  <div key={s.phase} id={`brana-${s.phase}`} className="scroll-mt-24 rounded-2xl bg-card p-6">
-                    <p className="text-sm font-semibold text-leaf-700">
-                      Brána {s.phase}
-                      {s.phase > 5 && <span className="ml-2 text-muted-foreground">· pro VISIBLE7 Gold</span>}
-                    </p>
-                    <h3 className="mt-1 text-xl font-bold">{s.name}</h3>
-                    <ul className="mt-3 space-y-2 text-sm">
-                      {s.topics.map((t) => (
-                        <li key={t} className="flex gap-2">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-4 border-t border-border pt-3 text-sm text-muted-foreground">
-                      <span className="font-semibold text-foreground">Výstup:</span> {s.outputs.join(", ")}
-                    </p>
-                  </div>
-                ))}
-                <div className="flex flex-col justify-center rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
-                  <p className="font-semibold text-foreground">Na certifikaci</p>
-                  <p className="mt-2 flex items-center gap-2">
-                    <QrCode className="h-4 w-4" aria-hidden="true" /> QR kód a ověření pravosti
-                  </p>
-                  <p className="mt-2 flex items-center gap-2">
-                    <FileText className="h-4 w-4" aria-hidden="true" /> Příloha s obsahem programu
-                  </p>
-                  <p className="mt-2 flex items-center gap-2">
-                    <Linkedin className="h-4 w-4" aria-hidden="true" /> Přidání na LinkedIn jedním klikem
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Kde se uplatníte</h2>
-          <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-            Program dává pevný základ pro vlastní podnikání i pro vstupní pozice v marketingu a e-commerce.
-          </p>
-          <ul className="mt-10 grid gap-5 sm:grid-cols-2">
-            {POSITIONS.map(({ icon: Icon, title, text }) => (
-              <li key={title} className="flex gap-4 rounded-2xl border border-border p-6">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
-                  <Icon className="h-6 w-6" aria-hidden="true" />
-                </span>
-                <div>
-                  <h3 className="text-lg font-bold">{title}</h3>
-                  <p className="mt-1 text-muted-foreground">{text}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-
+        {/* Profesní kvalifikace */}
         <section className="px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-leaf-500 text-white">
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.3fr_1fr] md:py-20">
               <div>
-                <p className="font-semibold text-white/80">Volitelně, po bráně {NSK_QUALIFICATION.unlockGate}</p>
+                <p className="font-semibold text-white/80">Ve studiu v ceně</p>
                 <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
                   Státem uznaná profesní kvalifikace
                 </h2>
                 <p className="mt-4 text-lg text-white/85">
-                  Můžete se přihlásit ke zkoušce profesní kvalifikace <strong>{NSK_QUALIFICATION.name}</strong>. Zkoušku
-                  pořádá Edu Partners jako autorizovaná osoba. Aplikace vás na ni připraví, osvědčení o profesní
-                  kvalifikaci vydává autorizovaná osoba po složení zkoušky.
+                  Studium zakončíte zkouškou profesní kvalifikace <strong>{NSK_QUALIFICATION.name}</strong> podle zákona
+                  č. 179/2006 Sb. Zkoušku pořádá Edu Partners jako autorizovaná osoba. Osvědčení o profesní kvalifikaci
+                  je uznané státem a platí v celé ČR.
+                </p>
+                <p className="mt-3 text-sm text-white/75">
+                  Bez studia lze zkoušku složit i samostatně: {kc(EXAM_PRICES.regular)}, pro členy VISIBLE7{" "}
+                  {kc(EXAM_PRICES.member)}.
                 </p>
                 <a
                   href={NSK_QUALIFICATION.url}
@@ -204,7 +319,7 @@ const CertificationPage = () => {
                   ["Kód kvalifikace", NSK_QUALIFICATION.code],
                   ["Úroveň", `EQF ${NSK_QUALIFICATION.eqf}`],
                   ["Uznává", "Národní soustava kvalifikací"],
-                  ["Přihlášení", `po bráně ${NSK_QUALIFICATION.unlockGate}`],
+                  ["Zkouška", "závěrečný den v Praze"],
                 ].map(([l, v]) => (
                   <div key={l} className="bg-leaf-700 p-5">
                     <dt className="text-sm text-white/70">{l}</dt>
@@ -216,18 +331,108 @@ const CertificationPage = () => {
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-8">
-          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Začněte zdarma</h2>
-          <p className="mt-3 text-lg text-muted-foreground">
-            Rentgen nápadu a první dvě brány vyzkoušíte bez platební karty.
+        {/* Co budete umět */}
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8 lg:px-12">
+          <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Co budete umět</h2>
+          <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+            Obsah 7 bran VISIBLE7. Brány 1–5 vedou k certifikaci {SPECIALIST_TITLE}, brány 6–7 k VISIBLE7 Gold. Stejný
+            obsah uvádí příloha osvědčení.
           </p>
-          <button
-            type="button"
-            onClick={start}
-            className="v7-trap-btn v7-phi-lg mt-8 pl-6 pr-12 py-4 font-bold text-signal-foreground"
-          >
-            Otestovat nápad zdarma
-          </button>
+          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {syllabus.map((s) => (
+              <div key={s.phase} id={`brana-${s.phase}`} className="scroll-mt-24 rounded-2xl border border-border p-6">
+                <p className="text-sm font-semibold text-leaf-700">
+                  Brána {s.phase}
+                  {s.phase > 5 && <span className="ml-2 text-muted-foreground">· pro VISIBLE7 Gold</span>}
+                </p>
+                <h3 className="mt-1 text-xl font-bold">{s.name}</h3>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {s.topics.map((t) => (
+                    <li key={t} className="flex gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 border-t border-border pt-3 text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">Výstup:</span> {s.outputs.join(", ")}
+                </p>
+              </div>
+            ))}
+            <div className="flex flex-col justify-center rounded-2xl border border-dashed border-border p-6 text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground">Na certifikaci</p>
+              <p className="mt-2 flex items-center gap-2">
+                <QrCode className="h-4 w-4" aria-hidden="true" /> QR kód a ověření pravosti
+              </p>
+              <p className="mt-2 flex items-center gap-2">
+                <FileText className="h-4 w-4" aria-hidden="true" /> Příloha s obsahem programu
+              </p>
+              <p className="mt-2 flex items-center gap-2">
+                <Linkedin className="h-4 w-4" aria-hidden="true" /> Přidání na LinkedIn jedním klikem
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Uplatnění */}
+        <section className="px-3 py-2 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-muted/50 py-16 md:py-20">
+            <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Kde se uplatníte</h2>
+              <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+                Studium dává pevný základ pro vlastní podnikání i pro vstupní pozice v marketingu a e-commerce.
+              </p>
+              <ul className="mt-10 grid gap-5 sm:grid-cols-2">
+                {POSITIONS.map(({ icon: Icon, title, text }) => (
+                  <li key={title} className="flex gap-4 rounded-2xl bg-card p-6">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+                      <Icon className="h-6 w-6" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="text-lg font-bold">{title}</h3>
+                      <p className="mt-1 text-muted-foreground">{text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Závěr */}
+        <section className="mx-auto max-w-4xl px-4 py-20 sm:px-8">
+          <div className="grid gap-8 rounded-3xl border-[3px] border-signal bg-leaf-50 p-6 sm:p-10 md:grid-cols-[1.2fr_1fr] md:items-center">
+            <div>
+              <h2 className="text-3xl font-extrabold tracking-tight">Začněte 11. 2. 2027</h2>
+              <p className="mt-3 text-muted-foreground">
+                Nejste si jistí, jestli je studium pro vás? Zavolejte Michalovi. Za 20 minut probereme váš nápad a
+                řekneme si upřímně, jestli vám studium pomůže.
+              </p>
+              <p className="mt-4">{consult}</p>
+            </div>
+            <div className="rounded-2xl bg-white p-6">
+              {open ? (
+                <>
+                  <StudyPrice />
+                  <div className="mt-5">
+                    <StudyCtas from="studium_page_bottom" />
+                  </div>
+                </>
+              ) : (
+                <p className="font-semibold">Další běh studia připravujeme.</p>
+              )}
+            </div>
+          </div>
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            Chcete začít sami a zdarma?{" "}
+            <button type="button" onClick={start} className="font-semibold text-primary underline underline-offset-4">
+              Otestovat nápad zdarma
+            </button>{" "}
+            ·{" "}
+            <Link to="/cenik" className="font-semibold text-primary underline underline-offset-4">
+              Ceník
+            </Link>
+          </p>
         </section>
       </main>
       <Footer variant="full" />

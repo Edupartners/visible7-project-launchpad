@@ -191,6 +191,7 @@ const App = () => (
           <Route path="/pro-skoly" element={<SchoolsPage />} />
           <Route path="/digitalni-kancelar" element={<OfficePage />} />
           <Route path="/certifikace" element={<CertificationPage />} />
+          <Route path="/studium" element={<CertificationPage />} />
           <Route path="/pracovni-listy" element={<WorksheetsPage />} />
           <Route path="/e-learning" element={<ELearningPage />} />
           <Route path="/podminky" element={<LegalPage doc={TERMS} />} />

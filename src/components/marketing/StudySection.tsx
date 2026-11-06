@@ -29,7 +29,7 @@ export const StudyPrice = ({ dark = false }: { dark?: boolean }) => {
 };
 
 /** Tlačítka studia: platba najednou, 5 plateb a úvodní hovor s Michalem (vždy). */
-export const StudyCtas = ({ from, dark = false }: { from: string; dark?: boolean }) => {
+export const StudyCtas = ({ from, dark = false, page = false }: { from: string; dark?: boolean; page?: boolean }) => {
   const shop = useShop();
   const pay = [
     { url: shop.study_installments_url, label: `Přihlásit se: ${STUDY.payments} plateb`, kind: "installments" },
@@ -55,15 +55,25 @@ export const StudyCtas = ({ from, dark = false }: { from: string; dark?: boolean
           {i === 0 && <CreditCard className="h-5 w-5" aria-hidden="true" />} {p.label}
         </a>
       ))}
-      <a
-        href={FREE_CONSULT_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => track("free_consult_click", { from: `${from}_studium` })}
-        className={pay.length ? secondary : primary}
-      >
-        <CalendarDays className="h-5 w-5" aria-hidden="true" /> Probrat studium s Michalem
-      </a>
+      {page ? (
+        <Link
+          to="/studium"
+          onClick={() => track("study_page_click", { from })}
+          className={pay.length ? secondary : primary}
+        >
+          Zobrazit celé studium <ArrowRight className="h-5 w-5" aria-hidden="true" />
+        </Link>
+      ) : (
+        <a
+          href={FREE_CONSULT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => track("free_consult_click", { from: `${from}_studium` })}
+          className={pay.length ? secondary : primary}
+        >
+          <CalendarDays className="h-5 w-5" aria-hidden="true" /> Probrat studium s Michalem
+        </a>
+      )}
     </div>
   );
 };
@@ -101,16 +111,22 @@ export const StudySection = () => {
           </ul>
           <p className="mt-5 text-xs text-muted-foreground">
             Zkouška samostatně {kc(EXAM_PRICES.regular)}, pro členy {kc(EXAM_PRICES.member)}.{" "}
-            <Link to="/certifikace" className="font-semibold text-foreground underline underline-offset-4">
-              Celý program a osvědčení
-            </Link>
+            <a
+              href={FREE_CONSULT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track("free_consult_click", { from: "landing_studium_link" })}
+              className="font-semibold text-foreground underline underline-offset-4"
+            >
+              Probrat studium s Michalem (20 min zdarma)
+            </a>
           </p>
         </div>
         <div className="flex flex-col justify-center gap-5 border-t border-leaf-200 bg-white p-6 sm:p-8 md:border-l md:border-t-0 lg:p-10">
           {open ? (
             <>
               <StudyPrice />
-              <StudyCtas from="landing" />
+              <StudyCtas from="landing" page />
               <p className="flex items-start gap-2 text-xs text-muted-foreground">
                 <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Platíte při přihlášce a pak za každý měsíc studia.
