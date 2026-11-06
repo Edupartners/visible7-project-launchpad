@@ -45,7 +45,8 @@ export function ShopAdmin() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = shop.checkout_url.trim();
-    if (url && !/^https:\/\//.test(url)) {
+    const studyUrl = (shop.study_checkout_url ?? "").trim();
+    if ((url && !/^https:\/\//.test(url)) || (studyUrl && !/^https:\/\//.test(studyUrl))) {
       setMsg("Odkaz na objednávku musí začínat https://");
       return;
     }
@@ -55,6 +56,7 @@ export function ShopAdmin() {
       await saveShop({
         ...shop,
         checkout_url: url,
+        study_checkout_url: studyUrl,
         product_id: shop.product_id?.trim() || undefined,
         form_id: shop.form_id?.trim() ?? "",
       });
@@ -120,6 +122,14 @@ export function ShopAdmin() {
             value={shop.checkout_url}
             onChange={(e) => set("checkout_url", e.target.value)}
             placeholder="https://form.simpleshop.cz/…"
+          />
+        </label>
+        <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">
+          <span className="font-semibold">Platba studia Specialista internetového obchodu (25 000 Kč)</span>
+          <Input
+            value={shop.study_checkout_url ?? ""}
+            onChange={(e) => set("study_checkout_url", e.target.value)}
+            placeholder="https://form.simpleshop.cz/… (prázdné = jen úvodní hovor)"
           />
         </label>
         <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">

@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
-import { ACADEMY, ACADEMY_ITEMS, academyOffer, czDate } from "@/lib/academy";
+import { STUDY, STUDY_ITEMS, studyOpen } from "@/lib/study";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 
 /** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
@@ -123,7 +123,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
         "Zkouška profesní kvalifikace Specialista internetového obchodu (66-043-N), nepovinná",
         "5 000 Kč",
         "3 500 Kč",
-        "Platí se zvlášť, ceny vč. DPH. Pro členy VISIBLE7 a absolventy Akademie 3 500 Kč místo 5 000 Kč. Jeden den přípravy se zkouškou 8 000 Kč. Zkoušku pořádá Edu Partners jako autorizovaná osoba, autorizující orgán je Ministerstvo průmyslu a obchodu.",
+        "Platí se zvlášť, ceny vč. DPH. Pro členy VISIBLE7 3 500 Kč místo 5 000 Kč, ve studiu Specialista internetového obchodu je v ceně. Jeden den přípravy se zkouškou 8 000 Kč. Zkoušku pořádá Edu Partners jako autorizovaná osoba, autorizující orgán je Ministerstvo průmyslu a obchodu.",
       ],
     ],
   },
@@ -179,7 +179,7 @@ const PricingPage = () => {
     ],
     [
       "Kolik stojí zkouška profesní kvalifikace?",
-      `Je nepovinná a platí se zvlášť: ${kc(EXAM_PRICES.regular)}, pro členy a absolventy Akademie ${kc(EXAM_PRICES.member)}. Jeden den přípravy se zkouškou ${kc(EXAM_PRICES.withPrep)}. Osvědčení je uznané státem a platí v celé ČR.`,
+      `Je nepovinná a platí se zvlášť: ${kc(EXAM_PRICES.regular)}, pro členy ${kc(EXAM_PRICES.member)}. Ve studiu ${STUDY.name} je zkouška v ceně. Jeden den přípravy se zkouškou ${kc(EXAM_PRICES.withPrep)}. Osvědčení je uznané státem a platí v celé ČR.`,
     ],
     ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
     [
@@ -193,7 +193,7 @@ const PricingPage = () => {
   ];
 
   const buy = canBuy(shop);
-  const academy = academyOffer();
+  const study = studyOpen();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -289,50 +289,65 @@ const PricingPage = () => {
             </div>
 
             <div
-              id="akademie"
+              id="studium"
               className="flex scroll-mt-24 flex-col rounded-2xl border-2 border-leaf-500 bg-card p-6 md:col-span-2 lg:col-span-1"
             >
               <div className="flex items-center justify-between gap-2">
-                <h2 className="font-semibold text-muted-foreground">Akademie s lektory</h2>
+                <h2 className="font-semibold text-muted-foreground">Studium s lektory</h2>
                 <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">
-                  Top nabídka s lektory
+                  Top nabídka
                 </span>
               </div>
-              <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(academy.price)}</p>
+              <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(STUDY.price)}</p>
               <p className="text-sm text-muted-foreground">
-                {academy.early
-                  ? `cena při přihlášení do ${czDate(ACADEMY.earlyUntil)}, pak ${kc(ACADEMY.price)}`
-                  : `nebo ve splátkách ${ACADEMY.installments}`}
+                vč. DPH, zkoušky a členství · běžně <s className="whitespace-nowrap">{kc(STUDY.usualPrice)}</s>
               </p>
               <p className="mt-3 text-sm">
-                <b>{ACADEMY.name}</b>. Start {czDate(ACADEMY.start)}, {ACADEMY.sessions} online setkání za{" "}
-                {ACADEMY.months} měsíců. Jednotlivě by kurzy stály přes {kc(ACADEMY.separateValue)}.
+                <b>{STUDY.name}</b>. {STUDY.sessions} online setkání, {STUDY.period}, zakončené zkouškou profesní
+                kvalifikace {NSK_QUALIFICATION.code}.
               </p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
-                {ACADEMY_ITEMS.map((it) => (
+                {STUDY_ITEMS.map((it) => (
                   <li key={it} className="flex gap-2">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />
                     {it}
                   </li>
                 ))}
               </ul>
-              {academy.open ? (
-                <a
-                  href={ACADEMY.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => track("academy_click", { source: "cenik", price: academy.price })}
-                  className="mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
-                >
-                  Přihlásit se do akademie <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </a>
+              {study ? (
+                <div className="mt-6 space-y-2">
+                  {shop.study_checkout_url && (
+                    <a
+                      href={shop.study_checkout_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track("study_checkout_click", { from: "cenik" })}
+                      className="flex h-12 items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
+                    >
+                      Zaplatit a začít studovat <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  )}
+                  <a
+                    href={FREE_CONSULT_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => track("free_consult_click", { from: "cenik_studium" })}
+                    className={
+                      shop.study_checkout_url
+                        ? "flex h-12 items-center justify-center rounded-xl border-2 border-primary font-semibold text-primary hover:bg-primary/5"
+                        : "flex h-12 items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
+                    }
+                  >
+                    Probrat studium s Michalem
+                  </a>
+                </div>
               ) : (
                 <p className="mt-6 rounded-xl bg-muted p-3 text-center text-sm font-semibold">
-                  Další běh akademie připravujeme.
+                  Další běh studia připravujeme.
                 </p>
               )}
               <p className="mt-3 text-xs text-muted-foreground">
-                Přihláška a platba probíhá na webu Edu Partners s.r.o. Akademie se otevírá od 7 účastníků.
+                Při platbě použijte e-mail, kterým se přihlašujete do aplikace. Fakturuje Edu Partners s.r.o.
               </p>
             </div>
           </div>

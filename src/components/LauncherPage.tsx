@@ -6,7 +6,8 @@ import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useFounderOffer, useShop }
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { useLessonStats } from "@/lib/courses";
-import { ACADEMY, academyOffer, czDate } from "@/lib/academy";
+import { STUDY, studyOpen } from "@/lib/study";
+import { StudySection } from "@/components/marketing/StudySection";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { TrustBand } from "@/components/marketing/TrustBand";
@@ -123,13 +124,6 @@ const SHOWCASE = [
   },
 ];
 
-const CERT_STEPS: [string, string][] = [
-  ["Brány 1–5", "osvědčení za každou fázi"],
-  ["Po bráně 5", SPECIALIST_TITLE],
-  ["Brány 6–7", "VISIBLE7 Gold za spuštěný projekt"],
-  ["Volitelně", "státní profesní kvalifikace"],
-];
-
 const FAQ = [
   [
     "Je test nápadu opravdu zdarma?",
@@ -177,7 +171,7 @@ const FAQ = [
   ],
   [
     "Kolik stojí zkouška profesní kvalifikace?",
-    "Zkouška je nepovinná a platí se zvlášť: 5 000 Kč, pro členy VISIBLE7 a absolventy Akademie 3 500 Kč. Jeden den přípravy se zkouškou stojí 8 000 Kč. Ceny jsou včetně DPH. Zkoušku pořádá Edu Partners jako autorizovaná osoba (autorizující orgán: Ministerstvo průmyslu a obchodu).",
+    "Zkouška je nepovinná a platí se zvlášť: 5 000 Kč, pro členy VISIBLE7 3 500 Kč. Ve studiu Specialista internetového obchodu je zkouška v ceně. Jeden den přípravy se zkouškou stojí 8 000 Kč. Ceny jsou včetně DPH. Zkoušku pořádá Edu Partners jako autorizovaná osoba (autorizující orgán: Ministerstvo průmyslu a obchodu).",
   ],
   ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
   ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
@@ -301,7 +295,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
   const offer = useFounderOffer();
   const { lessons } = useLessonStats();
-  const academy = academyOffer();
   const author = ADVISORS.find((a) => a.name.includes("Míček"));
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
   useEffect(() => {
@@ -483,6 +476,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
         <FeaturedCourses />
 
+        <StudySection />
+
         {/* Proces: 7 bran */}
         <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary py-20 text-white md:py-28">
@@ -655,54 +650,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
-        {/* Certifikace – krátce, celý program je na /certifikace */}
-        <section className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-leaf-500 text-white">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-8 lg:px-12 md:grid-cols-[1.2fr_1fr] md:py-20">
-              <div>
-                <p className="font-semibold text-white/80">Certifikace</p>
-                <h2 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{SPECIALIST_TITLE}</h2>
-                <p className="mt-4 text-lg text-white/85">
-                  Za každou bránu osvědčení, po bráně 5 certifikace s přílohou obsahu programu.
-                </p>
-                <p className="mt-4 text-white/85">
-                  Na konci můžete složit zkoušku profesní kvalifikace{" "}
-                  <a
-                    href={NSK_QUALIFICATION.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-white underline underline-offset-4 hover:no-underline"
-                  >
-                    Specialista internetového obchodu ({NSK_QUALIFICATION.code})
-                  </a>{" "}
-                  podle zákona č. 179/2006 Sb. Edu Partners je autorizovaná osoba, zkoušku složíte přímo u nás.
-                  Osvědčení je uznané státem a platí v celé ČR.
-                </p>
-                <p className="mt-4 rounded-xl bg-leaf-700 px-4 py-3 text-sm">
-                  <span className="font-bold">Zkouška (nepovinná, platí se zvlášť):</span>{" "}
-                  <s className="text-white/60">{kc(EXAM_PRICES.regular)}</s>{" "}
-                  <span className="font-bold">{kc(EXAM_PRICES.member)} pro členy</span> · s jednodenní přípravou{" "}
-                  {kc(EXAM_PRICES.withPrep)}
-                </p>
-                <Link
-                  to="/certifikace"
-                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-leaf-600 hover:bg-white/90"
-                >
-                  Celý program a osvědčení <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </div>
-              <ol className="space-y-px overflow-hidden rounded-2xl bg-white/20">
-                {CERT_STEPS.map(([when, what]) => (
-                  <li key={when} className="flex gap-4 bg-leaf-700 p-4">
-                    <span className="w-24 shrink-0 text-sm text-white/70">{when}</span>
-                    <span className="font-semibold">{what}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-        </section>
-
         <SavingsCalculator onStart={onAccessGranted} />
 
         {/* Ceník – krátce, celý ceník je na /cenik */}
@@ -735,19 +682,17 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{price}</dd>
                 </div>
               ))}
-              {academy.open && (
+              {studyOpen() && (
                 <div className="flex items-baseline justify-between gap-4 px-5 py-4">
                   <dt className="min-w-0">
-                    <Link to="/cenik#akademie" className="block font-semibold hover:text-primary">
-                      {ACADEMY.name}: členství + {ACADEMY.sessions} živých setkání s lektory
-                    </Link>
+                    <a href="#studium" className="block font-semibold hover:text-primary">
+                      Studium {STUDY.name}: {STUDY.sessions} setkání s lektory, zkouška a členství
+                    </a>
                     <span className="block text-sm text-muted-foreground">
-                      Start {czDate(ACADEMY.start)}
-                      {academy.early ? `, cena do ${czDate(ACADEMY.earlyUntil)}` : ""}. Jednotlivě přes{" "}
-                      {kc(ACADEMY.separateValue)}.
+                      {STUDY.period}. Běžně {kc(STUDY.usualPrice)}.
                     </span>
                   </dt>
-                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(academy.price)}</dd>
+                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(STUDY.price)}</dd>
                 </div>
               )}
               <div className="flex items-baseline justify-between gap-4 px-5 py-4">

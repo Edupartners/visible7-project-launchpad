@@ -11,6 +11,8 @@ export interface ShopSettings {
   product_id?: string;
   /** ID formuláře SimpleShopu pro vložení do stránky /clenstvi (z kódu: data-SimpleShopForm="…") */
   form_id?: string;
+  /** Odkaz na okamžitou platbu studia Specialista internetového obchodu (SimpleShop). Prázdné = jen hovor. */
+  study_checkout_url?: string;
 }
 
 export const SHOP_DEFAULT: ShopSettings = {
