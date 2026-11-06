@@ -224,8 +224,13 @@ export const GuideStepBlock = ({ id, children }: { id: string; children: React.R
               ))}
             </dl>
           </div>
+        </div>
+      )}
+      {children}
+      {active && step && (
+        <div className="mt-3 rounded-2xl bg-white p-5 shadow-sm sm:px-6">
           <p
-            className={`mt-4 flex items-start gap-2 text-sm font-semibold ${step.done ? "text-leaf-700" : "text-muted-foreground"}`}
+            className={`flex items-start gap-2 text-sm font-semibold ${step.done ? "text-leaf-700" : "text-muted-foreground"}`}
           >
             <span
               className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
@@ -280,7 +285,6 @@ export const GuideStepBlock = ({ id, children }: { id: string; children: React.R
           </div>
         </div>
       )}
-      {children}
     </div>
   );
 };
