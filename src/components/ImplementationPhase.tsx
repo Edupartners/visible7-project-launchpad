@@ -16,6 +16,7 @@ import {
   typeStats,
 } from "@/lib/buildPlans";
 import { MethodFigures } from "@/components/MethodFigures";
+import { InstallSupport } from "@/components/implementation/InstallSupport";
 
 interface ImplementationPhaseProps {
   onSelectBusinessType: (businessTypeId: string) => void;
@@ -77,7 +78,10 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
         </dl>
       </header>
 
+      <InstallSupport />
+
       {/* Váš plán */}
+      <div id="plan" className="scroll-mt-24" />
       {mine ? (
         <section
           aria-label="Váš plán tvorby"

@@ -25,6 +25,7 @@ import {
 import { BARRIERS, ROUNDS, TYPES } from "@/lib/quiz";
 import { AnnouncementsAdmin } from "@/components/announcements/AnnouncementsAdmin";
 import { PromoCodesAdmin } from "@/components/admin/PromoCodesAdmin";
+import { InstallRequestsAdmin } from "@/components/admin/InstallRequestsAdmin";
 import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
 import { DeadlinesAdmin } from "@/components/admin/DeadlinesAdmin";
 import { ShopAdmin } from "@/components/admin/ShopAdmin";
@@ -37,13 +38,14 @@ import { TAG_DOT, TagColor, UserTag, createTag, loadTags, setUserTag } from "@/l
 
 type Filter = "vse" | "aktivni" | "platici" | "klub";
 
-type Tab = "prehled" | "uzivatele" | "obsah" | "komunikace" | "prodej";
+type Tab = "prehled" | "uzivatele" | "obsah" | "komunikace" | "prodej" | "instalace";
 const TABS: { id: Tab; label: string; hint: string }[] = [
   { id: "prehled", label: "Přehled", hint: "čísla, brány, události, kdo jsou uživatelé" },
   { id: "uzivatele", label: "Uživatelé", hint: "hledání, štítky, smazání" },
   { id: "obsah", label: "Obsah", hint: "videa, pracovní listy, semináře" },
   { id: "komunikace", label: "Komunikace", hint: "oznámení, připomínky, termíny" },
   { id: "prodej", label: "Prodej", hint: "ceník, promo kódy" },
+  { id: "instalace", label: "Instalace", hint: "žádosti z brány 4" },
 ];
 const FILTERS: { id: Filter; label: string }[] = [
   { id: "vse", label: "Všichni" },
@@ -372,6 +374,8 @@ const AdminPage = () => {
                 <PromoCodesAdmin emails={Object.fromEntries(users.map((u) => [u.id, u.email]))} />
               </>
             )}
+
+            {tab === "instalace" && <InstallRequestsAdmin />}
 
             {tab === "uzivatele" && (
               <>

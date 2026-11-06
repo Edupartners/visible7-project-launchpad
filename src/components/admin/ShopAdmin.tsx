@@ -41,14 +41,20 @@ export function ShopAdmin() {
   if (!shop) return null;
 
   const set = (k: keyof ShopSettings, v: string) =>
-    setShop({ ...shop, [k]: ["price", "months", "days", "study_early_left"].includes(k) ? Number(v) || 0 : v });
+    setShop({
+      ...shop,
+      [k]: ["price", "months", "days", "study_early_left", "install_price", "install_elementor_price"].includes(k)
+        ? Number(v) || 0
+        : v,
+    });
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = shop.checkout_url.trim();
     const studyUrl = (shop.study_checkout_url ?? "").trim();
     const studyInstUrl = (shop.study_installments_url ?? "").trim();
-    if ([url, studyUrl, studyInstUrl].some((u) => u && !/^https:\/\//.test(u))) {
+    const installUrl = (shop.install_checkout_url ?? "").trim();
+    if ([url, studyUrl, studyInstUrl, installUrl].some((u) => u && !/^https:\/\//.test(u))) {
       setMsg("Odkaz na objednávku musí začínat https://");
       return;
     }
@@ -60,6 +66,7 @@ export function ShopAdmin() {
         checkout_url: url,
         study_checkout_url: studyUrl,
         study_installments_url: studyInstUrl,
+        install_checkout_url: installUrl,
         study_early_left: Math.max(
           0,
           Math.min(STUDY.earlySeats, Math.round(shop.study_early_left ?? STUDY.earlySeats)),
@@ -167,6 +174,41 @@ export function ShopAdmin() {
             </label>
           </div>
           <p className="text-xs text-muted-foreground">Bez odkazů se zobrazí jen úvodní hovor s Michalem.</p>
+        </div>
+        <div className="space-y-3 rounded-xl border border-border p-4 sm:col-span-2 lg:col-span-4">
+          <p className="font-semibold">Instalace webu s podporou (brána 4)</p>
+          <p className="text-sm text-muted-foreground">
+            Ceny vč. DPH. Licence Elementor Pro: když necháte 0, zobrazí se „56 USD“. Spotřebitelům je ale lepší ukázat
+            cenu v Kč.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-[10rem_10rem_1fr]">
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Instalace (Kč)</span>
+              <Input
+                type="number"
+                min={0}
+                value={shop.install_price ?? 990}
+                onChange={(e) => set("install_price", e.target.value)}
+              />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Elementor Pro (Kč)</span>
+              <Input
+                type="number"
+                min={0}
+                value={shop.install_elementor_price ?? 0}
+                onChange={(e) => set("install_elementor_price", e.target.value)}
+              />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Odkaz na platbu (volitelně)</span>
+              <Input
+                value={shop.install_checkout_url ?? ""}
+                onChange={(e) => set("install_checkout_url", e.target.value)}
+                placeholder="https://form.simpleshop.cz/…"
+              />
+            </label>
+          </div>
         </div>
         <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">
           <span className="font-semibold">Věta o hodnotě na ceníku</span>

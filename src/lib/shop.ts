@@ -17,6 +17,12 @@ export interface ShopSettings {
   study_installments_url?: string;
   /** Kolik míst za zvýhodněnou cenu studia zbývá (0 = platí plná cena). */
   study_early_left?: number;
+  /** Instalace webu s podporou (brána 4): cena služby v Kč vč. DPH */
+  install_price?: number;
+  /** Licence Elementor Pro na 1 rok v Kč vč. DPH (0 = zobrazí se 56 USD) */
+  install_elementor_price?: number;
+  /** Odkaz na platbu instalace (SimpleShop). Prázdné = platba po domluvě. */
+  install_checkout_url?: string;
 }
 
 export const SHOP_DEFAULT: ShopSettings = {
