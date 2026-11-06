@@ -769,13 +769,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                       Studium {STUDY.name}: {STUDY.sessions} setkání s lektory, zkouška a členství
                     </a>
                     <span className="block text-sm text-muted-foreground">
-                      {STUDY.period}. Nebo {STUDY.payments} × {kc(studyOffer(shop).monthly)}
-                      {studyOffer(shop).early ? `, cena pro prvních ${STUDY.earlySeats} přihlášených` : ""}.
+                      {STUDY.period}. Předem, nebo průběžně {STUDY.payments} × {kc(studyOffer(shop).monthly)}
+                      {studyOffer(shop).early ? ` (prvních ${STUDY.earlySeats} přihlášených)` : ""}.
                     </span>
                   </dt>
-                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">
-                    {kc(studyOffer(shop).price)}
-                  </dd>
+                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(STUDY.upfront)}</dd>
                 </div>
               )}
               <div className="flex items-baseline justify-between gap-4 px-5 py-4">

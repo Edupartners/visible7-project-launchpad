@@ -3,7 +3,7 @@ import type { ShopSettings } from "@/lib/shop";
 /**
  * Studium Specialista internetového obchodu (Edu Partners): 20 online setkání s lektory, vlastní projekt,
  * závěrečný den v Praze se zkouškou profesní kvalifikace v ceně. Včetně členství VISIBLE7.
- * Cena: prvních 15 přihlášených 20 000 Kč, potom 25 000 Kč. Najednou, nebo v 5 platbách
+ * Cena: předem vždy 20 000 Kč. Průběžně 5 plateb: prvních 15 přihlášených 5 × 4 000 Kč, potom 5 × 5 000 Kč
  * (zápisné při přihlášce + platba za každý měsíc studia únor–květen; nejde o úvěr, každá platba je za daný měsíc).
  */
 export const STUDY = {
@@ -13,8 +13,11 @@ export const STUDY = {
   /** Pro texty: začátek a konec semestru */
   dates: "11. 2. – 15. 6. 2027",
   start: "2027-02-11",
-  price: 25000,
-  earlyPrice: 20000,
+  /** Platba celého semestru předem: vždy 20 000 Kč (1 000 Kč za setkání) */
+  upfront: 20000,
+  /** Průběžná platba: prvních 15 přihlášených 4 000 Kč, potom 5 000 Kč za platbu */
+  earlyMonthly: 4000,
+  monthly: 5000,
   earlySeats: 15,
   payments: 5,
 };
@@ -37,8 +40,8 @@ export const studyOpen = (now = new Date()) => now < new Date(`${STUDY.start}T17
 export function studyOffer(shop: ShopSettings) {
   const left = Math.max(0, Math.min(STUDY.earlySeats, shop.study_early_left ?? STUDY.earlySeats));
   const early = left > 0;
-  const price = early ? STUDY.earlyPrice : STUDY.price;
-  return { early, left, price, monthly: Math.round(price / STUDY.payments) };
+  const monthly = early ? STUDY.earlyMonthly : STUDY.monthly;
+  return { early, left, monthly, installmentsTotal: monthly * STUDY.payments, upfront: STUDY.upfront };
 }
 
 /** 1 místo, 2–4 místa, 5+ míst */

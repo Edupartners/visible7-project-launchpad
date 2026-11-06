@@ -134,13 +134,13 @@ export function ShopAdmin() {
         <div className="space-y-3 rounded-xl border border-border p-4 sm:col-span-2 lg:col-span-4">
           <p className="font-semibold">Studium {STUDY.name}</p>
           <p className="text-sm text-muted-foreground">
-            Prvních {STUDY.earlySeats} přihlášených za {kc(STUDY.earlyPrice)} (5 × {kc(STUDY.earlyPrice / 5)}), potom{" "}
-            {kc(STUDY.price)} (5 × {kc(STUDY.price / 5)}). Po každé přihlášce snižte počet volných míst. Při 0 se na
-            webu ukáže plná cena; ceny v SimpleShopu pak změňte i tam. Číslo musí odpovídat skutečnosti.
+            Předem vždy {kc(STUDY.upfront)}. Průběžně: prvních {STUDY.earlySeats} přihlášených 5 ×{" "}
+            {kc(STUDY.earlyMonthly)}, potom 5 × {kc(STUDY.monthly)}. Po každé přihlášce snižte počet volných míst. Při 0
+            se na webu ukáže plná cena; ceny v SimpleShopu pak změňte i tam. Číslo musí odpovídat skutečnosti.
           </p>
           <div className="grid gap-3 sm:grid-cols-[10rem_1fr_1fr]">
             <label className="space-y-1 text-sm">
-              <span className="font-semibold">Volná místa za {kc(STUDY.earlyPrice)}</span>
+              <span className="font-semibold">Volná místa za 5 × {kc(STUDY.earlyMonthly)}</span>
               <Input
                 type="number"
                 min={0}

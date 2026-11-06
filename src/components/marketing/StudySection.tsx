@@ -9,26 +9,40 @@ import { track } from "@/lib/track";
 export const StudyPrice = ({ dark = false }: { dark?: boolean }) => {
   const offer = studyOffer(useShop());
   const muted = dark ? "text-white/80" : "text-muted-foreground";
+  const strong = dark ? "text-white" : "text-foreground";
   return (
     <div>
-      <p className={`text-sm font-semibold ${dark ? "text-white" : "text-foreground"}`}>
+      <p className={`text-sm font-semibold ${strong}`}>
         {offer.early
           ? `Cena pro prvních ${STUDY.earlySeats} přihlášených · zbývá ${seatsLabel(offer.left)}`
           : "Cena vč. DPH, zkoušky a členství"}
       </p>
-      <p className="mt-1 flex flex-wrap items-baseline gap-x-3">
-        <span className="text-5xl font-extrabold tracking-tight">{kc(offer.monthly)}</span>
-        <span className={`whitespace-nowrap ${muted}`}>× {STUDY.payments} plateb</span>
-      </p>
-      <p className={`mt-1 text-sm ${muted}`}>
-        Celkem <b className={dark ? "text-white" : "text-foreground"}>{kc(offer.price)}</b> vč. DPH, zkoušky a členství.
-        Můžete zaplatit i najednou. Nic dalšího neplatíte.
-      </p>
-      {offer.early && (
-        <p className={`mt-2 text-xs ${muted}`}>
-          Po zaplnění {STUDY.earlySeats} míst bude studium stát {kc(STUDY.price)} (
-          {nbsp(`${STUDY.payments} × ${kc(STUDY.price / STUDY.payments)}`)}).
-        </p>
+      {offer.early ? (
+        <>
+          <p className="mt-1 flex flex-wrap items-baseline gap-x-3">
+            <span className="text-5xl font-extrabold tracking-tight">{kc(offer.monthly)}</span>
+            <span className={`whitespace-nowrap ${muted}`}>× {STUDY.payments} plateb</span>
+          </p>
+          <p className={`mt-1 text-sm ${muted}`}>
+            Celkem <b className={strong}>{kc(offer.installmentsTotal)}</b> vč. DPH, zkoušky a členství. Nic dalšího
+            neplatíte.
+          </p>
+          <p className={`mt-2 text-xs ${muted}`}>
+            Zaplatíte-li celý semestr předem, platí {kc(STUDY.upfront)} vždy. Po zaplnění {STUDY.earlySeats} míst bude
+            průběžná platba {nbsp(`${STUDY.payments} × ${kc(STUDY.monthly)}`)}.
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mt-1 flex flex-wrap items-baseline gap-x-3">
+            <span className="text-5xl font-extrabold tracking-tight">{kc(STUDY.upfront)}</span>
+            <span className={`whitespace-nowrap ${muted}`}>při platbě předem</span>
+          </p>
+          <p className={`mt-1 text-sm ${muted}`}>
+            nebo průběžně {nbsp(`${STUDY.payments} × ${kc(offer.monthly)}`)} (celkem {kc(offer.installmentsTotal)}). Nic
+            dalšího neplatíte.
+          </p>
+        </>
       )}
     </div>
   );
@@ -39,7 +53,7 @@ export const StudyCtas = ({ from, dark = false, page = false }: { from: string; 
   const shop = useShop();
   const pay = [
     { url: shop.study_installments_url, label: `Přihlásit se: ${STUDY.payments} plateb`, kind: "installments" },
-    { url: shop.study_checkout_url, label: "Zaplatit najednou", kind: "full" },
+    { url: shop.study_checkout_url, label: `Zaplatit předem (${kc(STUDY.upfront)})`, kind: "full" },
   ].filter((p) => p.url);
   const primary = dark
     ? "v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
