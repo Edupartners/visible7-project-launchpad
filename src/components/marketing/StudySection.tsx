@@ -76,7 +76,7 @@ export const StudySection = () => {
       <div className="grid overflow-hidden rounded-3xl border-[3px] border-signal bg-leaf-50 shadow-[0_12px_40px_-12px_rgba(52,132,90,0.35)] md:grid-cols-[1.4fr_1fr]">
         <div className="p-6 sm:p-8 lg:p-10">
           <p className="v7-para-sm inline-block bg-signal px-3 py-1 text-xs font-bold text-signal-foreground">
-            Studium s lektory · {STUDY.period}
+            Semestrální studium · {STUDY.dates}
           </p>
           <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{STUDY.name}</h2>
           <p className="mt-2 text-muted-foreground">

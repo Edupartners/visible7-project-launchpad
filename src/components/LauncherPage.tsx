@@ -18,6 +18,7 @@ import {
   ArrowRight,
   Award,
   BarChart3,
+  CalendarDays,
   Check,
   Layers,
   Lock,
@@ -274,11 +275,13 @@ const PATHS: {
   href?: string;
   highlight?: boolean;
   top?: boolean;
+  note?: string;
 }[] = [
   {
-    pill: "Studium s lektory",
+    pill: "Semestrální studium",
     title: "Chci se stát specialistou internetového obchodu.",
     text: `${STUDY.sessions} online setkání s lektory, vlastní projekt a osvědčení o profesní kvalifikaci ${NSK_QUALIFICATION.code}.`,
+    note: `Termín: ${STUDY.dates}`,
     cta: "Zobrazit studium",
     href: "#studium",
     top: true,
@@ -288,6 +291,7 @@ const PATHS: {
     title: "Mám podnikatelský nápad.",
     text: "Chci zjistit, jestli o něj bude zájem, co bude stát a jestli se vyplatí ho rozvíjet.",
     cta: "Začít ověřením nápadu",
+    note: "Začít můžete kdykoli",
     highlight: true,
   },
   {
@@ -295,6 +299,7 @@ const PATHS: {
     title: "Chci podnikat, ale nevím v čem.",
     text: "Chci najít příležitost, která dává smysl vzhledem k mým zkušenostem, možnostem a času.",
     cta: "Prohlédnout první dvě brány",
+    note: "Začít můžete kdykoli",
     to: "/zacit-podnikat",
   },
   {
@@ -302,6 +307,7 @@ const PATHS: {
     title: "Už podnikám. Chci zákazníky online.",
     text: "Potřebuji pochopit, jak postavit web nebo e-shop a lépe zvládat marketing.",
     cta: "Co se mohu naučit",
+    note: "Začít můžete kdykoli",
     to: "/uz-podnikam",
   },
 ];
@@ -415,15 +421,29 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             {PATHS.map((p) => {
               const inner = (
                 <>
-                  <span
-                    className={`text-xs font-bold uppercase tracking-[0.12em] ${
-                      p.top || p.highlight ? "text-leaf-700" : "text-muted-foreground"
-                    }`}
-                  >
-                    {p.pill}
+                  <span className="flex items-center justify-between gap-2">
+                    <span
+                      className={`text-xs font-bold uppercase tracking-[0.12em] ${
+                        p.top || p.highlight ? "text-leaf-700" : "text-muted-foreground"
+                      }`}
+                    >
+                      {p.pill}
+                    </span>
+                    {p.top && (
+                      <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-extrabold text-signal-foreground">
+                        TOP
+                      </span>
+                    )}
                   </span>
                   <h3 className="mt-5 text-xl font-bold tracking-tight">{p.title}</h3>
                   <p className="mt-2 flex-1 text-muted-foreground">{p.text}</p>
+                  {p.note && (
+                    <p
+                      className={`mt-4 flex items-center gap-2 text-sm font-semibold ${p.top ? "text-leaf-700" : "text-muted-foreground"}`}
+                    >
+                      <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" /> {p.note}
+                    </p>
+                  )}
                   <span className="mt-6 inline-flex items-center gap-2 font-semibold text-primary group-hover:underline group-hover:underline-offset-4">
                     {p.cta}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />

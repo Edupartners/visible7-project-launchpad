@@ -9,7 +9,9 @@ import type { ShopSettings } from "@/lib/shop";
 export const STUDY = {
   name: "Specialista internetového obchodu",
   sessions: 20,
-  period: "únor–květen 2027",
+  period: "únor–červen 2027",
+  /** Pro texty: začátek a konec semestru */
+  dates: "11. 2. – první týden v červnu 2027",
   start: "2027-02-11",
   price: 25000,
   earlyPrice: 20000,
@@ -18,10 +20,10 @@ export const STUDY = {
 };
 
 export const STUDY_ITEMS = [
-  `${STUDY.sessions} online setkání s lektory z praxe (${STUDY.period})`,
+  `${STUDY.sessions} online setkání s lektory z praxe (únor–květen)`,
   "Vlastní projekt: web nebo e-shop, marketing a čísla",
   "Konzultace vašeho byznysu s lektory",
-  "Závěrečný den v Praze: obhajoba projektu a zkouška profesní kvalifikace",
+  "Závěrečný den v Praze (první týden v červnu): obhajoba projektu a zkouška profesní kvalifikace",
   "Zkouška v ceně a k tomu vše z členství VISIBLE7",
 ];
 
