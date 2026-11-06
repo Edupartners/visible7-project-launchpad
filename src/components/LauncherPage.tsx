@@ -276,12 +276,20 @@ const PATHS: {
   highlight?: boolean;
   top?: boolean;
   note?: string;
+  bullets?: string[];
 }[] = [
   {
     pill: "Semestrální studium",
     title: "Chci se stát specialistou internetového obchodu.",
     text: `${STUDY.sessions} online setkání s lektory, vlastní projekt a osvědčení o profesní kvalifikaci ${NSK_QUALIFICATION.code}.`,
     note: `Termín: ${STUDY.dates}`,
+    bullets: [
+      `Zkouška profesní kvalifikace ${NSK_QUALIFICATION.code}`,
+      `${STUDY.sessions} kurzů a setkání s lektory`,
+      "Vlastní projekt",
+      "E-learning",
+      "Komunita",
+    ],
     cta: "Zobrazit studium",
     href: "#studium",
     top: true,
@@ -436,7 +444,20 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                     )}
                   </span>
                   <h3 className="mt-5 text-xl font-bold tracking-tight">{p.title}</h3>
-                  <p className="mt-2 flex-1 text-muted-foreground">{p.text}</p>
+                  {p.bullets ? (
+                    <ul className="mt-3 flex-1 space-y-1.5 text-muted-foreground">
+                      {p.bullets.map((b) => (
+                        <li key={b} className="flex gap-2">
+                          <span className="font-bold text-leaf-600" aria-hidden="true">
+                            –
+                          </span>
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 flex-1 text-muted-foreground">{p.text}</p>
+                  )}
                   {p.note && (
                     <p
                       className={`mt-4 flex items-center gap-2 text-sm font-semibold ${p.top ? "text-leaf-700" : "text-muted-foreground"}`}
