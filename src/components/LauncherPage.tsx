@@ -284,10 +284,10 @@ const PATHS: {
     text: `${STUDY.sessions} online setkání s lektory, vlastní projekt a osvědčení o profesní kvalifikaci ${NSK_QUALIFICATION.code}.`,
     note: `Termín: ${STUDY.dates}`,
     bullets: [
-      `Zkouška profesní kvalifikace ${NSK_QUALIFICATION.code}`,
-      `${STUDY.sessions} kurzů a setkání s lektory`,
-      "Vlastní projekt",
-      "E-learning",
+      `Státní zkouška ${NSK_QUALIFICATION.code} v ceně`,
+      `${STUDY.sessions} online setkání s lektory`,
+      "Vlastní projekt s konzultacemi",
+      "E-learning a celé VISIBLE7",
     ],
     cta: "Zobrazit studium",
     href: "#studium",
@@ -444,11 +444,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   </span>
                   <h3 className="mt-5 text-xl font-bold tracking-tight">{p.title}</h3>
                   {p.bullets ? (
-                    <ul className="mt-3 flex-1 space-y-1.5 text-muted-foreground">
+                    <ul className="mt-4 flex-1 space-y-2.5">
                       {p.bullets.map((b) => (
-                        <li key={b} className="flex gap-2">
-                          <span className="font-bold text-leaf-600" aria-hidden="true">
-                            –
+                        <li key={b} className="flex items-start gap-2.5 text-[15px] font-medium leading-snug">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-signal text-signal-foreground">
+                            <Check className="h-3 w-3" strokeWidth={3.5} aria-hidden="true" />
                           </span>
                           {b}
                         </li>
