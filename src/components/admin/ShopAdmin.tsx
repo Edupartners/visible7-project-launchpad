@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/visible7/client";
 import { ShopSettings, kc, loadShop, monthsLabel, saveShop } from "@/lib/shop";
+import { STUDY } from "@/lib/study";
 
 interface Purchase {
   id: number;
@@ -40,13 +41,14 @@ export function ShopAdmin() {
   if (!shop) return null;
 
   const set = (k: keyof ShopSettings, v: string) =>
-    setShop({ ...shop, [k]: ["price", "months", "days"].includes(k) ? Number(v) || 0 : v });
+    setShop({ ...shop, [k]: ["price", "months", "days", "study_early_left"].includes(k) ? Number(v) || 0 : v });
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = shop.checkout_url.trim();
     const studyUrl = (shop.study_checkout_url ?? "").trim();
-    if ((url && !/^https:\/\//.test(url)) || (studyUrl && !/^https:\/\//.test(studyUrl))) {
+    const studyInstUrl = (shop.study_installments_url ?? "").trim();
+    if ([url, studyUrl, studyInstUrl].some((u) => u && !/^https:\/\//.test(u))) {
       setMsg("Odkaz na objednávku musí začínat https://");
       return;
     }
@@ -57,6 +59,11 @@ export function ShopAdmin() {
         ...shop,
         checkout_url: url,
         study_checkout_url: studyUrl,
+        study_installments_url: studyInstUrl,
+        study_early_left: Math.max(
+          0,
+          Math.min(STUDY.earlySeats, Math.round(shop.study_early_left ?? STUDY.earlySeats)),
+        ),
         product_id: shop.product_id?.trim() || undefined,
         form_id: shop.form_id?.trim() ?? "",
       });
@@ -124,14 +131,43 @@ export function ShopAdmin() {
             placeholder="https://form.simpleshop.cz/…"
           />
         </label>
-        <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">
-          <span className="font-semibold">Platba studia Specialista internetového obchodu (25 000 Kč)</span>
-          <Input
-            value={shop.study_checkout_url ?? ""}
-            onChange={(e) => set("study_checkout_url", e.target.value)}
-            placeholder="https://form.simpleshop.cz/… (prázdné = jen úvodní hovor)"
-          />
-        </label>
+        <div className="space-y-3 rounded-xl border border-border p-4 sm:col-span-2 lg:col-span-4">
+          <p className="font-semibold">Studium {STUDY.name}</p>
+          <p className="text-sm text-muted-foreground">
+            Prvních {STUDY.earlySeats} přihlášených za {kc(STUDY.earlyPrice)} (5 × {kc(STUDY.earlyPrice / 5)}), potom{" "}
+            {kc(STUDY.price)} (5 × {kc(STUDY.price / 5)}). Po každé přihlášce snižte počet volných míst. Při 0 se na
+            webu ukáže plná cena; ceny v SimpleShopu pak změňte i tam. Číslo musí odpovídat skutečnosti.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-[10rem_1fr_1fr]">
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Volná místa za {kc(STUDY.earlyPrice)}</span>
+              <Input
+                type="number"
+                min={0}
+                max={STUDY.earlySeats}
+                value={shop.study_early_left ?? STUDY.earlySeats}
+                onChange={(e) => set("study_early_left", e.target.value)}
+              />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Odkaz: platba najednou</span>
+              <Input
+                value={shop.study_checkout_url ?? ""}
+                onChange={(e) => set("study_checkout_url", e.target.value)}
+                placeholder="https://form.simpleshop.cz/…"
+              />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Odkaz: 5 plateb</span>
+              <Input
+                value={shop.study_installments_url ?? ""}
+                onChange={(e) => set("study_installments_url", e.target.value)}
+                placeholder="https://form.simpleshop.cz/…"
+              />
+            </label>
+          </div>
+          <p className="text-xs text-muted-foreground">Bez odkazů se zobrazí jen úvodní hovor s Michalem.</p>
+        </div>
         <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">
           <span className="font-semibold">Věta o hodnotě na ceníku</span>
           <Input value={shop.anchor} onChange={(e) => set("anchor", e.target.value)} maxLength={160} />

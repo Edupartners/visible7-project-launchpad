@@ -13,6 +13,10 @@ export interface ShopSettings {
   form_id?: string;
   /** Odkaz na okamžitou platbu studia Specialista internetového obchodu (SimpleShop). Prázdné = jen hovor. */
   study_checkout_url?: string;
+  /** Odkaz na platbu studia v 5 platbách (SimpleShop). Prázdné = tlačítko se nezobrazí. */
+  study_installments_url?: string;
+  /** Kolik míst za zvýhodněnou cenu studia zbývá (0 = platí plná cena). */
+  study_early_left?: number;
 }
 
 export const SHOP_DEFAULT: ShopSettings = {

@@ -1,7 +1,10 @@
+import type { ShopSettings } from "@/lib/shop";
+
 /**
  * Studium Specialista internetového obchodu (Edu Partners): 20 online setkání s lektory, vlastní projekt,
  * závěrečný den v Praze se zkouškou profesní kvalifikace v ceně. Včetně členství VISIBLE7.
- * Nahrazuje dřívější „Akademii online podnikání s AI“.
+ * Cena: prvních 15 přihlášených 20 000 Kč, potom 25 000 Kč. Najednou, nebo v 5 platbách
+ * (zápisné při přihlášce + platba za každý měsíc studia únor–květen; nejde o úvěr, každá platba je za daný měsíc).
  */
 export const STUDY = {
   name: "Specialista internetového obchodu",
@@ -9,8 +12,9 @@ export const STUDY = {
   period: "únor–květen 2027",
   start: "2027-02-11",
   price: 25000,
-  /** Celý kurz Specialista internetového obchodu s lektorem v Edu Partners. */
-  usualPrice: 49000,
+  earlyPrice: 20000,
+  earlySeats: 15,
+  payments: 5,
 };
 
 export const STUDY_ITEMS = [
@@ -23,3 +27,17 @@ export const STUDY_ITEMS = [
 
 /** Přihlášky do začátku studia. */
 export const studyOpen = (now = new Date()) => now < new Date(`${STUDY.start}T17:00:00+01:00`);
+
+/**
+ * Aktuální nabídka podle nastavení v administraci (Prodej → zbývající místa za zvýhodněnou cenu).
+ * Bez nastavení platí zvýhodněná cena se všemi 15 místy.
+ */
+export function studyOffer(shop: ShopSettings) {
+  const left = Math.max(0, Math.min(STUDY.earlySeats, shop.study_early_left ?? STUDY.earlySeats));
+  const early = left > 0;
+  const price = early ? STUDY.earlyPrice : STUDY.price;
+  return { early, left, price, monthly: Math.round(price / STUDY.payments) };
+}
+
+/** 1 místo, 2–4 místa, 5+ míst */
+export const seatsLabel = (n: number) => `${n} ${n === 1 ? "místo" : n < 5 ? "místa" : "míst"}`;

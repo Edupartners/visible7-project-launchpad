@@ -9,6 +9,7 @@ import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { STUDY, STUDY_ITEMS, studyOpen } from "@/lib/study";
+import { StudyCtas, StudyPrice } from "@/components/marketing/StudySection";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 
 /** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
@@ -298,10 +299,9 @@ const PricingPage = () => {
                   Top nabídka
                 </span>
               </div>
-              <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(STUDY.price)}</p>
-              <p className="text-sm text-muted-foreground">
-                vč. DPH, zkoušky a členství · běžně <s className="whitespace-nowrap">{kc(STUDY.usualPrice)}</s>
-              </p>
+              <div className="mt-3">
+                <StudyPrice />
+              </div>
               <p className="mt-3 text-sm">
                 <b>{STUDY.name}</b>. {STUDY.sessions} online setkání, {STUDY.period}, zakončené zkouškou profesní
                 kvalifikace {NSK_QUALIFICATION.code}.
@@ -315,31 +315,8 @@ const PricingPage = () => {
                 ))}
               </ul>
               {study ? (
-                <div className="mt-6 space-y-2">
-                  {shop.study_checkout_url && (
-                    <a
-                      href={shop.study_checkout_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => track("study_checkout_click", { from: "cenik" })}
-                      className="flex h-12 items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
-                    >
-                      Zaplatit a začít studovat <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </a>
-                  )}
-                  <a
-                    href={FREE_CONSULT_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => track("free_consult_click", { from: "cenik_studium" })}
-                    className={
-                      shop.study_checkout_url
-                        ? "flex h-12 items-center justify-center rounded-xl border-2 border-primary font-semibold text-primary hover:bg-primary/5"
-                        : "flex h-12 items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white hover:bg-primary/90"
-                    }
-                  >
-                    Probrat studium s Michalem
-                  </a>
+                <div className="mt-6">
+                  <StudyCtas from="cenik" />
                 </div>
               ) : (
                 <p className="mt-6 rounded-xl bg-muted p-3 text-center text-sm font-semibold">
@@ -347,7 +324,8 @@ const PricingPage = () => {
                 </p>
               )}
               <p className="mt-3 text-xs text-muted-foreground">
-                Při platbě použijte e-mail, kterým se přihlašujete do aplikace. Fakturuje Edu Partners s.r.o.
+                Při platbě použijte e-mail, kterým se přihlašujete do aplikace. Platíte při přihlášce a pak za každý
+                měsíc studia. Fakturuje Edu Partners s.r.o.
               </p>
             </div>
           </div>

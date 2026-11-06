@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { kc, useFounderOffer, useShop } from "@/lib/shop";
+import { studyOffer } from "@/lib/study";
 import { track } from "@/lib/track";
 
 /**
  * Kalkulačka úspory na úvodní stránce: kolik člověk ušetří, když web, marketing a plán zvládne sám.
- * Ceny jsou orientační z praxe (Michal, 10/2026); celý kurz Specialista internetového obchodu s lektorem 49 000 Kč (Edu Partners); kotva „přes 60 000 Kč“ patří k ceně členství.
+ * Ceny jsou orientační z praxe (Michal, 10/2026); kotva „přes 60 000 Kč“ patří k ceně členství.
  */
 const WEB = 25_000;
 const CARE_MONTHLY = 1_000;
@@ -140,8 +141,11 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">
-          Pro srovnání: <b className="text-foreground">kurz Specialista internetového obchodu s lektorem</b> stojí v Edu
-          Partners <b className="text-foreground">49&nbsp;000&nbsp;Kč</b>. VISIBLE7 vás provede stejnou cestou.
+          Chcete stejnou cestu s lektory a zkouškou?{" "}
+          <a href="#studium" className="font-semibold text-foreground underline underline-offset-4">
+            Studium Specialista internetového obchodu
+          </a>{" "}
+          od {kc(studyOffer(shop).monthly)} měsíčně.
         </p>
         <p className="mt-1.5 text-xs text-muted-foreground">
           Orientační odhad podle cen z praxe. Skutečná úspora závisí na vašem projektu. Další konzultace se seniorními

@@ -6,7 +6,7 @@ import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useFounderOffer, useShop }
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { useLessonStats } from "@/lib/courses";
-import { STUDY, studyOpen } from "@/lib/study";
+import { STUDY, studyOffer, studyOpen } from "@/lib/study";
 import { StudySection } from "@/components/marketing/StudySection";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
@@ -689,10 +689,13 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                       Studium {STUDY.name}: {STUDY.sessions} setkání s lektory, zkouška a členství
                     </a>
                     <span className="block text-sm text-muted-foreground">
-                      {STUDY.period}. Běžně {kc(STUDY.usualPrice)}.
+                      {STUDY.period}. Nebo {STUDY.payments} × {kc(studyOffer(shop).monthly)}
+                      {studyOffer(shop).early ? `, cena pro prvních ${STUDY.earlySeats} přihlášených` : ""}.
                     </span>
                   </dt>
-                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">{kc(STUDY.price)}</dd>
+                  <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight">
+                    {kc(studyOffer(shop).price)}
+                  </dd>
                 </div>
               )}
               <div className="flex items-baseline justify-between gap-4 px-5 py-4">
