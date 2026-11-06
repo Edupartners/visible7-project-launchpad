@@ -43,9 +43,7 @@ export function ShopAdmin() {
   const set = (k: keyof ShopSettings, v: string) =>
     setShop({
       ...shop,
-      [k]: ["price", "months", "days", "study_early_left", "install_price", "install_elementor_price"].includes(k)
-        ? Number(v) || 0
-        : v,
+      [k]: ["price", "months", "days", "study_early_left", "install_price"].includes(k) ? Number(v) || 0 : v,
     });
 
   const save = async (e: React.FormEvent) => {
@@ -178,26 +176,17 @@ export function ShopAdmin() {
         <div className="space-y-3 rounded-xl border border-border p-4 sm:col-span-2 lg:col-span-4">
           <p className="font-semibold">Instalace webu s podporou (brána 4)</p>
           <p className="text-sm text-muted-foreground">
-            Ceny vč. DPH. Licence Elementor Pro: když necháte 0, zobrazí se „56 USD“. Spotřebitelům je ale lepší ukázat
-            cenu v Kč.
+            Cena vč. DPH. Licence Elementor Pro na 1 rok je pro zákazníka zdarma, hosting (cca 700 Kč) a doménu (cca 260
+            Kč) platí přímo WEDOSu.
           </p>
-          <div className="grid gap-3 sm:grid-cols-[10rem_10rem_1fr]">
+          <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
             <label className="space-y-1 text-sm">
               <span className="font-semibold">Instalace (Kč)</span>
               <Input
                 type="number"
                 min={0}
-                value={shop.install_price ?? 990}
+                value={shop.install_price ?? 499}
                 onChange={(e) => set("install_price", e.target.value)}
-              />
-            </label>
-            <label className="space-y-1 text-sm">
-              <span className="font-semibold">Elementor Pro (Kč)</span>
-              <Input
-                type="number"
-                min={0}
-                value={shop.install_elementor_price ?? 0}
-                onChange={(e) => set("install_elementor_price", e.target.value)}
               />
             </label>
             <label className="space-y-1 text-sm">

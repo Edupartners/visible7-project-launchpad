@@ -6,13 +6,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
 import { supabase } from "@/integrations/visible7/client";
-import { INSTALL_STATUS, InstallRequest, WEB_TYPES, WEDOS_PRICES_URL, myLatestInstall } from "@/lib/install";
+import {
+  DOMAIN_YEAR,
+  HOSTING_YEAR,
+  INSTALL_PRICE,
+  INSTALL_STATUS,
+  InstallRequest,
+  WEB_TYPES,
+  WEDOS_PRICES_URL,
+  myLatestInstall,
+} from "@/lib/install";
 import { kc, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
 const INCLUDED = [
   "Instalace WordPressu na váš hosting",
-  "Aktivace Elementor Pro na 1 rok",
+  "Licence Elementor Pro na 1 rok zdarma",
   "Základní pluginy",
   "Certifikát SSL a propojení domény s hostingem",
   "Přístup odkazem na nastavení hesla. Hesla po vás nechceme.",
@@ -23,8 +32,7 @@ export const InstallSupport = () => {
   const { user } = useAuth();
   const { currentProject } = useProject();
   const shop = useShop();
-  const price = shop.install_price ?? 990;
-  const elementor = shop.install_elementor_price ? kc(shop.install_elementor_price) : "56 USD";
+  const price = shop.install_price ?? INSTALL_PRICE;
   const [req, setReq] = useState<InstallRequest | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
@@ -94,25 +102,34 @@ export const InstallSupport = () => {
               </div>
               <div className="flex justify-between gap-3 px-4 py-2.5">
                 <dt>Licence Elementor Pro na 1 rok</dt>
-                <dd className="font-bold">{elementor}</dd>
+                <dd className="font-bold text-leaf-700">zdarma</dd>
               </div>
               <div className="flex justify-between gap-3 px-4 py-2.5">
                 <dt>
-                  Hosting a doména{" "}
+                  Hosting na 1 rok
                   <span className="block text-xs text-muted-foreground">platíte přímo WEDOSu, na své jméno</span>
                 </dt>
-                <dd className="text-right">
-                  <a
-                    href={WEDOS_PRICES_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-semibold text-primary underline-offset-4 hover:underline"
-                  >
-                    podle ceníku <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                  </a>
-                </dd>
+                <dd className="whitespace-nowrap">cca {kc(HOSTING_YEAR)}</dd>
+              </div>
+              <div className="flex justify-between gap-3 px-4 py-2.5">
+                <dt>
+                  Doména na 1 rok
+                  <span className="block text-xs text-muted-foreground">platíte přímo WEDOSu, na své jméno</span>
+                </dt>
+                <dd className="whitespace-nowrap">cca {kc(DOMAIN_YEAR)}</dd>
+              </div>
+              <div className="flex justify-between gap-3 bg-leaf-50/60 px-4 py-2.5">
+                <dt className="font-semibold">První rok celkem</dt>
+                <dd className="whitespace-nowrap font-bold">cca {kc(price + HOSTING_YEAR + DOMAIN_YEAR)}</dd>
               </div>
             </dl>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Hosting a doména podle{" "}
+              <a href={WEDOS_PRICES_URL} target="_blank" rel="noopener noreferrer" className="underline">
+                aktuálního ceníku WEDOS
+              </a>
+              . Máte-li je už, platíte jen instalaci.
+            </p>
             <button
               type="button"
               onClick={() => {
@@ -380,9 +397,9 @@ const InstallForm = ({
               className="mt-0.5 h-4 w-4"
             />
             <span>
-              Objednávám instalaci za {kc(price)} a licenci Elementor Pro na 1 rok. Beru na vědomí, že hosting a doména
-              jsou na mé jméno, obsah webu si tvořím sám a údaje z formuláře použije Edu Partners s.r.o. k instalaci a
-              fakturaci.
+              Objednávám instalaci za {kc(price)} s licencí Elementor Pro na 1 rok zdarma. Beru na vědomí, že hosting a
+              doména jsou na mé jméno, obsah webu si tvořím sám a údaje z formuláře použije Edu Partners s.r.o. k
+              instalaci a fakturaci.
             </span>
           </label>
           {err && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{err}</p>}

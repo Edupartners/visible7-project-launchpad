@@ -33,6 +33,11 @@ export const WEB_TYPES = ["Prezentační web", "E-shop", "Prodejní stránka", "
 /** Ceník hostingu a domén u WEDOS (hosting i doména jsou na jméno zákazníka). */
 export const WEDOS_PRICES_URL = "https://vedos.cz/webhosting/srovnani/";
 
+/** Orientační roční ceny u WEDOS (platí zákazník přímo WEDOSu, na své jméno). */
+export const HOSTING_YEAR = 700;
+export const DOMAIN_YEAR = 260;
+export const INSTALL_PRICE = 499;
+
 export async function myLatestInstall(userId: string): Promise<InstallRequest | null> {
   const { data } = await supabase
     .from("install_requests")
