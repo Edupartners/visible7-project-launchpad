@@ -14,7 +14,7 @@ import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { TrustBand } from "@/components/marketing/TrustBand";
 import { FeaturedCourses } from "@/components/marketing/FeaturedCourses";
-import { OwnNumbers } from "@/components/marketing/OwnNumbers";
+import { EasyWebSection } from "@/components/marketing/EasyWebSection";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 import {
   ArrowRight,
@@ -693,7 +693,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           ))}
         </section>
 
-        <OwnNumbers />
+        <EasyWebSection onStart={onAccessGranted} />
 
         {/* Poradci */}
         <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
