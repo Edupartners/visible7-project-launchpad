@@ -265,7 +265,24 @@ const Cta = ({
 );
 
 /** Rozcestník pod hero: každý začíná jinde. */
-const PATHS: { pill: string; title: string; text: string; cta: string; to?: string; highlight?: boolean }[] = [
+const PATHS: {
+  pill: string;
+  title: string;
+  text: string;
+  cta: string;
+  to?: string;
+  href?: string;
+  highlight?: boolean;
+  top?: boolean;
+}[] = [
+  {
+    pill: "Studium s lektory",
+    title: "Chci se stát specialistou internetového obchodu.",
+    text: `${STUDY.sessions} online setkání s lektory, vlastní projekt a osvědčení o profesní kvalifikaci ${NSK_QUALIFICATION.code}.`,
+    cta: "Zobrazit studium",
+    href: "#studium",
+    top: true,
+  },
   {
     pill: "Nejčastější start",
     title: "Mám podnikatelský nápad.",
@@ -394,13 +411,13 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               potřebujete.
             </p>
           </div>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {PATHS.map((p) => {
               const inner = (
                 <>
                   <span
                     className={`text-xs font-bold uppercase tracking-[0.12em] ${
-                      p.highlight ? "text-leaf-700" : "text-muted-foreground"
+                      p.top || p.highlight ? "text-leaf-700" : "text-muted-foreground"
                     }`}
                   >
                     {p.pill}
@@ -413,12 +430,30 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   </span>
                 </>
               );
-              const cls = `group flex h-full flex-col rounded-2xl border p-6 text-left transition-colors ${
-                p.highlight
-                  ? "border-leaf-300 bg-leaf-50 hover:border-leaf-500"
-                  : "border-border bg-background hover:border-primary/40"
+              const cls = `group flex h-full flex-col rounded-2xl p-6 text-left transition-colors ${
+                p.top
+                  ? "border-[3px] border-signal bg-leaf-50 shadow-[0_12px_40px_-12px_rgba(52,132,90,0.35)]"
+                  : p.highlight
+                    ? "border border-leaf-300 bg-leaf-50 hover:border-leaf-500"
+                    : "border border-border bg-background hover:border-primary/40"
               }`;
-              return p.to ? (
+              return p.href ? (
+                <a
+                  key={p.title}
+                  href={p.href}
+                  className={cls}
+                  onClick={(e) => {
+                    track("landing_path_click", { path: p.pill });
+                    const el = document.getElementById(p.href!.slice(1));
+                    if (el) {
+                      e.preventDefault();
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
+                >
+                  {inner}
+                </a>
+              ) : p.to ? (
                 <Link
                   key={p.title}
                   to={p.to}
