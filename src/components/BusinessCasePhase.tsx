@@ -1,3 +1,4 @@
+import { GateGuideProvider, GuideStep, GuideStepBlock } from "@/components/guide/GateGuide";
 import { track } from "@/lib/track";
 import { AI_NAME, AiMichalAvatar, AiMichalNote } from "@/components/AiMichal";
 import { AiPrivacyNote } from "@/components/AiPrivacyNote";
@@ -605,6 +606,101 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const trough = current.rows.reduce((a, b) => (b.cumulative < a.cumulative ? b : a), current.rows[0]);
   const costsByKind = (kind: CostKind) => data.costs.filter((c) => c.kind === kind);
 
+  const guideSteps: GuideStep[] = [
+    {
+      id: "ai",
+      title: "Nechte AI předvyplnit čísla",
+      time: "2 minuty",
+      explain: [
+        "Byznys case je jednoduchý výpočet: kolik vyděláte, kolik utratíte a jestli vám něco zůstane. Žádná účetnictví, stačí odhady.",
+        "AI Michal zná váš projekt z bran 1 a 2 a doplní obvyklé hodnoty pro váš obor: cenu, počet zákazníků, marži i náklady. Vyplní jen prázdná pole, všechno pak můžete přepsat.",
+        "Chcete raději psát sami? Krok přeskočte.",
+      ],
+      example: [
+        [
+          "Jak to dopadlo",
+          "U WeSportly AI navrhla cenu předplatného a obvyklé náklady. Čísla jsme pak zkontrolovali a upravili.",
+        ],
+      ],
+      doneWhen: "máte předvyplněno, nebo chcete psát sami (můžete pokračovat).",
+      done: true,
+    },
+    {
+      id: "prijmy",
+      title: "Kolik vyděláte",
+      time: "15–20 minut",
+      think: true,
+      explain: [
+        "Představte si 12. měsíc po spuštění. Kolik toho prodáte za měsíc, za kolik a kolik vám z toho zůstane? Rozjezd do té doby dopočítáme sami.",
+        "Buďte spíš opatrní. Nováček skoro vždy přecení, kolik zákazníků přijde. U každého pole je otazník s vysvětlením a tlačítko „Doporučit hodnoty s AI“ ukáže, co je v oboru obvyklé.",
+        "Pozor na ceny za delší období: když prodáváte předplatné na 6 měsíců za 2 990 Kč, napište měsíční cenu 498 Kč.",
+      ],
+      example: [
+        ["Cena", "předplatné 149 Kč měsíčně"],
+        ["Zákazníci ve 12. měsíci", "300 předplatitelů"],
+        ["Odchodovost", "8 % měsíčně (z každých 100 jich 8 za měsíc odejde)"],
+        ["Pozor", "čísla jsou jen ilustrační"],
+      ],
+      doneWhen: "jsou vyplněné cena, objem a marže.",
+      done: hasRevenue && (data.revenue.grossMargin > 0 || group === "content"),
+    },
+    {
+      id: "naklady",
+      title: "Kolik utratíte",
+      time: "15–20 minut",
+      think: true,
+      explain: [
+        "Náklady jsou ve třech skupinách: jednorázové před spuštěním (web, vybavení), měsíční provoz (hosting, účetní, nástroje) a marketing.",
+        "Napište ke každé položce částku. Nevíte kolik? Tlačítko „Odhadnout částky s AI“ doplní obvyklé ceny v ČR a upozorní, na co jste zapomněli.",
+        "Nezapomeňte na marketing. Bez něj se o vás nikdo nedozví, a to je nejčastější chyba v plánech.",
+      ],
+      example: [
+        ["Jednorázově", "web 15 000 Kč, kamera a mikrofon 12 000 Kč"],
+        ["Měsíčně", "hosting videí 600 Kč, účetní 1 500 Kč"],
+        ["Marketing", "5 000 Kč měsíčně na reklamu na sociálních sítích"],
+        ["Pozor", "čísla jsou jen ilustrační"],
+      ],
+      doneWhen: "aspoň jedna položka má částku.",
+      done: hasCosts,
+    },
+    {
+      id: "vysledek",
+      title: "Vyplatí se to?",
+      time: "10 minut",
+      explain: [
+        "Tady nic nevyplňujete, jen čtete. Podívejte se na tři věci: kolik peněz potřebujete na začátek (nejnižší bod grafu), kdy se dostanete do plusu a jaký je zisk za 2 roky.",
+        "Přepněte na opatrný scénář. Když se to vyplatí i tehdy, je plán odolný. Když ne, vraťte se k příjmům nebo nákladům.",
+        "Pokud vidíte upozornění „Čísla vypadají až příliš dobře“, berte ho vážně.",
+      ],
+      example: [
+        ["Pozor", "čísla jsou jen ilustrační"],
+        [
+          "Co z toho plyne",
+          "WeSportly potřebuje na začátek asi 40 000 Kč a do plusu se dostane zhruba v 10. měsíci. V opatrném scénáři později, ale pořád se to vyplatí.",
+        ],
+      ],
+      doneWhen: "prohlédli jste si výsledek (můžete pokračovat).",
+      done: true,
+    },
+    {
+      id: "komentar",
+      title: "Nechte si čísla okomentovat",
+      time: "5 minut",
+      explain: [
+        "AI Michal se podívá na vaše čísla jako zkušený poradce: co je realistické, co je riskantní a na co si dát pozor.",
+        "Komentář je doporučený, ale ne povinný. Bránu dokončíte i bez něj.",
+      ],
+      example: [
+        [
+          "Komentář",
+          "Například: „Odchodovost 8 % je u předplatného obvyklá. Riziko vidím v nákladech na získání zákazníka, ověřte je malou kampaní.“",
+        ],
+      ],
+      doneWhen: "máte komentář, nebo ho přeskočíte.",
+      done: true,
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
       <DiagnosisDraftNote part="case" gate={3} />
@@ -660,744 +756,775 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         </dl>
       </Card>
 
-      {/* Vyplnit s AI */}
-      <section className="flex flex-col gap-4 rounded-2xl border-2 border-primary/20 bg-accent/50 p-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className="flex items-center gap-2 text-lg font-bold">
-            <Sparkles className="h-5 w-5 text-primary" /> Vyplnit byznys case s AI
-          </h3>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            AI podle vašeho projektu doplní cenu, objem, marži, růst i částky nákladů, upozorní na chybějící položky a
-            barevně ohodnotí, které kanály dávají smysl. Vyplní jen prázdná pole – vše pak můžete přepsat.
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {currentProject?.business_type
-              ? `Zbývá ${Math.max(0, AI_LIMITS.navrh - autofillUsed)} z ${AI_LIMITS.navrh} pro tento projekt.`
-              : "Nejdřív zvolte typ byznysu ve fázi 2."}
-          </p>
-          <AiPrivacyNote className="mt-2" />
-        </div>
-        <Button
-          className="btn-apple shrink-0"
-          onClick={runAutofill}
-          disabled={busyAutofill || autofillUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
-        >
-          {busyAutofill ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-          {busyAutofill ? "Vyplňuji…" : autofillUsed ? "Vyplnit znovu" : "Vyplnit s AI"}
-        </Button>
-      </section>
-
-      {/* Příjmy */}
-      <Card className="card-apple p-6">
-        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h3 className="text-lg font-bold">Příjmy</h3>
-            <p className="text-sm text-muted-foreground">
-              Zadejte plán pro 12. měsíc po spuštění. Rozjezd k němu dopočítáme postupně, druhý rok podle zadaného
-              růstu. U každého pole najdete vysvětlivku pod otazníkem.
-            </p>
-          </div>
-          <div className="shrink-0 sm:text-right">
-            <Button
-              variant="outline"
-              className="rounded-[10px]"
-              onClick={runAssumptions}
-              disabled={busyAssumptions || assumptionsUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
-            >
-              {busyAssumptions ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="mr-2 h-4 w-4" />
-              )}
-              {busyAssumptions ? "Hledám obvyklé hodnoty…" : assumptions ? "Doporučit znovu" : "Doporučit hodnoty s AI"}
-            </Button>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Marže, růst a další procenta podle oboru. Zbývá {Math.max(0, AI_LIMITS.navrh - assumptionsUsed)} z{" "}
-              {AI_LIMITS.navrh}.
-            </p>
-          </div>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          {revenueFields.map((f) => (
-            <NumField
-              key={f.key}
-              id={`rev-${f.key}`}
-              label={f.label}
-              suffix={f.suffix}
-              placeholder={f.placeholder}
-              help={f.help}
-              value={data.revenue[f.key]}
-              onChange={(v) =>
-                setRevenue({
-                  [f.key]: f.max ? Math.min(v, f.max) : v,
-                } as Partial<RevenueInputs>)
-              }
-              suggestion={assumptions?.find((a) => a.field === f.key)}
-            />
-          ))}
-        </div>
-      </Card>
-
-      {/* Náklady */}
-      <Card className="card-apple p-6">
-        <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h3 className="text-lg font-bold">Náklady</h3>
-            <p className="text-sm text-muted-foreground">
-              Náklady na zboží a dopravu už jsou v hrubé marži. Sem patří vše ostatní. Položku bez částky nepočítáme.
-            </p>
-          </div>
-          <div className="shrink-0 sm:text-right">
-            <Button
-              variant="outline"
-              className="rounded-[10px]"
-              onClick={runCostHints}
-              disabled={busyCosts || costHintsUsed >= AI_LIMITS.navrh || data.costs.length === 0}
-            >
-              {busyCosts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-              {busyCosts ? "Odhaduji částky…" : costHints ? "Odhadnout znovu" : "Odhadnout částky s AI"}
-            </Button>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Orientační ceny pro začínající projekt v ČR. Zbývá {Math.max(0, AI_LIMITS.navrh - costHintsUsed)} z{" "}
-              {AI_LIMITS.navrh}.
-            </p>
-          </div>
-        </div>
-        {costHints?.items.some((h) => h.fit) && (
-          <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">
-              Hodnocení AI podle toho, co dává smysl pro vašeho zákazníka:
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-1 rounded bg-emerald-500" /> doporučeno
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-1 rounded bg-orange-400" /> zvážit
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-1 rounded bg-red-500" /> nedoporučeno
-            </span>
-          </p>
-        )}
-        {costHints?.missing && costHints.missing.length > 0 && (
-          <div className="mt-4 rounded-xl border-l-2 border-primary bg-accent/60 p-4 text-sm">
-            <p className="font-semibold text-primary">AI upozorňuje na položky, které vám chybí</p>
-            <ul className="mt-2 space-y-2">
-              {costHints.missing.map((m) => {
-                const added = data.costs.some((c) => c.name.toLowerCase() === m.name.toLowerCase());
-                return (
-                  <li key={m.name} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <span>
-                      <strong>{m.name}</strong> ({KIND_SHORT[m.kind]}, orientačně {czk(m.typical)}) – {m.why}
-                    </span>
-                    {added ? (
-                      <span className="shrink-0 text-xs font-semibold text-emerald-700">Přidáno</span>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 shrink-0 rounded-lg px-2.5"
-                        onClick={() =>
-                          setData((prev) => ({
-                            ...prev,
-                            costs: [
-                              ...prev.costs,
-                              {
-                                id: newId(),
-                                name: m.name,
-                                amount: m.typical,
-                                kind: m.kind,
-                              },
-                            ],
-                          }))
-                        }
-                      >
-                        <Plus className="mr-1 h-3.5 w-3.5" /> Přidat
-                      </Button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-        {(["jednorazove", "mesicni", "marketing"] as CostKind[]).map((kind) => (
-          <div key={kind} className="border-t border-border pt-5 mt-5 first-of-type:mt-3">
-            <div className="mb-3">
-              <h4 className="font-semibold">{KIND_COPY[kind].title}</h4>
-              <p className="text-sm text-muted-foreground">{KIND_COPY[kind].hint}</p>
-            </div>
-            <ul className="space-y-2">
-              {costsByKind(kind).map((c) => {
-                const hint = costHints?.items.find((h) => h.id === c.id);
-                const fit = hint?.fit ? FIT_STYLE[hint.fit] : null;
-                return (
-                  <li key={c.id} className={fit ? `border-l-4 pl-3 ${fit.border}` : ""}>
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
-                      <Input
-                        value={c.name}
-                        onChange={(e) => updateCost(c.id, { name: e.target.value })}
-                        placeholder="Název položky"
-                        className="col-span-3 min-w-0 sm:flex-1"
-                        aria-label="Název položky"
-                      />
-                      <span className="relative min-w-0 sm:w-40 sm:shrink-0">
-                        <Input
-                          type="number"
-                          inputMode="decimal"
-                          min={0}
-                          value={c.amount ? String(c.amount) : ""}
-                          placeholder="0"
-                          onChange={(e) =>
-                            updateCost(c.id, {
-                              amount: Math.max(0, Number(e.target.value) || 0),
-                            })
-                          }
-                          className="pr-10 text-right tabular-nums"
-                          aria-label={`Částka – ${c.name || "položka"} (${KIND_COPY[kind].unit})`}
-                        />
-                        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
-                          Kč
-                        </span>
-                      </span>
-                      <select
-                        value={c.kind}
-                        onChange={(e) => updateCost(c.id, { kind: e.target.value as CostKind })}
-                        className="h-11 w-[7.5rem] shrink-0 rounded-xl border border-input bg-card px-2 text-sm sm:w-auto"
-                        aria-label="Druh nákladu"
-                      >
-                        <option value="jednorazove">jednorázově</option>
-                        <option value="mesicni">měsíčně</option>
-                        <option value="marketing">marketing</option>
-                      </select>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="shrink-0"
-                        onClick={() => removeCost(c.id)}
-                        aria-label="Odebrat položku"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {hint && (
-                      <div className="mt-1 flex flex-col gap-1 pl-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
-                        <span>
-                          {fit && (
-                            <span className={`mr-1.5 inline-block rounded-full px-2 py-0.5 font-semibold ${fit.badge}`}>
-                              {fit.label}
-                            </span>
-                          )}
-                          {hint.fitWhy && <span className="text-foreground">{hint.fitWhy} </span>}
-                          <span className="font-semibold text-primary">
-                            {c.kind === "marketing" ? "AI předpověď" : "AI: obvykle"} {czk(hint.typical)}
-                          </span>
-                          {hint.high > hint.low && ` (${czk(hint.low)} – ${czk(hint.high)})`}. {hint.why}
-                        </span>
-                        {c.amount === hint.typical ? (
-                          <span className="shrink-0 font-semibold text-emerald-700">Použito</span>
-                        ) : (
-                          <button
-                            type="button"
-                            className="shrink-0 self-start font-semibold text-primary hover:underline sm:self-auto"
-                            onClick={() => updateCost(c.id, { amount: hint.typical })}
-                          >
-                            Použít {czk(hint.typical)}
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-            <Button variant="ghost" size="sm" className="mt-2 text-primary" onClick={() => addCost(kind)}>
-              <Plus className="mr-1 h-4 w-4" /> Přidat položku
-            </Button>
-            {kind !== "jednorazove" && (
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-sm text-muted-foreground">Rychle přidat:</span>
-                {(kind === "marketing" ? AD_CHANNELS : COMMON_MONTHLY)
-                  .filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase()))
-                  .map((ch) => (
-                    <button
-                      key={ch}
-                      type="button"
-                      onClick={() =>
-                        setData((prev) => ({
-                          ...prev,
-                          costs: [
-                            ...prev.costs,
-                            {
-                              id: newId(),
-                              name: ch,
-                              amount: 0,
-                              kind,
-                            },
-                          ],
-                        }))
-                      }
-                      className="rounded-full border border-border px-3 py-1 text-sm hover:border-primary hover:text-primary"
-                    >
-                      + {ch}
-                    </button>
-                  ))}
-              </div>
-            )}
-          </div>
-        ))}
-        <div className="mt-5 border-t border-border pt-5">
-          <p className="mb-2 text-sm font-semibold">Forma podnikání a daně</p>
-          <div role="radiogroup" aria-label="Forma podnikání" className="grid gap-2 sm:grid-cols-3">
-            {TAX_FORMS.map((f) => {
-              const selected = data.taxForm === f.id;
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => chooseTaxForm(f.id)}
-                  className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${
-                    selected ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/40"
-                  }`}
-                >
-                  <span className="block font-semibold">{f.label}</span>
-                  <span className="block text-xs text-muted-foreground">{f.hint}</span>
-                </button>
-              );
-            })}
-          </div>
-          {hasRevenue && (
-            <div className="mt-4">
-              <TaxRegimeAdvice rows={results.realisticky.rows} data={data} />
-            </div>
-          )}
-        </div>
-        <div className="mt-5 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
-          <NumField
-            id="tax-rate"
-            label="Daň z příjmu (% ze zisku)"
-            suffix="%"
-            placeholder="např. 15"
-            value={data.taxRate ?? 0}
-            onChange={(v) => setData((prev) => ({ ...prev, taxRate: Math.min(v, 60) }))}
-            help={HELP.dan}
-          />
-          <NumField
-            id="target-profit"
-            label="Cílový zisk (% z obratu)"
-            suffix="% obratu"
-            value={data.targetProfit}
-            onChange={(v) => setData((prev) => ({ ...prev, targetProfit: Math.min(v, 90) }))}
-            help={HELP.cilovyZisk}
-          />
-        </div>
-      </Card>
-
-      {/* Výsledek */}
-      <Card className="card-apple p-6">
-        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h3 className="text-lg font-bold">Výsledek za 2 roky</h3>
-            <p className="text-sm text-muted-foreground">
-              Přepněte scénář a uvidíte, co se stane, když prodeje půjdou hůř nebo lépe.
-            </p>
-            {hasRevenue && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3 rounded-[10px]"
-                onClick={() => {
-                  if (!access.premium) {
-                    track("premium_blocked", { feature: "excel" }, currentProject?.id);
-                    toast({
-                      title: "Export do Excelu je v placeném přístupu",
-                      description: "Vaše čísla jsou uložená. Po odemčení si tabulku stáhnete hned.",
-                    });
-                    navigate("/cenik");
-                    return;
-                  }
-                  track("excel_export", {}, currentProject?.id);
-                  return downloadBusinessCaseExcel({
-                    projectName: currentProject?.name ?? "Projekt",
-                    typeName,
-                    group,
-                    data,
-                    results,
-                  }).catch(() => toast({ title: "Export se nepodařil", variant: "destructive" }));
-                }}
-              >
-                {access.premium ? <FileSpreadsheet className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}{" "}
-                Stáhnout do Excelu
-              </Button>
-            )}
-          </div>
-          <div
-            role="radiogroup"
-            aria-label="Scénář"
-            className="flex rounded-xl border border-border p-1 sm:inline-flex"
-          >
-            {SCENARIOS.map((s) => (
-              <button
-                key={s.id}
-                role="radio"
-                aria-checked={data.scenario === s.id}
-                onClick={() => setData((prev) => ({ ...prev, scenario: s.id }))}
-                className={`flex-1 rounded-lg px-1.5 py-1.5 text-[13px] font-semibold sm:text-sm transition-colors sm:flex-none sm:px-3 ${
-                  data.scenario === s.id
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                title={s.hint}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {!hasRevenue ? (
-          <p className="rounded-xl bg-secondary/70 p-4 text-sm text-muted-foreground">
-            Výsledek se ukáže, jakmile vyplníte příjmy.
-          </p>
-        ) : (
-          <>
-            {(m.profitMargin > 50 || (m.roi ?? 0) > 1000) && (
-              <p className="mb-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200" role="status">
-                <b>Čísla vypadají až příliš dobře</b> (marže zisku {pct(m.profitMargin)}
-                {m.roi !== null ? `, návratnost vložených peněz ${pct(m.roi)}` : ""}). Zkontrolujte hlavně cenu a objem.
-                {group === "subscription" &&
-                  " Cena je za měsíc: když prodáváte členství na delší období (např. 2 990 Kč na 6 měsíců), zadejte ji přepočtenou na měsíc (498 Kč)."}{" "}
-                Chybí-li vaše odměna nebo účetní, doplňte je do měsíčních nákladů.
-              </p>
-            )}
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <Stat label="Obrat" value={czk(m.revenueTotal)} help={HELP.obrat} />
-              <Stat
-                label={data.taxRate ? "Zisk před daní" : "Zisk"}
-                value={czk(m.profitTotal)}
-                note={data.taxRate ? `po dani ${czk(m.profitAfterTax)}` : `marže zisku ${pct(m.profitMargin)}`}
-                help={data.taxRate ? `${HELP.zisk} ${HELP.ziskPoZdaneni}` : HELP.zisk}
-              />
-              <Stat
-                label="Potřebný kapitál"
-                value={czk(m.requiredCapital)}
-                note="nejhlubší propad peněz"
-                help={HELP.kapital}
-              />
-              <Stat
-                label="ROI"
-                value={m.roi === null ? "—" : pct(m.roi)}
-                note="zisk za 2 roky ÷ potřebný kapitál"
-                help={HELP.roi}
-              />
-              <Stat
-                label="Bod zvratu"
-                value={monthLabel(m.breakEvenMonth)}
-                note="první měsíc v zisku"
-                help={HELP.bodZvratu}
-              />
-              <Stat
-                label="Návratnost"
-                value={monthLabel(m.paybackMonth)}
-                note="vložené peníze zpět"
-                help={HELP.navratnost}
-              />
-              <Stat label="Obrat ve 12. měsíci" value={czk(m.revenue12)} help={HELP.obrat12} />
-              <Stat label="Zisk ve 12. měsíci" value={czk(m.profit12)} help={HELP.zisk12} />
-            </div>
-
-            {/* Graf peněz v projektu */}
-            <div className="mt-6">
-              <h4 className="font-semibold">Peníze v projektu celkem</h4>
-              <p className="text-sm text-muted-foreground">
-                Nejnižší bod křivky je kapitál, který musíte mít připravený. Kde křivka protne nulu, máte vložené peníze
-                zpět.
-              </p>
-              <div className="mt-3 h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 16, right: 16, bottom: 4, left: 8 }}>
-                    <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="0" vertical={false} />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      tick={{
-                        fontSize: 12,
-                        fill: "hsl(var(--muted-foreground))",
-                      }}
-                      ticks={[0, 6, 12, 18, 24]}
-                      tickFormatter={(v) => (v === 0 ? "start" : `${v}. m.`)}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      width={64}
-                      tick={{
-                        fontSize: 12,
-                        fill: "hsl(var(--muted-foreground))",
-                      }}
-                      tickFormatter={(v) => `${Math.round(v / 1000).toLocaleString("cs-CZ")} tis.`}
-                    />
-                    <ReferenceLine y={0} stroke="hsl(var(--foreground))" strokeOpacity={0.4} />
-                    <Tooltip
-                      formatter={(v: number) => [czk(v), "Peníze celkem"]}
-                      labelFormatter={(l: number) => (l === 0 ? "Před spuštěním" : `${l}. měsíc`)}
-                      contentStyle={{
-                        borderRadius: 10,
-                        border: "1px solid hsl(var(--border))",
-                        fontSize: 13,
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="cumulative"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 5 }}
-                    />
-                    {m.requiredCapital > 0 && (
-                      <ReferenceDot
-                        x={trough.month}
-                        y={Math.round(trough.cumulative)}
-                        r={5}
-                        fill="hsl(var(--gate-copper))"
-                        stroke="hsl(var(--card))"
-                        strokeWidth={2}
-                        label={{
-                          value: `potřebný kapitál ${czk(m.requiredCapital)}`,
-                          position: "bottom",
-                          fontSize: 12,
-                          fill: "hsl(var(--foreground))",
-                        }}
-                      />
-                    )}
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* PNO */}
-            <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-xl border border-border p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h4 className="flex items-center gap-2 font-semibold">
-                    PNO – podíl marketingu na obratu <InfoTip label="PNO" text={HELP.pno} />
-                  </h4>
-                  <RatingPill rating={m.pnoRating} />
-                </div>
-                <p className="mt-3 text-3xl font-bold tabular-nums">{pct(m.pno12)}</p>
-                <p className="text-sm text-muted-foreground">
-                  ve 12. měsíci, maximum pro váš projekt je {pct(m.maxPno)}
-                </p>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Maximum počítáme z vaší marže: hrubá marže {pct(m.grossMargin)} − ostatní náklady v % obratu − cílový
-                  zisk {pct(data.targetProfit)}. Kurz s vysokou marží unese PNO kolem 20 %, prodej elektroniky jen pár
-                  procent.
-                </p>
-              </div>
-              <div className="rounded-xl border border-border p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h4 className="font-semibold">Hodnota zákazníka a cena za jeho získání</h4>
-                  {m.ltvCac !== null && <RatingPill rating={m.ltvCacRating} />}
-                </div>
-                <dl className="mt-3 space-y-1.5 text-sm">
-                  <div className="flex justify-between gap-3">
-                    <dt className="flex items-center gap-1.5 text-muted-foreground">
-                      LTV (zisk ze zákazníka za celou dobu) <InfoTip label="LTV" text={HELP.ltv} />
-                    </dt>
-                    <dd className="font-semibold tabular-nums">{m.ltv === null ? "—" : czk(m.ltv)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="flex items-center gap-1.5 text-muted-foreground">
-                      Cena za získání zákazníka <InfoTip label="Cena za získání zákazníka (CAC)" text={HELP.cac} />
-                    </dt>
-                    <dd className="font-semibold tabular-nums">{m.cac === null ? "—" : czk(m.cac)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">Poměr LTV k ceně za získání</dt>
-                    <dd className="font-semibold tabular-nums">
-                      {m.ltvCac === null ? "—" : `${(Math.round(m.ltvCac * 10) / 10).toLocaleString("cs-CZ")} : 1`}
-                    </dd>
-                  </div>
-                  {m.extras.map((e) => (
-                    <div key={e.label} className="flex justify-between gap-3">
-                      <dt className="text-muted-foreground">{e.label}</dt>
-                      <dd className="font-semibold tabular-nums">{e.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  Zdravý poměr LTV k ceně za získání je alespoň 3 : 1.
-                </p>
-              </div>
-            </div>
-
-            {/* Srovnání scénářů */}
-            <div className="mt-6 overflow-x-auto">
-              <table className="w-full min-w-[480px] text-sm">
-                <caption className="mb-2 text-left font-semibold">Srovnání scénářů</caption>
-                <thead>
-                  <tr className="border-b border-border text-left text-muted-foreground">
-                    <th className="py-2 font-medium"> </th>
-                    {SCENARIOS.map((s) => (
-                      <th key={s.id} className="py-2 text-right font-medium">
-                        {s.label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="tabular-nums">
-                  {[
-                    ["Zisk za 2 roky", (x: Metrics) => czk(x.profitTotal)],
-                    ["Potřebný kapitál", (x: Metrics) => czk(x.requiredCapital)],
-                    ["Bod zvratu", (x: Metrics) => monthLabel(x.breakEvenMonth)],
-                    ["Návratnost", (x: Metrics) => monthLabel(x.paybackMonth)],
-                    ["PNO ve 12. měsíci", (x: Metrics) => pct(x.pno12)],
-                  ].map(([label, fn]) => (
-                    <tr key={label as string} className="border-b border-border last:border-b-0">
-                      <th scope="row" className="py-2 text-left font-normal text-muted-foreground">
-                        {label as string}
-                      </th>
-                      {SCENARIOS.map((s) => (
-                        <td key={s.id} className={`py-2 text-right ${s.id === data.scenario ? "font-semibold" : ""}`}>
-                          {(fn as (x: Metrics) => string)(results[s.id].metrics)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </Card>
-
-      {/* Komentář AI */}
-      <Card className="card-apple p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-3">
-            <AiMichalAvatar />
+      <GateGuideProvider gate={3} steps={guideSteps}>
+        <GuideStepBlock id="ai">
+          {/* Vyplnit s AI */}
+          <section className="flex flex-col gap-4 rounded-2xl border-2 border-primary/20 bg-accent/50 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-lg font-bold">Komentář: {AI_NAME}</h3>
-              <AiMichalNote />
-              <p className="text-sm text-muted-foreground">
-                Projde spočítaná čísla všech tří scénářů a řekne, kde je plán citlivý a co si ověřit. Čísla nevymýšlí.
+              <h3 className="flex items-center gap-2 text-lg font-bold">
+                <Sparkles className="h-5 w-5 text-primary" /> Vyplnit byznys case s AI
+              </h3>
+              <p className="max-w-2xl text-sm text-muted-foreground">
+                AI podle vašeho projektu doplní cenu, objem, marži, růst i částky nákladů, upozorní na chybějící položky
+                a barevně ohodnotí, které kanály dávají smysl. Vyplní jen prázdná pole – vše pak můžete přepsat.
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {hasRevenue && hasCosts
-                  ? `Zbývá ${Math.max(0, AI_LIMITS.vyhodnoceni - commentsUsed)} z ${AI_LIMITS.vyhodnoceni} komentářů pro tento projekt.`
-                  : "Nejdřív vyplňte příjmy a alespoň jeden náklad."}
+                {currentProject?.business_type
+                  ? `Zbývá ${Math.max(0, AI_LIMITS.navrh - autofillUsed)} z ${AI_LIMITS.navrh} pro tento projekt.`
+                  : "Nejdřív zvolte typ byznysu ve fázi 2."}
               </p>
               <AiPrivacyNote className="mt-2" />
             </div>
-          </div>
-          <Button
-            variant={comment ? "outline" : "default"}
-            className="shrink-0 rounded-[10px]"
-            onClick={runComment}
-            disabled={busy || !hasRevenue || !hasCosts || commentsUsed >= AI_LIMITS.vyhodnoceni}
-          >
-            {busy ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : comment ? (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            ) : null}
-            {busy ? "Připravuji komentář…" : comment ? "Okomentovat znovu" : "Okomentovat výsledek"}
-          </Button>
-        </div>
-        {comment && (
-          <div className="mt-6 space-y-5">
-            <p className="text-base leading-relaxed">{comment.summary}</p>
-            {comment.sensitivities?.length > 0 && (
+            <Button
+              className="btn-apple shrink-0"
+              onClick={runAutofill}
+              disabled={busyAutofill || autofillUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
+            >
+              {busyAutofill ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {busyAutofill ? "Vyplňuji…" : autofillUsed ? "Vyplnit znovu" : "Vyplnit s AI"}
+            </Button>
+          </section>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="prijmy">
+          {/* Příjmy */}
+          <Card className="card-apple p-6">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <h4 className="mb-2 font-semibold">Kde je plán citlivý</h4>
-                <ul className="list-disc space-y-1 pl-5 text-sm">
-                  {comment.sensitivities.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
+                <h3 className="text-lg font-bold">Příjmy</h3>
+                <p className="text-sm text-muted-foreground">
+                  Zadejte plán pro 12. měsíc po spuštění. Rozjezd k němu dopočítáme postupně, druhý rok podle zadaného
+                  růstu. U každého pole najdete vysvětlivku pod otazníkem.
+                </p>
               </div>
-            )}
-            {comment.toVerify?.length > 0 && (
-              <div>
-                <h4 className="mb-2 font-semibold">Co si ověřit</h4>
-                <ul className="list-disc space-y-1 pl-5 text-sm">
-                  {comment.toVerify.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
+              <div className="shrink-0 sm:text-right">
+                <Button
+                  variant="outline"
+                  className="rounded-[10px]"
+                  onClick={runAssumptions}
+                  disabled={busyAssumptions || assumptionsUsed >= AI_LIMITS.navrh || !currentProject?.business_type}
+                >
+                  {busyAssumptions ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="mr-2 h-4 w-4" />
+                  )}
+                  {busyAssumptions
+                    ? "Hledám obvyklé hodnoty…"
+                    : assumptions
+                      ? "Doporučit znovu"
+                      : "Doporučit hodnoty s AI"}
+                </Button>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Marže, růst a další procenta podle oboru. Zbývá {Math.max(0, AI_LIMITS.navrh - assumptionsUsed)} z{" "}
+                  {AI_LIMITS.navrh}.
+                </p>
               </div>
-            )}
-            {comment.nextSteps?.length > 0 && (
-              <div>
-                <h4 className="mb-2 font-semibold">Co udělat teď</h4>
-                <ol className="list-decimal space-y-1 pl-5 text-sm">
-                  {comment.nextSteps.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ol>
-              </div>
-            )}
-          </div>
-        )}
-      </Card>
-
-      {/* Plán vs. skutečnost z napojeného účtu (zatím náhled) */}
-      <Link
-        to="/cash-flow"
-        className="group flex items-center gap-4 rounded-2xl border border-leaf-200 bg-leaf-50 p-5 transition-colors hover:border-leaf-400"
-      >
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-leaf-500 text-white">
-          <Wallet className="h-5 w-5" aria-hidden="true" />
-        </span>
-        <span className="flex-1">
-          <span className="flex items-center gap-2 font-bold">
-            Plán a skutečnost z vašeho účtu
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">brzy</span>
-          </span>
-          <span className="block text-sm text-muted-foreground">
-            Po napojení podnikatelského účtu porovnáme tento plán se skutečnými příjmy a výdaji a hlídáme hotovost.
-          </span>
-        </span>
-        <ArrowRight
-          className="h-5 w-5 shrink-0 text-leaf-700 transition-transform group-hover:translate-x-0.5"
-          aria-hidden="true"
-        />
-      </Link>
-
-      <MethodFigures ids={["08_bod_zvratu", "09_ltv_cac"]} />
-
-      <AdvisorsInline
-        phase={3}
-        title="Projděte čísla se seniorním poradcem"
-        topic="Fáze 3 – Strategie a čísla"
-        lines={caseLines()}
-      />
-
-      {/* Kontrola */}
-      <Card className="card-apple p-6">
-        <h3 className="mb-3 text-lg font-bold">Kontrola před dokončením</h3>
-        <ul className="mb-5 space-y-2 text-sm">
-          {checks.map((c) => (
-            <li key={c.label} className="flex items-center gap-2">
-              {c.ok ? (
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              ) : (
-                <span
-                  className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`}
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {revenueFields.map((f) => (
+                <NumField
+                  key={f.key}
+                  id={`rev-${f.key}`}
+                  label={f.label}
+                  suffix={f.suffix}
+                  placeholder={f.placeholder}
+                  help={f.help}
+                  value={data.revenue[f.key]}
+                  onChange={(v) =>
+                    setRevenue({
+                      [f.key]: f.max ? Math.min(v, f.max) : v,
+                    } as Partial<RevenueInputs>)
+                  }
+                  suggestion={assumptions?.find((a) => a.field === f.key)}
                 />
+              ))}
+            </div>
+          </Card>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="naklady">
+          {/* Náklady */}
+          <Card className="card-apple p-6">
+            <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h3 className="text-lg font-bold">Náklady</h3>
+                <p className="text-sm text-muted-foreground">
+                  Náklady na zboží a dopravu už jsou v hrubé marži. Sem patří vše ostatní. Položku bez částky
+                  nepočítáme.
+                </p>
+              </div>
+              <div className="shrink-0 sm:text-right">
+                <Button
+                  variant="outline"
+                  className="rounded-[10px]"
+                  onClick={runCostHints}
+                  disabled={busyCosts || costHintsUsed >= AI_LIMITS.navrh || data.costs.length === 0}
+                >
+                  {busyCosts ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="mr-2 h-4 w-4" />
+                  )}
+                  {busyCosts ? "Odhaduji částky…" : costHints ? "Odhadnout znovu" : "Odhadnout částky s AI"}
+                </Button>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Orientační ceny pro začínající projekt v ČR. Zbývá {Math.max(0, AI_LIMITS.navrh - costHintsUsed)} z{" "}
+                  {AI_LIMITS.navrh}.
+                </p>
+              </div>
+            </div>
+            {costHints?.items.some((h) => h.fit) && (
+              <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">
+                  Hodnocení AI podle toho, co dává smysl pro vašeho zákazníka:
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-3 w-1 rounded bg-emerald-500" /> doporučeno
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-3 w-1 rounded bg-orange-400" /> zvážit
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-3 w-1 rounded bg-red-500" /> nedoporučeno
+                </span>
+              </p>
+            )}
+            {costHints?.missing && costHints.missing.length > 0 && (
+              <div className="mt-4 rounded-xl border-l-2 border-primary bg-accent/60 p-4 text-sm">
+                <p className="font-semibold text-primary">AI upozorňuje na položky, které vám chybí</p>
+                <ul className="mt-2 space-y-2">
+                  {costHints.missing.map((m) => {
+                    const added = data.costs.some((c) => c.name.toLowerCase() === m.name.toLowerCase());
+                    return (
+                      <li key={m.name} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <span>
+                          <strong>{m.name}</strong> ({KIND_SHORT[m.kind]}, orientačně {czk(m.typical)}) – {m.why}
+                        </span>
+                        {added ? (
+                          <span className="shrink-0 text-xs font-semibold text-emerald-700">Přidáno</span>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 shrink-0 rounded-lg px-2.5"
+                            onClick={() =>
+                              setData((prev) => ({
+                                ...prev,
+                                costs: [
+                                  ...prev.costs,
+                                  {
+                                    id: newId(),
+                                    name: m.name,
+                                    amount: m.typical,
+                                    kind: m.kind,
+                                  },
+                                ],
+                              }))
+                            }
+                          >
+                            <Plus className="mr-1 h-3.5 w-3.5" /> Přidat
+                          </Button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+            {(["jednorazove", "mesicni", "marketing"] as CostKind[]).map((kind) => (
+              <div key={kind} className="border-t border-border pt-5 mt-5 first-of-type:mt-3">
+                <div className="mb-3">
+                  <h4 className="font-semibold">{KIND_COPY[kind].title}</h4>
+                  <p className="text-sm text-muted-foreground">{KIND_COPY[kind].hint}</p>
+                </div>
+                <ul className="space-y-2">
+                  {costsByKind(kind).map((c) => {
+                    const hint = costHints?.items.find((h) => h.id === c.id);
+                    const fit = hint?.fit ? FIT_STYLE[hint.fit] : null;
+                    return (
+                      <li key={c.id} className={fit ? `border-l-4 pl-3 ${fit.border}` : ""}>
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex">
+                          <Input
+                            value={c.name}
+                            onChange={(e) => updateCost(c.id, { name: e.target.value })}
+                            placeholder="Název položky"
+                            className="col-span-3 min-w-0 sm:flex-1"
+                            aria-label="Název položky"
+                          />
+                          <span className="relative min-w-0 sm:w-40 sm:shrink-0">
+                            <Input
+                              type="number"
+                              inputMode="decimal"
+                              min={0}
+                              value={c.amount ? String(c.amount) : ""}
+                              placeholder="0"
+                              onChange={(e) =>
+                                updateCost(c.id, {
+                                  amount: Math.max(0, Number(e.target.value) || 0),
+                                })
+                              }
+                              className="pr-10 text-right tabular-nums"
+                              aria-label={`Částka – ${c.name || "položka"} (${KIND_COPY[kind].unit})`}
+                            />
+                            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
+                              Kč
+                            </span>
+                          </span>
+                          <select
+                            value={c.kind}
+                            onChange={(e) => updateCost(c.id, { kind: e.target.value as CostKind })}
+                            className="h-11 w-[7.5rem] shrink-0 rounded-xl border border-input bg-card px-2 text-sm sm:w-auto"
+                            aria-label="Druh nákladu"
+                          >
+                            <option value="jednorazove">jednorázově</option>
+                            <option value="mesicni">měsíčně</option>
+                            <option value="marketing">marketing</option>
+                          </select>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0"
+                            onClick={() => removeCost(c.id)}
+                            aria-label="Odebrat položku"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {hint && (
+                          <div className="mt-1 flex flex-col gap-1 pl-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
+                            <span>
+                              {fit && (
+                                <span
+                                  className={`mr-1.5 inline-block rounded-full px-2 py-0.5 font-semibold ${fit.badge}`}
+                                >
+                                  {fit.label}
+                                </span>
+                              )}
+                              {hint.fitWhy && <span className="text-foreground">{hint.fitWhy} </span>}
+                              <span className="font-semibold text-primary">
+                                {c.kind === "marketing" ? "AI předpověď" : "AI: obvykle"} {czk(hint.typical)}
+                              </span>
+                              {hint.high > hint.low && ` (${czk(hint.low)} – ${czk(hint.high)})`}. {hint.why}
+                            </span>
+                            {c.amount === hint.typical ? (
+                              <span className="shrink-0 font-semibold text-emerald-700">Použito</span>
+                            ) : (
+                              <button
+                                type="button"
+                                className="shrink-0 self-start font-semibold text-primary hover:underline sm:self-auto"
+                                onClick={() => updateCost(c.id, { amount: hint.typical })}
+                              >
+                                Použít {czk(hint.typical)}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <Button variant="ghost" size="sm" className="mt-2 text-primary" onClick={() => addCost(kind)}>
+                  <Plus className="mr-1 h-4 w-4" /> Přidat položku
+                </Button>
+                {kind !== "jednorazove" && (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Rychle přidat:</span>
+                    {(kind === "marketing" ? AD_CHANNELS : COMMON_MONTHLY)
+                      .filter((ch) => !data.costs.some((c) => c.name.toLowerCase() === ch.toLowerCase()))
+                      .map((ch) => (
+                        <button
+                          key={ch}
+                          type="button"
+                          onClick={() =>
+                            setData((prev) => ({
+                              ...prev,
+                              costs: [
+                                ...prev.costs,
+                                {
+                                  id: newId(),
+                                  name: ch,
+                                  amount: 0,
+                                  kind,
+                                },
+                              ],
+                            }))
+                          }
+                          className="rounded-full border border-border px-3 py-1 text-sm hover:border-primary hover:text-primary"
+                        >
+                          + {ch}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <div className="mt-5 border-t border-border pt-5">
+              <p className="mb-2 text-sm font-semibold">Forma podnikání a daně</p>
+              <div role="radiogroup" aria-label="Forma podnikání" className="grid gap-2 sm:grid-cols-3">
+                {TAX_FORMS.map((f) => {
+                  const selected = data.taxForm === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => chooseTaxForm(f.id)}
+                      className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${
+                        selected ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/40"
+                      }`}
+                    >
+                      <span className="block font-semibold">{f.label}</span>
+                      <span className="block text-xs text-muted-foreground">{f.hint}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {hasRevenue && (
+                <div className="mt-4">
+                  <TaxRegimeAdvice rows={results.realisticky.rows} data={data} />
+                </div>
               )}
-              <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
-            </li>
-          ))}
-        </ul>
-        <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
-          Dokončit fázi 3
-        </Button>
-      </Card>
+            </div>
+            <div className="mt-5 grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
+              <NumField
+                id="tax-rate"
+                label="Daň z příjmu (% ze zisku)"
+                suffix="%"
+                placeholder="např. 15"
+                value={data.taxRate ?? 0}
+                onChange={(v) => setData((prev) => ({ ...prev, taxRate: Math.min(v, 60) }))}
+                help={HELP.dan}
+              />
+              <NumField
+                id="target-profit"
+                label="Cílový zisk (% z obratu)"
+                suffix="% obratu"
+                value={data.targetProfit}
+                onChange={(v) => setData((prev) => ({ ...prev, targetProfit: Math.min(v, 90) }))}
+                help={HELP.cilovyZisk}
+              />
+            </div>
+          </Card>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="vysledek">
+          {/* Výsledek */}
+          <Card className="card-apple p-6">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h3 className="text-lg font-bold">Výsledek za 2 roky</h3>
+                <p className="text-sm text-muted-foreground">
+                  Přepněte scénář a uvidíte, co se stane, když prodeje půjdou hůř nebo lépe.
+                </p>
+                {hasRevenue && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 rounded-[10px]"
+                    onClick={() => {
+                      if (!access.premium) {
+                        track("premium_blocked", { feature: "excel" }, currentProject?.id);
+                        toast({
+                          title: "Export do Excelu je v placeném přístupu",
+                          description: "Vaše čísla jsou uložená. Po odemčení si tabulku stáhnete hned.",
+                        });
+                        navigate("/cenik");
+                        return;
+                      }
+                      track("excel_export", {}, currentProject?.id);
+                      return downloadBusinessCaseExcel({
+                        projectName: currentProject?.name ?? "Projekt",
+                        typeName,
+                        group,
+                        data,
+                        results,
+                      }).catch(() => toast({ title: "Export se nepodařil", variant: "destructive" }));
+                    }}
+                  >
+                    {access.premium ? <FileSpreadsheet className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}{" "}
+                    Stáhnout do Excelu
+                  </Button>
+                )}
+              </div>
+              <div
+                role="radiogroup"
+                aria-label="Scénář"
+                className="flex rounded-xl border border-border p-1 sm:inline-flex"
+              >
+                {SCENARIOS.map((s) => (
+                  <button
+                    key={s.id}
+                    role="radio"
+                    aria-checked={data.scenario === s.id}
+                    onClick={() => setData((prev) => ({ ...prev, scenario: s.id }))}
+                    className={`flex-1 rounded-lg px-1.5 py-1.5 text-[13px] font-semibold sm:text-sm transition-colors sm:flex-none sm:px-3 ${
+                      data.scenario === s.id
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    title={s.hint}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {!hasRevenue ? (
+              <p className="rounded-xl bg-secondary/70 p-4 text-sm text-muted-foreground">
+                Výsledek se ukáže, jakmile vyplníte příjmy.
+              </p>
+            ) : (
+              <>
+                {(m.profitMargin > 50 || (m.roi ?? 0) > 1000) && (
+                  <p
+                    className="mb-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200"
+                    role="status"
+                  >
+                    <b>Čísla vypadají až příliš dobře</b> (marže zisku {pct(m.profitMargin)}
+                    {m.roi !== null ? `, návratnost vložených peněz ${pct(m.roi)}` : ""}). Zkontrolujte hlavně cenu a
+                    objem.
+                    {group === "subscription" &&
+                      " Cena je za měsíc: když prodáváte členství na delší období (např. 2 990 Kč na 6 měsíců), zadejte ji přepočtenou na měsíc (498 Kč)."}{" "}
+                    Chybí-li vaše odměna nebo účetní, doplňte je do měsíčních nákladů.
+                  </p>
+                )}
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <Stat label="Obrat" value={czk(m.revenueTotal)} help={HELP.obrat} />
+                  <Stat
+                    label={data.taxRate ? "Zisk před daní" : "Zisk"}
+                    value={czk(m.profitTotal)}
+                    note={data.taxRate ? `po dani ${czk(m.profitAfterTax)}` : `marže zisku ${pct(m.profitMargin)}`}
+                    help={data.taxRate ? `${HELP.zisk} ${HELP.ziskPoZdaneni}` : HELP.zisk}
+                  />
+                  <Stat
+                    label="Potřebný kapitál"
+                    value={czk(m.requiredCapital)}
+                    note="nejhlubší propad peněz"
+                    help={HELP.kapital}
+                  />
+                  <Stat
+                    label="ROI"
+                    value={m.roi === null ? "—" : pct(m.roi)}
+                    note="zisk za 2 roky ÷ potřebný kapitál"
+                    help={HELP.roi}
+                  />
+                  <Stat
+                    label="Bod zvratu"
+                    value={monthLabel(m.breakEvenMonth)}
+                    note="první měsíc v zisku"
+                    help={HELP.bodZvratu}
+                  />
+                  <Stat
+                    label="Návratnost"
+                    value={monthLabel(m.paybackMonth)}
+                    note="vložené peníze zpět"
+                    help={HELP.navratnost}
+                  />
+                  <Stat label="Obrat ve 12. měsíci" value={czk(m.revenue12)} help={HELP.obrat12} />
+                  <Stat label="Zisk ve 12. měsíci" value={czk(m.profit12)} help={HELP.zisk12} />
+                </div>
+
+                {/* Graf peněz v projektu */}
+                <div className="mt-6">
+                  <h4 className="font-semibold">Peníze v projektu celkem</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Nejnižší bod křivky je kapitál, který musíte mít připravený. Kde křivka protne nulu, máte vložené
+                    peníze zpět.
+                  </p>
+                  <div className="mt-3 h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData} margin={{ top: 16, right: 16, bottom: 4, left: 8 }}>
+                        <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="0" vertical={false} />
+                        <XAxis
+                          dataKey="month"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{
+                            fontSize: 12,
+                            fill: "hsl(var(--muted-foreground))",
+                          }}
+                          ticks={[0, 6, 12, 18, 24]}
+                          tickFormatter={(v) => (v === 0 ? "start" : `${v}. m.`)}
+                        />
+                        <YAxis
+                          tickLine={false}
+                          axisLine={false}
+                          width={64}
+                          tick={{
+                            fontSize: 12,
+                            fill: "hsl(var(--muted-foreground))",
+                          }}
+                          tickFormatter={(v) => `${Math.round(v / 1000).toLocaleString("cs-CZ")} tis.`}
+                        />
+                        <ReferenceLine y={0} stroke="hsl(var(--foreground))" strokeOpacity={0.4} />
+                        <Tooltip
+                          formatter={(v: number) => [czk(v), "Peníze celkem"]}
+                          labelFormatter={(l: number) => (l === 0 ? "Před spuštěním" : `${l}. měsíc`)}
+                          contentStyle={{
+                            borderRadius: 10,
+                            border: "1px solid hsl(var(--border))",
+                            fontSize: 13,
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="cumulative"
+                          stroke="hsl(var(--primary))"
+                          strokeWidth={2}
+                          dot={false}
+                          activeDot={{ r: 5 }}
+                        />
+                        {m.requiredCapital > 0 && (
+                          <ReferenceDot
+                            x={trough.month}
+                            y={Math.round(trough.cumulative)}
+                            r={5}
+                            fill="hsl(var(--gate-copper))"
+                            stroke="hsl(var(--card))"
+                            strokeWidth={2}
+                            label={{
+                              value: `potřebný kapitál ${czk(m.requiredCapital)}`,
+                              position: "bottom",
+                              fontSize: 12,
+                              fill: "hsl(var(--foreground))",
+                            }}
+                          />
+                        )}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* PNO */}
+                <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                  <div className="rounded-xl border border-border p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="flex items-center gap-2 font-semibold">
+                        PNO – podíl marketingu na obratu <InfoTip label="PNO" text={HELP.pno} />
+                      </h4>
+                      <RatingPill rating={m.pnoRating} />
+                    </div>
+                    <p className="mt-3 text-3xl font-bold tabular-nums">{pct(m.pno12)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      ve 12. měsíci, maximum pro váš projekt je {pct(m.maxPno)}
+                    </p>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      Maximum počítáme z vaší marže: hrubá marže {pct(m.grossMargin)} − ostatní náklady v % obratu −
+                      cílový zisk {pct(data.targetProfit)}. Kurz s vysokou marží unese PNO kolem 20 %, prodej
+                      elektroniky jen pár procent.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-border p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="font-semibold">Hodnota zákazníka a cena za jeho získání</h4>
+                      {m.ltvCac !== null && <RatingPill rating={m.ltvCacRating} />}
+                    </div>
+                    <dl className="mt-3 space-y-1.5 text-sm">
+                      <div className="flex justify-between gap-3">
+                        <dt className="flex items-center gap-1.5 text-muted-foreground">
+                          LTV (zisk ze zákazníka za celou dobu) <InfoTip label="LTV" text={HELP.ltv} />
+                        </dt>
+                        <dd className="font-semibold tabular-nums">{m.ltv === null ? "—" : czk(m.ltv)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <dt className="flex items-center gap-1.5 text-muted-foreground">
+                          Cena za získání zákazníka <InfoTip label="Cena za získání zákazníka (CAC)" text={HELP.cac} />
+                        </dt>
+                        <dd className="font-semibold tabular-nums">{m.cac === null ? "—" : czk(m.cac)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-3">
+                        <dt className="text-muted-foreground">Poměr LTV k ceně za získání</dt>
+                        <dd className="font-semibold tabular-nums">
+                          {m.ltvCac === null ? "—" : `${(Math.round(m.ltvCac * 10) / 10).toLocaleString("cs-CZ")} : 1`}
+                        </dd>
+                      </div>
+                      {m.extras.map((e) => (
+                        <div key={e.label} className="flex justify-between gap-3">
+                          <dt className="text-muted-foreground">{e.label}</dt>
+                          <dd className="font-semibold tabular-nums">{e.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      Zdravý poměr LTV k ceně za získání je alespoň 3 : 1.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Srovnání scénářů */}
+                <div className="mt-6 overflow-x-auto">
+                  <table className="w-full min-w-[480px] text-sm">
+                    <caption className="mb-2 text-left font-semibold">Srovnání scénářů</caption>
+                    <thead>
+                      <tr className="border-b border-border text-left text-muted-foreground">
+                        <th className="py-2 font-medium"> </th>
+                        {SCENARIOS.map((s) => (
+                          <th key={s.id} className="py-2 text-right font-medium">
+                            {s.label}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="tabular-nums">
+                      {[
+                        ["Zisk za 2 roky", (x: Metrics) => czk(x.profitTotal)],
+                        ["Potřebný kapitál", (x: Metrics) => czk(x.requiredCapital)],
+                        ["Bod zvratu", (x: Metrics) => monthLabel(x.breakEvenMonth)],
+                        ["Návratnost", (x: Metrics) => monthLabel(x.paybackMonth)],
+                        ["PNO ve 12. měsíci", (x: Metrics) => pct(x.pno12)],
+                      ].map(([label, fn]) => (
+                        <tr key={label as string} className="border-b border-border last:border-b-0">
+                          <th scope="row" className="py-2 text-left font-normal text-muted-foreground">
+                            {label as string}
+                          </th>
+                          {SCENARIOS.map((s) => (
+                            <td
+                              key={s.id}
+                              className={`py-2 text-right ${s.id === data.scenario ? "font-semibold" : ""}`}
+                            >
+                              {(fn as (x: Metrics) => string)(results[s.id].metrics)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </Card>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="komentar">
+          {/* Komentář AI */}
+          <Card className="card-apple p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <AiMichalAvatar />
+                <div>
+                  <h3 className="text-lg font-bold">Komentář: {AI_NAME}</h3>
+                  <AiMichalNote />
+                  <p className="text-sm text-muted-foreground">
+                    Projde spočítaná čísla všech tří scénářů a řekne, kde je plán citlivý a co si ověřit. Čísla
+                    nevymýšlí.
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {hasRevenue && hasCosts
+                      ? `Zbývá ${Math.max(0, AI_LIMITS.vyhodnoceni - commentsUsed)} z ${AI_LIMITS.vyhodnoceni} komentářů pro tento projekt.`
+                      : "Nejdřív vyplňte příjmy a alespoň jeden náklad."}
+                  </p>
+                  <AiPrivacyNote className="mt-2" />
+                </div>
+              </div>
+              <Button
+                variant={comment ? "outline" : "default"}
+                className="shrink-0 rounded-[10px]"
+                onClick={runComment}
+                disabled={busy || !hasRevenue || !hasCosts || commentsUsed >= AI_LIMITS.vyhodnoceni}
+              >
+                {busy ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : comment ? (
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                ) : null}
+                {busy ? "Připravuji komentář…" : comment ? "Okomentovat znovu" : "Okomentovat výsledek"}
+              </Button>
+            </div>
+            {comment && (
+              <div className="mt-6 space-y-5">
+                <p className="text-base leading-relaxed">{comment.summary}</p>
+                {comment.sensitivities?.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 font-semibold">Kde je plán citlivý</h4>
+                    <ul className="list-disc space-y-1 pl-5 text-sm">
+                      {comment.sensitivities.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {comment.toVerify?.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 font-semibold">Co si ověřit</h4>
+                    <ul className="list-disc space-y-1 pl-5 text-sm">
+                      {comment.toVerify.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {comment.nextSteps?.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 font-semibold">Co udělat teď</h4>
+                    <ol className="list-decimal space-y-1 pl-5 text-sm">
+                      {comment.nextSteps.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+        </GuideStepBlock>
+
+        {/* Plán vs. skutečnost z napojeného účtu (zatím náhled) */}
+        <Link
+          to="/cash-flow"
+          className="group flex items-center gap-4 rounded-2xl border border-leaf-200 bg-leaf-50 p-5 transition-colors hover:border-leaf-400"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-leaf-500 text-white">
+            <Wallet className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span className="flex-1">
+            <span className="flex items-center gap-2 font-bold">
+              Plán a skutečnost z vašeho účtu
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">brzy</span>
+            </span>
+            <span className="block text-sm text-muted-foreground">
+              Po napojení podnikatelského účtu porovnáme tento plán se skutečnými příjmy a výdaji a hlídáme hotovost.
+            </span>
+          </span>
+          <ArrowRight
+            className="h-5 w-5 shrink-0 text-leaf-700 transition-transform group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </Link>
+
+        <MethodFigures ids={["08_bod_zvratu", "09_ltv_cac"]} />
+
+        <AdvisorsInline
+          phase={3}
+          title="Projděte čísla se seniorním poradcem"
+          topic="Fáze 3 – Strategie a čísla"
+          lines={caseLines()}
+        />
+
+        {/* Kontrola */}
+        <Card id="guide-finish" className="card-apple p-6">
+          <h3 className="mb-3 text-lg font-bold">Kontrola před dokončením</h3>
+          <ul className="mb-5 space-y-2 text-sm">
+            {checks.map((c) => (
+              <li key={c.label} className="flex items-center gap-2">
+                {c.ok ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                ) : (
+                  <span
+                    className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`}
+                  />
+                )}
+                <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
+              </li>
+            ))}
+          </ul>
+          <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
+            Dokončit fázi 3
+          </Button>
+        </Card>
+      </GateGuideProvider>
     </div>
   );
 };

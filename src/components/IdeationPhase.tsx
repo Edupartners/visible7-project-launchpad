@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { MethodFigures } from "@/components/MethodFigures";
 import { MarketSizeCard } from "@/components/MarketSizeCard";
+import { GateGuideProvider, GuideStep, GuideStepBlock } from "@/components/guide/GateGuide";
 import { MARKET_SIZE_ENABLED } from "@/lib/market";
 
 interface LeanCanvasData {
@@ -104,6 +105,14 @@ const FIELDS: { key: FieldKey; title: string; hint: string; area: string }[] = [
     hint: "Za co vám zákazník zaplatí? Prodej, předplatné, upsell…",
     area: "revenue",
   },
+];
+
+/** Kroky průvodce bránou 2: pole canvasu po dvojicích. */
+const CANVAS_GROUPS: { id: string; keys: FieldKey[] }[] = [
+  { id: "zakaznik", keys: ["customerSegments", "problem"] },
+  { id: "hodnota", keys: ["uniqueValueProposition", "solution"] },
+  { id: "trh", keys: ["existingAlternatives", "channels"] },
+  { id: "penize", keys: ["costStructure", "revenueStreams"] },
 ];
 
 const RATING_STYLE: Record<string, string> = {
@@ -278,6 +287,108 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
 
   const aiType = suggestion?.businessType;
 
+  const has = (...keys: FieldKey[]) => keys.every((k) => (canvas[k] ?? "").trim().length >= 5);
+  const guideSteps: GuideStep[] = [
+    {
+      id: "ai",
+      title: "Nechte si udělat první návrh",
+      time: "2 minuty",
+      explain: [
+        "Lean Canvas je plán podnikání na jednu stránku. Má 8 políček a projdeme je spolu po dvou.",
+        "Nemusíte začínat s prázdným papírem. AI Michal si přečte, co jste napsali v bráně 1, a navrhne všechna políčka. Návrh nic nepřepíše, u každého pole sami rozhodnete, jestli ho použijete.",
+        "Chcete raději psát sami? Klidně tenhle krok přeskočte.",
+      ],
+      example: [
+        [
+          "Jak to dopadlo",
+          "U WeSportly AI navrhla všech 8 polí. Většinu bylo potřeba jen zkrátit a přepsat vlastními slovy.",
+        ],
+      ],
+      doneWhen: "máte návrh od AI, nebo chcete psát sami (můžete pokračovat).",
+      done: true,
+    },
+    {
+      id: "zakaznik",
+      title: "Komu prodáváte a co ho trápí",
+      time: "10 minut",
+      explain: [
+        "Segment zákazníků je skupina lidí, kterým prodáváte. Navažte na personu z brány 1, jen ji rozšiřte na celou skupinu. A napište, kdo bude úplně první zákazník.",
+        "Do Problému napište 1–3 hlavní starosti zákazníka. Jeho slovy, ne vašimi.",
+      ],
+      example: [
+        [
+          "Segment zákazníků",
+          "Hobby cyklisté 25–50 let, kteří si rádi opraví kolo sami. První zákazníci: lidé z cyklistických skupin na Facebooku.",
+        ],
+        ["Problém", "1. Hledání správného videa trvá dlouho. 2. Videa nesedí na moje kolo. 3. Nevím, jaký díl koupit."],
+      ],
+      doneWhen: "obě pole jsou vyplněná.",
+      done: has("customerSegments", "problem"),
+    },
+    {
+      id: "hodnota",
+      title: "Proč koupí právě u vás a jak to řešíte",
+      time: "10–15 minut",
+      think: true,
+      explain: [
+        "Unikátní hodnota (USP) je jedna věta, proč si zákazník vybere vás. Můžete převzít USP z brány 1.",
+        "Do Řešení napište, co konkrétně zákazník dostane. Hlavní funkce nebo obsah nabídky, ne víc než 3–4 body.",
+      ],
+      example: [
+        ["USP", "Opravte si kolo sami za 5 minut: krátké video přesně pro váš problém a hned pod ním správný díl."],
+        ["Řešení", "Knihovna krátkých videí podle typu kola a závady. U každého videa seznam nářadí a odkaz na díl."],
+      ],
+      doneWhen: "obě pole jsou vyplněná.",
+      done: has("uniqueValueProposition", "solution"),
+    },
+    {
+      id: "trh",
+      title: "Jak to zákazník řeší dnes a kudy se k němu dostanete",
+      time: "10–15 minut",
+      think: true,
+      explain: [
+        "Existující alternativy: jak zákazník svůj problém řeší dnes, než přijdete vy. Pomůže levná a prémiová konkurence z brány 1.",
+        "Marketingové kanály: kde vás zákazník uvidí. Napište 3–5 konkrétních míst, ne jen „sociální sítě“. Tady se zamyslete, kanály rozhodují o tom, jestli se o vás vůbec někdo dozví.",
+      ],
+      example: [
+        ["Alternativy", "YouTube (zdarma), cykloservis (500–1 500 Kč za opravu), rada od kamaráda."],
+        [
+          "Kanály",
+          "Krátká videa na Instagramu a YouTube, cyklistické skupiny na Facebooku, spolupráce s e-shopy s díly, vyhledávání „jak seřídit…“.",
+        ],
+      ],
+      doneWhen: "obě pole jsou vyplněná.",
+      done: has("existingAlternatives", "channels"),
+    },
+    {
+      id: "penize",
+      title: "Za co budete platit a za co zaplatí zákazník",
+      time: "10 minut",
+      explain: [
+        "Náklady: jen seznam položek, zatím bez částek. Čísla spočítáme v bráně 3.",
+        "Příjmy: za co vám zákazník zaplatí. Jednorázový prodej, předplatné, provize, doplňkový prodej.",
+      ],
+      example: [
+        ["Náklady", "Natáčení videí, web a hosting videí, marketing, účetní."],
+        ["Příjmy", "Provize z prodeje dílů přes odkazy pod videi, později předplatné za prémiová videa."],
+      ],
+      doneWhen: "obě pole jsou vyplněná.",
+      done: has("costStructure", "revenueStreams"),
+    },
+    {
+      id: "typ",
+      title: "Vyberte typ online byznysu",
+      time: "2–5 minut",
+      explain: [
+        "Podle typu vám v bráně 4 doporučíme, co a jak postavit (web, e-shop, kurz…), a v bráně 3 ukazatele, které hlídat.",
+        "Nevíte? Pokud jste použili návrh AI, u jednoho typu je napsané „Doporučeno AI“. Volbu můžete kdykoli změnit.",
+      ],
+      example: [["Typ", "Members (placený obsah): základní videa zdarma, prémiová v předplatném."]],
+      doneWhen: "je vybraný jeden typ.",
+      done: !!currentProject?.business_type,
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
       <DiagnosisDraftNote part="canvas" gate={2} />
@@ -318,278 +429,289 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
         </div>
       )}
 
-      {/* AI Michal */}
-      <Card className="card-apple p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-3">
-            <AiMichalAvatar />
-            <div>
-              <h3 className="text-lg font-semibold">{AI_NAME}</h3>
-              <AiMichalNote />
-              <p className="text-sm text-muted-foreground">
-                Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u
-                každého pole sami rozhodnete.
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Zbývá {left("navrh")} z {AI_LIMITS.navrh} návrhů pro tento projekt.
-              </p>
-              <AiPrivacyNote className="mt-2" />
-            </div>
-          </div>
-          <Button
-            className="btn-apple shrink-0"
-            onClick={() => runAi("navrh")}
-            disabled={busy !== null || left("navrh") === 0 || aiOff}
-          >
-            {busy === "navrh" ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="mr-2 h-4 w-4" />
-            )}
-            {busy === "navrh" ? "Připravuji návrh…" : suggestion ? "Navrhnout znovu" : "Navrhnout s AI"}
-          </Button>
-        </div>
-
-        {aiOff && (
-          <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-            AI zatím není zapnutá. Canvas můžete vyplnit ručně a fázi dokončit i bez ní.
-          </p>
-        )}
-
-        {suggestion && emptyWithSuggestion > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-secondary p-3 text-sm">
-            <span>
-              Návrh je připravený u {pendingSuggestions} {pendingSuggestions === 1 ? "pole" : "polí"}.
-            </span>
-            <Button size="sm" variant="outline" className="rounded-lg" onClick={fillEmptyFromSuggestion}>
-              Vyplnit prázdná pole ({emptyWithSuggestion})
-            </Button>
-          </div>
-        )}
-      </Card>
-
-      {/* Typ byznysu */}
-      <Card className="card-apple p-6">
-        <h3 className="text-lg font-semibold">Typ online byznysu</h3>
-        <p className="mb-4 text-sm text-muted-foreground">
-          Podle typu doporučíme ve fázi 4 postup tvorby a ve fázi 3 hlídané ukazatele.
-          {aiType && typeName(aiType) && (
-            <>
-              {" "}
-              AI doporučuje: <strong className="text-foreground">{typeName(aiType)}</strong>
-              {suggestion?.businessTypeReason ? ` – ${suggestion.businessTypeReason}` : ""}
-            </>
-          )}
-        </p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {businessTypes.map((t) => {
-            const selected = currentProject?.business_type === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => projectId && setBusinessType(projectId, t.id)}
-                className={`relative rounded-xl border px-3 py-2.5 text-left text-sm transition ${
-                  selected
-                    ? "border-primary bg-primary/10 font-semibold text-foreground"
-                    : "border-border bg-card hover:border-primary/40"
-                }`}
-                aria-pressed={selected}
+      <GateGuideProvider gate={2} steps={guideSteps}>
+        <GuideStepBlock id="ai">
+          {/* AI Michal */}
+          <Card className="card-apple p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <AiMichalAvatar />
+                <div>
+                  <h3 className="text-lg font-semibold">{AI_NAME}</h3>
+                  <AiMichalNote />
+                  <p className="text-sm text-muted-foreground">
+                    Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u
+                    každého pole sami rozhodnete.
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Zbývá {left("navrh")} z {AI_LIMITS.navrh} návrhů pro tento projekt.
+                  </p>
+                  <AiPrivacyNote className="mt-2" />
+                </div>
+              </div>
+              <Button
+                className="btn-apple shrink-0"
+                onClick={() => runAi("navrh")}
+                disabled={busy !== null || left("navrh") === 0 || aiOff}
               >
-                {t.name}
-                {aiType === t.id && (
-                  <span className="mt-0.5 block text-xs font-normal text-primary">Doporučeno AI</span>
+                {busy === "navrh" ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" />
                 )}
-                {selected && <Check className="absolute right-2 top-2 h-4 w-4 text-primary" />}
-              </button>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Pole canvasu */}
-      <div className="space-y-4">
-        {FIELDS.map((f, i) => {
-          const s = suggestionFor(f.key);
-          return (
-            <Card key={f.key} className="card-apple p-6">
-              <div className="mb-3 flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    <span className="mr-2 text-muted-foreground">{i + 1}.</span>
-                    {f.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">{f.hint}</p>
-                </div>
-                {canvas[f.key]?.trim() && <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />}
-              </div>
-
-              {s && (
-                <div className="mb-3 rounded-xl border-l-2 border-primary bg-accent/60 p-4">
-                  <p className="mb-1 text-sm font-semibold text-primary">Návrh AI</p>
-                  <p className="whitespace-pre-line text-sm text-foreground">{s}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Button size="sm" className="rounded-lg" onClick={() => applySuggestion(f.key, s)}>
-                      <Check className="mr-1 h-4 w-4" /> Použít
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-lg"
-                      onClick={() => applySuggestion(f.key, s, true)}
-                    >
-                      <Pencil className="mr-1 h-4 w-4" /> Upravit
-                    </Button>
-                    <Button size="sm" variant="ghost" className="rounded-lg" onClick={() => dismiss(f.key)}>
-                      <X className="mr-1 h-4 w-4" /> Ponechat můj text
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <Textarea
-                ref={(el) => (fieldRefs.current[f.key] = el)}
-                value={canvas[f.key]}
-                onChange={(e) => setField(f.key, e.target.value)}
-                placeholder={`Napište: ${f.title.toLowerCase()}`}
-                className="min-h-[110px]"
-              />
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Náhled canvasu */}
-      <Card className="card-apple p-6">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="flex items-center gap-2 text-lg font-semibold">
-            <LayoutGrid className="h-5 w-5 text-primary" /> Náhled na jedné stránce
-          </h3>
-          <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setShowGrid((v) => !v)}>
-            {showGrid ? "Skrýt" : "Zobrazit"}
-          </Button>
-        </div>
-        {showGrid && (
-          <div className="lean-grid mt-4 grid gap-2 text-sm">
-            {FIELDS.map((f) => (
-              <div key={f.key} className="rounded-xl bg-secondary p-3" style={{ gridArea: f.area }}>
-                <p className="mb-1 text-sm font-semibold text-muted-foreground">{f.title}</p>
-                <p className="whitespace-pre-line">{canvas[f.key]?.trim() || "—"}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* Vyhodnocení */}
-      <div ref={evalRef}>
-        <Card className="card-apple p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex items-start gap-3">
-              <div>
-                <h3 className="text-lg font-semibold">Vyhodnocení canvasu</h3>
-                <p className="text-sm text-muted-foreground">
-                  AI se podívá na canvas jako mentor: co je silné, co doplnit a kde si pole odporují.
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {filled < 7
-                    ? `Nejdřív vyplňte alespoň 7 polí (zbývá ${7 - filled}).`
-                    : `Zbývá ${left("vyhodnoceni")} z ${AI_LIMITS.vyhodnoceni} vyhodnocení pro tento projekt.`}
-                </p>
-              </div>
+                {busy === "navrh" ? "Připravuji návrh…" : suggestion ? "Navrhnout znovu" : "Navrhnout s AI"}
+              </Button>
             </div>
-            <Button
-              variant={evaluation ? "outline" : "default"}
-              className="shrink-0 rounded-[10px]"
-              onClick={() => runAi("vyhodnoceni")}
-              disabled={busy !== null || filled < 7 || left("vyhodnoceni") === 0 || aiOff}
-            >
-              {busy === "vyhodnoceni" ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : evaluation ? (
-                <RefreshCw className="mr-2 h-4 w-4" />
-              ) : (
-                <ClipboardCheck className="mr-2 h-4 w-4" />
+
+            {aiOff && (
+              <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+                AI zatím není zapnutá. Canvas můžete vyplnit ručně a fázi dokončit i bez ní.
+              </p>
+            )}
+
+            {suggestion && emptyWithSuggestion > 0 && (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-secondary p-3 text-sm">
+                <span>
+                  Návrh je připravený u {pendingSuggestions} {pendingSuggestions === 1 ? "pole" : "polí"}.
+                </span>
+                <Button size="sm" variant="outline" className="rounded-lg" onClick={fillEmptyFromSuggestion}>
+                  Vyplnit prázdná pole ({emptyWithSuggestion})
+                </Button>
+              </div>
+            )}
+          </Card>
+        </GuideStepBlock>
+
+        {/* Pole canvasu po skupinách (kroky průvodce) */}
+        {CANVAS_GROUPS.map((g) => (
+          <GuideStepBlock key={g.id} id={g.id}>
+            <div className="space-y-4">
+              {FIELDS.filter((f) => g.keys.includes(f.key)).map((f) => {
+                const i = FIELDS.indexOf(f);
+                const s = suggestionFor(f.key);
+                return (
+                  <Card key={f.key} className="card-apple p-6">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-semibold">
+                          <span className="mr-2 text-muted-foreground">{i + 1}.</span>
+                          {f.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">{f.hint}</p>
+                      </div>
+                      {canvas[f.key]?.trim() && <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />}
+                    </div>
+
+                    {s && (
+                      <div className="mb-3 rounded-xl border-l-2 border-primary bg-accent/60 p-4">
+                        <p className="mb-1 text-sm font-semibold text-primary">Návrh AI</p>
+                        <p className="whitespace-pre-line text-sm text-foreground">{s}</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Button size="sm" className="rounded-lg" onClick={() => applySuggestion(f.key, s)}>
+                            <Check className="mr-1 h-4 w-4" /> Použít
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-lg"
+                            onClick={() => applySuggestion(f.key, s, true)}
+                          >
+                            <Pencil className="mr-1 h-4 w-4" /> Upravit
+                          </Button>
+                          <Button size="sm" variant="ghost" className="rounded-lg" onClick={() => dismiss(f.key)}>
+                            <X className="mr-1 h-4 w-4" /> Ponechat můj text
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    <Textarea
+                      ref={(el) => (fieldRefs.current[f.key] = el)}
+                      value={canvas[f.key]}
+                      onChange={(e) => setField(f.key, e.target.value)}
+                      placeholder={`Napište: ${f.title.toLowerCase()}`}
+                      className="min-h-[110px]"
+                    />
+                  </Card>
+                );
+              })}
+            </div>
+          </GuideStepBlock>
+        ))}
+
+        <GuideStepBlock id="typ">
+          {/* Typ byznysu */}
+          <Card className="card-apple p-6">
+            <h3 className="text-lg font-semibold">Typ online byznysu</h3>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Podle typu doporučíme ve fázi 4 postup tvorby a ve fázi 3 hlídané ukazatele.
+              {aiType && typeName(aiType) && (
+                <>
+                  {" "}
+                  AI doporučuje: <strong className="text-foreground">{typeName(aiType)}</strong>
+                  {suggestion?.businessTypeReason ? ` – ${suggestion.businessTypeReason}` : ""}
+                </>
               )}
-              {busy === "vyhodnoceni" ? "Vyhodnocuji…" : evaluation ? "Vyhodnotit znovu" : "Vyhodnotit canvas"}
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              {businessTypes.map((t) => {
+                const selected = currentProject?.business_type === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => projectId && setBusinessType(projectId, t.id)}
+                    className={`relative rounded-xl border px-3 py-2.5 text-left text-sm transition ${
+                      selected
+                        ? "border-primary bg-primary/10 font-semibold text-foreground"
+                        : "border-border bg-card hover:border-primary/40"
+                    }`}
+                    aria-pressed={selected}
+                  >
+                    {t.name}
+                    {aiType === t.id && (
+                      <span className="mt-0.5 block text-xs font-normal text-primary">Doporučeno AI</span>
+                    )}
+                    {selected && <Check className="absolute right-2 top-2 h-4 w-4 text-primary" />}
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+        </GuideStepBlock>
+
+        {/* Náhled canvasu */}
+        <Card className="card-apple p-6">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="flex items-center gap-2 text-lg font-semibold">
+              <LayoutGrid className="h-5 w-5 text-primary" /> Náhled na jedné stránce
+            </h3>
+            <Button variant="outline" size="sm" className="rounded-lg" onClick={() => setShowGrid((v) => !v)}>
+              {showGrid ? "Skrýt" : "Zobrazit"}
             </Button>
           </div>
-
-          {evaluation && (
-            <div className="mt-6 space-y-5">
-              <p className="text-base leading-relaxed">{evaluation.summary}</p>
-              <ul className="divide-y divide-border/60 rounded-xl bg-secondary/60">
-                {evaluation.criteria?.map((c) => (
-                  <li key={c.name} className="flex flex-col gap-1 p-4 sm:flex-row sm:items-start sm:gap-4">
-                    <div className="flex shrink-0 items-center gap-2 sm:w-56">
-                      <span className="font-medium">{c.name}</span>
-                    </div>
-                    <span
-                      className={`w-fit shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                        RATING_STYLE[c.rating] ?? "bg-secondary"
-                      }`}
-                    >
-                      {c.rating}
-                    </span>
-                    <p className="text-sm text-muted-foreground">{c.comment}</p>
-                  </li>
-                ))}
-              </ul>
-              {evaluation.contradictions?.length > 0 && (
-                <div>
-                  <h4 className="mb-2 flex items-center gap-2 font-semibold">
-                    <AlertTriangle className="h-4 w-4 text-amber-500" /> Rozpory k dořešení
-                  </h4>
-                  <ul className="list-disc space-y-1 pl-5 text-sm">
-                    {evaluation.contradictions.map((c, i) => (
-                      <li key={i}>{c}</li>
-                    ))}
-                  </ul>
+          {showGrid && (
+            <div className="lean-grid mt-4 grid gap-2 text-sm">
+              {FIELDS.map((f) => (
+                <div key={f.key} className="rounded-xl bg-secondary p-3" style={{ gridArea: f.area }}>
+                  <p className="mb-1 text-sm font-semibold text-muted-foreground">{f.title}</p>
+                  <p className="whitespace-pre-line">{canvas[f.key]?.trim() || "—"}</p>
                 </div>
-              )}
-              {evaluation.nextSteps?.length > 0 && (
-                <div>
-                  <h4 className="mb-2 font-semibold">Co udělat teď</h4>
-                  <ol className="list-decimal space-y-1 pl-5 text-sm">
-                    {evaluation.nextSteps.map((s, i) => (
-                      <li key={i}>{s}</li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Vyhodnocení je doporučení, ne verdikt. Rozhodnutí je na vás – případně ho proberte s lektorem.
-              </p>
+              ))}
             </div>
           )}
         </Card>
-      </div>
 
-      {MARKET_SIZE_ENABLED && currentProject?.id && <MarketSizeCard projectId={currentProject.id} />}
+        {/* Vyhodnocení */}
+        <div ref={evalRef}>
+          <Card className="card-apple p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold">Vyhodnocení canvasu</h3>
+                  <p className="text-sm text-muted-foreground">
+                    AI se podívá na canvas jako mentor: co je silné, co doplnit a kde si pole odporují.
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {filled < 7
+                      ? `Nejdřív vyplňte alespoň 7 polí (zbývá ${7 - filled}).`
+                      : `Zbývá ${left("vyhodnoceni")} z ${AI_LIMITS.vyhodnoceni} vyhodnocení pro tento projekt.`}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant={evaluation ? "outline" : "default"}
+                className="shrink-0 rounded-[10px]"
+                onClick={() => runAi("vyhodnoceni")}
+                disabled={busy !== null || filled < 7 || left("vyhodnoceni") === 0 || aiOff}
+              >
+                {busy === "vyhodnoceni" ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : evaluation ? (
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                ) : (
+                  <ClipboardCheck className="mr-2 h-4 w-4" />
+                )}
+                {busy === "vyhodnoceni" ? "Vyhodnocuji…" : evaluation ? "Vyhodnotit znovu" : "Vyhodnotit canvas"}
+              </Button>
+            </div>
 
-      <MethodFigures ids={["07_lean_canvas"]} />
+            {evaluation && (
+              <div className="mt-6 space-y-5">
+                <p className="text-base leading-relaxed">{evaluation.summary}</p>
+                <ul className="divide-y divide-border/60 rounded-xl bg-secondary/60">
+                  {evaluation.criteria?.map((c) => (
+                    <li key={c.name} className="flex flex-col gap-1 p-4 sm:flex-row sm:items-start sm:gap-4">
+                      <div className="flex shrink-0 items-center gap-2 sm:w-56">
+                        <span className="font-medium">{c.name}</span>
+                      </div>
+                      <span
+                        className={`w-fit shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                          RATING_STYLE[c.rating] ?? "bg-secondary"
+                        }`}
+                      >
+                        {c.rating}
+                      </span>
+                      <p className="text-sm text-muted-foreground">{c.comment}</p>
+                    </li>
+                  ))}
+                </ul>
+                {evaluation.contradictions?.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold">
+                      <AlertTriangle className="h-4 w-4 text-amber-500" /> Rozpory k dořešení
+                    </h4>
+                    <ul className="list-disc space-y-1 pl-5 text-sm">
+                      {evaluation.contradictions.map((c, i) => (
+                        <li key={i}>{c}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {evaluation.nextSteps?.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 font-semibold">Co udělat teď</h4>
+                    <ol className="list-decimal space-y-1 pl-5 text-sm">
+                      {evaluation.nextSteps.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Vyhodnocení je doporučení, ne verdikt. Rozhodnutí je na vás – případně ho proberte s lektorem.
+                </p>
+              </div>
+            )}
+          </Card>
+        </div>
 
-      {/* Kontrola a dokončení */}
-      <Card className="card-apple p-6">
-        <h3 className="mb-3 text-lg font-semibold">Kontrola před dokončením</h3>
-        <ul className="mb-5 space-y-2 text-sm">
-          {checks.map((c) => (
-            <li key={c.label} className="flex items-center gap-2">
-              {c.ok ? (
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              ) : (
-                <span
-                  className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`}
-                />
-              )}
-              <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
-            </li>
-          ))}
-        </ul>
-        <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
-          Dokončit fázi 2
-        </Button>
-      </Card>
+        {MARKET_SIZE_ENABLED && currentProject?.id && <MarketSizeCard projectId={currentProject.id} />}
+
+        <MethodFigures ids={["07_lean_canvas"]} />
+
+        {/* Kontrola a dokončení */}
+        <Card id="guide-finish" className="card-apple p-6">
+          <h3 className="mb-3 text-lg font-semibold">Kontrola před dokončením</h3>
+          <ul className="mb-5 space-y-2 text-sm">
+            {checks.map((c) => (
+              <li key={c.label} className="flex items-center gap-2">
+                {c.ok ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <span
+                    className={`h-4 w-4 rounded-full border-2 ${c.required ? "border-amber-400" : "border-border"}`}
+                  />
+                )}
+                <span className={c.ok ? "" : "text-muted-foreground"}>{c.label}</span>
+              </li>
+            ))}
+          </ul>
+          <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
+            Dokončit fázi 2
+          </Button>
+        </Card>
+      </GateGuideProvider>
     </div>
   );
 };
