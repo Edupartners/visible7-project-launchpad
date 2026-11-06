@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DiagnosisDraftNote } from "@/components/diagnosis/DiagnosisDraftNote";
+import { GateGuideProvider, GuideStep, GuideStepBlock } from "@/components/guide/GateGuide";
 import { useNavigate } from "react-router-dom";
 import {
   CartesianGrid,
@@ -271,6 +272,106 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
     setCelebrate(true);
   };
 
+  const guideSteps: GuideStep[] = [
+    {
+      id: "komu",
+      title: "Kdo je váš zákazník a co ho trápí",
+      time: "10–15 minut",
+      think: true,
+      explain: [
+        "Tomuhle se říká vytvoření persony. Představte si jednoho konkrétního člověka, který si váš produkt nebo službu koupí. Kolik mu je, čím se živí, v jaké je situaci, co ho trápí.",
+        "Nepište „všichni“ ani „každý, kdo…“. Kdo prodává všem, neprodá nikomu. Klidně ho pojmenujte, ať si ho umíte představit.",
+        "Do druhého pole napište, jaký problém dnes má. Jeho slovy, tak jak by si postěžoval kamarádovi.",
+      ],
+      example: [
+        [
+          "Zákazník",
+          "Petr, 38 let, pracuje v kanceláři, o víkendech jezdí na kole. Drobné opravy by si rád udělal sám, ale nemá na to čas.",
+        ],
+        [
+          "Problém",
+          "Chce si posunout sedlovku. Na YouTube hodinu hledá video přesně pro své kolo a pak ještě shání správný díl.",
+        ],
+      ],
+      doneWhen: "obě pole jsou vyplněná (aspoň jedna věta).",
+      done: checks[0].ok,
+    },
+    {
+      id: "co",
+      title: "Co prodáváte a jak se to jmenuje",
+      time: "5–10 minut",
+      explain: [
+        "Popište jednou dvěma větami, co zákazníkovi nabídnete. Produkt, službu, kurz, aplikaci. Tak, aby to pochopila i vaše babička.",
+        "Dejte projektu pracovní název. Nemusí být konečný, jde jen o to, abyste o projektu mohli mluvit. Slogan klidně doplňte až na konci.",
+      ],
+      example: [
+        [
+          "Co prodávám",
+          "Krátká videa, jak si sám opravit a seřídit kolo. Pod každým videem odkaz na správný díl, třeba v Decathlonu.",
+        ],
+        ["Název", "WeSportly"],
+        ["Slogan", "Opravte si kolo za 5 minut."],
+      ],
+      doneWhen: "je vyplněné, co prodáváte, a projekt má název.",
+      done: checks[2].ok,
+    },
+    {
+      id: "errc",
+      title: "Čím budete jiní než konkurence (matice ERRC)",
+      time: "20–30 minut",
+      think: true,
+      explain: [
+        "Najděte dva konkurenty. Levný je nejlevnější způsob, jak zákazník problém řeší dnes (často zdarma). Prémiový je nejdražší a nejkvalitnější řešení.",
+        "Pak u vlastností, na kterých zákazníkovi záleží, rozhodněte, co udělá váš projekt jinak: co úplně vynecháte (Eliminovat), co ubere (Snížit), co přidá (Zvýšit) a co úplně nového vytvoříte (Vytvořit).",
+        "Nejdůležitější je políčko Vytvořit. To je důvod, proč si zákazník vybere právě vás.",
+      ],
+      example: [
+        ["Levná konkurence", "YouTube: zdarma, ale hledání trvá dlouho a video nemusí sedět na vaše kolo."],
+        ["Prémiová konkurence", "Cykloservis: spolehlivé, ale drahé a čeká se několik dní."],
+        ["Eliminovat", "dlouhé hledání správného videa"],
+        ["Snížit", "délku videa na 3–5 minut"],
+        ["Zvýšit", "přesnost návodu pro konkrétní typ kola"],
+        ["Vytvořit", "odkaz na přesně ten díl, který potřebujete, hned pod videem"],
+      ],
+      doneWhen: "máte pojmenované oba konkurenty a aspoň jednu položku ve Vytvořit.",
+      done: checks[1].ok && checks[3].ok,
+    },
+    {
+      id: "krivka",
+      title: "Podívejte se na svou hodnotovou křivku",
+      time: "5 minut",
+      explain: [
+        "Tady nic nevyplňujete. Graf se nakreslil sám z matice nad ním.",
+        "Vaše křivka je zelená. Podívejte se, jestli vede jinudy než obě konkurence. Modrý obdélník ukazuje místo, kde jste jiní: tam je váš modrý oceán.",
+        "Když se zelená křivka kryje s konkurencí, vraťte se o krok zpět a přidejte něco do Zvýšit nebo Vytvořit.",
+      ],
+      example: [
+        [
+          "Co je vidět",
+          "WeSportly je výš než YouTube u přesnosti návodu a u nákupu dílu, a přitom levnější a rychlejší než servis.",
+        ],
+      ],
+      doneWhen: "v grafu je vidět vaše křivka (stačí aspoň jedna položka v matici).",
+      done: curve.length > 0,
+    },
+    {
+      id: "usp",
+      title: "Napište své USP jednou větou",
+      time: "10–15 minut",
+      think: true,
+      explain: [
+        "USP je jedna věta, proč si zákazník má koupit právě od vás. Ne seznam vlastností, ale co získá.",
+        "Odpovězte v ní: komu, jaký výsledek, jak rychle, s jakou námahou. Vyjděte z políček Vytvořit a Zvýšit.",
+        "Nevíte si rady? Klikněte na „Sestavit koncept z mých odpovědí“ a pak ho přepište vlastními slovy.",
+      ],
+      example: [
+        ["USP", "Opravte si kolo sami za 5 minut: krátké video přesně pro váš problém a hned pod ním správný díl."],
+      ],
+      doneWhen: "USP má aspoň jednu celou větu.",
+      done: checks[6].ok,
+    },
+  ];
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-12 sm:px-6 lg:px-8">
       <DiagnosisDraftNote part="vision" gate={1} />
@@ -301,419 +402,443 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         </div>
       </Card>
 
-      {/* Úvod: modrý oceán = přidaná hodnota, USP */}
-      <Card className="card-apple p-6">
-        <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
-            <Lightbulb className="h-5 w-5" />
-          </div>
-          <h3 className="text-lg font-semibold">Modrý oceán = víc hodnoty, ne nižší cena</h3>
-        </div>
-        <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
-          <p>
-            Modrý oceán není o tom být levnější. Je o tom{" "}
-            <strong className="text-foreground">přidat zákazníkovi tolik hodnoty</strong>, že vás přestane srovnávat s
-            konkurencí. Kdo soutěží cenou, prohrává s tím, kdo je ochotný prodělávat víc.
-          </p>
-
-          <div>
-            <p className="mb-2 font-medium text-foreground">
-              Kde hodnota vzniká (rovnice hodnoty podle Alexe Hormoziho)
-            </p>
-            <div className="rounded-xl border border-border/60 p-4">
-              <div className="flex flex-col items-center gap-1 text-center text-foreground">
-                <span className="font-semibold">Vysněný výsledek × Jistota, že ho dosáhnu</span>
-                <span className="h-px w-full max-w-sm bg-foreground/40" />
-                <span className="font-semibold">Čas do výsledku × Úsilí a oběti</span>
-              </div>
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                <li>
-                  <strong className="text-foreground">↑ Výsledek:</strong> co přesně zákazník získá, ne co dostane do
-                  ruky.
-                </li>
-                <li>
-                  <strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit – postup, záruka, důkazy.
-                </li>
-                <li>
-                  <strong className="text-foreground">↓ Čas:</strong> jak rychle uvidí první výsledek.
-                </li>
-                <li>
-                  <strong className="text-foreground">↓ Úsilí:</strong> co za něj uděláte vy, aby nemusel on.
-                </li>
-              </ul>
+      <GateGuideProvider gate={1} steps={guideSteps}>
+        {/* Úvod: modrý oceán = přidaná hodnota, USP */}
+        <Card className="card-apple p-6">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+              <Lightbulb className="h-5 w-5" />
             </div>
-            <p className="mt-2">
-              V ERRC matici to funguje stejně: <strong className="text-foreground">Eliminovat a Snížit</strong> ubírá
-              zákazníkovi čas, úsilí a zbytečné náklady, <strong className="text-foreground">Zvýšit a Vytvořit</strong>{" "}
-              přidává výsledek a jistotu.
-            </p>
+            <h3 className="text-lg font-semibold">Modrý oceán = víc hodnoty, ne nižší cena</h3>
           </div>
-
-          <p>
-            <strong className="text-foreground">USP</strong> je pak jedna věta, ze které je jasné, jakou hodnotu
-            zákazník dostane: jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Ne seznam vlastností.
-          </p>
-
-          <div className="rounded-xl bg-muted/60 p-4">
-            <p className="mb-1 font-medium text-foreground">Příklad: online kurz vaření pro pracující rodiče</p>
+          <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p>
-              Výsledek: domácí večeře pro celou rodinu každý den. Jistota: hotový týdenní plán a nákupní seznam. Čas: 30
-              minut. Úsilí: nic nevymýšlí. Kurz proto vynechá exotické suroviny a dlouhé lekce a přidá plán jídel.
+              Modrý oceán není o tom být levnější. Je o tom{" "}
+              <strong className="text-foreground">přidat zákazníkovi tolik hodnoty</strong>, že vás přestane srovnávat s
+              konkurencí. Kdo soutěží cenou, prohrává s tím, kdo je ochotný prodělávat víc.
             </p>
-            <p className="mt-2 italic text-foreground">
-              „Večeře pro celou rodinu za 30 minut – bez vymýšlení, s plánem a nákupním seznamem na celý týden.“
-            </p>
-          </div>
-        </div>
-      </Card>
 
-      {/* Krok 1: Komu */}
-      <Card className="card-apple p-6">
-        <SectionHeader icon={Users} step={1} title="Komu" subtitle="Nejdřív zákazník, teprve potom produkt." />
-        <div className="space-y-4">
-          <Field label="Kdo je váš zákazník?" hint="Co nejkonkrétněji: kdo to je, v jaké je situaci.">
-            <Textarea
-              value={basics.customer ?? ""}
-              onChange={(e) => setBasic("customer", e.target.value)}
-              placeholder="např. pracující rodiče s malými dětmi, kteří chtějí vařit doma"
-              className="min-h-[80px] rounded-xl"
-            />
-          </Field>
-          <Field label="Jaký problém řeší?" hint="Co ho dnes trápí nebo co mu chybí.">
-            <Textarea
-              value={basics.problem ?? ""}
-              onChange={(e) => setBasic("problem", e.target.value)}
-              placeholder="např. nemají čas vymýšlet jídla a nakupovat, končí u polotovarů"
-              className="min-h-[80px] rounded-xl"
-            />
-          </Field>
-        </div>
-      </Card>
-
-      {/* Krok 2: Co prodávám */}
-      <Card className="card-apple p-6">
-        <SectionHeader icon={Package} step={2} title="Co prodávám" subtitle="Produkt nebo služba, název a slogan." />
-        <div className="space-y-4">
-          <Field label="Co prodáváte?" hint="Jednou dvěma větami. Počítáme s online podnikáním.">
-            <Textarea
-              value={basics.offering ?? ""}
-              onChange={(e) => setBasic("offering", e.target.value)}
-              placeholder="např. online kurz vaření s týdenními plány jídel"
-              className="min-h-[70px] rounded-xl"
-            />
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Název projektu">
-              <Input
-                value={basics.name}
-                onChange={(e) => setBasic("name", e.target.value)}
-                placeholder="Zadejte název vašeho projektu..."
-                className="h-11 rounded-xl"
-              />
-            </Field>
-            <Field label="Slogan" hint="Klidně později, až budete mít USP.">
-              <Input
-                value={basics.slogan}
-                onChange={(e) => setBasic("slogan", e.target.value)}
-                placeholder="např. Večeře za 30 minut"
-                className="h-11 rounded-xl"
-              />
-            </Field>
-          </div>
-        </div>
-      </Card>
-
-      {/* Krok 3: ERRC */}
-      <Card className="card-apple p-6">
-        <SectionHeader
-          icon={Target}
-          step={3}
-          title="ERRC matice"
-          subtitle="Srovnáte se se dvěma konkrétními konkurenty a najdete místo, kde budete jiní než oba."
-        />
-
-        <div className="mb-5 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
-          <p className="mb-2 font-medium text-foreground">Jak matici vyplnit</p>
-          <ol className="list-decimal space-y-1.5 pl-5">
-            <li>
-              <strong className="text-foreground">Pojmenujte dva konkurenty.</strong> Levnou konkurenci – nejlevnější
-              způsob, jak zákazník svůj problém vyřeší dnes (často i zdarma). A prémiovou konkurenci – nejdražší a
-              nejkvalitnější řešení na trhu. Mezi nimi hledáte své místo.
-            </li>
-            <li>
-              <strong className="text-foreground">Napište, co zákazníci na trhu řeší.</strong> Cenu, kvalitu, rychlost,
-              osobní přístup… Každou věc dejte do kvadrantu podle toho, co s ní uděláte vy: vynecháte, snížíte, zvýšíte,
-              nebo ji přinesete nově.
-            </li>
-            <li>
-              <strong className="text-foreground">Ohodnoťte ji třemi čísly 0–100</strong>: kolik jí nabízí levná
-              konkurence, kolik prémiová a kolik vy. 0 = vůbec, 100 = maximum.
-            </li>
-          </ol>
-          <p className="mt-3">
-            Příklad: položka „osobní konzultace“ – levná konkurence (YouTube) 0, prémiová (kurz se šéfkuchařem) 90, vy
-            60. Výsledná křivka ukáže, jestli jste jen levnější kopie prémiového řešení, nebo opravdu něco jiného.
-          </p>
-        </div>
-
-        <div className="mb-5 grid gap-4 sm:grid-cols-2">
-          <Field label="Levná konkurence" hint="Kdo nebo co je nejlevnější alternativa?">
-            <Input
-              value={basics.lowCostName ?? ""}
-              onChange={(e) => setBasic("lowCostName", e.target.value)}
-              placeholder="např. recepty zdarma na YouTube"
-              className="h-11 rounded-xl"
-            />
-          </Field>
-          <Field label="Prémiová konkurence" hint="Kdo nebo co je nejdražší a nejkvalitnější řešení?">
-            <Input
-              value={basics.premiumName ?? ""}
-              onChange={(e) => setBasic("premiumName", e.target.value)}
-              placeholder="např. kurz se šéfkuchařem"
-              className="h-11 rounded-xl"
-            />
-          </Field>
-        </div>
-        <div className="grid gap-4 lg:grid-cols-2">
-          {QUADRANTS.map((q) => {
-            const Icon = q.icon;
-            const items = errc[q.key] ?? [];
-            return (
-              <div key={q.key} className="rounded-2xl border border-border/60 p-4">
-                <div className="mb-1 flex items-center gap-2">
-                  <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${q.tone}`}>
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <h4 className="font-semibold">{q.title}</h4>
+            <div>
+              <p className="mb-2 font-medium text-foreground">
+                Kde hodnota vzniká (rovnice hodnoty podle Alexe Hormoziho)
+              </p>
+              <div className="rounded-xl border border-border/60 p-4">
+                <div className="flex flex-col items-center gap-1 text-center text-foreground">
+                  <span className="font-semibold">Vysněný výsledek × Jistota, že ho dosáhnu</span>
+                  <span className="h-px w-full max-w-sm bg-foreground/40" />
+                  <span className="font-semibold">Čas do výsledku × Úsilí a oběti</span>
                 </div>
-                <p className="mb-3 text-xs text-muted-foreground">{q.question}</p>
-
-                {items.length > 0 && (
-                  <div className="mb-1 grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] gap-1.5 text-[11px] text-muted-foreground">
-                    <span />
-                    <span
-                      className="text-center"
-                      title={`Levná konkurence${basics.lowCostName ? `: ${basics.lowCostName}` : ""}`}
-                    >
-                      Levná
-                    </span>
-                    <span
-                      className="text-center"
-                      title={`Prémiová konkurence${basics.premiumName ? `: ${basics.premiumName}` : ""}`}
-                    >
-                      Prém.
-                    </span>
-                    <span className="text-center font-medium text-primary" title="Váš projekt">
-                      Já
-                    </span>
-                    <span />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  {items.map((item) => (
-                    <div key={item.id} className="grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] items-center gap-1.5">
-                      <Input
-                        value={item.text}
-                        onChange={(e) => updateItem(q.key, item.id, { text: e.target.value })}
-                        placeholder={q.placeholder}
-                        className="h-9 rounded-lg text-sm"
-                        aria-label={`${q.title}: položka`}
-                      />
-                      {(["lowCost", "premium", "mine"] as const).map((field) => {
-                        const locked = isLocked(q.key, field);
-                        const value = locked ? 0 : item[field];
-                        return (
-                          <Input
-                            key={field}
-                            type="number"
-                            inputMode="numeric"
-                            min={0}
-                            max={100}
-                            value={value}
-                            disabled={locked}
-                            title={locked ? "Dáno metodikou" : undefined}
-                            onChange={(e) => updateItem(q.key, item.id, { [field]: clamp(Number(e.target.value)) })}
-                            className={`h-9 rounded-lg px-1 text-center text-sm ${field === "mine" ? "border-primary/40 font-semibold" : ""}`}
-                            aria-label={`${item.text || q.title}: ${field === "lowCost" ? "levná konkurence" : field === "premium" ? "prémiová konkurence" : "můj projekt"}`}
-                          />
-                        );
-                      })}
-                      <button
-                        type="button"
-                        onClick={() => removeItem(q.key, item.id)}
-                        className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-                        aria-label="Odebrat položku"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <Button variant="ghost" size="sm" className="mt-2 w-full rounded-lg" onClick={() => addItem(q.key)}>
-                  <Plus className="mr-1 h-4 w-4" />
-                  Přidat
-                </Button>
+                <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <li>
+                    <strong className="text-foreground">↑ Výsledek:</strong> co přesně zákazník získá, ne co dostane do
+                    ruky.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit – postup, záruka, důkazy.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">↓ Čas:</strong> jak rychle uvidí první výsledek.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">↓ Úsilí:</strong> co za něj uděláte vy, aby nemusel on.
+                  </li>
+                </ul>
               </div>
-            );
-          })}
-        </div>
-      </Card>
+              <p className="mt-2">
+                V ERRC matici to funguje stejně: <strong className="text-foreground">Eliminovat a Snížit</strong> ubírá
+                zákazníkovi čas, úsilí a zbytečné náklady,{" "}
+                <strong className="text-foreground">Zvýšit a Vytvořit</strong> přidává výsledek a jistotu.
+              </p>
+            </div>
 
-      {/* Krok 4: Hodnotová křivka */}
-      <Card className="card-apple p-6">
-        <SectionHeader
-          icon={TrendingUp}
-          step={4}
-          title="Hodnotová křivka"
-          subtitle="Kreslí se sama z matice. Vaše křivka je zelená. Modrý obdélník ukazuje modrý oceán: co zvyšujete a co vytváříte nového, tedy kde vedete jinudy než obě konkurence."
-        />
-        {curve.length === 0 ? (
-          <p className="rounded-xl bg-muted/60 p-6 text-center text-sm text-muted-foreground">
-            Jakmile v matici pojmenujete první položky, objeví se tu křivka.
-          </p>
-        ) : (
-          <div className="h-[340px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={curve} margin={{ top: 10, right: 24, left: -16, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis
-                  dataKey="x"
-                  type="number"
-                  domain={[-0.6, Math.max(curve.length - 0.4, 0.4)]}
-                  ticks={curve.map((p) => p.x)}
-                  tickFormatter={(x: number) => curve[x]?.name ?? ""}
-                  interval={0}
-                  angle={-30}
-                  textAnchor="end"
-                  height={70}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  ticks={[0, 25, 50, 75, 100]}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
-                />
-                {ocean && (
-                  <ReferenceArea
-                    x1={ocean.from}
-                    x2={ocean.to}
-                    y1={0}
-                    y2={100}
-                    fill="#2563eb"
-                    fillOpacity={0.08}
-                    stroke="#2563eb"
-                    strokeDasharray="6 4"
-                    strokeWidth={1.5}
-                    ifOverflow="extendDomain"
-                    label={{
-                      value: "Modrý oceán",
-                      position: "insideTop",
-                      fill: "#1d4ed8",
-                      fontSize: 13,
-                      fontWeight: 700,
-                    }}
-                  />
-                )}
-                <Tooltip labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string })?.full ?? ""} />
-                <Legend verticalAlign="top" height={32} wrapperStyle={{ fontSize: 13 }} />
-                <Line
-                  type="linear"
-                  dataKey="Low-cost konkurence"
-                  name={
-                    basics.lowCostName?.trim() ? `Levná: ${shorten(basics.lowCostName.trim(), 28)}` : "Levná konkurence"
-                  }
-                  stroke="#94a3b8"
-                  strokeWidth={2}
-                  strokeDasharray="5 4"
-                  dot={{ r: 3 }}
-                />
-                <Line
-                  type="linear"
-                  dataKey="Prémiová konkurence"
-                  name={
-                    basics.premiumName?.trim()
-                      ? `Prémiová: ${shorten(basics.premiumName.trim(), 28)}`
-                      : "Prémiová konkurence"
-                  }
-                  stroke="#f59e0b"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-                <Line
-                  type="linear"
-                  dataKey="Můj projekt"
-                  stroke="#16a34a"
-                  strokeWidth={4}
-                  dot={{ r: 5, fill: "#16a34a" }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <p>
+              <strong className="text-foreground">USP</strong> je pak jedna věta, ze které je jasné, jakou hodnotu
+              zákazník dostane: jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Ne seznam vlastností.
+            </p>
+
+            <div className="rounded-xl bg-muted/60 p-4">
+              <p className="mb-1 font-medium text-foreground">Příklad: online kurz vaření pro pracující rodiče</p>
+              <p>
+                Výsledek: domácí večeře pro celou rodinu každý den. Jistota: hotový týdenní plán a nákupní seznam. Čas:
+                30 minut. Úsilí: nic nevymýšlí. Kurz proto vynechá exotické suroviny a dlouhé lekce a přidá plán jídel.
+              </p>
+              <p className="mt-2 italic text-foreground">
+                „Večeře pro celou rodinu za 30 minut – bez vymýšlení, s plánem a nákupním seznamem na celý týden.“
+              </p>
+            </div>
           </div>
-        )}
-      </Card>
+        </Card>
 
-      {/* Krok 5: USP */}
-      <Card className="card-apple p-6">
-        <SectionHeader
-          icon={Sparkles}
-          step={5}
-          title="Moje USP"
-          subtitle="Jedna věta: komu, jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Vycházejte z položek Vytvořit a Zvýšit."
+        <GuideStepBlock id="komu">
+          {/* Krok 1: Komu */}
+          <Card className="card-apple p-6">
+            <SectionHeader icon={Users} step={1} title="Komu" subtitle="Nejdřív zákazník, teprve potom produkt." />
+            <div className="space-y-4">
+              <Field label="Kdo je váš zákazník?" hint="Co nejkonkrétněji: kdo to je, v jaké je situaci.">
+                <Textarea
+                  value={basics.customer ?? ""}
+                  onChange={(e) => setBasic("customer", e.target.value)}
+                  placeholder="např. pracující rodiče s malými dětmi, kteří chtějí vařit doma"
+                  className="min-h-[80px] rounded-xl"
+                />
+              </Field>
+              <Field label="Jaký problém řeší?" hint="Co ho dnes trápí nebo co mu chybí.">
+                <Textarea
+                  value={basics.problem ?? ""}
+                  onChange={(e) => setBasic("problem", e.target.value)}
+                  placeholder="např. nemají čas vymýšlet jídla a nakupovat, končí u polotovarů"
+                  className="min-h-[80px] rounded-xl"
+                />
+              </Field>
+            </div>
+          </Card>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="co">
+          {/* Krok 2: Co prodávám */}
+          <Card className="card-apple p-6">
+            <SectionHeader
+              icon={Package}
+              step={2}
+              title="Co prodávám"
+              subtitle="Produkt nebo služba, název a slogan."
+            />
+            <div className="space-y-4">
+              <Field label="Co prodáváte?" hint="Jednou dvěma větami. Počítáme s online podnikáním.">
+                <Textarea
+                  value={basics.offering ?? ""}
+                  onChange={(e) => setBasic("offering", e.target.value)}
+                  placeholder="např. online kurz vaření s týdenními plány jídel"
+                  className="min-h-[70px] rounded-xl"
+                />
+              </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Název projektu">
+                  <Input
+                    value={basics.name}
+                    onChange={(e) => setBasic("name", e.target.value)}
+                    placeholder="Zadejte název vašeho projektu..."
+                    className="h-11 rounded-xl"
+                  />
+                </Field>
+                <Field label="Slogan" hint="Klidně později, až budete mít USP.">
+                  <Input
+                    value={basics.slogan}
+                    onChange={(e) => setBasic("slogan", e.target.value)}
+                    placeholder="např. Večeře za 30 minut"
+                    className="h-11 rounded-xl"
+                  />
+                </Field>
+              </div>
+            </div>
+          </Card>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="errc">
+          {/* Krok 3: ERRC */}
+          <Card className="card-apple p-6">
+            <SectionHeader
+              icon={Target}
+              step={3}
+              title="ERRC matice"
+              subtitle="Srovnáte se se dvěma konkrétními konkurenty a najdete místo, kde budete jiní než oba."
+            />
+
+            <div className="mb-5 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
+              <p className="mb-2 font-medium text-foreground">Jak matici vyplnit</p>
+              <ol className="list-decimal space-y-1.5 pl-5">
+                <li>
+                  <strong className="text-foreground">Pojmenujte dva konkurenty.</strong> Levnou konkurenci –
+                  nejlevnější způsob, jak zákazník svůj problém vyřeší dnes (často i zdarma). A prémiovou konkurenci –
+                  nejdražší a nejkvalitnější řešení na trhu. Mezi nimi hledáte své místo.
+                </li>
+                <li>
+                  <strong className="text-foreground">Napište, co zákazníci na trhu řeší.</strong> Cenu, kvalitu,
+                  rychlost, osobní přístup… Každou věc dejte do kvadrantu podle toho, co s ní uděláte vy: vynecháte,
+                  snížíte, zvýšíte, nebo ji přinesete nově.
+                </li>
+                <li>
+                  <strong className="text-foreground">Ohodnoťte ji třemi čísly 0–100</strong>: kolik jí nabízí levná
+                  konkurence, kolik prémiová a kolik vy. 0 = vůbec, 100 = maximum.
+                </li>
+              </ol>
+              <p className="mt-3">
+                Příklad: položka „osobní konzultace“ – levná konkurence (YouTube) 0, prémiová (kurz se šéfkuchařem) 90,
+                vy 60. Výsledná křivka ukáže, jestli jste jen levnější kopie prémiového řešení, nebo opravdu něco
+                jiného.
+              </p>
+            </div>
+
+            <div className="mb-5 grid gap-4 sm:grid-cols-2">
+              <Field label="Levná konkurence" hint="Kdo nebo co je nejlevnější alternativa?">
+                <Input
+                  value={basics.lowCostName ?? ""}
+                  onChange={(e) => setBasic("lowCostName", e.target.value)}
+                  placeholder="např. recepty zdarma na YouTube"
+                  className="h-11 rounded-xl"
+                />
+              </Field>
+              <Field label="Prémiová konkurence" hint="Kdo nebo co je nejdražší a nejkvalitnější řešení?">
+                <Input
+                  value={basics.premiumName ?? ""}
+                  onChange={(e) => setBasic("premiumName", e.target.value)}
+                  placeholder="např. kurz se šéfkuchařem"
+                  className="h-11 rounded-xl"
+                />
+              </Field>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              {QUADRANTS.map((q) => {
+                const Icon = q.icon;
+                const items = errc[q.key] ?? [];
+                return (
+                  <div key={q.key} className="rounded-2xl border border-border/60 p-4">
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${q.tone}`}>
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <h4 className="font-semibold">{q.title}</h4>
+                    </div>
+                    <p className="mb-3 text-xs text-muted-foreground">{q.question}</p>
+
+                    {items.length > 0 && (
+                      <div className="mb-1 grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] gap-1.5 text-[11px] text-muted-foreground">
+                        <span />
+                        <span
+                          className="text-center"
+                          title={`Levná konkurence${basics.lowCostName ? `: ${basics.lowCostName}` : ""}`}
+                        >
+                          Levná
+                        </span>
+                        <span
+                          className="text-center"
+                          title={`Prémiová konkurence${basics.premiumName ? `: ${basics.premiumName}` : ""}`}
+                        >
+                          Prém.
+                        </span>
+                        <span className="text-center font-medium text-primary" title="Váš projekt">
+                          Já
+                        </span>
+                        <span />
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] items-center gap-1.5"
+                        >
+                          <Input
+                            value={item.text}
+                            onChange={(e) => updateItem(q.key, item.id, { text: e.target.value })}
+                            placeholder={q.placeholder}
+                            className="h-9 rounded-lg text-sm"
+                            aria-label={`${q.title}: položka`}
+                          />
+                          {(["lowCost", "premium", "mine"] as const).map((field) => {
+                            const locked = isLocked(q.key, field);
+                            const value = locked ? 0 : item[field];
+                            return (
+                              <Input
+                                key={field}
+                                type="number"
+                                inputMode="numeric"
+                                min={0}
+                                max={100}
+                                value={value}
+                                disabled={locked}
+                                title={locked ? "Dáno metodikou" : undefined}
+                                onChange={(e) => updateItem(q.key, item.id, { [field]: clamp(Number(e.target.value)) })}
+                                className={`h-9 rounded-lg px-1 text-center text-sm ${field === "mine" ? "border-primary/40 font-semibold" : ""}`}
+                                aria-label={`${item.text || q.title}: ${field === "lowCost" ? "levná konkurence" : field === "premium" ? "prémiová konkurence" : "můj projekt"}`}
+                              />
+                            );
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => removeItem(q.key, item.id)}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                            aria-label="Odebrat položku"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button variant="ghost" size="sm" className="mt-2 w-full rounded-lg" onClick={() => addItem(q.key)}>
+                      <Plus className="mr-1 h-4 w-4" />
+                      Přidat
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Krok 4: Hodnotová křivka */}
+        </GuideStepBlock>
+
+        <GuideStepBlock id="krivka">
+          <Card className="card-apple p-6">
+            <SectionHeader
+              icon={TrendingUp}
+              step={4}
+              title="Hodnotová křivka"
+              subtitle="Kreslí se sama z matice. Vaše křivka je zelená. Modrý obdélník ukazuje modrý oceán: co zvyšujete a co vytváříte nového, tedy kde vedete jinudy než obě konkurence."
+            />
+            {curve.length === 0 ? (
+              <p className="rounded-xl bg-muted/60 p-6 text-center text-sm text-muted-foreground">
+                Jakmile v matici pojmenujete první položky, objeví se tu křivka.
+              </p>
+            ) : (
+              <div className="h-[340px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={curve} margin={{ top: 10, right: 24, left: -16, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="x"
+                      type="number"
+                      domain={[-0.6, Math.max(curve.length - 0.4, 0.4)]}
+                      ticks={curve.map((p) => p.x)}
+                      tickFormatter={(x: number) => curve[x]?.name ?? ""}
+                      interval={0}
+                      angle={-30}
+                      textAnchor="end"
+                      height={70}
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                    />
+                    <YAxis
+                      domain={[0, 100]}
+                      ticks={[0, 25, 50, 75, 100]}
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                    />
+                    {ocean && (
+                      <ReferenceArea
+                        x1={ocean.from}
+                        x2={ocean.to}
+                        y1={0}
+                        y2={100}
+                        fill="#2563eb"
+                        fillOpacity={0.08}
+                        stroke="#2563eb"
+                        strokeDasharray="6 4"
+                        strokeWidth={1.5}
+                        ifOverflow="extendDomain"
+                        label={{
+                          value: "Modrý oceán",
+                          position: "insideTop",
+                          fill: "#1d4ed8",
+                          fontSize: 13,
+                          fontWeight: 700,
+                        }}
+                      />
+                    )}
+                    <Tooltip labelFormatter={(_, p) => (p?.[0]?.payload as { full?: string })?.full ?? ""} />
+                    <Legend verticalAlign="top" height={32} wrapperStyle={{ fontSize: 13 }} />
+                    <Line
+                      type="linear"
+                      dataKey="Low-cost konkurence"
+                      name={
+                        basics.lowCostName?.trim()
+                          ? `Levná: ${shorten(basics.lowCostName.trim(), 28)}`
+                          : "Levná konkurence"
+                      }
+                      stroke="#94a3b8"
+                      strokeWidth={2}
+                      strokeDasharray="5 4"
+                      dot={{ r: 3 }}
+                    />
+                    <Line
+                      type="linear"
+                      dataKey="Prémiová konkurence"
+                      name={
+                        basics.premiumName?.trim()
+                          ? `Prémiová: ${shorten(basics.premiumName.trim(), 28)}`
+                          : "Prémiová konkurence"
+                      }
+                      stroke="#f59e0b"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                    />
+                    <Line
+                      type="linear"
+                      dataKey="Můj projekt"
+                      stroke="#16a34a"
+                      strokeWidth={4}
+                      dot={{ r: 5, fill: "#16a34a" }}
+                      activeDot={{ r: 7 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </Card>
+        </GuideStepBlock>
+
+        <GuideStepBlock id="usp">
+          {/* Krok 5: USP */}
+          <Card className="card-apple p-6">
+            <SectionHeader
+              icon={Sparkles}
+              step={5}
+              title="Moje USP"
+              subtitle="Jedna věta: komu, jaký výsledek, jak rychle, s jakou námahou a proč to vyjde. Vycházejte z položek Vytvořit a Zvýšit."
+            />
+            <Textarea
+              value={usp}
+              onChange={(e) => setUsp(e.target.value)}
+              placeholder="např. Večeře pro celou rodinu za 30 minut – s plánem na celý týden."
+              className="min-h-[90px] rounded-xl"
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <Button variant="outline" className="rounded-xl" onClick={suggestUsp}>
+                <Wand2 className="mr-2 h-4 w-4" />
+                Sestavit koncept z mých odpovědí
+              </Button>
+              <p className="text-xs text-muted-foreground">Koncept je jen výchozí bod – přepište ho vlastními slovy.</p>
+            </div>
+          </Card>
+        </GuideStepBlock>
+
+        <MethodFigures ids={["04_errc", "05_mapa_oceanu", "06_mapa_uzitku", "11_hooked"]} />
+
+        <AdvisorsInline
+          phase={1}
+          title="Probrat modrý oceán s poradcem"
+          topic="Fáze 1 – Vize (strategie modrého oceánu)"
         />
-        <Textarea
-          value={usp}
-          onChange={(e) => setUsp(e.target.value)}
-          placeholder="např. Večeře pro celou rodinu za 30 minut – s plánem na celý týden."
-          className="min-h-[90px] rounded-xl"
-        />
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <Button variant="outline" className="rounded-xl" onClick={suggestUsp}>
-            <Wand2 className="mr-2 h-4 w-4" />
-            Sestavit koncept z mých odpovědí
+
+        {/* Kontrola a dokončení */}
+        <Card id="guide-finish" className="card-apple p-6">
+          <h3 className="mb-1 text-lg font-semibold">Kontrola</h3>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Povinné body odemknou další bránu. Doporučené body hlídají, aby šlo opravdu o modrý oceán. Vyhodnocení
+            pomocí AI přibude v další verzi.
+          </p>
+          <ul className="space-y-2">
+            {checks.map((c) => (
+              <li key={c.label} className="flex items-start gap-2 text-sm">
+                {c.ok ? (
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                ) : c.required ? (
+                  <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                ) : (
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                )}
+                <span className={c.ok ? "text-foreground" : "text-muted-foreground"}>
+                  {c.label}
+                  {!c.required && !c.ok && <span className="ml-1 text-xs text-amber-600">(doporučeno)</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <Button className="btn-apple mt-6 h-12 w-full" disabled={!canFinish} onClick={finish}>
+            {canFinish ? "Dokončit fázi a otevřít bránu 2" : "Doplňte povinné body"}
           </Button>
-          <p className="text-xs text-muted-foreground">Koncept je jen výchozí bod – přepište ho vlastními slovy.</p>
-        </div>
-      </Card>
-
-      <MethodFigures ids={["04_errc", "05_mapa_oceanu", "06_mapa_uzitku", "11_hooked"]} />
-
-      <AdvisorsInline
-        phase={1}
-        title="Probrat modrý oceán s poradcem"
-        topic="Fáze 1 – Vize (strategie modrého oceánu)"
-      />
-
-      {/* Kontrola a dokončení */}
-      <Card className="card-apple p-6">
-        <h3 className="mb-1 text-lg font-semibold">Kontrola</h3>
-        <p className="mb-4 text-sm text-muted-foreground">
-          Povinné body odemknou další bránu. Doporučené body hlídají, aby šlo opravdu o modrý oceán. Vyhodnocení pomocí
-          AI přibude v další verzi.
-        </p>
-        <ul className="space-y-2">
-          {checks.map((c) => (
-            <li key={c.label} className="flex items-start gap-2 text-sm">
-              {c.ok ? (
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-              ) : c.required ? (
-                <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-              ) : (
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-              )}
-              <span className={c.ok ? "text-foreground" : "text-muted-foreground"}>
-                {c.label}
-                {!c.required && !c.ok && <span className="ml-1 text-xs text-amber-600">(doporučeno)</span>}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <Button className="btn-apple mt-6 h-12 w-full" disabled={!canFinish} onClick={finish}>
-          {canFinish ? "Dokončit fázi a otevřít bránu 2" : "Doplňte povinné body"}
-        </Button>
-      </Card>
+        </Card>
+      </GateGuideProvider>
     </div>
   );
 };
