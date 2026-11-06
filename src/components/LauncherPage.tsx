@@ -288,7 +288,6 @@ const PATHS: {
       `${STUDY.sessions} kurzů a setkání s lektory`,
       "Vlastní projekt",
       "E-learning",
-      "Komunita",
     ],
     cta: "Zobrazit studium",
     href: "#studium",
