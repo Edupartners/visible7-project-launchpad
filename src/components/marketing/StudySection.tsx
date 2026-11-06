@@ -72,65 +72,53 @@ export const StudyCtas = ({ from, dark = false }: { from: string; dark?: boolean
 export const StudySection = () => {
   const open = studyOpen();
   return (
-    <section id="studium" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-leaf-500 text-white">
-        <div className="mx-auto grid max-w-6xl items-start gap-10 px-4 py-16 sm:px-8 md:grid-cols-[1.15fr_1fr] md:py-20 lg:px-12">
-          <div>
-            <p className="v7-para-sm inline-block bg-signal px-3 py-1 text-sm font-bold text-signal-foreground">
-              Studium s lektory · {STUDY.period}
-            </p>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Staňte se specialistou na online podnikání
-            </h2>
-            <p className="mt-4 text-lg text-white/85">
-              Studium <b className="text-white">{STUDY.name}</b> zakončíte zkouškou profesní kvalifikace{" "}
-              <a
-                href={NSK_QUALIFICATION.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="whitespace-nowrap font-semibold text-white underline underline-offset-4 hover:no-underline"
-              >
-                {NSK_QUALIFICATION.code}
-              </a>{" "}
-              podle zákona č. 179/2006 Sb. Osvědčení je uznané státem a platí v celé ČR. Edu Partners je autorizovaná
-              osoba, zkoušku složíte přímo u nás.
-            </p>
-            {open ? (
-              <>
-                <div className="mt-6">
-                  <StudyPrice dark />
-                </div>
-                <div className="mt-6">
-                  <StudyCtas from="landing" dark />
-                </div>
-              </>
-            ) : (
-              <p className="mt-6 rounded-xl bg-leaf-700 p-4 font-semibold">Další běh studia připravujeme.</p>
-            )}
-            <p className="mt-4 text-sm text-white/75">
-              Studovat nechcete? Zkoušku můžete složit i samostatně: {kc(EXAM_PRICES.regular)}, pro členy{" "}
-              {kc(EXAM_PRICES.member)}.{" "}
-              <Link to="/certifikace" className="font-semibold text-white underline underline-offset-4">
-                Celý program a osvědčení
-              </Link>
-            </p>
-          </div>
-          <div className="rounded-2xl bg-leaf-700 p-6">
-            <p className="font-bold">Co ve studiu dostanete</p>
-            <ul className="mt-4 space-y-3">
-              {STUDY_ITEMS.map((it) => (
-                <li key={it} className="flex gap-3">
-                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-signal" strokeWidth={3} aria-hidden="true" />
-                  <span>{it}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 flex items-start gap-2 border-t border-white/15 pt-4 text-sm text-white/80">
-              <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-              Platíte při přihlášce a pak za každý měsíc studia. Za každou bránu VISIBLE7 navíc osvědčení s ověřovacím
-              kódem.
-            </p>
-          </div>
+    <section id="studium" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-10 sm:px-8 md:pb-12 lg:px-12">
+      <div className="grid overflow-hidden rounded-3xl border border-leaf-200 bg-leaf-50 md:grid-cols-[1.4fr_1fr]">
+        <div className="p-6 sm:p-8 lg:p-10">
+          <p className="v7-para-sm inline-block bg-signal px-3 py-1 text-xs font-bold text-signal-foreground">
+            Studium s lektory · {STUDY.period}
+          </p>
+          <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{STUDY.name}</h2>
+          <p className="mt-2 text-muted-foreground">
+            Projdete cestu s lektory a zakončíte ji státní zkouškou profesní kvalifikace{" "}
+            <a
+              href={NSK_QUALIFICATION.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whitespace-nowrap font-semibold text-leaf-700 underline underline-offset-4 hover:no-underline"
+            >
+              {NSK_QUALIFICATION.code}
+            </a>
+            . Osvědčení platí v celé ČR.
+          </p>
+          <ul className="mt-5 grid gap-x-6 gap-y-2.5 text-sm sm:grid-cols-2">
+            {STUDY_ITEMS.map((it) => (
+              <li key={it} className="flex gap-2">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
+                <span>{it}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-xs text-muted-foreground">
+            Zkouška samostatně {kc(EXAM_PRICES.regular)}, pro členy {kc(EXAM_PRICES.member)}.{" "}
+            <Link to="/certifikace" className="font-semibold text-foreground underline underline-offset-4">
+              Celý program a osvědčení
+            </Link>
+          </p>
+        </div>
+        <div className="flex flex-col justify-center gap-5 border-t border-leaf-200 bg-white p-6 sm:p-8 md:border-l md:border-t-0 lg:p-10">
+          {open ? (
+            <>
+              <StudyPrice />
+              <StudyCtas from="landing" />
+              <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                Platíte při přihlášce a pak za každý měsíc studia.
+              </p>
+            </>
+          ) : (
+            <p className="rounded-xl bg-muted p-4 font-semibold">Další běh studia připravujeme.</p>
+          )}
         </div>
       </div>
     </section>
