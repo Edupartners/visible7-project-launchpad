@@ -101,14 +101,80 @@ const newId = () => Math.random().toString(36).slice(2, 10);
 const defaultsFor = (q: ErrcQuadrant): Omit<ErrcItem, "id" | "text"> => {
   switch (q) {
     case "eliminate":
-      return { lowCost: 50, premium: 80, mine: 0 };
+      return { lowCost: 50, premium: 75, mine: 0 };
     case "reduce":
-      return { lowCost: 50, premium: 80, mine: 20 };
+      return { lowCost: 50, premium: 75, mine: 25 };
     case "raise":
-      return { lowCost: 30, premium: 60, mine: 90 };
+      return { lowCost: 25, premium: 50, mine: 100 };
     case "create":
-      return { lowCost: 0, premium: 0, mine: 80 };
+      return { lowCost: 0, premium: 0, mine: 75 };
   }
+};
+
+/** Stupnice místo čísel 0–100 (ukládá se dál číslo, graf se nemění). */
+const LEVELS = [
+  { v: 0, label: "Nic" },
+  { v: 25, label: "Málo" },
+  { v: 50, label: "Středně" },
+  { v: 75, label: "Hodně" },
+  { v: 100, label: "Nejvíc" },
+] as const;
+const nearestLevel = (n: number) => Math.round(clamp(n) / 25) * 25;
+
+const ScaleRow = ({
+  who,
+  value,
+  locked,
+  mine,
+  onChange,
+}: {
+  who: string;
+  value: number;
+  locked: boolean;
+  mine?: boolean;
+  onChange: (v: number) => void;
+}) => (
+  <div className="grid gap-1 sm:grid-cols-[7.5rem_1fr] sm:items-center sm:gap-2">
+    <span className={`truncate text-xs ${mine ? "font-bold text-leaf-700" : "text-muted-foreground"}`} title={who}>
+      {who}
+    </span>
+    {locked ? (
+      <span className="text-xs text-muted-foreground">Nic (tak to v tomto políčku má být)</span>
+    ) : (
+      <div className="grid grid-cols-5 gap-1" role="radiogroup" aria-label={who}>
+        {LEVELS.map((l) => {
+          const on = nearestLevel(value) === l.v;
+          return (
+            <button
+              key={l.v}
+              type="button"
+              role="radio"
+              aria-checked={on}
+              onClick={() => onChange(l.v)}
+              className={`h-8 rounded-md px-0.5 text-[11px] font-semibold transition-colors ${
+                on
+                  ? mine
+                    ? "bg-leaf-600 text-white"
+                    : "bg-primary text-white"
+                  : "bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+              }`}
+            >
+              {l.label}
+            </button>
+          );
+        })}
+      </div>
+    )}
+  </div>
+);
+
+/** Kontrola logiky kvadrantu: Snížit = méně než konkurence, Zvýšit = víc. */
+const errcWarning = (q: ErrcQuadrant, i: ErrcItem) => {
+  if (q === "reduce" && i.mine >= Math.max(i.lowCost, i.premium))
+    return "U Snížit má být vaše hodnota nižší než u konkurence.";
+  if (q === "raise" && i.mine <= Math.min(i.lowCost, i.premium))
+    return "U Zvýšit má být vaše hodnota vyšší než u konkurence.";
+  return null;
 };
 
 /** Pole, které je v daném kvadrantu dané metodikou a nedá se měnit. */
@@ -185,6 +251,9 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
   }, [errcLoading, legacyLoading, legacyErrc, errc, setErrc]);
 
   const setBasic = (field: keyof VisionBasics, value: string) => setBasics((prev) => ({ ...prev, [field]: value }));
+
+  const lowName = basics.lowCostName?.trim() ? shorten(basics.lowCostName.trim(), 22) : "Levná konkurence";
+  const premName = basics.premiumName?.trim() ? shorten(basics.premiumName.trim(), 22) : "Prémiová konkurence";
 
   const addItem = (q: ErrcQuadrant) =>
     setErrc((prev) => ({ ...prev, [q]: [...(prev[q] ?? []), { id: newId(), text: "", ...defaultsFor(q) }] }));
@@ -332,6 +401,8 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         ["Snížit", "délku videa na 3–5 minut"],
         ["Zvýšit", "přesnost návodu pro konkrétní typ kola"],
         ["Vytvořit", "odkaz na přesně ten díl, který potřebujete, hned pod videem"],
+        ["Jak hodnotit (Snížit: délka videa)", "YouTube Hodně · Cykloservis Nic · Vy Málo"],
+        ["Jak hodnotit (Vytvořit: odkaz na díl)", "konkurence Nic (dáno) · Vy Nejvíc"],
       ],
       doneWhen: "máte pojmenované oba konkurenty a aspoň jednu položku ve Vytvořit.",
       done: checks[1].ok && checks[3].ok,
@@ -587,6 +658,11 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 />
               </Field>
             </div>
+            <p className="mb-4 rounded-xl border border-leaf-200 bg-leaf-50 p-3 text-sm">
+              <b>Jak hodnotit:</b> napište položku (vlastnost, na které zákazníkovi záleží) a u každé klikněte, kolik
+              toho dnes nabízí <b>{lowName}</b>, kolik <b>{premName}</b> a kolik nabídnete <b>vy</b>. Nic, málo,
+              středně, hodně, nebo nejvíc. Předvyplněné hodnoty jen dolaďte.
+            </p>
             <div className="grid gap-4 lg:grid-cols-2">
               {QUADRANTS.map((q) => {
                 const Icon = q.icon;
@@ -601,70 +677,46 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                     </div>
                     <p className="mb-3 text-xs text-muted-foreground">{q.question}</p>
 
-                    {items.length > 0 && (
-                      <div className="mb-1 grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] gap-1.5 text-[11px] text-muted-foreground">
-                        <span />
-                        <span
-                          className="text-center"
-                          title={`Levná konkurence${basics.lowCostName ? `: ${basics.lowCostName}` : ""}`}
-                        >
-                          Levná
-                        </span>
-                        <span
-                          className="text-center"
-                          title={`Prémiová konkurence${basics.premiumName ? `: ${basics.premiumName}` : ""}`}
-                        >
-                          Prém.
-                        </span>
-                        <span className="text-center font-medium text-primary" title="Váš projekt">
-                          Já
-                        </span>
-                        <span />
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      {items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="grid grid-cols-[1fr_repeat(3,3.25rem)_1.75rem] items-center gap-1.5"
-                        >
-                          <Input
-                            value={item.text}
-                            onChange={(e) => updateItem(q.key, item.id, { text: e.target.value })}
-                            placeholder={q.placeholder}
-                            className="h-9 rounded-lg text-sm"
-                            aria-label={`${q.title}: položka`}
-                          />
-                          {(["lowCost", "premium", "mine"] as const).map((field) => {
-                            const locked = isLocked(q.key, field);
-                            const value = locked ? 0 : item[field];
-                            return (
+                    <div className="space-y-3">
+                      {items.map((item) => {
+                        const warn = errcWarning(q.key, item);
+                        return (
+                          <div key={item.id} className="space-y-2 rounded-xl bg-muted/40 p-3">
+                            <div className="flex items-center gap-1.5">
                               <Input
-                                key={field}
-                                type="number"
-                                inputMode="numeric"
-                                min={0}
-                                max={100}
-                                value={value}
-                                disabled={locked}
-                                title={locked ? "Dáno metodikou" : undefined}
-                                onChange={(e) => updateItem(q.key, item.id, { [field]: clamp(Number(e.target.value)) })}
-                                className={`h-9 rounded-lg px-1 text-center text-sm ${field === "mine" ? "border-primary/40 font-semibold" : ""}`}
-                                aria-label={`${item.text || q.title}: ${field === "lowCost" ? "levná konkurence" : field === "premium" ? "prémiová konkurence" : "můj projekt"}`}
+                                value={item.text}
+                                onChange={(e) => updateItem(q.key, item.id, { text: e.target.value })}
+                                placeholder={q.placeholder}
+                                className="h-9 rounded-lg bg-background text-sm"
+                                aria-label={`${q.title}: položka`}
                               />
-                            );
-                          })}
-                          <button
-                            type="button"
-                            onClick={() => removeItem(q.key, item.id)}
-                            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-                            aria-label="Odebrat položku"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
+                              <button
+                                type="button"
+                                onClick={() => removeItem(q.key, item.id)}
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                                aria-label="Odebrat položku"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                            {(["lowCost", "premium", "mine"] as const).map((field) => (
+                              <ScaleRow
+                                key={field}
+                                who={field === "lowCost" ? lowName : field === "premium" ? premName : "Vy"}
+                                value={isLocked(q.key, field) ? 0 : item[field]}
+                                locked={isLocked(q.key, field)}
+                                mine={field === "mine"}
+                                onChange={(v) => updateItem(q.key, item.id, { [field]: v })}
+                              />
+                            ))}
+                            {warn && (
+                              <p className="flex items-start gap-1.5 text-xs font-semibold text-amber-700">
+                                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" /> {warn}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <Button variant="ghost" size="sm" className="mt-2 w-full rounded-lg" onClick={() => addItem(q.key)}>
