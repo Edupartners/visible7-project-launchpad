@@ -359,7 +359,7 @@ const TestPageEditor = () => {
             <Button
               onClick={create}
               disabled={creating}
-              className="v7-trap-btn mt-8 h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
+              className="v7-trap-btn v7-phi-sm mt-8 h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
             >
               {creating ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Sparkles className="mr-2 h-5 w-5" />}
               Vytvořit web projektu
@@ -720,7 +720,7 @@ const TestPageEditor = () => {
               size="sm"
               onClick={suggest}
               disabled={ai}
-              className="v7-trap-btn pr-9 font-bold text-signal-foreground"
+              className="v7-trap-btn v7-phi-sm pr-9 font-bold text-signal-foreground"
             >
               {ai ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Sparkles className="mr-1.5 h-4 w-4" />}
               Navrhnout texty s AI
@@ -1225,7 +1225,7 @@ const TestPageEditor = () => {
           ) : (
             <Button
               size="sm"
-              className="v7-trap-btn pr-9 font-bold text-signal-foreground"
+              className="v7-trap-btn v7-phi-sm pr-9 font-bold text-signal-foreground"
               onClick={() => publish(true)}
             >
               <Rocket className="mr-1.5 h-4 w-4" /> Zveřejnit

@@ -269,7 +269,7 @@ const PricingPage = () => {
                 <Link
                   to="/clenstvi"
                   onClick={() => track("checkout_click", { source: "cenik", price: shop.price })}
-                  className="v7-trap-btn mt-6 flex h-12 items-center justify-center text-base font-bold text-signal-foreground"
+                  className="v7-trap-btn v7-phi-sm mt-6 flex h-12 items-center justify-center text-base font-bold text-signal-foreground"
                 >
                   Koupit členství
                 </Link>
@@ -417,7 +417,7 @@ const PricingPage = () => {
           <button
             type="button"
             onClick={start}
-            className="v7-trap-btn mt-10 inline-flex h-14 items-center gap-2 pl-7 pr-12 font-bold text-signal-foreground"
+            className="v7-trap-btn v7-phi-lg mt-10 inline-flex h-14 items-center gap-2 pl-7 pr-12 font-bold text-signal-foreground"
           >
             Začít zdarma <ArrowRight className="h-5 w-5" />
           </button>

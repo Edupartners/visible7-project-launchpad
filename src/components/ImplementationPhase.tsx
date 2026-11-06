@@ -97,7 +97,7 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Button
                   onClick={() => onSelectBusinessType(mine.id)}
-                  className="v7-trap-btn h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
+                  className="v7-trap-btn v7-phi-sm h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
                 >
                   {progressOf(mine, all) > 0 ? "Pokračovat v plánu" : "Otevřít plán tvorby"}
                   <ArrowRight className="ml-2 h-5 w-5" />

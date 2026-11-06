@@ -127,7 +127,7 @@ export const PhaseIntroTemplate = ({
               <button
                 type="button"
                 onClick={start}
-                className="mt-4 v7-trap-btn inline-flex h-12 items-center justify-center gap-2 pl-7 pr-11 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
+                className="mt-4 v7-trap-btn v7-phi-sm inline-flex h-12 items-center justify-center gap-2 pl-7 pr-11 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
               >
                 {ctaLabel}
                 <ArrowRight className="h-5 w-5" />
@@ -241,7 +241,7 @@ export const PhaseIntroTemplate = ({
         <button
           type="button"
           onClick={start}
-          className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-8 pr-12 text-lg font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
+          className="v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-8 pr-12 text-lg font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
         >
           {ctaLabel}
           <ArrowRight className="h-5 w-5" />

@@ -62,7 +62,7 @@ export const OwnNumbers = () => {
                 <button
                   type="button"
                   onClick={() => setState("open")}
-                  className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
+                  className="v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
                 >
                   Chci do pilotu
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
@@ -88,7 +88,7 @@ export const OwnNumbers = () => {
                     <button
                       type="submit"
                       disabled={state === "sending"}
-                      className="v7-trap-btn inline-flex h-12 items-center justify-center pl-6 pr-10 font-bold text-signal-foreground disabled:opacity-60"
+                      className="v7-trap-btn v7-phi-sm inline-flex h-12 items-center justify-center pl-6 pr-10 font-bold text-signal-foreground disabled:opacity-60"
                     >
                       {state === "sending" ? "Odesílám…" : "Odeslat"}
                     </button>

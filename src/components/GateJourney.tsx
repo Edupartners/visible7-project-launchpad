@@ -48,7 +48,7 @@ export const GateJourney = ({ gates, completed, onOpen, showHeader = true, showL
             </div>
             {current && (
               <Button
-                className="v7-trap-btn self-start rounded-none pl-5 text-base font-bold text-signal-foreground sm:self-auto"
+                className="v7-trap-btn v7-phi-sm self-start rounded-none pl-5 text-base font-bold text-signal-foreground sm:self-auto"
                 onClick={() => onOpen(current.route)}
               >
                 {count === 0 ? "Začít bránou 1" : `Pokračovat bránou ${current.id}`}

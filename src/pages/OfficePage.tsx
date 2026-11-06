@@ -198,7 +198,7 @@ const OfficePage = () => {
               <button
                 type="button"
                 onClick={start}
-                className="v7-trap-btn inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
+                className="v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
               >
                 Otestovat nápad zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </button>

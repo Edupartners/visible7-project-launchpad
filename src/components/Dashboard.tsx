@@ -9,6 +9,8 @@ import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
 import { DashboardJourney } from "./diagnosis/DashboardJourney";
+import { JourneyGuide } from "./guide/JourneyGuide";
+import { stageFor } from "@/lib/guide";
 import { GrowthBadge } from "./GrowthBadge";
 import { DIAGNOSIS_KEY } from "@/lib/diagnosis";
 import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
@@ -184,6 +186,10 @@ export const Dashboard = (_props: DashboardProps) => {
           </div>
         </header>
 
+        {currentProject?.id && !diagnosisLoading && (
+          <JourneyGuide projectId={currentProject.id} stage={stageFor(Boolean(diagnosis), completedPhases)} />
+        )}
+
         <DashboardAnnouncements />
 
         {/* Jen naléhavé stavy členství (končí zkušební přístup) */}
@@ -220,7 +226,7 @@ export const Dashboard = (_props: DashboardProps) => {
             </div>
             <Button
               onClick={() => navigate(next.route)}
-              className="v7-trap-btn h-12 shrink-0 self-start rounded-none pl-6 text-base font-bold text-signal-foreground focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-auto"
+              className="v7-trap-btn v7-phi-sm h-12 shrink-0 self-start rounded-none pl-6 text-base font-bold text-signal-foreground focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-auto"
             >
               {doneCount === 0 ? "Začít" : "Pokračovat"}
               <ArrowRight className="ml-2 h-5 w-5" />

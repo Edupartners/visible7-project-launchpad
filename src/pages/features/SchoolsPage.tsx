@@ -104,7 +104,7 @@ const SchoolOffer = () => (
               onClick={() => track("school_inquiry_click", { pkg: p.name })}
               className={`mt-7 inline-flex h-12 items-center justify-center ${
                 p.featured
-                  ? "v7-trap-btn pl-6 pr-12 font-bold text-signal-foreground"
+                  ? "v7-trap-btn v7-phi-sm pl-6 pr-12 font-bold text-signal-foreground"
                   : "border-2 border-leaf-500 px-6 font-semibold text-leaf-700 transition-colors hover:bg-leaf-50"
               }`}
             >

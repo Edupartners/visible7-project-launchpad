@@ -13,7 +13,7 @@ function BuyButton({ source, className = "", label }: { source: string; classNam
   const text = label ?? `Získat členství na ${monthsLabel(shop.months)}`;
   return (
     <Button
-      className={`v7-trap-btn h-11 pl-5 pr-11 font-bold text-signal-foreground ${className}`}
+      className={`v7-trap-btn v7-phi-sm h-11 pl-5 pr-11 font-bold text-signal-foreground ${className}`}
       onClick={() => {
         track("checkout_click", { source, price: shop.price });
         navigate(canBuy(shop) ? "/clenstvi" : "/cenik");

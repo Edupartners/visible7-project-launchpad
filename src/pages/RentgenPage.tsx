@@ -305,7 +305,7 @@ export const DiagnosisResult = ({
         </div>
         <Button
           onClick={() => navigate("/vision")}
-          className="v7-trap-btn h-12 shrink-0 pl-6 pr-12 text-base font-bold text-signal-foreground"
+          className="v7-trap-btn v7-phi-sm h-12 shrink-0 pl-6 pr-12 text-base font-bold text-signal-foreground"
         >
           Projít bránou 1 <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
@@ -455,7 +455,7 @@ export const BusinessResult = ({
         </div>
         <Button
           onClick={() => navigate("/vision")}
-          className="v7-trap-btn h-auto min-h-12 w-full shrink-0 whitespace-normal pl-6 pr-12 py-3 text-base sm:w-auto font-bold text-signal-foreground"
+          className="v7-trap-btn v7-phi-sm h-auto min-h-12 w-full shrink-0 whitespace-normal pl-6 pr-12 py-3 text-base sm:w-auto font-bold text-signal-foreground"
         >
           Pokračovat Strategií modrého oceánu <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
@@ -965,7 +965,7 @@ const RentgenPage = () => {
                     }
                     run();
                   }}
-                  className="v7-trap-btn h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
+                  className="v7-trap-btn v7-phi-sm h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
                 >
                   <Sparkles className="mr-2 h-5 w-5" /> Udělat rentgen
                 </Button>
