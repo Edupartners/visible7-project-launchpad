@@ -5,6 +5,7 @@ import { ADVISORS, CONSULTATION } from "@/lib/advisors";
 import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useFounderOffer, useShop } from "@/lib/shop";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
+import { useLessonStats } from "@/lib/courses";
 import { ACADEMY, academyOffer, czDate } from "@/lib/academy";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
@@ -299,6 +300,7 @@ const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
   const offer = useFounderOffer();
+  const { lessons } = useLessonStats();
   const academy = academyOffer();
   const author = ADVISORS.find((a) => a.name.includes("Míček"));
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
@@ -347,11 +349,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <span className="text-leaf-500">Začněte tím, že ho ověříte.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              <strong className="font-semibold text-foreground">
-                První místo pro všechny, kteří to myslí s podnikáním vážně.
-              </strong>{" "}
-              Získejte vědomosti z praxe a možnost profesní kvalifikace{" "}
-              <span className="whitespace-nowrap">„Specialista internetového obchodu“</span>.
+              <strong className="font-semibold text-foreground">Vy máte nápad. My máme všechno ostatní.</strong>{" "}
+              {lessons.toLocaleString("cs-CZ")} návodů, AI asistenty, seniorní poradce a postup od prvního plánu k
+              prvním zákazníkům. S možností profesní kvalifikace.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta
@@ -426,7 +426,12 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   : "border-border bg-background hover:border-primary/40"
               }`;
               return p.to ? (
-                <Link key={p.title} to={p.to} className={cls} onClick={() => track("landing_path_click", { path: p.pill })}>
+                <Link
+                  key={p.title}
+                  to={p.to}
+                  className={cls}
+                  onClick={() => track("landing_path_click", { path: p.pill })}
+                >
                   {inner}
                 </Link>
               ) : (
@@ -622,14 +627,12 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
             <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
               <div>
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Po celé cestě máte podporu
-                </h2>
+                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Po celé cestě máte podporu</h2>
                 <p className="mt-4 text-lg text-muted-foreground">
                   Jednou měsíčně živý seminář s lektory Edu Partners, v ceně členství. A když se zaseknete, zavoláte
-                  člověku: 16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
-                  i AI. Konzultace {CONSULTATION.minutes} minut, orientačně {CONSULTATION.price.toLocaleString("cs-CZ")}{" "}
-                  Kč.
+                  člověku: 16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
+                  e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
+                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
                 </p>
               </div>
               <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
