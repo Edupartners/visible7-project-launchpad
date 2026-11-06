@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, CalendarDays, Check, CreditCard } from "lucide-react";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
-import { FREE_CONSULT_URL, kc, useShop } from "@/lib/shop";
+import { FREE_CONSULT_URL, kc, nbsp, useShop } from "@/lib/shop";
 import { STUDY, STUDY_ITEMS, seatsLabel, studyOffer, studyOpen } from "@/lib/study";
 import { track } from "@/lib/track";
 
@@ -21,9 +21,15 @@ export const StudyPrice = ({ dark = false }: { dark?: boolean }) => {
         <span className={`whitespace-nowrap ${muted}`}>× {STUDY.payments} plateb</span>
       </p>
       <p className={`mt-1 text-sm ${muted}`}>
-        nebo {kc(offer.price)} najednou
-        {offer.early ? `, potom ${kc(STUDY.price)}` : ""}. Vč. DPH, zkoušky a členství.
+        Celkem <b className={dark ? "text-white" : "text-foreground"}>{kc(offer.price)}</b> vč. DPH, zkoušky a členství.
+        Můžete zaplatit i najednou. Nic dalšího neplatíte.
       </p>
+      {offer.early && (
+        <p className={`mt-2 text-xs ${muted}`}>
+          Po zaplnění {STUDY.earlySeats} míst bude studium stát {kc(STUDY.price)} (
+          {nbsp(`${STUDY.payments} × ${kc(STUDY.price / STUDY.payments)}`)}).
+        </p>
+      )}
     </div>
   );
 };
