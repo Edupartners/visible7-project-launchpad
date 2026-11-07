@@ -558,12 +558,12 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
         {/* Proces: 7 bran */}
         <section id="jak" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary py-20 text-white md:py-28">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-primary py-12 text-white md:py-14">
             <div className="mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
-              <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div className="max-w-2xl">
                   <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Sedm bran od nápadu po růst</h2>
-                  <p className="mt-4 text-lg text-white/70">
+                  <p className="mt-3 text-white/70">
                     Projekty nejčastěji krachují na chybějících dovednostech, marketingu a mylné představě o číslech.
                     Proto jdete krok za krokem a mezi branami je vždy kontrolní otázka: dál jdete, až když na ni umíte
                     odpovědět.
@@ -577,7 +577,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   ))}
                 </ul>
               </div>
-              <ol className="relative mt-12 grid gap-y-3 lg:grid-cols-7 lg:gap-x-3 lg:pt-12">
+              <ol className="relative mt-6 grid gap-y-3 lg:grid-cols-7 lg:gap-x-3 lg:pt-12">
                 <span
                   className="absolute left-[1.375rem] top-6 bottom-6 w-0.5 bg-gradient-to-b from-leaf-400 to-white/25 lg:left-[7%] lg:right-[7%] lg:top-[4.375rem] lg:bottom-auto lg:h-0.5 lg:w-auto lg:bg-gradient-to-r"
                   aria-hidden="true"
@@ -635,7 +635,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   </li>
                 ))}
               </ol>
-              <div className="mt-8 grid gap-3 text-sm font-semibold lg:grid-cols-7 lg:gap-x-3">
+              <div className="mt-6 grid gap-3 text-sm font-semibold lg:grid-cols-7 lg:gap-x-3">
                 <p className="flex items-center justify-center gap-2 rounded-full bg-leaf-500 px-4 py-2 lg:col-span-5">
                   <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
                   Brány 1–5: certifikace {SPECIALIST_TITLE}
