@@ -638,7 +638,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <div className="mt-6 grid gap-3 text-sm font-semibold lg:grid-cols-7 lg:gap-x-3">
                 <p className="flex items-center justify-center gap-2 rounded-full bg-leaf-500 px-4 py-2 lg:col-span-5">
                   <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  Brány 1–5: certifikace {SPECIALIST_TITLE}
+                  Brány 1–5: příprava na profesní kvalifikaci Specialista internetového obchodu
                 </p>
                 <p className="flex items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-2 ring-1 ring-white/25 lg:col-span-2">
                   <Award className="h-4 w-4 shrink-0" aria-hidden="true" />
