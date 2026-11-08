@@ -376,8 +376,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
               <strong className="font-semibold text-foreground">Vy máte nápad. My máme všechno ostatní.</strong>{" "}
-              {lessons.toLocaleString("cs-CZ")} návodů, AI asistenty, seniorní poradce a postup od prvního plánu k
-              prvním zákazníkům. S možností profesní kvalifikace.
+              {lessons.toLocaleString("cs-CZ")} návodů, AI asistenty, seniorní poradce a systém, jak se od prvního plánu
+              dostanete k prvním zákazníkům. S možností profesní kvalifikace.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta
