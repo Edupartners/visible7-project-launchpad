@@ -4,6 +4,8 @@ export interface ConsentValues {
   terms: boolean;
   klub: boolean;
   marketing: boolean;
+  /** Potvrzení věku 18+ (jen při registraci) */
+  adult?: boolean;
 }
 
 const Box = ({
@@ -37,12 +39,20 @@ export const ConsentFields = ({
   value,
   onChange,
   showOptional = true,
+  showAdult = false,
 }: {
   value: ConsentValues;
   onChange: (v: ConsentValues) => void;
   showOptional?: boolean;
+  /** Registrace: povinné potvrzení, že je uživateli alespoň 18 let */
+  showAdult?: boolean;
 }) => (
   <div className="space-y-3">
+    {showAdult && (
+      <Box id="consent-adult" checked={!!value.adult} onChange={(v) => onChange({ ...value, adult: v })} required>
+        Je mi alespoň 18 let. <span className="text-muted-foreground">(povinné)</span>
+      </Box>
+    )}
     <Box id="consent-terms" checked={value.terms} onChange={(v) => onChange({ ...value, terms: v })} required>
       Souhlasím s{" "}
       <Link to="/podminky" target="_blank" className="font-semibold text-primary underline underline-offset-2">

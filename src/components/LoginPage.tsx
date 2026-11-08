@@ -19,7 +19,12 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
   const returnUrl = redirectTo ?? window.location.origin;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [consents, setConsents] = useState<ConsentValues>({ terms: false, klub: false, marketing: false });
+  const [consents, setConsents] = useState<ConsentValues>({
+    terms: false,
+    klub: false,
+    marketing: false,
+    adult: false,
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +35,12 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || (isLogin && !password) || (!isLogin && (!firstName || !lastName || !consents.terms))) return;
+    if (
+      !email ||
+      (isLogin && !password) ||
+      (!isLogin && (!firstName || !lastName || !consents.terms || !consents.adult))
+    )
+      return;
 
     setIsSubmitting(true);
 
@@ -55,6 +65,9 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           data: {
             first_name: firstName,
             last_name: lastName,
+            // Služba je pro uživatele od 18 let; potvrzení zůstává u účtu s datem registrace.
+            adult_confirmed: true,
+            adult_confirmed_at: new Date().toISOString(),
             // Souhlasy se při založení účtu zapíší do evidence souhlasů (trigger v databázi).
             consents: {
               version: LEGAL_VERSION,
@@ -262,7 +275,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
               </div>
             </div>
 
-            {!isLogin && <ConsentFields value={consents} onChange={setConsents} />}
+            {!isLogin && <ConsentFields value={consents} onChange={setConsents} showAdult />}
 
             {isLogin && (
               <div className="text-right -mt-3">
@@ -283,7 +296,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                 isSubmitting ||
                 !email ||
                 (isLogin && !password) ||
-                (!isLogin && (!firstName || !lastName || !consents.terms))
+                (!isLogin && (!firstName || !lastName || !consents.terms || !consents.adult))
               }
             >
               {isSubmitting ? (
