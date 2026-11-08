@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import "@fontsource-variable/rethink-sans";
 import "./index.css";
 import { capturePromoFromUrl } from "./lib/promo";
 
