@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, ChevronDown, Menu as MenuIcon, X } from "lucide-react";
 import { ADVISORS } from "@/lib/advisors";
 import { track } from "@/lib/track";
+import { supabase } from "@/integrations/visible7/client";
 import { NAV_MENUS, type NavFeature, type NavLinkItem, type NavMenu } from "@/components/marketing/navMenus";
 
 const author = ADVISORS.find((a) => a.name.includes("Míček"));
@@ -137,6 +138,13 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
   const [mobile, setMobile] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const { pathname, hash } = useLocation();
+  // Přihlášený uživatel vidí na veřejných stránkách, že je stále přihlášený, a cestu zpět do aplikace.
+  const [email, setEmail] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setEmail(session?.user.email ?? null));
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const close = () => {
     setOpen(null);
@@ -206,16 +214,32 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1 text-sm font-semibold sm:gap-2">
-          <Link to="/home" className="rounded-lg px-2 py-2 text-primary hover:underline sm:px-3">
-            Přihlásit
-          </Link>
-          <button
-            type="button"
-            onClick={start}
-            className="v7-trap-btn v7-phi-sm hidden whitespace-nowrap py-2.5 pl-5 pr-9 font-bold text-signal-foreground sm:inline-flex"
-          >
-            Začít zdarma
-          </button>
+          {email ? (
+            <Link
+              to="/home"
+              title={`Přihlášen: ${email}`}
+              className="v7-trap-btn v7-phi-sm inline-flex items-center gap-2 whitespace-nowrap py-1.5 pl-1.5 pr-9 font-bold text-signal-foreground"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
+                {(email.split("@")[0] || "?").slice(0, 2).toUpperCase()}
+              </span>
+              <span className="hidden sm:inline">Moje aplikace</span>
+              <span className="sm:hidden">Aplikace</span>
+            </Link>
+          ) : (
+            <>
+              <Link to="/home" className="rounded-lg px-2 py-2 text-primary hover:underline sm:px-3">
+                Přihlásit
+              </Link>
+              <button
+                type="button"
+                onClick={start}
+                className="v7-trap-btn v7-phi-sm hidden whitespace-nowrap py-2.5 pl-5 pr-9 font-bold text-signal-foreground sm:inline-flex"
+              >
+                Začít zdarma
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() => setMobile((v) => !v)}

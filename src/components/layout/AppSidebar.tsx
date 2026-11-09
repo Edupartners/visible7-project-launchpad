@@ -364,87 +364,90 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
 
         {!businessFirst && businessBlock}
 
-        <SectionHead id="nastroje" label="Nástroje" />
-        {isOpen("nastroje") && (
-          <ul className="space-y-0.5">
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/strategy")}
-                aria-current={pathname === "/strategy" ? "page" : undefined}
-                className={itemCls(pathname === "/strategy")}
-              >
-                <Calculator className="h-4 w-4 text-muted-foreground" /> Finanční plán
-              </button>
-            </li>
-            <li>
-              <button type="button" onClick={() => go("/mapa-cesty")} className={itemCls(pathname === "/mapa-cesty")}>
-                <Map className="h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/rentgen-trhu")}
-                className={itemCls(pathname === "/rentgen-trhu")}
-              >
-                <Globe2 className="h-4 w-4 text-muted-foreground" /> Rentgen trhu
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/benchmarking-phase")}
-                aria-current={pathname === "/benchmarking-phase" ? "page" : undefined}
-                className={itemCls(pathname === "/benchmarking-phase")}
-              >
-                <Megaphone className="h-4 w-4 text-muted-foreground" /> Marketingové kanály
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/investor-pitch")}
-                aria-current={pathname === "/investor-pitch" ? "page" : undefined}
-                className={itemCls(pathname === "/investor-pitch")}
-                title={pitchReady ? undefined : "Dostupné po dokončení bran 1–3"}
-              >
-                <Presentation className="h-4 w-4 text-muted-foreground" />
-                <span className={pitchReady ? "" : "text-muted-foreground"}>Pitch pro investory</span>
-                {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/listy")}
-                aria-current={pathname === "/listy" ? "page" : undefined}
-                className={itemCls(pathname === "/listy")}
-              >
-                <FileText className="h-4 w-4 text-muted-foreground" /> Pracovní listy
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/testovaci-stranka")}
-                aria-current={pathname === "/testovaci-stranka" ? "page" : undefined}
-                className={itemCls(pathname === "/testovaci-stranka")}
-              >
-                <FlaskConical className="h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                onClick={() => go("/digitalni-kancelar")}
-                className={itemCls(pathname === "/digitalni-kancelar")}
-              >
-                <Briefcase className="h-4 w-4 text-muted-foreground" /> Digitální kancelář
-              </button>
-            </li>
-          </ul>
-        )}
+        {/* Nástroje jsou na počítači v horním menu, v postranním jen na mobilu */}
+        <div className="lg:hidden">
+          <SectionHead id="nastroje" label="Nástroje" />
+          {isOpen("nastroje") && (
+            <ul className="space-y-0.5">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/strategy")}
+                  aria-current={pathname === "/strategy" ? "page" : undefined}
+                  className={itemCls(pathname === "/strategy")}
+                >
+                  <Calculator className="h-4 w-4 text-muted-foreground" /> Finanční plán
+                </button>
+              </li>
+              <li>
+                <button type="button" onClick={() => go("/mapa-cesty")} className={itemCls(pathname === "/mapa-cesty")}>
+                  <Map className="h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/rentgen-trhu")}
+                  className={itemCls(pathname === "/rentgen-trhu")}
+                >
+                  <Globe2 className="h-4 w-4 text-muted-foreground" /> Rentgen trhu
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/benchmarking-phase")}
+                  aria-current={pathname === "/benchmarking-phase" ? "page" : undefined}
+                  className={itemCls(pathname === "/benchmarking-phase")}
+                >
+                  <Megaphone className="h-4 w-4 text-muted-foreground" /> Marketingové kanály
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/investor-pitch")}
+                  aria-current={pathname === "/investor-pitch" ? "page" : undefined}
+                  className={itemCls(pathname === "/investor-pitch")}
+                  title={pitchReady ? undefined : "Dostupné po dokončení bran 1–3"}
+                >
+                  <Presentation className="h-4 w-4 text-muted-foreground" />
+                  <span className={pitchReady ? "" : "text-muted-foreground"}>Pitch pro investory</span>
+                  {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/listy")}
+                  aria-current={pathname === "/listy" ? "page" : undefined}
+                  className={itemCls(pathname === "/listy")}
+                >
+                  <FileText className="h-4 w-4 text-muted-foreground" /> Pracovní listy
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/testovaci-stranka")}
+                  aria-current={pathname === "/testovaci-stranka" ? "page" : undefined}
+                  className={itemCls(pathname === "/testovaci-stranka")}
+                >
+                  <FlaskConical className="h-4 w-4 text-muted-foreground" /> Web projektu (test zájmu)
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => go("/digitalni-kancelar")}
+                  className={itemCls(pathname === "/digitalni-kancelar")}
+                >
+                  <Briefcase className="h-4 w-4 text-muted-foreground" /> Digitální kancelář
+                </button>
+              </li>
+            </ul>
+          )}
+        </div>
 
         <SectionHead id="pomoc" label="Pomoc a výsledky" />
         {isOpen("pomoc") && (
