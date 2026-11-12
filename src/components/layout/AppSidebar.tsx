@@ -46,6 +46,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { AppHeader } from "./AppHeader";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { FREE_GATES, useAccess } from "@/lib/access";
+import { gateOfPath, useResume } from "@/lib/resume";
 
 const GATE_ROUTES = [
   { name: "Vize", route: "/vision" },
@@ -108,7 +109,9 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const done = new Set(completedPhases);
   const nextGate = [1, 2, 3, 4, 5, 6, 7].find((n) => !done.has(n));
-  const onGate = GATE_ROUTES.some((g) => g.route === pathname);
+  const currentGate = gateOfPath(pathname);
+  const onGate = currentGate !== null;
+  const { resume } = useResume();
   const [cestaOpen, setCestaOpen] = useState(readCesta);
   const [toolsOpen, setToolsOpen] = useState(false);
   const showGates = cestaOpen || onGate;
@@ -275,12 +278,12 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
                   const isDone = done.has(n);
                   const locked = !isDone && !FREE_GATES.includes(n) && !access.full;
                   const isNext = !isDone && n === nextGate;
-                  const active = pathname === g.route;
+                  const active = currentGate === n;
                   return (
                     <li key={g.route}>
                       <button
                         type="button"
-                        onClick={() => go(g.route)}
+                        onClick={() => go(resume(g.route))}
                         aria-current={active ? "page" : undefined}
                         className={itemCls(active)}
                       >
@@ -434,6 +437,8 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const done = new Set(completedPhases);
   const nextGate = [1, 2, 3, 4, 5, 6, 7].find((n) => !done.has(n));
+  const currentGate = gateOfPath(pathname);
+  const { resume } = useResume();
   const icon = (label: string, path: string, Icon: typeof Award) => (
     <button
       key={path}
@@ -471,10 +476,10 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
             <button
               key={g.route}
               type="button"
-              onClick={() => navigate(g.route)}
+              onClick={() => navigate(resume(g.route))}
               title={`${n} ${g.name}`}
               aria-label={`Brána ${n}: ${g.name}`}
-              className={`flex h-9 w-9 items-center justify-center rounded-lg ${pathname === g.route ? "bg-primary/10" : "hover:bg-muted"}`}
+              className={`flex h-9 w-9 items-center justify-center rounded-lg ${currentGate === n ? "bg-primary/10" : "hover:bg-muted"}`}
             >
               <span
                 className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${

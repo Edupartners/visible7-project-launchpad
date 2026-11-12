@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, ChevronDown, Lightbulb, Plus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { BlockVideo } from "@/components/BlockVideo";
 import { useDeepLinkBlock } from "@/lib/deepLink";
+import { GATE_MAIN, useResume } from "@/lib/resume";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
 import { CustomerJourney } from "@/components/CustomerJourney";
 import {
@@ -44,6 +45,14 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
   const [celebrate, setCelebrate] = useState(false);
   const [addedCosts, setAddedCosts] = useState<string[]>([]);
   useDeepLinkBlock(t?.blocks ?? [], setOpen);
+  const { resume, remember } = useResume();
+  const [confirmSwitch, setConfirmSwitch] = useState(false);
+  const mineType = buildType(currentProject?.business_type);
+  // Cizí model si člověk jen prohlíží: nic se neodškrtává a poslední místo v bráně se nepřepíše.
+  const browsing = !!t && !!mineType && mineType.id !== t.id;
+  useEffect(() => {
+    if (t && !browsing) remember(`/business-type/${t.id}${open ? `?blok=${open}` : ""}`);
+  }, [t, browsing, open, remember]);
 
   if (!t) {
     return <p className="mx-auto max-w-3xl px-4 py-10 text-muted-foreground">Tento typ byznysu neznáme.</p>;
@@ -63,6 +72,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
     setAll((prev) => ({ ...prev, [t.id]: patch(prev[t.id] ?? EMPTY_PROGRESS) }));
 
   const toggleStep = (b: BuildBlock, i: number) => {
+    if (browsing) return;
     // Rozpracovaný blok zůstane otevřený, i když se odškrtnutím posledního kroku dokončí.
     setOpen(b.id);
     update((prev) => {
@@ -75,6 +85,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
   };
 
   const finishBlock = (b: BuildBlock) => {
+    if (browsing) return;
     update((prev) => ({
       ...prev,
       steps: Array.from(new Set([...prev.steps, ...b.steps.map((_, j) => stepId(b.id, j))])),
@@ -114,6 +125,58 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
           onNext={() => navigate("/benchmarking-phase")}
           onHome={() => navigate("/home")}
         />
+      )}
+
+      {browsing && mineType && currentProject && (
+        <section
+          aria-label="Prohlížíte si jiný model"
+          className="sticky top-16 z-20 rounded-2xl border-[3px] border-amber-300 bg-amber-50 p-4 shadow-sm sm:p-5"
+        >
+          <p className="font-bold text-amber-950">
+            Prohlížíte si jiný model: {t.name}. Váš model je {mineType.name}.
+          </p>
+          {!confirmSwitch ? (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(resume(GATE_MAIN[4]))}
+                className="v7-trap-btn inline-flex h-11 items-center gap-2 pl-5 pr-10 font-bold text-signal-foreground"
+              >
+                Zpět na můj model: {mineType.name}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmSwitch(true)}
+                className="text-sm font-semibold text-amber-950 underline-offset-4 hover:underline"
+              >
+                Chci přejít na tento model
+              </button>
+            </div>
+          ) : (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <p className="basis-full text-sm text-amber-950">
+                Opravdu přejít na {t.name}? Co máte hotové u modelu {mineType.name}, zůstane uložené.
+              </p>
+              <Button
+                className="rounded-[10px]"
+                onClick={async () => {
+                  const ok = await setBusinessType(currentProject.id, t.id);
+                  setConfirmSwitch(false);
+                  toast(
+                    ok
+                      ? { title: `Váš model je teď ${t.name}` }
+                      : { title: "Model se nepodařilo změnit", variant: "destructive" },
+                  );
+                }}
+              >
+                Ano, přejít na {t.name}
+              </Button>
+              <Button variant="outline" className="rounded-[10px]" onClick={() => setConfirmSwitch(false)}>
+                Zůstat u modelu {mineType.name}
+              </Button>
+            </div>
+          )}
+        </section>
       )}
 
       {/* Hlavička */}
@@ -162,13 +225,9 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
           </div>
           <Progress value={pct} className="h-2.5" />
         </div>
-        {!isMine && currentProject && (
+        {!isMine && currentProject && !browsing && (
           <div className="mt-5 flex flex-col gap-3 rounded-xl bg-muted/60 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm">
-              {currentProject.business_type
-                ? "Tohle není typ, který jste zvolili ve fázi 2. Plán si můžete prohlédnout, nebo typ změnit."
-                : "Zatím nemáte zvolený typ byznysu."}
-            </p>
+            <p className="text-sm">Zatím nemáte zvolený model. Chcete stavět tento?</p>
             <Button
               variant="outline"
               className="shrink-0 rounded-[10px]"
@@ -176,12 +235,12 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
                 const ok = await setBusinessType(currentProject.id, t.id);
                 toast(
                   ok
-                    ? { title: `Váš typ je teď ${t.name}` }
-                    : { title: "Typ se nepodařilo změnit", variant: "destructive" },
+                    ? { title: `Váš model je teď ${t.name}` }
+                    : { title: "Model se nepodařilo nastavit", variant: "destructive" },
                 );
               }}
             >
-              Nastavit jako můj typ
+              Nastavit jako můj model
             </Button>
           </div>
         )}
@@ -251,6 +310,7 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
                                 type="checkbox"
                                 checked={checked}
                                 onChange={() => toggleStep(b, j)}
+                                disabled={browsing}
                                 className="mt-0.5 h-5 w-5 shrink-0 accent-[hsl(var(--primary))]"
                               />
                               <span className={checked ? "text-muted-foreground line-through" : ""}>{s}</span>
@@ -293,7 +353,11 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
                         </button>
                       </div>
                     )}
-                    {!done ? (
+                    {browsing ? (
+                      <p className="text-sm text-muted-foreground">
+                        Tento model si jen prohlížíte, kroky se tu neodškrtávají.
+                      </p>
+                    ) : !done ? (
                       <Button className="rounded-[10px]" onClick={() => finishBlock(b)}>
                         <Check className="mr-2 h-4 w-4" /> Blok hotový
                       </Button>

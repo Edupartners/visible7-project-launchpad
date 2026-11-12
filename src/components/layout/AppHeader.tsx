@@ -37,6 +37,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { FREE_GATES, useAccess } from "@/lib/access";
 import { useIsAdmin } from "@/lib/admin";
+import { useResume } from "@/lib/resume";
 
 export const GATE_ROUTES = [
   { name: "Vize", route: "/vision" },
@@ -80,6 +81,7 @@ export const AppHeader = ({
   const { projects, currentProject, switchProject, createProject } = useProject();
   const isAdmin = useIsAdmin();
   const { done, nextGate, locked, pitchReady } = useGateStatus();
+  const { resume } = useResume();
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
   const email = user?.email ?? "";
@@ -176,7 +178,7 @@ export const AppHeader = ({
                       const n = i + 1;
                       const isDone = done.has(n);
                       return (
-                        <DropdownMenuItem key={g.route} onSelect={() => navigate(g.route)}>
+                        <DropdownMenuItem key={g.route} onSelect={() => navigate(resume(g.route))}>
                           <span
                             className={`mr-2.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
                               isDone

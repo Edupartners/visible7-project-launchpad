@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { AdvisorsInline } from "@/components/AdvisorsInline";
 import { BlockVideo } from "@/components/BlockVideo";
 import { useDeepLinkBlock } from "@/lib/deepLink";
+import { useResume } from "@/lib/resume";
 import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useMarketingContext } from "@/lib/marketingContext";
@@ -59,6 +60,11 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
   }, [saved]);
 
   useDeepLinkBlock(c?.blocks ?? [], setOpen);
+  // Poslední místo v bráně 5: tento kanál a otevřený blok.
+  const { remember } = useResume();
+  useEffect(() => {
+    if (c) remember(`/marketing-channel/${c.id}${open ? `?blok=${open}` : ""}`);
+  }, [c, open, remember]);
 
   if (!c) return <p className="mx-auto max-w-3xl px-4 py-10 text-muted-foreground">Tento kanál neznáme.</p>;
 
@@ -288,7 +294,10 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
                 </div>
               ))}
             </dl>
-            <p className="text-xs text-muted-foreground">Vyhodnoceno {saved.date ? new Date(saved.date).toLocaleDateString("cs-CZ") : ""}. Po dalším testu údaje přepište.</p>
+            <p className="text-xs text-muted-foreground">
+              Vyhodnoceno {saved.date ? new Date(saved.date).toLocaleDateString("cs-CZ") : ""}. Po dalším testu údaje
+              přepište.
+            </p>
           </div>
         )}
       </section>

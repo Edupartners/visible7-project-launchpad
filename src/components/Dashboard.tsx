@@ -19,6 +19,7 @@ import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { useProject } from "@/contexts/ProjectContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useResume } from "@/lib/resume";
 import {
   ArrowRight,
   Award,
@@ -142,6 +143,7 @@ const ProjectTitle = () => {
 
 export const Dashboard = (_props: DashboardProps) => {
   const navigate = useNavigate();
+  const { resume } = useResume();
   const { currentProject } = useProject();
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
   const [diagnosis, , { loading: diagnosisLoading }] = useSupabaseProgress<unknown>(DIAGNOSIS_KEY, null);
@@ -225,7 +227,7 @@ export const Dashboard = (_props: DashboardProps) => {
               </div>
             </div>
             <Button
-              onClick={() => navigate(next.route)}
+              onClick={() => navigate(resume(next.route))}
               className="v7-trap-btn v7-phi-sm h-12 shrink-0 self-start rounded-none pl-6 text-base font-bold text-signal-foreground focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-primary sm:self-auto"
             >
               {doneCount === 0 ? "Začít" : "Pokračovat"}
@@ -246,7 +248,7 @@ export const Dashboard = (_props: DashboardProps) => {
         <GateJourney
           gates={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
           completed={completedPhases}
-          onOpen={(route) => navigate(route)}
+          onOpen={(route) => navigate(resume(route))}
           showHeader={false}
           showList={false}
         />

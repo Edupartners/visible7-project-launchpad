@@ -77,10 +77,17 @@ export const GateGuideProvider = ({
 
   // Načtení stavu: uložený krok, jinak první nehotový.
   useEffect(() => {
-    setOn(read(offKey) !== "1");
+    const isOn = read(offKey) !== "1";
+    setOn(isOn);
     const saved = read(stepKey);
-    if (saved && steps.some((s) => s.id === saved)) setCurrent(saved);
-    else setCurrent((steps.find((s) => !s.done) ?? steps[0])?.id ?? null);
+    if (saved && steps.some((s) => s.id === saved)) {
+      setCurrent(saved);
+      // Návrat do brány: posuneme stránku na krok, kde člověk skončil (ne na začátek).
+      if (isOn && saved !== steps[0]?.id) {
+        const t = setTimeout(() => scrollToStep(saved), 400);
+        return () => clearTimeout(t);
+      }
+    } else setCurrent((steps.find((s) => !s.done) ?? steps[0])?.id ?? null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pid, gate]);
 

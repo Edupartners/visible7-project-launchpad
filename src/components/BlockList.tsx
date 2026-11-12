@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useResume } from "@/lib/resume";
 import { Check, ChevronDown, Lightbulb, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BlockVideo } from "@/components/BlockVideo";
@@ -29,6 +31,12 @@ export const BlockList = ({ area, blocks, steps, done, onToggleStep, onFinish, o
     setOpen,
   );
   const current = open ?? blocks.find((b) => !done.includes(b.id) && !b.optional)?.id ?? null;
+  // Zapamatujeme otevřený blok, aby se člověk z menu vrátil přesně sem.
+  const { pathname } = useLocation();
+  const { remember } = useResume();
+  useEffect(() => {
+    if (open) remember(`${pathname}?blok=${open}`);
+  }, [open, pathname, remember]);
   const nextOpen = (except: string) => blocks.find((x) => x.id !== except && !done.includes(x.id) && !x.optional)?.id;
 
   return (
