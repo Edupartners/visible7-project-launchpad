@@ -30,6 +30,7 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { LessonSearch } from "@/components/LessonSearch";
+import { MichalCallIcon } from "@/components/MichalCall";
 import { NotificationBell } from "@/components/announcements/NotificationBell";
 import { useAuth } from "@/components/AuthGate";
 import { useProject } from "@/contexts/ProjectContext";
@@ -158,9 +159,11 @@ export const AppHeader = ({
           {!withSidebar && <span className="mx-2 hidden h-6 w-px bg-border lg:block" aria-hidden="true" />}
 
           <nav aria-label="Hlavní menu" className="hidden items-center lg:flex">
-            <button type="button" onClick={() => navigate("/home")} className={navCls(pathname === "/home")}>
-              Přehled
-            </button>
+            {!withSidebar && (
+              <button type="button" onClick={() => navigate("/home")} className={navCls(pathname === "/home")}>
+                Přehled
+              </button>
+            )}
 
             {!withSidebar && (
               <>
@@ -238,9 +241,11 @@ export const AppHeader = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <button type="button" onClick={() => navigate("/poradci")} className={navCls(pathname === "/poradci")}>
-              Poradci
-            </button>
+            {!withSidebar && (
+              <button type="button" onClick={() => navigate("/poradci")} className={navCls(pathname === "/poradci")}>
+                Poradci
+              </button>
+            )}
             <button type="button" onClick={() => navigate("/seminare")} className={navCls(pathname === "/seminare")}>
               Semináře
             </button>
@@ -248,6 +253,7 @@ export const AppHeader = ({
 
           <div className="ml-auto flex items-center gap-1">
             <LessonSearch />
+            <MichalCallIcon from="header" />
             <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger

@@ -12,6 +12,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
+import { BusinessTabs } from "@/components/business/BusinessTabs";
 import { Kpi } from "@/components/business/Kpi";
 import { MyDeadlines } from "@/components/deadlines/MyDeadlines";
 import { useCashflowDemo } from "@/hooks/useCashflow";
@@ -67,6 +68,7 @@ const MyBusinessPage = () => {
   return (
     <SidebarLayout>
       <main className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
+        <BusinessTabs />
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Můj podnik</h1>
           <p className="mt-2 max-w-2xl text-lg text-muted-foreground">

@@ -61,12 +61,12 @@ export const MichalCallSidebar = () => (
   </a>
 );
 
-export const MichalCallIcon = () => (
+export const MichalCallIcon = ({ from = "sidebar_collapsed" }: { from?: string }) => (
   <a
     href={FREE_CONSULT_URL}
     target="_blank"
     rel="noopener noreferrer"
-    onClick={() => open("sidebar_collapsed")}
+    onClick={() => open(from)}
     title="Zavolejte Michalovi – 20 min zdarma"
     aria-label="Zavolejte Michalovi – 20 minut zdarma"
     className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted"
