@@ -104,7 +104,9 @@ export const GrowthBadge = ({ currentCompleted }: { currentCompleted: number }) 
         >
           <BadgeIcon level={level} />
           <span className="min-w-0">
-            <span className="block text-xs text-muted-foreground">Vaše úroveň {level} ze 7</span>
+            <span className="block text-xs text-muted-foreground">
+              Vaše úroveň {level} ze 7{level > currentCompleted ? " · podle nejlepšího projektu" : ""}
+            </span>
             <span className="block font-bold leading-tight">{current.name}</span>
             <span className="hidden max-w-[15rem] truncate text-xs italic text-muted-foreground sm:block">{motto}</span>
           </span>
