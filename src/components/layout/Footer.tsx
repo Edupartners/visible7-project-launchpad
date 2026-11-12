@@ -167,33 +167,23 @@ export const Footer = ({ variant = "compact" }: { variant?: "full" | "compact" }
       </footer>
     );
 
+  // V aplikaci jen jeden řádek: navigace je v menu, tady jen kontakt a právní odkazy.
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="space-y-4 text-center">
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-foreground">Máte otázky? Jsme tu pro vás!</div>
-            <div className="text-sm text-muted-foreground">
-              Napište nám na{" "}
-              <a href={`mailto:${OPERATOR.email}`} className="text-primary hover:underline">
-                {OPERATOR.email}
-              </a>
-            </div>
-          </div>
-          <nav aria-label="Odkazy" className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm">
-            <Link to="/pracovni-listy" className="font-semibold text-primary hover:underline">
-              Pracovní listy ke stažení
-            </Link>
-            <Link to="/certifikace" className="text-muted-foreground hover:text-foreground hover:underline">
-              Certifikace
-            </Link>
-            <Link to="/cenik" className="text-muted-foreground hover:text-foreground hover:underline">
-              Ceník
-            </Link>
-          </nav>
-          <EduPartners />
-          <Legal />
-        </div>
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-5 gap-y-1 px-4 py-4 text-sm text-muted-foreground sm:px-6 lg:px-8">
+        <span>© 2026 MICEK® · {OPERATOR.name}</span>
+        <a href={`mailto:${OPERATOR.email}`} className="hover:text-foreground hover:underline">
+          {OPERATOR.email}
+        </a>
+        <Link to="/podminky" className="hover:text-foreground hover:underline">
+          Podmínky užívání
+        </Link>
+        <Link to="/ochrana-osobnich-udaju" className="hover:text-foreground hover:underline">
+          Ochrana osobních údajů
+        </Link>
+        <button type="button" onClick={openCookieSettings} className="hover:text-foreground hover:underline">
+          Nastavení cookies
+        </button>
       </div>
     </footer>
   );
