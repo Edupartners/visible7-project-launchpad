@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAccess } from "@/lib/access";
 import { PremiumLock } from "@/components/access/Locks";
 import { BusinessVerification, loadVerification } from "@/lib/tradeLicense";
+import { GateQuiz } from "@/components/GateQuiz";
+import { quizGatesFor, quizStatus } from "@/lib/gateQuiz";
 
 interface CertificateIssueDialogProps {
   open: boolean;
@@ -49,6 +51,22 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
   }, [open, kind, currentProject]);
   const needsIco = kind === "gold" && business === null;
 
+  // Kontrolní otázky: osvědčení za brány 1–5 (a za záměr) až po jejich splnění.
+  const quizGates = quizGatesFor(kind, phase);
+  const [passed, setPassed] = useState<number[] | null>(null);
+  useEffect(() => {
+    if (!open || !currentProject || quizGates.length === 0) return;
+    let active = true;
+    setPassed(null);
+    quizStatus(currentProject.id).then((g) => active && setPassed(g));
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, currentProject, kind, phase]);
+  const missingQuiz = quizGates.filter((g) => !(passed ?? []).includes(g));
+  const quizLoading = quizGates.length > 0 && passed === null;
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentProject) return;
@@ -71,7 +89,9 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className={`max-h-[90vh] overflow-y-auto ${!locked && missingQuiz.length > 0 ? "sm:max-w-2xl" : "sm:max-w-md"}`}
+      >
         {locked ? (
           <div>
             <DialogHeader>
@@ -81,6 +101,28 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
             <div className="mt-5">
               <PremiumLock feature="certificate" compact />
             </div>
+          </div>
+        ) : quizLoading ? (
+          <div className="py-10 text-center text-muted-foreground">
+            <DialogTitle className="sr-only">{certificateTitle(kind, phase)}</DialogTitle>
+            Načítám…
+          </div>
+        ) : missingQuiz.length > 0 && currentProject ? (
+          <div>
+            <DialogTitle className="sr-only">Kontrolní otázky</DialogTitle>
+            {quizGates.length > 1 && (
+              <p className="mb-3 rounded-lg bg-muted px-3 py-2 text-sm">
+                Osvědčení {certificateTitle(kind, phase)} vyžaduje kontrolní otázky ke všem branám 1–5. Zbývá:{" "}
+                {missingQuiz.map((g) => `brána ${g}`).join(", ")}.
+              </p>
+            )}
+            <GateQuiz
+              key={missingQuiz[0]}
+              projectId={currentProject.id}
+              gate={missingQuiz[0]}
+              onPassed={() => setPassed((p) => [...(p ?? []), missingQuiz[0]])}
+              onClose={() => onOpenChange(false)}
+            />
           </div>
         ) : needsIco ? (
           <div>
