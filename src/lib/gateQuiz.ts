@@ -2,8 +2,9 @@ import { supabase } from "@/integrations/visible7/client";
 
 /** Kontrolní otázky před osvědčením. Otázky losuje a hodnotí server, správné odpovědi klient nemá. */
 export const QUIZ_GATES = [1, 2, 3, 4, 5];
-export const QUIZ_SIZE = 5;
-export const QUIZ_PASS = 4;
+/** 10 otázek, k osvědčení 70 % (7 správně). Musí odpovídat funkcím quiz_start a quiz_submit na serveru. */
+export const QUIZ_SIZE = 10;
+export const QUIZ_PASS = 7;
 
 export interface QuizQuestion {
   id: string;

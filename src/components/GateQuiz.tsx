@@ -63,7 +63,7 @@ export const GateQuiz = ({
           <li>
             {QUIZ_SIZE} otázek z praxe, k osvědčení stačí {QUIZ_PASS} správně.
           </li>
-          <li>Zabere to asi 3 minuty.</li>
+          <li>Zabere to asi 6 minut.</li>
           <li>Když to nevyjde, uvidíte, co si zopakovat, a můžete to zkusit znovu s jinými otázkami.</li>
         </ul>
         {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-900">{error}</p>}
