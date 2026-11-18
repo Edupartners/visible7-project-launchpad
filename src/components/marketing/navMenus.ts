@@ -198,7 +198,7 @@ export const NAV_MENUS: NavMenu[] = [
           { title: "Osvědčení za každou bránu", hint: "S ověřením online podle kódu", icon: Award, to: "/certifikace" },
           {
             title: "Studium Specialista internetového obchodu",
-            hint: "Semestr s lektory a státní zkouškou v ceně",
+            hint: "Semestr s lektory a zkouškou profesní kvalifikace v ceně",
             icon: GraduationCap,
             to: "/studium",
           },
@@ -208,7 +208,7 @@ export const NAV_MENUS: NavMenu[] = [
     ],
     feature: {
       title: "Semestrální studium s lektory",
-      text: "20 online setkání, vlastní projekt, e-learning a státní zkouška profesní kvalifikace v jedné ceně.",
+      text: "20 online setkání, vlastní projekt, e-learning a zkouška profesní kvalifikace v jedné ceně.",
       cta: "Zobrazit studium",
       to: "/studium",
     },

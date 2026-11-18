@@ -251,8 +251,8 @@ const CertificationPage = () => {
             </p>
             <h1 className="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">{STUDY.name}</h1>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Za čtyři měsíce si s lektory postavíte vlastní online byznys a zakončíte to státní zkouškou profesní
-              kvalifikace {NSK_QUALIFICATION.code}. Lektoři, e-learning, plán 7 bran, AI i zkouška v jedné ceně.
+              Za čtyři měsíce si s lektory postavíte vlastní online byznys a zakončíte to zkouškou profesní kvalifikace{" "}
+              {NSK_QUALIFICATION.code}. Lektoři, e-learning, plán 7 bran, AI i zkouška v jedné ceně.
             </p>
             <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
               {[

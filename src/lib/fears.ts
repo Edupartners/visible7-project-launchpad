@@ -1,4 +1,4 @@
-import { Clock, Flag, Gem, PiggyBank, Wallet } from "lucide-react";
+import { Clock, Flag, Gem, PiggyBank, RotateCcw, Wallet } from "lucide-react";
 
 /**
  * Nejčastější obavy začínajících podnikatelů a co s nimi VISIBLE7 dělá.
@@ -39,5 +39,12 @@ export const FEARS = [
     faq: "Není rozjezd podnikání moc drahý?",
     answer:
       "Online podnikání se dá rozjet s malým rozpočtem. Byznys case ukáže každou položku nákladů a AI vám připomene, na co jste zapomněli. Začátek s VISIBLE7 je zdarma.",
+  },
+  {
+    icon: RotateCcw,
+    fear: "Neudělám zkoušku.",
+    faq: "Co když u zkoušky profesní kvalifikace neuspěji?",
+    answer:
+      "Nic se neděje. Ve studiu opakujete zkoušku zdarma, dokud ji nesložíte (do konce roku 2027). Předem si navíc v aplikaci vyzkoušíte kontrolní otázky ke každé bráně a uvidíte, co si zopakovat.",
   },
 ] as const;

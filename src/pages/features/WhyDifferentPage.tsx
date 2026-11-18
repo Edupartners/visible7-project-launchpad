@@ -74,7 +74,7 @@ const PILLARS: Pillar[] = [
   {
     icon: Award,
     title: "Osvědčení a kvalifikace",
-    text: "Osvědčení za každou bránu, certifikace a volitelně státní zkouška.",
+    text: "Osvědčení za každou bránu, certifikace a volitelně zkouška profesní kvalifikace.",
     to: "/certifikace",
   },
 ];

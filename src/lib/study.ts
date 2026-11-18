@@ -27,7 +27,7 @@ export const STUDY_ITEMS = [
   "Vlastní projekt: web nebo e-shop, marketing a čísla",
   "Konzultace vašeho byznysu s lektory",
   "Závěrečný den v Praze (červen): obhajoba projektu a zkouška profesní kvalifikace",
-  "Zkouška v ceně a k tomu vše z členství VISIBLE7",
+  "Zkouška v ceně a k tomu vše z členství VISIBLE7. Když napoprvé neuspějete, opakujete zkoušku zdarma, dokud ji nesložíte (do konce roku 2027).",
 ];
 
 /** Přihlášky do začátku studia. */

@@ -110,7 +110,7 @@ export const StudySection = () => {
           </p>
           <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{STUDY.name}</h2>
           <p className="mt-2 text-muted-foreground">
-            Projdete cestu s lektory a zakončíte ji státní zkouškou profesní kvalifikace{" "}
+            Projdete cestu s lektory a zakončíte ji zkouškou profesní kvalifikace{" "}
             <a
               href={NSK_QUALIFICATION.url}
               target="_blank"
