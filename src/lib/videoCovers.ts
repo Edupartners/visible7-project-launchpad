@@ -36,6 +36,7 @@ const LECTURES: Record<string, { topic?: Topic; name: string }> = {
   "1241968251": { topic: "data", name: "Google Analytics 4 a Tag Manager, 2. část (Patrik)" },
   "1240183101": { topic: "facebook", name: "Reklama, kreativy a video na Facebooku (Martina a Štěpán)" },
   "1246660984": { name: "AI, doména a hosting od základu (Michal)" },
+  "1246660986": { name: "Web od základu: HTML a CSS (Michal)" },
   "1189858739": { topic: "data", name: "Data a přehledy, 1. část" },
   "1189984574": { topic: "data", name: "Data a Power BI, 2. část" },
   "1191484977": { topic: "grafika", name: "Grafika ve Photopea, 1. část" },
