@@ -268,7 +268,7 @@ const WhyDifferentPage = () => {
         title: "To, co uděláte, máte černé na bílém",
         text: `Za každou bránu osvědčení, po bráně 5 certifikace ${SPECIALIST_TITLE}. Kdo chce víc, může složit zkoušku státem uznané profesní kvalifikace ${NSK_QUALIFICATION.name} (${NSK_QUALIFICATION.code}).`,
         image: `${IMG}jini-certifikace.webp`,
-        alt: "Cesta k certifikaci: osvědčení za fáze, certifikace, VISIBLE7 Gold a státní profesní kvalifikace",
+        alt: "Cesta k certifikaci: osvědčení za fáze, certifikace, VISIBLE7 Gold a profesní kvalifikace",
         points: ["Zkoušku pořádá Edu Partners jako autorizovaná osoba", "Kvalifikace je volitelná"],
       },
     ],

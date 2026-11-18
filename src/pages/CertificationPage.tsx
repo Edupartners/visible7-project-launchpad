@@ -175,7 +175,7 @@ const CertificationPage = () => {
     },
     {
       icon: GraduationCap,
-      title: `Státní zkouška ${NSK_QUALIFICATION.code} v ceně`,
+      title: `Zkouška profesní kvalifikace ${NSK_QUALIFICATION.code} v ceně`,
       text: "Osvědčení o profesní kvalifikaci Specialista internetového obchodu, uznané státem a platné v celé ČR.",
       alone: kc(EXAM_PRICES.regular),
     },
@@ -257,7 +257,7 @@ const CertificationPage = () => {
             <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
               {[
                 `${STUDY.sessions} online setkání s lektory`,
-                `Státní zkouška ${NSK_QUALIFICATION.code} v ceně`,
+                `Zkouška profesní kvalifikace ${NSK_QUALIFICATION.code} v ceně`,
                 "Vlastní projekt s konzultacemi",
                 "E-learning a celé VISIBLE7",
               ].map((t) => (

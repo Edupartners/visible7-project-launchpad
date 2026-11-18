@@ -287,7 +287,7 @@ const PATHS: {
     text: `${STUDY.sessions} online setkání s lektory, vlastní projekt a osvědčení o profesní kvalifikaci ${NSK_QUALIFICATION.code}.`,
     note: `Termín: ${STUDY.dates}`,
     bullets: [
-      `Státní zkouška ${NSK_QUALIFICATION.code} v ceně`,
+      `Zkouška profesní kvalifikace ${NSK_QUALIFICATION.code} v ceně`,
       `${STUDY.sessions} online setkání s lektory`,
       "Vlastní projekt s konzultacemi",
       "E-learning a celé VISIBLE7",

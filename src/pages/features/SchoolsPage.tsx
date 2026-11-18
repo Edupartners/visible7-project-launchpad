@@ -215,7 +215,7 @@ const SchoolsPage = () => {
         title: "Výsledek, který si žák dá do životopisu",
         text: `Za každou bránu osvědčení s popisem obsahu, po bráně 5 certifikace ${SPECIALIST_TITLE}. Kdo chce víc, může složit zkoušku státem uznané profesní kvalifikace ${NSK_QUALIFICATION.name}.`,
         image: `${IMG}jini-certifikace.webp`,
-        alt: "Cesta k certifikaci: osvědčení za fáze, certifikace, VISIBLE7 Gold a státní profesní kvalifikace",
+        alt: "Cesta k certifikaci: osvědčení za fáze, certifikace, VISIBLE7 Gold a profesní kvalifikace",
       },
     ],
     positioningTitle: "Za aplikací je 15 let výuky podnikání",
