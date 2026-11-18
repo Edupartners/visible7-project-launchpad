@@ -366,18 +366,22 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5 text-sm font-semibold text-primary">
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
               <span>
-                Kompletní průvodce online podnikáním s certifikací a možností státní zkoušky{" "}
-                <span className="whitespace-nowrap">{NSK_QUALIFICATION.code}</span>
+                Státem uznaná profesní kvalifikace{" "}
+                <span className="whitespace-nowrap">NSK {NSK_QUALIFICATION.code}</span>
               </span>
             </p>
-            <h1 className="mt-6 text-[2.4rem] font-extrabold leading-[1.04] tracking-[-0.035em] min-[400px]:text-[2.8rem] sm:text-6xl lg:text-[4.5rem]">
-              <span className="block">Máte nápad na podnikání?</span>
-              <span className="text-leaf-500">Začněte tím, že ho ověříte.</span>
+            <h1 className="mt-6 font-extrabold tracking-[-0.035em]">
+              <span className="block text-[2.3rem] leading-[1.04] min-[400px]:text-[2.7rem] sm:text-6xl lg:text-[4.25rem]">
+                Rozjeďte vlastní online byznys za {STUDY.sessions} setkání.
+              </span>
+              <span className="mt-3 block text-[1.45rem] leading-tight text-leaf-500 sm:text-3xl lg:text-[2.25rem]">
+                Získejte profesní kvalifikaci Specialista internetového obchodu.
+              </span>
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
-              <strong className="font-semibold text-foreground">Vy máte nápad. My máme všechno ostatní.</strong>{" "}
-              {lessons.toLocaleString("cs-CZ")} návodů, AI asistenty, seniorní poradce a systém, jak se od prvního plánu
-              dostanete k prvním zákazníkům. S možností profesní kvalifikace.
+              <strong className="font-semibold text-foreground">Vy máte sílu budovat. My máme všechno ostatní:</strong>{" "}
+              {STUDY.sessions} setkání s lektory, {lessons.toLocaleString("cs-CZ")} návodů, AI asistenty, seniorní
+              poradce a systém, jak se od prvního plánu dostanete k prvním zákazníkům.
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta
