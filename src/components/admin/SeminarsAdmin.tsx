@@ -28,6 +28,7 @@ interface Form {
   join_url: string;
   recording_url: string;
   published: boolean;
+  lecturer: string;
 }
 
 const EMPTY: Form = {
@@ -35,13 +36,14 @@ const EMPTY: Form = {
   description: "",
   gate: "",
   date: "",
-  time: "18:00",
+  time: "17:00",
   duration_min: "90",
   place: "Online",
   access: "clenove",
   join_url: "",
   recording_url: "",
   published: true,
+  lecturer: "",
 };
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -52,13 +54,14 @@ const toForm = (s: AdminSeminar): Form => {
     description: s.description,
     gate: s.gate ? String(s.gate) : "",
     date: d ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "",
-    time: d ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : "18:00",
+    time: d ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : "17:00",
     duration_min: String(s.duration_min),
     place: s.place,
     access: s.access,
     join_url: s.join_url ?? "",
     recording_url: s.recording_url ?? "",
     published: s.published,
+    lecturer: s.lecturer ?? "",
   };
 };
 
@@ -66,13 +69,14 @@ const toInput = (f: Form): SeminarInput => ({
   title: f.title.trim(),
   description: f.description.trim(),
   gate: f.gate ? Number(f.gate) : null,
-  starts_at: f.date ? new Date(`${f.date}T${f.time || "18:00"}`).toISOString() : null,
+  starts_at: f.date ? new Date(`${f.date}T${f.time || "17:00"}`).toISOString() : null,
   duration_min: Math.min(Math.max(Number(f.duration_min) || 90, 15), 480),
   place: f.place.trim() || "Online",
   access: f.access,
   join_url: f.join_url.trim() || null,
   recording_url: f.recording_url.trim() || null,
   published: f.published,
+  lecturer: f.lecturer.trim() || null,
 });
 
 /** Správa živých seminářů: témata, termíny, odkazy a záznamy. */
@@ -98,6 +102,15 @@ export function SeminarsAdmin() {
     for (const u of [form.join_url, form.recording_url]) {
       if (u.trim() && !u.trim().startsWith("https://")) {
         setMsg("Odkazy musí začínat https://");
+        return;
+      }
+    }
+    // Setkání se drží v čase 17:00–20:00.
+    if (form.date) {
+      const [h, m] = (form.time || "17:00").split(":").map(Number);
+      const end = h * 60 + m + (Number(form.duration_min) || 90);
+      if (h * 60 + m < 17 * 60 || end > 20 * 60) {
+        setMsg("Seminář musí být mezi 17:00 a 20:00 (začátek nejdřív v 17:00, konec nejpozději ve 20:00).");
         return;
       }
     }
@@ -193,6 +206,15 @@ export function SeminarsAdmin() {
             <option value="clenove">Jen pro členy</option>
             <option value="zdarma">Zdarma pro všechny přihlášené</option>
           </select>
+        </label>
+        <label className="space-y-1 text-sm">
+          <span className="font-semibold">Lektor</span>
+          <Input
+            value={form.lecturer}
+            maxLength={120}
+            onChange={(e) => set("lecturer", e.target.value)}
+            placeholder="Jméno a příjmení (fotka se doplní sama)"
+          />
         </label>
         <label className="space-y-1 text-sm">
           <span className="font-semibold">Kde</span>

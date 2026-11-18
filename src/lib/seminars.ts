@@ -20,6 +20,7 @@ export interface Seminar {
   place: string;
   access: SeminarAccess;
   published: boolean;
+  lecturer?: string | null;
 }
 
 export interface AdminSeminar extends Seminar {
@@ -30,7 +31,7 @@ export interface AdminSeminar extends Seminar {
 
 export type SeminarInput = Omit<AdminSeminar, "id" | "registrations">;
 
-const COLS = "id, title, description, gate, starts_at, duration_min, place, access, published";
+const COLS = "id, title, description, gate, starts_at, duration_min, place, access, published, lecturer";
 
 /** Seminář probíhá nebo teprve bude (do konce + 30 min). */
 export const isUpcoming = (s: Pick<Seminar, "starts_at" | "duration_min">, now = Date.now()) =>

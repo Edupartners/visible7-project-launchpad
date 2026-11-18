@@ -47,6 +47,7 @@ import { AppHeader } from "./AppHeader";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { FREE_GATES, useAccess } from "@/lib/access";
 import { gateOfPath, useResume } from "@/lib/resume";
+import { useIsStudent } from "@/lib/studySchedule";
 
 const GATE_ROUTES = [
   { name: "Vize", route: "/vision" },
@@ -104,6 +105,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
   const [name, setName] = useState("");
   const email = user?.email ?? "";
   const isAdmin = useIsAdmin();
+  const isStudent = useIsStudent();
   const { pathname, hash } = useLocation();
   const access = useAccess();
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
@@ -338,11 +340,23 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
             </button>
           </li>
           {/* Na mobilu není horní menu: semináře a nástroje jsou tady */}
-          <li className="lg:hidden">
-            <button type="button" onClick={() => go("/seminare")} className={mainCls(pathname === "/seminare")}>
-              <Presentation className="h-[18px] w-[18px] text-muted-foreground" /> Živé semináře
-            </button>
-          </li>
+          {isStudent ? (
+            <li className="lg:hidden">
+              <button
+                type="button"
+                onClick={() => go("/moje-studium")}
+                className={mainCls(pathname === "/moje-studium")}
+              >
+                <Presentation className="h-[18px] w-[18px] text-muted-foreground" /> Studium
+              </button>
+            </li>
+          ) : (
+            <li className="lg:hidden">
+              <button type="button" onClick={() => go("/seminare")} className={mainCls(pathname === "/seminare")}>
+                <Presentation className="h-[18px] w-[18px] text-muted-foreground" /> Živé semináře
+              </button>
+            </li>
+          )}
           <li className="lg:hidden">
             <button
               type="button"

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarPlus, Check, Clock, Crown, Loader2, MapPin, PlayCircle, Radio, Video } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
+import { LecturerChip } from "@/components/LecturerChip";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthGate";
 import { useToast } from "@/hooks/use-toast";
@@ -164,13 +165,21 @@ const SeminarsPage = () => {
             <MapPin className="h-4 w-4" /> {s.place}
           </span>
         </p>
+        {s.lecturer && (
+          <div className="mt-3">
+            <LecturerChip name={s.lecturer} dark={highlight} size={highlight ? "lg" : "md"} />
+          </div>
+        )}
         {s.description && (
           <p className={`mt-3 leading-relaxed ${highlight ? "text-white/90" : "text-sm"}`}>{s.description}</p>
         )}
         <div className="flex-1" />
         <div className="mt-5 flex flex-wrap items-center gap-2">
           {locked ? (
-            <Button onClick={() => navigate("/clenstvi")} className="v7-trap-btn v7-phi-sm pr-9 font-bold text-signal-foreground">
+            <Button
+              onClick={() => navigate("/clenstvi")}
+              className="v7-trap-btn v7-phi-sm pr-9 font-bold text-signal-foreground"
+            >
               <Crown className="mr-2 h-4 w-4" /> Získat členství
             </Button>
           ) : (
@@ -226,7 +235,8 @@ const SeminarsPage = () => {
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Živé semináře</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            Jednou měsíčně 90 minut online: výklad, práce na projektech účastníků a vaše otázky. Záznamy najdete tady.
+            Online v úterý od 17:00, 90 minut: výklad, práce na projektech účastníků a vaše otázky. Záznamy najdete
+            tady.
           </p>
         </header>
 

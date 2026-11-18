@@ -37,6 +37,7 @@ import { useProject } from "@/contexts/ProjectContext";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { FREE_GATES, useAccess } from "@/lib/access";
 import { useIsAdmin } from "@/lib/admin";
+import { useIsStudent } from "@/lib/studySchedule";
 import { useResume } from "@/lib/resume";
 
 export const GATE_ROUTES = [
@@ -80,6 +81,7 @@ export const AppHeader = ({
   const { user, signOut } = useAuth();
   const { projects, currentProject, switchProject, createProject } = useProject();
   const isAdmin = useIsAdmin();
+  const isStudent = useIsStudent();
   const { done, nextGate, locked, pitchReady } = useGateStatus();
   const { resume } = useResume();
   const [creating, setCreating] = useState(false);
@@ -248,9 +250,20 @@ export const AppHeader = ({
                 Poradci
               </button>
             )}
-            <button type="button" onClick={() => navigate("/seminare")} className={navCls(pathname === "/seminare")}>
-              Semináře
-            </button>
+            {(isStudent || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => navigate("/moje-studium")}
+                className={navCls(pathname === "/moje-studium")}
+              >
+                Studium
+              </button>
+            )}
+            {!isStudent && (
+              <button type="button" onClick={() => navigate("/seminare")} className={navCls(pathname === "/seminare")}>
+                Semináře
+              </button>
+            )}
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
