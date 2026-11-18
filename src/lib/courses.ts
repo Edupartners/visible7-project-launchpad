@@ -185,8 +185,8 @@ export function useCourseHours() {
   return { course, totalHours: Math.floor(allMinutes / 60) };
 }
 
-/** Lekce a hodiny bez zdvojení (kapitola ve dvou kartách se počítá jednou). Funkce lesson_stats, stav 1. 11. 2026 jako záloha. */
-const LESSONS_SNAPSHOT = { lessons: 438, minutes: 3115 };
+/** Lekce a hodiny bez zdvojení (kapitola ve dvou kartách se počítá jednou). Funkce lesson_stats, stav 18. 11. 2026 jako záloha. */
+const LESSONS_SNAPSHOT = { lessons: 455, minutes: 3290 };
 
 async function loadLessons() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
