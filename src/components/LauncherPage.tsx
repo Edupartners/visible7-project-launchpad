@@ -372,7 +372,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </p>
             <h1 className="mt-6 font-extrabold tracking-[-0.035em]">
               <span className="block text-[2.3rem] leading-[1.04] min-[400px]:text-[2.7rem] sm:text-6xl lg:text-[4.25rem]">
-                Rozjeďte vlastní online byznys za {STUDY.sessions} setkání.
+                Naučte se online byznys na vlastním projektu.
               </span>
               <span className="mt-3 block text-[1.45rem] leading-tight text-leaf-500 sm:text-3xl lg:text-[2.25rem]">
                 Získejte profesní kvalifikaci Specialista internetového obchodu.
