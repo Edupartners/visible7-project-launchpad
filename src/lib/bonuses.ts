@@ -66,6 +66,22 @@ export const BONUSES: Bonus[] = [
       "Kdy se v AI objevíte a jak to měřit",
     ],
   },
+  {
+    id: "ai_prakticky",
+    title: "AI v praxi: od promptu k webu bez programování",
+    lead: "ChatGPT, Claude, NotebookLM, Google AI Studio a Lovable na ukázkách z praxe: co AI umí, jak jí zadávat práci a jak si s ní postavit první web.",
+    why: "AI dnes udělá velkou část práce za vás, pokud víte, který nástroj na co použít a jak mu práci zadat.",
+    certificateFor: "za absolvování videokurzu o praktickém využití umělé inteligence v podnikání",
+    skills: ["práce s AI asistenty", "psaní promptů", "tvorba webu a aplikace pomocí AI"],
+    topics: [
+      "Co AI umí a proč se ji naučit teď",
+      "Human in the loop, limity AI a jak psát prompty",
+      "ChatGPT a Claude v praxi: projekty, napojení na e-mail, skilly",
+      "NotebookLM a analýza webu s AI",
+      "Google AI Studio: aplikace bez programování",
+      "Lovable: web z jednoho zadání a kde zůstávají data",
+    ],
+  },
 ];
 
 export const bonusById = (id: string | null | undefined) => BONUSES.find((b) => b.id === id) ?? null;

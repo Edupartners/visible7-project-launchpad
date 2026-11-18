@@ -17,7 +17,8 @@ type Topic =
   | "kurz";
 
 /** Dlouhé přednášky rozdělené na kapitoly (vimeo_id → téma a název do štítku). */
-const LECTURES: Record<string, { topic: Topic; name: string }> = {
+/** topic chybí = přednáška přes víc témat, fotka se vezme podle karty. */
+const LECTURES: Record<string, { topic?: Topic; name: string }> = {
   "1189761843": { topic: "affiliate", name: "Affiliate marketing" },
   "1189692519": { topic: "ppc", name: "PPC: Google Ads a Sklik, 1. část" },
   "1189706192": { topic: "ppc", name: "PPC: Google Ads a Sklik, 2. část" },
@@ -34,6 +35,7 @@ const LECTURES: Record<string, { topic: Topic; name: string }> = {
   "1241979980": { topic: "data", name: "Google Analytics 4, 1. část (Patrik)" },
   "1241968251": { topic: "data", name: "Google Analytics 4 a Tag Manager, 2. část (Patrik)" },
   "1240183101": { topic: "facebook", name: "Reklama, kreativy a video na Facebooku (Martina a Štěpán)" },
+  "1246660984": { name: "AI, doména a hosting od základu (Michal)" },
   "1189858739": { topic: "data", name: "Data a přehledy, 1. část" },
   "1189984574": { topic: "data", name: "Data a Power BI, 2. část" },
   "1191484977": { topic: "grafika", name: "Grafika ve Photopea, 1. část" },
@@ -74,13 +76,14 @@ const CARDS: Record<string, Topic> = {
   "tvorba:kurz": "kurz",
   "bonus:ai_act": "ai",
   "bonus:ai_viditelnost": "seo",
+  "bonus:ai_prakticky": "ai",
 };
 
 const src = (t: Topic) => `/video-covers/${t}.webp`;
 
 export const videoCover = (key: string, vimeoId?: string | null): string | null => {
   const lecture = vimeoId ? LECTURES[vimeoId] : undefined;
-  if (lecture) return src(lecture.topic);
+  if (lecture?.topic) return src(lecture.topic);
   const topic = CARDS[key];
   return topic ? src(topic) : null;
 };
