@@ -390,7 +390,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   onAccessGranted();
                 }}
               >
-                Otestovat nápad zdarma
+                Začněte testem nápadu
               </Cta>
               <a
                 href="#uvnitr"
