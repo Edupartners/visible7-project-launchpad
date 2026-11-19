@@ -207,7 +207,7 @@ const WhyDifferentPage = () => {
     ),
     lead: "Plán, čísla, AI asistence, tvorba webu nebo e-shopu, marketing, e-learning, poradci i osvědčení. Ne deset nástrojů a tři kurzy, ale jedna aplikace, která vás provede od nápadu po spuštěný projekt.",
     cta: "Začít zdarma",
-    note: "Test nápadu a brány 1–2 zdarma, bez platební karty. Pro registraci stačí e-mail.",
+    note: "Vstupní diagnostika a brány 1–2 zdarma, bez platební karty. Pro registraci stačí e-mail.",
     heroImage: `${IMG}jini-implementace.webp`,
     heroAlt: "Plán tvorby e-shopu v aplikaci: doména, založení e-shopu, produkty, platby, právní minimum",
     heroStats: [
@@ -237,7 +237,7 @@ const WhyDifferentPage = () => {
       {
         eyebrow: "Plán a čísla",
         title: "Nejdřív plán, který dává smysl",
-        text: "Test nápadu, modrý oceán a Lean Canvas, pak finanční plán na 24 měsíců. AI navrhne obsah a čísla obvyklá ve vašem oboru, aplikace spočítá kapitál, bod zvratu a daně.",
+        text: "Vstupní diagnostika, modrý oceán a Lean Canvas, pak finanční plán na 24 měsíců. Vyplňujete vy, AI vám pomůže s formulací a obvyklými čísly v oboru, aplikace spočítá kapitál, bod zvratu a daně.",
         image: `${IMG}financni-plan-graf.webp`,
         alt: "Graf peněz v projektu s vyznačeným potřebným kapitálem a bodem zvratu",
       },
@@ -315,7 +315,7 @@ const WhyDifferentPage = () => {
       ],
       [
         "Kolik to stojí?",
-        `Test nápadu a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Vstupní diagnostika a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
       [
         "Jak AI pracuje s mými daty?",

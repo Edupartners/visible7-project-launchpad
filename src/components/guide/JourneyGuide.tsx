@@ -6,7 +6,7 @@ import { ADVISORS } from "@/lib/advisors";
 import { track } from "@/lib/track";
 
 /**
- * Průvodce v mezikrocích: po registraci uvítání, po rentgenu a po každé bráně jedno okno
+ * Průvodce v mezikrocích: po registraci uvítání, po vstupní diagnostice a po každé bráně jedno okno
  * „hotovo – teď tohle – proč“. Každé okno se v projektu ukáže jen jednou; průvodce jde vypnout.
  */
 type Step = { title: string; done?: string; next: string; why: string; cta: string; to: string };
@@ -14,16 +14,16 @@ type Step = { title: string; done?: string; next: string; why: string; cta: stri
 const STEPS: Record<string, Step> = {
   welcome: {
     title: "Dobrý den, vítejte ve VISIBLE7",
-    next: "Začněte rentgenem nápadu",
-    why: "Čtyři otázky, pět minut. Hned uvidíte, jestli nápad obstojí, kolik bude stát a kdy vás může uživit. Pak vás provedu sedmi branami od nápadu k prvním zákazníkům.",
-    cta: "Udělat rentgen nápadu",
-    to: "/rentgen",
+    next: "Začněte vstupní diagnostikou",
+    why: "Tři minuty. Zjistíte, co už umíte a co se ke startu doučíte. Pak vás provedu branami od nápadu k prvním zákazníkům. Projekt vyplňujete vy, AI vám jen pomáhá s formulací.",
+    cta: "Udělat diagnostiku",
+    to: "/diagnostika",
   },
   rentgen: {
-    title: "Rentgen máte hotový",
-    done: "Víte, jak nápad obstojí a co ověřit jako první.",
+    title: "Mapu ke startu máte",
+    done: "Víte, co už umíte a co se doučíte.",
     next: "Brána 1: Vize",
-    why: "Najdete, čím budete jiní než levná i prémiová konkurence (modrý oceán). Rentgen bránu předvyplnil, vy ji jen opravíte.",
+    why: "Popíšete zákazníka a najdete, čím budete jiní než levná i prémiová konkurence (modrý oceán). Vyplňujete vy, krok za krokem.",
     cta: "Otevřít bránu 1",
     to: "/vision",
   },
@@ -156,7 +156,7 @@ export const JourneyGuide = ({ projectId, stage }: { projectId: string; stage: s
             return (
               <li
                 key={s}
-                title={s === "rentgen" ? "Rentgen nápadu" : `Brána ${s}`}
+                title={s === "rentgen" ? "Vstupní diagnostika" : `Brána ${s}`}
                 className={`flex h-7 flex-1 items-center justify-center rounded-md text-xs font-bold ${
                   state === "done"
                     ? "bg-leaf-500 text-white"
@@ -165,7 +165,7 @@ export const JourneyGuide = ({ projectId, stage }: { projectId: string; stage: s
                       : "bg-muted text-muted-foreground"
                 }`}
               >
-                {state === "done" ? <Check className="h-3.5 w-3.5" /> : s === "rentgen" ? "R" : s}
+                {state === "done" ? <Check className="h-3.5 w-3.5" /> : s === "rentgen" ? "D" : s}
               </li>
             );
           })}

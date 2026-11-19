@@ -75,7 +75,7 @@ export const SimpleRegistrationModal = ({
               <CheckCircle className="w-5 h-5 text-green-600" />
               <div>
                 <p className="text-sm font-medium text-green-800">
-                  Rentgen a brány 1–2 zdarma
+                  Vstupní diagnostika a brány 1–2 zdarma
                 </p>
                 <p className="text-xs text-green-600">
                   Bez platební karty

@@ -163,9 +163,9 @@ const SchoolsPage = () => {
     ),
     lead: "Místo teorie z učebnice si každý žák projde vlastní nápad: od testu nápadu přes byznys model a finanční plán až po web a marketing. Vy dostanete hotovou osnovu, videa a pracovní listy do výuky.",
     cta: "Vyzkoušet zdarma",
-    note: "Test nápadu a brány 1–2 si můžete vyzkoušet zdarma. Licenci pro třídu poptáte níže.",
-    heroImage: `${IMG}test-napadu-vysledek.webp`,
-    heroAlt: "Výsledek testu nápadu: verdikt, typ byznysu, potřebný kapitál a bod zvratu",
+    note: "Vstupní diagnostika a brány 1–2 si můžete vyzkoušet zdarma. Licenci pro třídu poptáte níže.",
+    heroImage: `${IMG}vstupni-diagnostika.webp`,
+    heroAlt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
     heroStats: [
       ["Licence", "školní rok"],
       ["Třída", "od 14 900 Kč"],
@@ -190,9 +190,9 @@ const SchoolsPage = () => {
     rowsTitle: "Co žáci ve VISIBLE7 udělají",
     rows: [
       {
-        eyebrow: "Test nápadu a byznys model",
+        eyebrow: "Nápad a byznys model",
         title: "Od nápadu k Lean Canvasu",
-        text: "Žák otestuje nápad, strategií modrého oceánu najde, čím bude jiný než konkurence, a sestaví Lean Canvas. AI navrhne obsah, žák ho musí obhájit a upravit.",
+        text: "Žák si ujasní nápad, strategií modrého oceánu najde, čím bude jiný než konkurence, a sestaví Lean Canvas. AI navrhne obsah, žák ho musí obhájit a upravit.",
         image: `${IMG}plan-canvas.webp`,
         alt: "Lean Canvas v aplikaci: segment zákazníků, problém, unikátní hodnota a řešení",
       },

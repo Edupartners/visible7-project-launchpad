@@ -90,7 +90,7 @@ export const AppHeader = ({
   const onGate = GATE_ROUTES.some((g) => g.route === pathname);
   const onTool = [
     "/strategy",
-    "/mapa-cesty",
+    "/diagnostika",
     "/rentgen-trhu",
     "/investor-pitch",
     "/listy",
@@ -215,9 +215,8 @@ export const AppHeader = ({
                 <DropdownMenuItem onSelect={() => navigate("/strategy")}>
                   <Calculator className="mr-2.5 h-4 w-4 text-muted-foreground" /> Finanční plán
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/mapa-cesty")} disabled={!pitchReady}>
-                  <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa cesty A → D
-                  {!pitchReady && <Lock className="ml-auto h-3.5 w-3.5" />}
+                <DropdownMenuItem onSelect={() => navigate("/diagnostika")}>
+                  <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa ke startu
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/rentgen-trhu")}>
                   <Globe2 className="mr-2.5 h-4 w-4 text-muted-foreground" /> Rentgen trhu

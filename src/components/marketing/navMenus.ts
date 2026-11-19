@@ -14,7 +14,6 @@ import {
   Landmark,
   Lightbulb,
   Lock,
-  Map,
   Megaphone,
   MessagesSquare,
   PlayCircle,
@@ -30,7 +29,7 @@ import { FREE_CONSULT_URL } from "@/lib/shop";
 
 /**
  * Obsah horního menu veřejných stránek. Odkaz je buď cesta v aplikaci (`to`), externí adresa (`href`),
- * nebo `start: true` = stejná akce jako hlavní tlačítko (registrace / test nápadu).
+ * nebo `start: true` = stejná akce jako hlavní tlačítko (registrace / vstupní diagnostika).
  */
 export interface NavLinkItem {
   title: string;
@@ -117,10 +116,10 @@ export const NAV_MENUS: NavMenu[] = [
         heading: "Funkce",
         items: [
           {
-            title: "Test nápadu",
-            hint: "Za 5 minut zjistíte, jestli o to někdo stojí",
+            title: "Vstupní diagnostika",
+            hint: "Co už umíte a co se ke startu doučíte",
             icon: FlaskConical,
-            to: "/test-napadu",
+            start: true,
           },
           {
             title: "Podnikatelský plán",
@@ -140,7 +139,6 @@ export const NAV_MENUS: NavMenu[] = [
             icon: Megaphone,
             to: "/marketingove-kanaly",
           },
-          { title: "Mapa cesty", hint: "Kdy vás projekt uživí", icon: Map, to: "/test-napadu" },
         ],
         more: { label: "Všechny funkce a co je zdarma", to: "/cenik#funkce" },
       },
@@ -227,7 +225,7 @@ export const NAV_MENUS: NavMenu[] = [
       {
         heading: "Pro podnikatele",
         items: [
-          { title: "Otestovat nápad", hint: "Než do něj dáte peníze", icon: FlaskConical, to: "/test-napadu" },
+          { title: "Co mi chybí ke startu", hint: "Vstupní diagnostika zdarma", icon: FlaskConical, start: true },
           {
             title: "Plán pro banku a investory",
             hint: "Čísla, která banka chce vidět",

@@ -571,7 +571,7 @@ const CertificationPage = () => {
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Chcete začít sami a zdarma?{" "}
             <button type="button" onClick={start} className="font-semibold text-primary underline underline-offset-4">
-              Otestovat nápad zdarma
+              Zjistit, co mi chybí ke startu
             </button>{" "}
             ·{" "}
             <Link to="/cenik" className="font-semibold text-primary underline underline-offset-4">

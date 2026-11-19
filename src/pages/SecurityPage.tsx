@@ -50,7 +50,7 @@ const FAQ: [string, string][] = [
   ],
   [
     "Musím AI používat?",
-    "AI se nikdy nespustí sama, vždy jen na vaše kliknutí. Test nápadu na AI stojí, ale brány i finanční plán můžete vyplnit ručně a výpočty aplikace AI nepotřebují.",
+    "AI se nikdy nespustí sama, vždy jen na vaše kliknutí. Brány i finanční plán můžete vyplnit ručně a výpočty aplikace AI nepotřebují.",
   ],
   [
     "Co se stane, když projekt smažu?",

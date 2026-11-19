@@ -12,7 +12,7 @@ const StartBusinessPage = () => {
     slug: "zacit-podnikat",
     metaTitle: "Jak začít podnikat krok za krokem, s AI a poradci | VISIBLE7 MICEK",
     metaDescription:
-      "Od nápadu po prvního zákazníka v sedmi branách. Test nápadu zdarma, podnikatelský a finanční plán, živnost, web a marketing. S videi, AI pomocníkem a poradci z praxe.",
+      "Od nápadu po prvního zákazníka v sedmi branách. Vstupní diagnostika zdarma, podnikatelský a finanční plán, živnost, web a marketing. S videi, AI pomocníkem a poradci z praxe.",
     eyebrow: "Pro začínající podnikatele",
     title: (
       <>
@@ -24,10 +24,10 @@ const StartBusinessPage = () => {
       </>
     ),
     lead: "Od nápadu po prvního platícího zákazníka v sedmi branách. Víte, co udělat dnes, kolik to bude stát a kdy vás podnikání může uživit. S videi, AI pomocníkem a poradci z praxe.",
-    cta: "Otestovat nápad zdarma",
-    note: "Test nápadu a brány 1–2 zdarma, bez platební karty. Pro registraci stačí e-mail.",
-    heroImage: `${IMG}test-napadu-cesta.webp`,
-    heroAlt: "Mapa cesty od dneška přes první zákazníky k bodu, kdy vás projekt uživí",
+    cta: "Zjistit, co mi chybí ke startu",
+    note: "Vstupní diagnostika a brány 1–2 zdarma, bez platební karty. Pro registraci stačí e-mail.",
+    heroImage: `${IMG}vstupni-diagnostika.webp`,
+    heroAlt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
     heroStats: [
       ["Cesta", "7 bran"],
       ["Start", "zdarma"],
@@ -51,11 +51,11 @@ const StartBusinessPage = () => {
     rowsTitle: "Od nápadu k prvnímu zákazníkovi, krok za krokem",
     rows: [
       {
-        eyebrow: "Do 5 minut · zdarma",
-        title: "Nejdřív zjistěte, jestli nápad dává smysl",
-        text: "Čtyři krátké otázky a máte verdikt, typ byznysu, potřebný kapitál, bod zvratu a tři největší rizika s testem na 14 dní. Dřív, než utratíte první korunu.",
-        image: `${IMG}test-napadu-vysledek.webp`,
-        alt: "Výsledek testu nápadu: verdikt, typ byznysu, potřebný kapitál a bod zvratu",
+        eyebrow: "3 minuty · zdarma",
+        title: "Nejdřív zjistěte, co už umíte",
+        text: "Vstupní diagnostika ukáže, co ke startu zvládáte, co se doučíte a ve které bráně. Ke spuštění obvykle stačí méně, než si myslíte.",
+        image: `${IMG}vstupni-diagnostika.webp`,
+        alt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
       },
       {
         eyebrow: "Brány 1 a 2 · zdarma",
@@ -115,7 +115,7 @@ const StartBusinessPage = () => {
       ],
       [
         "Kolik času tomu musím dát?",
-        "Záleží na vás. Test nápadu trvá do 5 minut, jedna brána obvykle několik večerů. Můžete začít při zaměstnání.",
+        "Záleží na vás. Vstupní diagnostika trvá 3 minuty, jedna brána obvykle několik večerů. Můžete začít při zaměstnání.",
       ],
       [
         "Musím hned založit živnost?",
@@ -123,11 +123,11 @@ const StartBusinessPage = () => {
       ],
       [
         "Kolik peněz potřebuji na začátek?",
-        "To spočítá právě test nápadu a finanční plán. Metodika vede k tomu začít s málem a škálovat až potom.",
+        "To spočítá finanční plán v bráně 3. Metodika vede k tomu začít s málem a škálovat až potom.",
       ],
       [
         "Kolik to stojí?",
-        `Test nápadu a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Vstupní diagnostika a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
       [
         "Jak AI pracuje s mými daty?",

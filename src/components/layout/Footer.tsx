@@ -13,7 +13,7 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: "Začněte zdarma",
     links: [
-      { label: "Otestovat nápad", to: "/home?novy", strong: true },
+      { label: "Vstupní diagnostika", to: "/home?novy", strong: true },
       { label: "Kvíz: Jaký jste typ podnikatele", to: "/kviz" },
       { label: "Konzultace 20 min zdarma", to: FREE_CONSULT_URL, external: true },
     ],

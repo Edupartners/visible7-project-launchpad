@@ -298,7 +298,7 @@ const WorksheetsPage = () => {
                 onClick={() => navigate("/home?novy")}
                 className="w-full rounded-xl border border-border px-5 py-3 text-sm font-semibold hover:border-primary hover:text-primary"
               >
-                Otestovat nápad zdarma do 5 minut
+                Zjistit, co mi chybí ke startu
               </button>
             </div>
           ) : (

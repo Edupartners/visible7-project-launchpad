@@ -200,7 +200,7 @@ const OfficePage = () => {
                 onClick={start}
                 className="v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
               >
-                Otestovat nápad zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                Zjistit, co mi chybí ke startu <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </button>
               <Link
                 to="/zacit-podnikat"

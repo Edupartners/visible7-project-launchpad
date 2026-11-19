@@ -16,10 +16,10 @@ import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 type Cell = boolean | string;
 const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, string?][] }[] => [
   {
-    group: "Test nápadu a podnikatelský plán",
+    group: "Vstupní diagnostika a podnikatelský plán",
     rows: [
-      ["Rentgen nápadu do 5 minut: verdikt, čísla a rizika (i pro ty, kdo už podnikají)", true, true],
-      ["Mapa cesty A → D: kdy první zákazníci a kdy vás projekt uživí", true, true],
+      ["Vstupní diagnostika: co už umíte a co se ke startu doučíte", true, true],
+      ["Rentgen podniku pro ty, kdo už podnikají", true, true],
       ["Brána 1 Vize: strategie modrého oceánu, ERRC matice, hodnotová křivka a USP", true, true],
       ["Brána 2 Ideace: Lean Canvas a výběr z 13 typů online byznysu", true, true],
     ],
@@ -185,7 +185,7 @@ const PricingPage = () => {
     ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
     [
       "Mohu nejdřív vyzkoušet?",
-      "Ano. Rentgen nápadu a brány 1 a 2 jsou zdarma bez platební karty. Když zjistíte, jaký jste typ podnikatele (krátký kvíz), získáte navíc 3 dny plného přístupu zdarma.",
+      "Ano. Vstupní diagnostika a brány 1 a 2 jsou zdarma bez platební karty. Když zjistíte, jaký jste typ podnikatele (krátký kvíz), získáte navíc 3 dny plného přístupu zdarma.",
     ],
     [
       "Jak se členství aktivuje?",
@@ -215,7 +215,7 @@ const PricingPage = () => {
               <p className="text-sm text-muted-foreground">bez platební karty</p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {[
-                  "Rentgen nápadu do 5 minut",
+                  "Vstupní diagnostika (3 minuty)",
                   "Brána 1 Vize (modrý oceán)",
                   "Brána 2 Ideace (Lean Canvas) s AI",
                   "Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma",

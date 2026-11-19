@@ -78,7 +78,7 @@ const readCesta = () => {
 const BUSINESS_PATHS = ["/muj-podnik", "/cash-flow", "/financni-report"];
 const TOOLS: [string, string, typeof Award][] = [
   ["Finanční plán", "/strategy", Calculator],
-  ["Mapa cesty A → D", "/mapa-cesty", Map],
+  ["Mapa ke startu", "/diagnostika", Map],
   ["Rentgen trhu", "/rentgen-trhu", Globe2],
   ["Marketingové kanály", "/benchmarking-phase", Megaphone],
   ["Pitch pro investory", "/investor-pitch", Presentation],

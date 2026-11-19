@@ -159,11 +159,11 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           <p className="mt-4 text-lg text-white/75">
             {isLogin
               ? "Pokračujte tam, kde jste skončili. Váš projekt i všechna čísla na vás čekají."
-              : "Po registraci vás čeká Rentgen nápadu: 4 otázky, upřímný verdikt AI a mapa cesty k prvním zákazníkům."}
+              : "Po registraci vás čeká vstupní diagnostika: za 3 minuty uvidíte, co už umíte a co se ke startu doučíte. Projekt pak vyplňujete vy, AI vám jen pomáhá."}
           </p>
           {!isLogin && (
             <ul className="mt-8 space-y-3">
-              {["Rentgen nápadu a brány 1 a 2 zdarma", "Bez platební karty", "Data uložená v EU"].map((t) => (
+              {["Vstupní diagnostika a brány 1 a 2 zdarma", "Bez platební karty", "Data uložená v EU"].map((t) => (
                 <li key={t} className="flex items-center gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500">
                     <Check className="h-3.5 w-3.5" strokeWidth={3} />
@@ -204,7 +204,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           <p className="mt-1 text-muted-foreground">
             {isLogin
               ? "E-mail a heslo, které jste zadali při registraci."
-              : "Zabere to minutu. Pak hned začnete rentgen nápadu."}
+              : "Zabere to minutu. Pak hned začnete vstupní diagnostikou."}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">

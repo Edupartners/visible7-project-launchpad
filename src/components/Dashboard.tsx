@@ -8,11 +8,12 @@ import { useNavigate } from "react-router-dom";
 import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
 import { GateJourney } from "./GateJourney";
-import { DashboardJourney } from "./diagnosis/DashboardJourney";
+import { EntryDiagnosisCard } from "./diagnosis/EntryDiagnosisCard";
 import { JourneyGuide } from "./guide/JourneyGuide";
 import { stageFor } from "@/lib/guide";
 import { GrowthBadge } from "./GrowthBadge";
 import { DIAGNOSIS_KEY } from "@/lib/diagnosis";
+import { ENTRY_KEY } from "@/lib/entryDiagnosis";
 import { NSK_QUALIFICATION, qualificationMailto } from "@/lib/qualification";
 import { GATE_NAMES, listMyCertificates } from "@/lib/certificates";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
@@ -146,7 +147,11 @@ export const Dashboard = (_props: DashboardProps) => {
   const { resume } = useResume();
   const { currentProject } = useProject();
   const [completedPhases] = useSupabaseProgress<number[]>("completed_phases", []);
-  const [diagnosis, , { loading: diagnosisLoading }] = useSupabaseProgress<unknown>(DIAGNOSIS_KEY, null);
+  const [oldDiagnosis, , { loading: oldLoading }] = useSupabaseProgress<unknown>(DIAGNOSIS_KEY, null);
+  const [entry, , { loading: entryLoading }] = useSupabaseProgress<unknown>(ENTRY_KEY, null);
+  // Starý rentgen nápadu (kdo ho už má) se počítá stejně jako vstupní diagnostika.
+  const diagnosis = entry || oldDiagnosis;
+  const diagnosisLoading = oldLoading || entryLoading;
   const [certCount, setCertCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -200,8 +205,8 @@ export const Dashboard = (_props: DashboardProps) => {
         {/* Kdo už podniká: vstup do Můj podnik */}
         <MyBusinessTeaser />
 
-        {/* Bez rentgenu na začátku cesty: rentgen je první krok */}
-        {!diagnosisLoading && !diagnosis && doneCount === 0 && <DashboardJourney prominent />}
+        {/* Na začátku cesty: vstupní diagnostika je první krok */}
+        {!diagnosisLoading && !diagnosis && doneCount === 0 && <EntryDiagnosisCard />}
 
         {/* Co dělat teď – jedna jasná akce */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 ? null : next && NextIcon ? (

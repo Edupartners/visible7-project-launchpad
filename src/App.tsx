@@ -29,7 +29,6 @@ import AdvisorsPage from "./pages/AdvisorsPage";
 import LegalPage from "./pages/LegalPage";
 import PricingPage from "./pages/PricingPage";
 import FinancialPlanPage from "./pages/features/FinancialPlanPage";
-import IdeaTestPage from "./pages/features/IdeaTestPage";
 import BusinessPlanPage from "./pages/features/BusinessPlanPage";
 import MarketingChannelsPage from "./pages/features/MarketingChannelsPage";
 import BankConnectPage from "./pages/features/BankConnectPage";
@@ -51,7 +50,7 @@ import QuizPage from "./pages/QuizPage";
 import SeminarsPage from "./pages/SeminarsPage";
 import MyStudyPage from "./pages/MyStudyPage";
 import BonusesPage from "./pages/BonusesPage";
-import JourneyMapPage from "./pages/JourneyMapPage";
+import EntryDiagnosisPage from "./pages/EntryDiagnosisPage";
 import MarketRentgenPage from "./pages/MarketRentgenPage";
 import CashflowPage from "./pages/CashflowPage";
 import MockBankPage from "./pages/MockBankPage";
@@ -62,6 +61,14 @@ import { GateLock, PremiumGate } from "@/components/access/Locks";
 import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
+
+// Rentgen nápadu je skrytý (nahradila ho vstupní diagnostika). Zůstává jen rentgen podniku pro ty, kdo už podnikají.
+const BusinessRentgenOnly = () =>
+  new URLSearchParams(useLocation().search).get("rezim") === "podnik" ? (
+    <RentgenPage />
+  ) : (
+    <Navigate to="/diagnostika" replace />
+  );
 
 // Testovací stránky uživatelů (/t/…) mají vlastní lištu souhlasu pro svůj Pixel a GA4.
 const AppCookieBanner = () => (useLocation().pathname.startsWith("/t/") ? null : <CookieBanner />);
@@ -76,12 +83,13 @@ const ProtectedRoutes = () => (
       <Route path="/poradci" element={<AdvisorsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/admin" element={<AdminPage />} />
-      <Route path="/rentgen" element={<RentgenPage />} />
+      <Route path="/diagnostika" element={<EntryDiagnosisPage />} />
+      <Route path="/rentgen" element={<BusinessRentgenOnly />} />
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />
       <Route path="/moje-studium" element={<MyStudyPage />} />
       <Route path="/bonusy" element={<BonusesPage />} />
-      <Route path="/mapa-cesty" element={<JourneyMapPage />} />
+      <Route path="/mapa-cesty" element={<Navigate to="/diagnostika" replace />} />
       <Route path="/rentgen-trhu" element={<MarketRentgenPage />} />
       <Route path="/cash-flow" element={<CashflowPage />} />
       <Route path="/cvicna-banka" element={<MockBankPage />} />
@@ -182,7 +190,7 @@ const App = () => (
           <Route path="/osvedceni/:code" element={<CertificatePage />} />
           <Route path="/cenik" element={<PricingPage />} />
           <Route path="/financni-plan" element={<FinancialPlanPage />} />
-          <Route path="/test-napadu" element={<IdeaTestPage />} />
+          <Route path="/test-napadu" element={<Navigate to="/" replace />} />
           <Route path="/podnikatelsky-plan" element={<BusinessPlanPage />} />
           <Route path="/marketingove-kanaly" element={<MarketingChannelsPage />} />
           <Route path="/napojeni-banky" element={<BankConnectPage />} />

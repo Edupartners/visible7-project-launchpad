@@ -25,7 +25,7 @@ const MarketingChannelsPage = () => {
     ),
     lead: "12 kanálů od Meta Ads a Google Ads po SEO a e-mail. AI je seřadí podle vašeho typu byznysu, zákazníka a rozpočtu. Ke každému máte postup krok za krokem a testovací rozpočet.",
     cta: "Začít zdarma",
-    note: `Test nápadu a brány 1–2 zdarma. Marketingové kanály jsou brána 5, součást členství za ${price}.`,
+    note: `Vstupní diagnostika a brány 1–2 zdarma. Marketingové kanály jsou brána 5, součást členství za ${price}.`,
     heroImage: `${IMG}kanaly-doporucene.webp`,
     heroAlt: "Doporučené kanály seřazené podle typu byznysu: Meta Ads, Google Ads a Sklik s testovacím rozpočtem",
     heroStats: [
@@ -119,7 +119,7 @@ const MarketingChannelsPage = () => {
       ],
       [
         "Kolik to stojí?",
-        `Test nápadu a brány 1 a 2 jsou zdarma. Marketingové kanály jsou součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Vstupní diagnostika a brány 1 a 2 jsou zdarma. Marketingové kanály jsou součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
     ],
   };

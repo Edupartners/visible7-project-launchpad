@@ -99,7 +99,7 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
 ];
 
 const STEPS = [
-  { title: "Otestujte nápad do 5 minut", meta: "zdarma", text: "Zjistíte, jestli o to někdo stojí a zaplatí." },
+  { title: "Zjistěte, co už umíte", meta: "zdarma", text: "Za 3 minuty uvidíte, co se ke startu doučíte." },
   { title: "Čísla, která sedí", meta: "zdarma", text: "Tržby, náklady, daně a bod zvratu spočítané za vás." },
   { title: "Hotový plán", meta: "PRICE", text: "Sedm fází od vize po škálování, s videi, AI a poradci." },
 ];
@@ -129,12 +129,12 @@ const SHOWCASE = [
 
 const FAQ = [
   [
-    "Je test nápadu opravdu zdarma?",
+    "Je vstupní diagnostika opravdu zdarma?",
     "Ano. Stačí registrace e-mailem, platební kartu nezadáváte. Zdarma jsou i brány 1 a 2.",
   ],
   [
-    "Jak přesný je výsledek testu nápadu?",
-    "Je to první odhad z vašich odpovědí a obvyklých čísel v oboru, ne záruka. Ukáže, kde je nápad silný a co ověřit jako první. Se skutečnými čísly v bráně 3 se zpřesní.",
+    "Udělá AI projekt za mě?",
+    "Ne. Projekt vyplňujete vy, krok za krokem, a tím se to naučíte. AI vám pomůže s formulací a lektoři a poradci s tím, co nepůjde. Ke startu obvykle stačí méně, než si myslíte.",
   ],
   [
     "Musím umět programovat nebo rozumět technice?",
@@ -390,7 +390,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   onAccessGranted();
                 }}
               >
-                Začněte testem nápadu
+                Zjistěte, co už umíte
               </Cta>
               <a
                 href="#uvnitr"
@@ -744,8 +744,8 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Začněte zdarma. Celá cesta za {kc(shop.price)}.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Test nápadu a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a živé
-                semináře jednou měsíčně. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
+                Vstupní diagnostiku a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a
+                živé semináře jednou měsíčně. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
                 {shop.anchor}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -757,7 +757,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
-                ["Test nápadu (5 minut) a brány 1–2", "0 Kč"],
+                ["Vstupní diagnostika (3 minuty) a brány 1–2", "0 Kč"],
                 ["Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma", "0 Kč"],
                 [`Členství na ${monthsLabel(shop.months)}: 7 bran a živé semináře`, `${kc(shop.price)}`],
               ].map(([name, price]) => (
