@@ -18,10 +18,10 @@ export const EntryDiagnosisCard = () => {
           <p className="text-sm font-semibold text-signal">Začněte tady</p>
           <h2 className="text-2xl font-bold tracking-tight">Co už umíte a co vám chybí ke startu</h2>
           <p className="mt-1 max-w-lg text-white/80">
-            Zjistíte, co zvládáte, co se doučíte a ve které bráně. Bez hodnocení nápadu, jen mapa pro vás.
+            Zjistíte, na co máte talent, co už zvládáte a co se doučíte. Bez hodnocení nápadu, jen mapa pro vás.
           </p>
           <p className="mt-2 flex items-center gap-1.5 text-sm text-white/60">
-            <Clock className="h-4 w-4" /> asi 3 minuty · zdarma
+            <Clock className="h-4 w-4" /> asi 4 minuty · zdarma
           </p>
         </div>
       </div>

@@ -159,7 +159,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           <p className="mt-4 text-lg text-white/75">
             {isLogin
               ? "Pokračujte tam, kde jste skončili. Váš projekt i všechna čísla na vás čekají."
-              : "Po registraci vás čeká vstupní diagnostika: za 3 minuty uvidíte, co už umíte a co se ke startu doučíte. Projekt pak vyplňujete vy, AI vám jen pomáhá."}
+              : "Po registraci vás čeká vstupní diagnostika: za 4 minuty uvidíte, na co máte talent, co už umíte a co se ke startu doučíte. Projekt pak vyplňujete vy, AI vám jen pomáhá."}
           </p>
           {!isLogin && (
             <ul className="mt-8 space-y-3">

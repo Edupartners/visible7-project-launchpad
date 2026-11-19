@@ -51,9 +51,9 @@ const StartBusinessPage = () => {
     rowsTitle: "Od nápadu k prvnímu zákazníkovi, krok za krokem",
     rows: [
       {
-        eyebrow: "3 minuty · zdarma",
+        eyebrow: "4 minuty · zdarma",
         title: "Nejdřív zjistěte, co už umíte",
-        text: "Vstupní diagnostika ukáže, co ke startu zvládáte, co se doučíte a ve které bráně. Ke spuštění obvykle stačí méně, než si myslíte.",
+        text: "Vstupní diagnostika ukáže, na co máte talent, co ke startu zvládáte, co se doučíte a ve které bráně. Ke spuštění obvykle stačí méně, než si myslíte.",
         image: `${IMG}vstupni-diagnostika.webp`,
         alt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
       },
@@ -115,7 +115,7 @@ const StartBusinessPage = () => {
       ],
       [
         "Kolik času tomu musím dát?",
-        "Záleží na vás. Vstupní diagnostika trvá 3 minuty, jedna brána obvykle několik večerů. Můžete začít při zaměstnání.",
+        "Záleží na vás. Vstupní diagnostika trvá 4 minuty, jedna brána obvykle několik večerů. Můžete začít při zaměstnání.",
       ],
       [
         "Musím hned založit živnost?",

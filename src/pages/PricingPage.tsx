@@ -18,7 +18,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
   {
     group: "Vstupní diagnostika a podnikatelský plán",
     rows: [
-      ["Vstupní diagnostika: co už umíte a co se ke startu doučíte", true, true],
+      ["Vstupní diagnostika: na co máte talent, co už umíte a co se ke startu doučíte", true, true],
       ["Rentgen podniku pro ty, kdo už podnikají", true, true],
       ["Brána 1 Vize: strategie modrého oceánu, ERRC matice, hodnotová křivka a USP", true, true],
       ["Brána 2 Ideace: Lean Canvas a výběr z 13 typů online byznysu", true, true],
@@ -215,7 +215,7 @@ const PricingPage = () => {
               <p className="text-sm text-muted-foreground">bez platební karty</p>
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {[
-                  "Vstupní diagnostika (3 minuty)",
+                  "Vstupní diagnostika (4 minuty)",
                   "Brána 1 Vize (modrý oceán)",
                   "Brána 2 Ideace (Lean Canvas) s AI",
                   "Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma",

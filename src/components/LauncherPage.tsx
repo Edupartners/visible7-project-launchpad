@@ -99,7 +99,11 @@ const GATES: { name: string; icon: typeof Target; does: string; get: string; tag
 ];
 
 const STEPS = [
-  { title: "Zjistěte, co už umíte", meta: "zdarma", text: "Za 3 minuty uvidíte, co se ke startu doučíte." },
+  {
+    title: "Zjistěte, co už umíte",
+    meta: "zdarma",
+    text: "Za 4 minuty uvidíte, na co máte talent a co se ke startu doučíte.",
+  },
   { title: "Čísla, která sedí", meta: "zdarma", text: "Tržby, náklady, daně a bod zvratu spočítané za vás." },
   { title: "Hotový plán", meta: "PRICE", text: "Sedm fází od vize po škálování, s videi, AI a poradci." },
 ];
@@ -757,7 +761,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
-                ["Vstupní diagnostika (3 minuty) a brány 1–2", "0 Kč"],
+                ["Vstupní diagnostika (4 minuty) a brány 1–2", "0 Kč"],
                 ["Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma", "0 Kč"],
                 [`Členství na ${monthsLabel(shop.months)}: 7 bran a živé semináře`, `${kc(shop.price)}`],
               ].map(([name, price]) => (
