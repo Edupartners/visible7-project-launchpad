@@ -32,12 +32,12 @@ export const EMPTY_ENTRY: EntryAnswers = { level: "start", want: "", idea: "", s
 export const LEVELS: { id: EntryLevel; label: string; text: string }[] = [
   {
     id: "start",
-    label: "Chci rozjet vlastní byznys",
+    label: "Rychlý start",
     text: "Projdete základ, který ke startu opravdu potřebujete. Nic navíc.",
   },
   {
     id: "full",
-    label: "Chci projít celý kurz a získat kvalifikaci",
+    label: "Kompletní studium e-commerce",
     text: "Základ a k tomu témata do hloubky. Připraví vás na zkoušku profesní kvalifikace.",
   },
 ];

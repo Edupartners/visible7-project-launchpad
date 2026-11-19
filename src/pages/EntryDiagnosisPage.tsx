@@ -1,16 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Compass,
-  GraduationCap,
-  Loader2,
-  PencilLine,
-  RotateCcw,
-  Store,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Compass, GraduationCap, Loader2, RotateCcw } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,7 +32,7 @@ const SKILL_CHOICES: { id: SkillLevel; label: string; on: string }[] = [
   { id: "ne", label: "Ještě ne", on: "border-slate-400 bg-slate-100 text-slate-900" },
 ];
 
-const STEP_TITLES = ["Co chcete", "Co byste rádi dělali", "Co už umíte", "Kolik máte času"];
+const STEP_TITLES = ["Co byste rádi dělali", "Co už umíte", "Kolik máte času", "Vaše cesta"];
 
 const choiceCls = (on: boolean) =>
   `flex w-full flex-col items-start rounded-2xl border-2 p-4 text-left transition-colors sm:p-5 ${
@@ -138,7 +128,7 @@ const EntryResult = ({ d, onEdit }: { d: EntryDiagnosis; onEdit: () => void }) =
             </li>
           )}
           <li>
-            <span className="font-semibold">Úroveň: </span>
+            <span className="font-semibold">Cesta: </span>
             {level?.label}.{" "}
             {d.answers.level === "start"
               ? `Témata do hloubky (${DEEP_TOPICS.slice(0, 3).join(", ")} a další) ke startu nepotřebujete. Najdete je v celém kurzu, až budete chtít.`
@@ -189,7 +179,7 @@ const EntryDiagnosisPage = () => {
   const set = <K extends keyof EntryAnswers>(k: K, v: EntryAnswers[K]) => setA((p) => ({ ...p, [k]: v }));
   const answered = SKILL_AREAS.filter((s) => a.skills[s.id]).length;
   const canNext =
-    step === 1 ? Boolean(a.want) : step === 2 ? answered === SKILL_AREAS.length : step === 3 ? Boolean(a.hours) : true;
+    step === 0 ? Boolean(a.want) : step === 1 ? answered === SKILL_AREAS.length : step === 2 ? Boolean(a.hours) : true;
 
   const finish = () => {
     const d: EntryDiagnosis = { answers: { ...a, idea: a.idea.trim() }, createdAt: new Date().toISOString() };
@@ -224,31 +214,18 @@ const EntryDiagnosisPage = () => {
               Co už umíte a co vám chybí ke startu
             </h1>
             <p className="mt-3 text-lg text-muted-foreground">
-              Ke spuštění vlastního projektu obvykle stačí méně, než si myslíte. Zjistíme, co už zvládáte a co se
-              doučíte. Nic se tu nehodnotí, odpovídejte upřímně.
+              Ke spuštění vlastního projektu obvykle stačí méně, než si myslíte. Zjistíme spolu, jak málo stačí k
+              úspěšnému startu.
             </p>
-            <div className="mt-6 flex gap-3 rounded-2xl bg-leaf-50 p-4 ring-1 ring-leaf-200">
-              <PencilLine className="mt-0.5 h-5 w-5 shrink-0 text-leaf-700" aria-hidden="true" />
-              <p className="text-sm">
-                <span className="font-semibold">Jak VISIBLE7 funguje: </span>
-                svůj projekt vyplňujete vy, krok za krokem. AI za vás nic nevymýšlí, jen vám pomůže s formulací. Díky
-                tomu se to opravdu naučíte a projekt bude váš.
-              </p>
-            </div>
+            <p className="mt-3 text-lg text-muted-foreground">
+              Pak si vyberete cestu rychlého startu, nebo cestu kompletního studia e-commerce.
+            </p>
             <Button
               onClick={() => setStarted(true)}
               className="v7-trap-btn mt-8 h-12 pl-6 pr-11 text-base font-bold text-signal-foreground"
             >
               Začít <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="mt-6 text-sm text-muted-foreground">
-              <Store className="mr-1 inline h-4 w-4" aria-hidden="true" />
-              Už podnikáte?{" "}
-              <Link to="/rentgen?rezim=podnik" className="font-semibold text-primary hover:underline">
-                Udělejte si rentgen podniku
-              </Link>
-              .
-            </p>
           </section>
         ) : (
           <section className="mx-auto max-w-3xl">
@@ -265,9 +242,9 @@ const EntryDiagnosisPage = () => {
               ))}
             </ol>
 
-            {step === 0 && (
+            {step === 3 && (
               <div className="mt-8">
-                <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Co od VISIBLE7 chcete?</h1>
+                <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Kterou cestu si vyberete?</h1>
                 <div className="mt-5 grid gap-3">
                   {LEVELS.map((l) => (
                     <button
@@ -281,11 +258,11 @@ const EntryDiagnosisPage = () => {
                     </button>
                   ))}
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">Úroveň můžete kdykoli změnit.</p>
+                <p className="mt-3 text-sm text-muted-foreground">Cestu můžete kdykoli změnit.</p>
               </div>
             )}
 
-            {step === 1 && (
+            {step === 0 && (
               <div className="mt-8">
                 <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Co byste rádi dělali?</h1>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -314,7 +291,7 @@ const EntryDiagnosisPage = () => {
               </div>
             )}
 
-            {step === 2 && (
+            {step === 1 && (
               <div className="mt-8">
                 <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Co z toho už umíte?</h1>
                 <p className="mt-2 text-muted-foreground">
@@ -351,7 +328,7 @@ const EntryDiagnosisPage = () => {
               </div>
             )}
 
-            {step === 3 && (
+            {step === 2 && (
               <div className="mt-8">
                 <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
                   Kolik času týdně můžete projektu dát?
