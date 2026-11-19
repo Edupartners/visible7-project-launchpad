@@ -81,7 +81,7 @@ export interface LessonHit {
 const blockTitle = new Map(ALL_BLOCKS.map((b) => [b.key, b.title]));
 const SHARED_MKT = new Set(["mereni", "rozpocet", "konkurence"]);
 
-function routeOf(blockKey: string, businessType: string | null | undefined): { path: string; place: string } | null {
+export function routeOf(blockKey: string, businessType: string | null | undefined): { path: string; place: string } | null {
   const [area, id] = blockKey.split(":") as [BlockArea, string];
   if (!id) return null;
   if (area === "marketing") {

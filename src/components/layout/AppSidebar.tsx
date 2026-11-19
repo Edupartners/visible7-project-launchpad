@@ -15,6 +15,7 @@ import {
   ChevronUp,
   FileText,
   FlaskConical,
+  BookA,
   Gift,
   FolderOpen,
   Globe,
@@ -418,6 +419,9 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => go("/bonusy")}>
               <Gift className="mr-2.5 h-4 w-4 text-muted-foreground" /> Bonusy
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => go("/slovnik")}>
+              <BookA className="mr-2.5 h-4 w-4 text-muted-foreground" /> Slovník pojmů
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => go("/")}>
               <Globe className="mr-2.5 h-4 w-4 text-muted-foreground" /> Úvodní stránka webu

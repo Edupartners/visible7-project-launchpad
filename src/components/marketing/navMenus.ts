@@ -5,6 +5,7 @@ import {
   Building2,
   ClipboardList,
   Compass,
+  BookA,
   BookOpen,
   Briefcase,
   FlaskConical,
@@ -182,6 +183,12 @@ export const NAV_MENUS: NavMenu[] = [
             hint: "Přes 50 hodin videí ve 400+ krátkých lekcích",
             icon: PlayCircle,
             to: "/e-learning",
+          },
+          {
+            title: "Slovník podnikatele",
+            hint: "Pojmy z webu, marketingu a AI s odkazy na lekce",
+            icon: BookA,
+            to: "/slovnik",
           },
           {
             title: "Pracovní listy",
