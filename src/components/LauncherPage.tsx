@@ -378,8 +378,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <span className="block text-[2.3rem] leading-[1.04] min-[400px]:text-[2.7rem] sm:text-6xl lg:text-[4.25rem]">
                 Naučte se online byznys na vlastním projektu.
               </span>
-              <span className="mt-3 block text-[1.45rem] leading-tight text-leaf-500 sm:text-3xl lg:text-[2.25rem]">
-                Získejte profesní kvalifikaci Specialista internetového obchodu.
+              <span className="mt-4 block text-[1.45rem] leading-snug text-foreground/75 sm:text-3xl lg:text-[2.25rem]">
+                Získejte profesní kvalifikaci{" "}
+                <span className="box-decoration-clone bg-[linear-gradient(transparent_58%,hsl(var(--signal))_58%,hsl(var(--signal))_92%,transparent_92%)] px-[0.15em] text-primary">
+                  Specialista internetového obchodu.
+                </span>
               </span>
             </h1>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
