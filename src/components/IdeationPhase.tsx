@@ -78,7 +78,7 @@ const FIELDS: { key: FieldKey; title: string; hint: string; area: string }[] = [
   {
     key: "solution",
     title: "Řešení",
-    hint: "Jak problém řešíte – hlavní funkce nebo obsah nabídky.",
+    hint: "Jak problém řešíte: hlavní funkce nebo obsah nabídky.",
     area: "solution",
   },
   {
@@ -96,7 +96,7 @@ const FIELDS: { key: FieldKey; title: string; hint: string; area: string }[] = [
   {
     key: "costStructure",
     title: "Náklady",
-    hint: "Položky nákladů online projektu – zatím bez částek, spočítáme je ve fázi 3.",
+    hint: "Položky nákladů online projektu. Zatím bez částek, spočítáte je v bráně 3.",
     area: "costs",
   },
   {
@@ -407,9 +407,9 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-primary">Fáze 2 ze 7</p>
+            <p className="text-sm font-semibold text-primary">Brána 2 ze 7</p>
             <h2 className="text-2xl font-bold text-foreground">Lean Canvas</h2>
-            <p className="text-sm text-muted-foreground">Celý byznys na jedné stránce – navazuje na váš modrý oceán.</p>
+            <p className="text-sm text-muted-foreground">Celý byznys na jedné stránce. Navazuje na váš modrý oceán.</p>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-primary">{filled}/8</p>
@@ -423,7 +423,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
         <div className="flex items-start gap-3 rounded-2xl bg-primary/5 p-4 text-sm">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
-            Z fáze 1 (Strategie modrého oceánu) jsme předvyplnili {preFilled.length}{" "}
+            Z brány 1 (Strategie modrého oceánu) jsme předvyplnili {preFilled.length}{" "}
             {preFilled.length === 1 ? "pole" : preFilled.length < 5 ? "pole" : "polí"}. Klidně je upravte.
           </p>
         </div>
@@ -440,8 +440,8 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
                   <h3 className="text-lg font-semibold">{AI_NAME}</h3>
                   <AiMichalNote />
                   <p className="text-sm text-muted-foreground">
-                    Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše – u
-                    každého pole sami rozhodnete.
+                    Na základě modrého oceánu navrhne všechna pole a odhadne typ online byznysu. Návrh nic nepřepíše, u
+                    každého pole rozhodnete sami.
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Zbývá {left("navrh")} z {AI_LIMITS.navrh} návrhů pro tento projekt.
@@ -544,7 +544,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
           <Card className="card-apple p-6">
             <h3 className="text-lg font-semibold">Typ online byznysu</h3>
             <p className="mb-4 text-sm text-muted-foreground">
-              Podle typu doporučíme ve fázi 4 postup tvorby a ve fázi 3 hlídané ukazatele.
+              Podle typu doporučíme v bráně 4 postup tvorby a v bráně 3 ukazatele, které hlídat.
               {aiType && typeName(aiType) && (
                 <>
                   {" "}
@@ -679,7 +679,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Vyhodnocení je doporučení, ne verdikt. Rozhodnutí je na vás – případně ho proberte s lektorem.
+                  Vyhodnocení je doporučení, ne verdikt. Rozhodnutí je na vás. Když si nejste jistí, proberte ho s lektorem.
                 </p>
               </div>
             )}
@@ -708,7 +708,7 @@ export const IdeationPhase = ({ onComplete }: IdeationPhaseProps) => {
             ))}
           </ul>
           <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
-            Dokončit fázi 2
+            Dokončit bránu 2
           </Button>
         </Card>
       </GateGuideProvider>

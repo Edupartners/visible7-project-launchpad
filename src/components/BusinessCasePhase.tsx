@@ -116,7 +116,7 @@ const KIND_COPY: Record<CostKind, { title: string; hint: string; unit: string }>
   },
   marketing: {
     title: "Marketing",
-    hint: "Rozpočet na kanály z Lean Canvasu. Je to předpověď – skutečnou cenu za proklik a zákazníka zjistíte až testováním ve fázi 5. Z rozpočtu se počítá PNO.",
+    hint: "Rozpočet na kanály z Lean Canvasu. Je to předpověď. Skutečnou cenu za proklik a zákazníka zjistíte až testováním v bráně 5. Z rozpočtu se počítá PNO.",
     unit: "Kč měsíčně",
   },
 };
@@ -387,7 +387,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
   const hasCosts = data.costs.some((c) => c.amount > 0);
   const checks = [
     {
-      label: "Typ byznysu zvolený ve fázi 2",
+      label: "Typ byznysu zvolený v bráně 2",
       ok: !!currentProject?.business_type,
       required: true,
     },
@@ -526,7 +526,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
     setAutofillUsed((n) => n + 1);
     toast({
       title: "AI vyplnila byznys case",
-      description: "Prázdná pole jsou doplněná. Projděte je – u každého je vysvětlení a vše můžete přepsat.",
+      description: "Prázdná pole jsou doplněná. Projděte je. U každého je vysvětlení a všechno můžete přepsat.",
     });
   };
 
@@ -612,7 +612,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       title: "Nechte AI předvyplnit čísla",
       time: "2 minuty",
       explain: [
-        "Byznys case je jednoduchý výpočet: kolik vyděláte, kolik utratíte a jestli vám něco zůstane. Žádná účetnictví, stačí odhady.",
+        "Byznys case je jednoduchý výpočet: kolik vyděláte, kolik utratíte a jestli vám něco zůstane. Žádné účetnictví, stačí odhady.",
         "AI Michal zná váš projekt z bran 1 a 2 a doplní obvyklé hodnoty pro váš obor: cenu, počet zákazníků, marži i náklady. Vyplní jen prázdná pole, všechno pak můžete přepsat.",
         "Chcete raději psát sami? Krok přeskočte.",
       ],
@@ -631,7 +631,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
       time: "15–20 minut",
       think: true,
       explain: [
-        "Představte si 12. měsíc po spuštění. Kolik toho prodáte za měsíc, za kolik a kolik vám z toho zůstane? Rozjezd do té doby dopočítáme sami.",
+        "Vezměte si 12. měsíc po spuštění. Kolik toho prodáte za měsíc, za kolik a kolik vám z toho zůstane? Rozjezd do té doby dopočítáme sami.",
         "Buďte spíš opatrní. Nováček skoro vždy přecení, kolik zákazníků přijde. U každého pole je otazník s vysvětlením a tlačítko „Doporučit hodnoty s AI“ ukáže, co je v oboru obvyklé.",
         "Pozor na ceny za delší období: když prodáváte předplatné na 6 měsíců za 2 990 Kč, napište měsíční cenu 498 Kč.",
       ],
@@ -708,8 +708,8 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
         <PhaseCelebration
           gate={3}
           title="Byznys case je hotový"
-          message="Máte spočítaný obrat, zisk, potřebný kapitál i hranici PNO. Fáze 1–3 tvoří základ podnikatelského záměru."
-          nextLabel="Pokračovat na Tvorbu"
+          message="Máte spočítaný obrat, zisk, potřebný kapitál i hranici PNO. Brány 1–3 jsou základ vašeho podnikatelského záměru."
+          nextLabel="Pokračovat na Implementaci"
           onNext={() => navigate("/implementation")}
           onHome={() => navigate("/home")}
         />
@@ -717,7 +717,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
 
       {/* Hlavička */}
       <Card className="card-apple p-6">
-        <p className="text-sm font-semibold text-primary">Fáze 3 ze 7</p>
+        <p className="text-sm font-semibold text-primary">Brána 3 ze 7</p>
         <h2 className="text-2xl font-bold">Byznys case</h2>
         <p className="mt-1 max-w-2xl text-muted-foreground">
           Doplňte čísla a uvidíte, kolik peněz projekt potřebuje, kdy se dostane do zisku a kolik smíte dát do
@@ -766,12 +766,12 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
               </h3>
               <p className="max-w-2xl text-sm text-muted-foreground">
                 AI podle vašeho projektu doplní cenu, objem, marži, růst i částky nákladů, upozorní na chybějící položky
-                a barevně ohodnotí, které kanály dávají smysl. Vyplní jen prázdná pole – vše pak můžete přepsat.
+                a barevně ohodnotí, které kanály dávají smysl. Vyplní jen prázdná pole a všechno pak můžete přepsat.
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {currentProject?.business_type
                   ? `Zbývá ${Math.max(0, AI_LIMITS.navrh - autofillUsed)} z ${AI_LIMITS.navrh} pro tento projekt.`
-                  : "Nejdřív zvolte typ byznysu ve fázi 2."}
+                  : "Nejdřív zvolte typ byznysu v bráně 2."}
               </p>
               <AiPrivacyNote className="mt-2" />
             </div>
@@ -899,7 +899,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                     return (
                       <li key={m.name} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <span>
-                          <strong>{m.name}</strong> ({KIND_SHORT[m.kind]}, orientačně {czk(m.typical)}) – {m.why}
+                          <strong>{m.name}</strong> ({KIND_SHORT[m.kind]}, orientačně {czk(m.typical)}): {m.why}
                         </span>
                         {added ? (
                           <span className="shrink-0 text-xs font-semibold text-emerald-700">Přidáno</span>
@@ -965,7 +965,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                                 })
                               }
                               className="pr-10 text-right tabular-nums"
-                              aria-label={`Částka – ${c.name || "položka"} (${KIND_COPY[kind].unit})`}
+                              aria-label={`Částka: ${c.name || "položka"} (${KIND_COPY[kind].unit})`}
                             />
                             <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">
                               Kč
@@ -1303,7 +1303,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
                   <div className="rounded-xl border border-border p-5">
                     <div className="flex items-center justify-between gap-3">
                       <h4 className="flex items-center gap-2 font-semibold">
-                        PNO – podíl marketingu na obratu <InfoTip label="PNO" text={HELP.pno} />
+                        PNO: podíl marketingu na obratu <InfoTip label="PNO" text={HELP.pno} />
                       </h4>
                       <RatingPill rating={m.pnoRating} />
                     </div>
@@ -1521,7 +1521,7 @@ export const BusinessCasePhase = ({ onComplete }: BusinessCasePhaseProps) => {
             ))}
           </ul>
           <Button className="btn-apple w-full sm:w-auto" disabled={!canFinish} onClick={finish}>
-            Dokončit fázi 3
+            Dokončit bránu 3
           </Button>
         </Card>
       </GateGuideProvider>

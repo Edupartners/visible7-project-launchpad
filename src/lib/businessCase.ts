@@ -562,13 +562,13 @@ export const HELP = {
   roi: "Návratnost investice: zisk za 2 roky vydělený potřebným kapitálem. 100 % znamená, že zisk se rovná penězům, které jste museli vložit.",
   bodZvratu: "První měsíc, kdy příjmy pokryjí všechny měsíční náklady a projekt je v zisku.",
   navratnost: "Měsíc, kdy se vám vrátí všechny vložené peníze včetně ztrát z rozjezdu.",
-  obrat12: "Měsíční příjmy rok po spuštění – ukazuje, kam se projekt dostane.",
+  obrat12: "Měsíční příjmy rok po spuštění. Ukazuje, kam se projekt dostane.",
   zisk12: "Měsíční zisk rok po spuštění, po odečtení zboží, provozu i marketingu.",
   pno: "Podíl nákladů na obratu: kolik procent z tržeb utratíte za marketing. Když je vyšší než maximum pro váš projekt, marketing vám sní zisk.",
   ltv: "Kolik na jednom zákazníkovi vyděláte (po odečtení přímých nákladů) za celou dobu, co u vás nakupuje.",
   cac: "Kolik vás stojí marketing na získání jednoho nového zákazníka. Měl by být alespoň třikrát nižší než LTV.",
   dan:
-    "Daň z příjmu se platí ze zisku. Fyzická osoba (OSVČ) obvykle 15 %, s.r.o. 21 %. Počítáme ji zvlášť za každý rok a jen ze zisku. Paušální daň, pojištění a DPH tu nejsou – pojištění OSVČ přidejte do měsíčních nákladů, ceny zadávejte bez DPH.",
+    "Daň z příjmu se platí ze zisku. Fyzická osoba (OSVČ) obvykle 15 %, s.r.o. 21 %. Počítáme ji zvlášť za každý rok a jen ze zisku. Paušální daň, pojištění a DPH tu nejsou. Pojištění OSVČ přidejte do měsíčních nákladů a ceny zadávejte bez DPH.",
   ziskPoZdaneni: "Zisk za 2 roky po odečtení daně z příjmu. Kolik vám z projektu opravdu zůstane.",
   cilovyZisk:
     "Kolik procent z obratu chcete mít jako zisk. Čím vyšší cíl, tím méně peněz zbývá na marketing a tím nižší je maximální PNO.",

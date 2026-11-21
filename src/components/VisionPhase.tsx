@@ -887,7 +887,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
             ))}
           </ul>
           <Button className="btn-apple mt-6 h-12 w-full" disabled={!canFinish} onClick={finish}>
-            {canFinish ? "Dokončit fázi a otevřít bránu 2" : "Doplňte povinné body"}
+            {canFinish ? "Dokončit bránu 1 a otevřít bránu 2" : "Doplňte povinné body"}
           </Button>
         </Card>
       </GateGuideProvider>
