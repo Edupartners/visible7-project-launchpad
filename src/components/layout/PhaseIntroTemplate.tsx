@@ -33,13 +33,13 @@ interface PhaseIntroTemplateProps {
 
 /** Úvodní věta každé brány – proč se do ní pustit právě teď. */
 const HOOK: Record<number, string> = {
-  1: "Každý úspěšný byznys začal jednou otázkou: čím budu jiný?",
-  2: "Z nápadu uděláte plán na jednu stránku. AI vám s tím pomůže.",
-  3: "Čísla nelžou. Za hodinu budete vědět, jestli se to vyplatí.",
-  4: "Teď to postavíte. Krok za krokem, s videem u každého bloku.",
-  5: "Najdete zákazníky – a zjistíte, kolik vás doopravdy stojí.",
-  6: "Den D. Jeden produkt, jeden kanál, první platící zákazník.",
-  7: "Projekt běží. Teď ho necháte růst – bez pasti.",
+  1: "Proč by lidé měli jít k vám, a ne ke konkurenci? Tady na to najdete odpověď.",
+  2: "Celý byznys dáte na jednu stránku. AI vám s tím pomůže, rozhodujete ale vy.",
+  3: "Nejdřív si spočítáte, kolik můžete ztratit. Teprve potom, kolik vyděláte.",
+  4: "Teď se staví. U každého bloku máte video, jak na to.",
+  5: "Najdete zákazníky. A zjistíte, kolik vás jeden doopravdy stojí.",
+  6: "Den D. Jeden produkt, jeden kanál a první zákazník, který zaplatí.",
+  7: "Projekt běží. Teď ho necháte růst tak, aby vám po cestě nedošly peníze.",
 };
 
 /**
@@ -83,10 +83,10 @@ export const PhaseIntroTemplate = ({
       : `Začít bránu ${phaseNumber}`;
 
   const greeting = thisDone
-    ? `${firstName ? `${firstName}, tuhle` : "Tuhle"} bránu už máte otevřenou. Vraťte se k ní, kdykoli potřebujete.`
+    ? `${firstName ? `${firstName}, tuhle` : "Tuhle"} bránu už máte otevřenou. Kdykoli se k ní můžete vrátit.`
     : doneCount === 0
-      ? `Vítejte${firstName ? `, ${firstName}` : ""}! Začínáte cestu přes 7 bran.`
-      : `Skvělá práce${firstName ? `, ${firstName}` : ""}! ${doneCount} ${doneCount === 1 ? "bránu" : doneCount < 5 ? "brány" : "bran"} máte za sebou.`;
+      ? `Vítejte${firstName ? `, ${firstName}` : ""}. Před vámi je sedm bran.`
+      : `Paráda${firstName ? `, ${firstName}` : ""}. Za sebou máte už ${doneCount} ${doneCount === 1 ? "bránu" : doneCount < 5 ? "brány" : "bran"}.`;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
@@ -267,7 +267,7 @@ export const PhaseIntroTemplate = ({
                 className="h-full w-full"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
-                title={`Úvodní video – ${name}`}
+                title={`Úvodní video: ${name}`}
               />
             </div>
           )}

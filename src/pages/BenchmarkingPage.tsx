@@ -7,7 +7,7 @@ import { PhaseIntroTemplate } from "@/components/layout/PhaseIntroTemplate";
 
 const learningPoints = [
   { text: "Které 2–3 kanály se hodí právě pro vašeho zákazníka", color: "bg-emerald-500" },
-  { text: "Jak kanál nastavit podle videa krok za krokem", color: "bg-sky-500" },
+  { text: "Jak kanál nastavit podle videa", color: "bg-sky-500" },
   { text: "Kde a čím inzeruje vaše konkurence", color: "bg-violet-500" },
   { text: "Kdy kanál škálovat, ladit nebo vypnout podle PNO", color: "bg-orange-500" },
 ];
@@ -23,7 +23,7 @@ const BenchmarkingPage = () => {
         <PhaseIntroTemplate
           title="Budování poptávky"
           subtitle="Kde najdete zákazníky a co se vyplatí"
-          description="Vyberete kanály seřazené podle vašeho projektu, nastavíte je podle instruktážních videí a otestujete s malým rozpočtem. Výsledek porovnáme s maximálním PNO z vašeho byznys case, takže víte, kam dát peníze."
+          description="Kanály máte seřazené podle svého projektu. Vyberete si, nastavíte je podle videí a vyzkoušíte s malým rozpočtem. Výsledek pak porovnáte s maximálním PNO z byznys case. Uvidíte, kam se vyplatí dát peníze a co vypnout."
           phaseNumber={5}
           icon={BarChart3}
           learningPoints={learningPoints}

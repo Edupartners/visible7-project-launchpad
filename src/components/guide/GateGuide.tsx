@@ -169,7 +169,7 @@ export const GateGuideProvider = ({
               onClick={start}
               className="flex items-center gap-2 text-sm font-semibold text-leaf-700 hover:underline"
             >
-              <Compass className="h-4 w-4" aria-hidden="true" /> Projít s průvodcem krok za krokem
+              <Compass className="h-4 w-4" aria-hidden="true" /> Projít bránu s průvodcem
             </button>
           </div>
         )}

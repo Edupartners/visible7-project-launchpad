@@ -22,7 +22,7 @@ const LaunchPage = () => {
         <PhaseIntroTemplate
           title="Launch"
           subtitle="Start mikrobyznysu v Česku"
-          description="Spustíte jeden produkt pro jednu úzkou skupinu zákazníků, s rozpočtem, o který si můžete dovolit přijít. Projdete vše, co je potřeba vyřídit – živnost, úřady, datovou schránku, odvody a účetnictví – a nastavíte milníky MVP podle svého byznys case."
+          description="Začnete jedním produktem pro úzkou skupinu zákazníků. A s rozpočtem, o který si můžete dovolit přijít. Vyřídíte, co je potřeba: živnost, úřady, datovou schránku, odvody a účetnictví. Milníky MVP si nastavíte podle svého byznys case."
           phaseNumber={6}
           icon={Rocket}
           learningPoints={learningPoints}

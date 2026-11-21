@@ -63,7 +63,7 @@ const TalentStep = ({
     <div className="mt-8">
       <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Co byste dělali raději?</h1>
       <p className="mt-2 text-muted-foreground">
-        Vyberte rychle, co je vám bližší. Nejde o to, co umíte, ale co vás baví. Správná odpověď neexistuje.
+        Vyberte rychle, co je vám bližší. Teď neřešíme, co umíte, ale co vás baví. Správná odpověď neexistuje.
       </p>
       <p className="mt-6 text-sm font-semibold text-leaf-700" aria-live="polite">
         {i + 1} z {TALENT_PAIRS.length}
@@ -179,7 +179,7 @@ const EntryResult = ({ d, onEdit, onTalent }: { d: EntryDiagnosis; onEdit: () =>
           {toLearn.length === 0
             ? "Ke startu máte všechno. Můžete jít rovnou na věc."
             : r.can.length === 0
-              ? `Ke startu se doučíte ${count(toLearn.length)}. Všechno se dá naučit krok za krokem.`
+              ? `Ke startu se doučíte ${count(toLearn.length)}. Dá se to naučit a obvykle je toho míň, než si myslíte.`
               : `Ke startu už umíte ${r.can.length} z ${r.total}. Doučíte se ${count(toLearn.length)}.`}
         </h2>
         <div className={`mt-4 grid gap-4 ${byGate.length ? "md:grid-cols-[2fr_3fr]" : ""}`}>
@@ -355,8 +355,8 @@ const EntryDiagnosisPage = () => {
               Co už umíte a co vám chybí ke startu
             </h1>
             <p className="mt-3 text-lg text-muted-foreground">
-              Ke spuštění vlastního projektu obvykle stačí méně, než si myslíte. Zjistíme spolu, na co máte talent a jak
-              málo stačí k úspěšnému startu.
+              Ke spuštění vlastního projektu obvykle stačí méně, než si myslíte. Zjistíme spolu, na co máte talent a co vám
+              ke startu opravdu chybí.
             </p>
             <p className="mt-3 text-lg text-muted-foreground">
               Pak si vyberete cestu rychlého startu, nebo cestu kompletního studia e-commerce.

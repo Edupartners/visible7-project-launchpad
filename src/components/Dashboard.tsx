@@ -56,27 +56,27 @@ const phases = [
   },
   {
     id: 3,
-    description: "Návratnost, PNO, bod zvratu a potřebný kapitál.",
+    description: "Spočítáte, jestli se to vyplatí a kolik potřebujete na start.",
     icon: TrendingUp,
     time: "60 min",
     route: "/strategy",
   },
   {
     id: 4,
-    description: "Postup tvorby podle typu vašeho byznysu.",
+    description: "Postavíte web nebo e-shop podle typu svého byznysu.",
     icon: Wrench,
     time: "20 min",
     route: "/implementation",
   },
   {
     id: 5,
-    description: "Marketingové kanály seřazené podle vašeho zákazníka.",
+    description: "Najdete kanály, kde nakupuje váš zákazník.",
     icon: BarChart3,
     time: "35 min",
     route: "/benchmarking-phase",
   },
-  { id: 6, description: "Spuštění projektu a sledované ukazatele.", icon: Rocket, time: "40 min", route: "/launch" },
-  { id: 7, description: "Jak projekt rozšiřovat, když už běží.", icon: Layers, time: "50 min", route: "/expansion" },
+  { id: 6, description: "Spustíte projekt a víte, co na něm sledovat.", icon: Rocket, time: "40 min", route: "/launch" },
+  { id: 7, description: "Jak růst, když už projekt běží.", icon: Layers, time: "50 min", route: "/expansion" },
 ];
 
 interface DashboardProps {

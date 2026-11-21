@@ -30,9 +30,9 @@ const VisionPage = () => {
 
   const learningPoints = [
     { text: "Komu prodáváte a jaký problém řešíte", color: "bg-blue-500" },
-    { text: "ERRC matice – co vynechat, snížit, zvýšit a vytvořit", color: "bg-emerald-500" },
-    { text: "Hodnotová křivka – srovnání s levnou a prémiovou konkurencí", color: "bg-violet-500" },
-    { text: "USP – jeden důvod, proč si zákazník vybere vás", color: "bg-orange-500" },
+    { text: "Matice ERRC: co vynechat, snížit, zvýšit a vytvořit", color: "bg-emerald-500" },
+    { text: "Hodnotová křivka: jak si stojíte proti levné a prémiové konkurenci", color: "bg-violet-500" },
+    { text: "USP: jeden důvod, proč si zákazník vybere právě vás", color: "bg-orange-500" },
   ];
 
   if (showIntro) {
@@ -41,7 +41,7 @@ const VisionPage = () => {
         <PhaseIntroTemplate
           title="Vize"
           subtitle="Vitamín, nebo lék? Najděte, kde můžete inovovat"
-          description="Blue Ocean Strategy vám pomůže najít neobsazený prostor na trhu, kde můžete vytvořit novou poptávku místo konkurování v přeplněném 'červeném oceánu'. ERRC matice (Eliminate-Reduce-Raise-Create) je srdcem této strategie a pomůže vám identifikovat co odstranit z trhu, co zlevnit, co vylepšit a co úplně nového vytvořit. Výsledkem je jedinečná hodnotová propozice, která vás odliší od konkurence."
+          description="Většina lidí začne tím, že dělá totéž co ostatní, jen o kousek levněji. To je červený oceán, kde se všichni perou o cenu. Modrý oceán je místo, kde zatím nikdo není, a dostanete se tam tím, že zákazníkovi přinesete novou hodnotu. Pomůže vám s tím matice ERRC: co úplně vynecháte, co uděláte méně, co uděláte lépe a co přinesete nového. Na konci máte jednu větu, proč si zákazník vybere právě vás."
           phaseNumber={1}
           icon={Eye}
           learningPoints={learningPoints}

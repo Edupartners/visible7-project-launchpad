@@ -21,8 +21,8 @@ const ImplementationPage = () => {
       {showIntro ? (
         <PhaseIntroTemplate
           title="Implementace"
-          subtitle="Postavte to – bez programátora"
-          description="Typ byznysu jste zvolili ve fázi 2. Teď dostanete plán tvorby přesně pro něj: bloky od domény po kontrolu před spuštěním, u každého instruktážní video a kroky k odškrtnutí. E-shop postavíte na Shoptetu, web na WordPressu."
+          subtitle="Postavte to sami, bez programátora"
+          description="Typ byznysu už máte z brány 2. Tady dostanete plán tvorby přesně pro něj, od domény až po kontrolu před spuštěním. Každý blok má instruktážní video a kroky, které si odškrtáte. E-shop postavíte na Shoptetu, web na WordPressu."
           phaseNumber={4}
           icon={Wrench}
           learningPoints={learningPoints}

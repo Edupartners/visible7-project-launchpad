@@ -320,7 +320,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
       },
       { label: "Něco přinášíte úplně nového (Vytvořit)", ok: errcTexts(errc, "create").length > 0, required: true },
       {
-        label: "Něco vynecháváte nebo snižujete – bez toho modrý oceán nevznikne",
+        label: "Něco vynecháváte nebo snižujete. Bez toho modrý oceán nevznikne.",
         ok: errcTexts(errc, "eliminate").length + errcTexts(errc, "reduce").length > 0,
         required: false,
       },
@@ -348,7 +348,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
       time: "10–15 minut",
       think: true,
       explain: [
-        "Tomuhle se říká vytvoření persony. Představte si jednoho konkrétního člověka, který si váš produkt nebo službu koupí. Kolik mu je, čím se živí, v jaké je situaci, co ho trápí.",
+        "Tomu se říká persona. Vezměte jednoho konkrétního člověka, který si od vás koupí. Kolik mu je, čím se živí, v jaké je situaci a co ho trápí.",
         "Nepište „všichni“ ani „každý, kdo…“. Kdo prodává všem, neprodá nikomu. Klidně ho pojmenujte, ať si ho umíte představit.",
         "Do druhého pole napište, jaký problém dnes má. Jeho slovy, tak jak by si postěžoval kamarádovi.",
       ],
@@ -390,8 +390,8 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
       time: "20–30 minut",
       think: true,
       explain: [
-        "Najděte dva konkurenty. Levný je nejlevnější způsob, jak zákazník problém řeší dnes (často zdarma). Prémiový je nejdražší a nejkvalitnější řešení.",
-        "Pak u vlastností, na kterých zákazníkovi záleží, rozhodněte, co udělá váš projekt jinak: co úplně vynecháte (Eliminovat), co ubere (Snížit), co přidá (Zvýšit) a co úplně nového vytvoříte (Vytvořit).",
+        "Najděte dva konkurenty. Ten levný je způsob, jak zákazník problém řeší dnes nejlevněji (často zdarma). Ten prémiový je nejdražší a nejkvalitnější řešení.",
+        "Pak u vlastností, na kterých zákazníkovi záleží, rozhodněte, co udělá váš projekt jinak: co úplně vynecháte (Eliminovat), co uberete (Snížit), co přidáte (Zvýšit) a co úplně nového vytvoříte (Vytvořit).",
         "Nejdůležitější je políčko Vytvořit. To je důvod, proč si zákazník vybere právě vás.",
       ],
       example: [
@@ -450,7 +450,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
         <PhaseCelebration
           gate={1}
           title="Strategie modrého oceánu je hotová"
-          message="Váš zákazník, ERRC matice a USP se propíšou do Lean Canvasu."
+          message="Zákazník, matice ERRC i USP se vám samy propíšou do Lean Canvasu."
           nextLabel="Pokračovat na Ideaci"
           onNext={() => navigate("/ideation")}
           onHome={() => navigate("/home")}
@@ -460,7 +460,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
       <Card className="card-apple p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-primary">Fáze 1 ze 7</p>
+            <p className="text-sm font-semibold text-primary">Brána 1 ze 7</p>
             <h2 className="text-2xl font-bold text-foreground">Strategie modrého oceánu</h2>
             <p className="text-sm text-muted-foreground">Najděte místo na trhu mezi levnou a prémiovou konkurencí.</p>
           </div>
@@ -484,9 +484,9 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
           </div>
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p>
-              Modrý oceán není o tom být levnější. Je o tom{" "}
+              Modrý oceán neznamená být levnější. Znamená{" "}
               <strong className="text-foreground">přidat zákazníkovi tolik hodnoty</strong>, že vás přestane srovnávat s
-              konkurencí. Kdo soutěží cenou, prohrává s tím, kdo je ochotný prodělávat víc.
+              konkurencí. Kdo soutěží cenou, vždycky narazí na někoho, kdo je ochotný prodělávat víc.
             </p>
 
             <div>
@@ -505,7 +505,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                     ruky.
                   </li>
                   <li>
-                    <strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit – postup, záruka, důkazy.
+                    <strong className="text-foreground">↑ Jistota:</strong> proč tomu má věřit: postup, záruka, důkazy.
                   </li>
                   <li>
                     <strong className="text-foreground">↓ Čas:</strong> jak rychle uvidí první výsledek.
@@ -534,7 +534,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 30 minut. Úsilí: nic nevymýšlí. Kurz proto vynechá exotické suroviny a dlouhé lekce a přidá plán jídel.
               </p>
               <p className="mt-2 italic text-foreground">
-                „Večeře pro celou rodinu za 30 minut – bez vymýšlení, s plánem a nákupním seznamem na celý týden.“
+                „Večeře pro celou rodinu za 30 minut. Bez vymýšlení, s plánem a nákupním seznamem na celý týden.“
               </p>
             </div>
           </div>
@@ -612,15 +612,15 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
               icon={Target}
               step={3}
               title="ERRC matice"
-              subtitle="Srovnáte se se dvěma konkrétními konkurenty a najdete místo, kde budete jiní než oba."
+              subtitle="Postavíte se vedle dvou konkrétních konkurentů a najdete místo, kde budete jiní než oba."
             />
 
             <div className="mb-5 rounded-2xl bg-muted/60 p-4 text-sm text-muted-foreground">
               <p className="mb-2 font-medium text-foreground">Jak matici vyplnit</p>
               <ol className="list-decimal space-y-1.5 pl-5">
                 <li>
-                  <strong className="text-foreground">Pojmenujte dva konkurenty.</strong> Levnou konkurenci –
-                  nejlevnější způsob, jak zákazník svůj problém vyřeší dnes (často i zdarma). A prémiovou konkurenci –
+                  <strong className="text-foreground">Pojmenujte dva konkurenty.</strong> Levnou konkurenci, tedy
+                  nejlevnější způsob, jak zákazník svůj problém vyřeší dnes (často i zdarma). A prémiovou, tedy
                   nejdražší a nejkvalitnější řešení na trhu. Mezi nimi hledáte své místo.
                 </li>
                 <li>
@@ -634,7 +634,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 </li>
               </ol>
               <p className="mt-3">
-                Příklad: položka „osobní konzultace“ – levná konkurence (YouTube) 0, prémiová (kurz se šéfkuchařem) 90,
+                Příklad: položka „osobní konzultace“. Levná konkurence (YouTube) 0, prémiová (kurz se šéfkuchařem) 90,
                 vy 60. Výsledná křivka ukáže, jestli jste jen levnější kopie prémiového řešení, nebo opravdu něco
                 jiného.
               </p>
@@ -738,7 +738,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
               icon={TrendingUp}
               step={4}
               title="Hodnotová křivka"
-              subtitle="Kreslí se sama z matice. Vaše křivka je zelená. Modrý obdélník ukazuje modrý oceán: co zvyšujete a co vytváříte nového, tedy kde vedete jinudy než obě konkurence."
+              subtitle="Kreslí se sama z matice. Vaše křivka je zelená. Modrý obdélník ukazuje, kde vedete jinudy než obě konkurence, tedy co zvyšujete a co přinášíte nového. To je váš modrý oceán."
             />
             {curve.length === 0 ? (
               <p className="rounded-xl bg-muted/60 p-6 text-center text-sm text-muted-foreground">
@@ -841,7 +841,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
             <Textarea
               value={usp}
               onChange={(e) => setUsp(e.target.value)}
-              placeholder="např. Večeře pro celou rodinu za 30 minut – s plánem na celý týden."
+              placeholder="např. Večeře pro celou rodinu za 30 minut, s plánem na celý týden."
               className="min-h-[90px] rounded-xl"
             />
             <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -849,7 +849,7 @@ export const VisionPhase = ({ onComplete }: VisionPhaseProps) => {
                 <Wand2 className="mr-2 h-4 w-4" />
                 Sestavit koncept z mých odpovědí
               </Button>
-              <p className="text-xs text-muted-foreground">Koncept je jen výchozí bod – přepište ho vlastními slovy.</p>
+              <p className="text-xs text-muted-foreground">Koncept je jen začátek. Přepište ho vlastními slovy.</p>
             </div>
           </Card>
         </GuideStepBlock>

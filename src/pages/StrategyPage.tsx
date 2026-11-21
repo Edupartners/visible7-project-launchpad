@@ -41,7 +41,7 @@ const StrategyPage = () => {
         <PhaseIntroTemplate
           title="Strategie a čísla"
           subtitle="Vyplatí se to?"
-          description="Náklady a kanály z Lean Canvasu doplníte o čísla. Aplikace spočítá obrat, zisk, potřebný kapitál, bod zvratu a návratnost ve třech scénářích. Maximální PNO odvodí z vaší marže, takže uvidíte, kolik smíte utratit za marketing."
+          description="K nákladům a kanálům z Lean Canvasu doplníte čísla. Aplikace z nich spočítá obrat, zisk, kolik peněz potřebujete na start, bod zvratu a návratnost, a to ve třech scénářích. Z vaší marže vyjde i maximální PNO. Uvidíte tak, kolik můžete dát do marketingu, aniž byste prodělali."
           phaseNumber={3}
           icon={Target}
           learningPoints={learningPoints}

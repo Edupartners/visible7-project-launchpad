@@ -223,7 +223,7 @@ export const PhaseCards = ({
                 className="h-full w-full"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
-                title={`Úvodní video – ${playing.name}`}
+                title={`Úvodní video: ${playing.name}`}
               />
             </div>
           )}
