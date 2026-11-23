@@ -23,7 +23,6 @@ import {
   CalendarDays,
   Check,
   Layers,
-  Lock,
   Lightbulb,
   Play,
   Rocket,
@@ -373,22 +372,22 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <Award className="h-4 w-4 shrink-0 text-leaf-600" aria-hidden="true" />
               <span>Edu Partners · vzděláváme od roku 2011</span>
             </p>
-            <h1 className="mt-6 font-extrabold tracking-[-0.035em]">
-              <span className="block text-[2.3rem] leading-[1.04] min-[400px]:text-[2.7rem] sm:text-6xl lg:text-[4.25rem]">
+            <h1 className="mt-8 font-extrabold tracking-[-0.035em]">
+              <span className="block text-[2.3rem] leading-[1.08] min-[400px]:text-[2.7rem] sm:text-6xl lg:text-[4.25rem]">
                 Naučte se online byznys na vlastním projektu.
               </span>
-              <span className="mt-6 block text-xl font-bold leading-relaxed tracking-normal text-foreground sm:text-[1.375rem]">
+              <span className="mt-8 block text-lg font-bold leading-relaxed sm:text-xl tracking-normal text-foreground sm:text-[1.375rem]">
                 Získejte státem uznanou kvalifikaci{" "}
                 <span className="box-decoration-clone bg-[linear-gradient(transparent_58%,hsl(var(--signal))_58%,hsl(var(--signal))_92%,transparent_92%)] px-[0.15em] text-primary">
                   Specialista internetového obchodu.
                 </span>
               </span>
             </h1>
-            <p className="mt-2 max-w-2xl text-xl leading-relaxed text-muted-foreground sm:text-[1.375rem]">
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl sm:text-[1.375rem]">
               Vy máte sílu budovat. My máme systém: {STUDY.sessions} setkání se seniorními poradci, e-learning, vlastní
               projekt, osvědčení.
             </p>
-            <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <div className="mt-10 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Cta
                 onClick={() => {
                   track("hero_idea_test_click", {});
@@ -405,16 +404,13 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <Play className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Stačí e-mail, bez platební karty.{" "}
-              <Link
-                to="/bezpecnost"
-                className="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:text-foreground"
-              >
-                <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                Váš nápad zůstává jen váš.
-              </Link>
-            </p>
+            <Link
+              to="/studium"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+            >
+              <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Semestrální studium {STUDY.dates}
+            </Link>
           </div>
           <div id="video" className="mx-auto mt-12 max-w-3xl scroll-mt-24">
             <HeroVideo photo={author?.photo} />
@@ -857,11 +853,11 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Štěstí přeje odvážným. A připraveným.
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-lg text-white/70">
-                Za 5 minut zjistíte, jestli má váš nápad místo na trhu. Zdarma.
+                Za 4 minuty zjistíte, co už umíte a co vám chybí ke startu. Zdarma.
               </p>
               <div className="mt-10">
                 <Cta onClick={onAccessGranted} light>
-                  Začít plán zdarma
+                  Zjistěte, co už umíte
                 </Cta>
               </div>
               <p className="mt-6 text-sm text-white/50">
