@@ -1,12 +1,15 @@
 import { track } from "@/lib/track";
 import { useEffect, useRef, useState } from "react";
-import { Check, PlayCircle, Video } from "lucide-react";
+import { Check, ListVideo, Play, PlayCircle, SkipForward, Video } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { BuildBlock } from "@/lib/buildPlans";
 import {
   BlockArea,
   BlockVideoRow,
   blockKey,
+  fmtTime,
   setWatched,
+  useAllBlockVideos,
   useBlockVideos,
   videosLabel,
   vimeoSrc,
@@ -81,58 +84,200 @@ function Poster({
   );
 }
 
-function PlayerFrame({ video, title, onEnded }: { video: BlockVideoRow; title: string; onEnded: () => void }) {
+type VimeoMsg = { event?: string; data?: { seconds?: number } };
+
+/** Posílání příkazů přehrávači Vimea přes postMessage. */
+const vimeoSender = (ref: React.RefObject<HTMLIFrameElement>) => (method: string, value?: unknown) =>
+  ref.current?.contentWindow?.postMessage(JSON.stringify({ method, value }), "https://player.vimeo.com");
+
+const parseVimeoMsg = (e: MessageEvent, ref: React.RefObject<HTMLIFrameElement>): VimeoMsg | null => {
+  if (e.origin !== "https://player.vimeo.com" || e.source !== ref.current?.contentWindow) return null;
+  try {
+    return typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+  } catch {
+    return null;
+  }
+};
+
+function PlayerFrame({
+  video,
+  title,
+  onEnded,
+  onNext,
+}: {
+  video: BlockVideoRow;
+  title: string;
+  onEnded: () => void;
+  /** Další kapitola v kartě (když je) */
+  onNext?: () => void;
+}) {
   const ref = useRef<HTMLIFrameElement>(null);
   const ended = useRef(onEnded);
   ended.current = onEnded;
+  // Kapitola skončila: nabídnout další kapitolu, nebo pokračovat v záznamu bez zastavení.
+  const [paused, setPaused] = useState(false);
+  const keepGoing = useRef(false);
   useEffect(() => {
-    // Kapitola z dlouhé přednášky: na konci úseku video zastavit a označit jako zhlédnuté.
+    setPaused(false);
+    keepGoing.current = false;
     const end = video.end_sec;
     let done = false;
-    const send = (method: string, value?: unknown) =>
-      ref.current?.contentWindow?.postMessage(JSON.stringify({ method, value }), "https://player.vimeo.com");
+    const send = vimeoSender(ref);
     const finish = () => {
       if (done) return;
       done = true;
       ended.current();
     };
     const onMsg = (e: MessageEvent) => {
-      if (e.origin !== "https://player.vimeo.com" || e.source !== ref.current?.contentWindow) return;
-      let d: { event?: string; data?: { seconds?: number } } | null = null;
-      try {
-        d = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
-      } catch {
-        return;
-      }
-      if (d?.event === "ready") {
+      const d = parseVimeoMsg(e, ref);
+      if (!d) return;
+      if (d.event === "ready") {
         send("addEventListener", "ended");
         if (end) send("addEventListener", "timeupdate");
       }
-      if (d?.event === "ended") finish();
-      if (end && d?.event === "timeupdate" && (d.data?.seconds ?? 0) >= end && !done) {
+      if (d.event === "ended") finish();
+      if (end && !keepGoing.current && d.event === "timeupdate" && (d.data?.seconds ?? 0) >= end && !done) {
         send("pause");
         finish();
+        setPaused(true);
       }
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
   }, [video.id, video.end_sec]);
   return (
-    <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
-      <iframe
-        ref={ref}
-        key={video.id}
-        src={vimeoSrc(video, true)}
-        className="h-full w-full"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
-        title={`Video: ${title}`}
-      />
+    <div className="space-y-2">
+      <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
+        <iframe
+          ref={ref}
+          key={video.id}
+          src={vimeoSrc(video, true)}
+          className="h-full w-full"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+          title={`Video: ${title}`}
+        />
+      </div>
+      {paused && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl bg-leaf-50 px-3 py-2 text-sm ring-1 ring-leaf-200">
+          <span className="mr-auto font-semibold">Kapitola skončila.</span>
+          {onNext && (
+            <button
+              type="button"
+              onClick={onNext}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 font-semibold text-primary-foreground"
+            >
+              Další kapitola <SkipForward className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              keepGoing.current = true;
+              setPaused(false);
+              vimeoSender(ref)("play");
+            }}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 font-semibold"
+          >
+            Pokračovat v záznamu <Play className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-function VideoPlaylist({
+/** Celý záznam přednášky s rozpisem minut: proklik skočí na čas, video běží dál. */
+function LectureDialog({
+  video,
+  open,
+  onOpenChange,
+}: {
+  video: BlockVideoRow;
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+}) {
+  const { videos } = useAllBlockVideos();
+  const ref = useRef<HTMLIFrameElement>(null);
+  const [now, setNow] = useState(video.start_sec ?? 0);
+  const chapters = Array.from(
+    new Map(
+      videos
+        .filter((v) => v.vimeo_id === video.vimeo_id && v.start_sec != null)
+        .sort((a, b) => (a.start_sec ?? 0) - (b.start_sec ?? 0))
+        .map((v) => [v.start_sec, v] as const),
+    ).values(),
+  );
+  const name = lectureName(video.vimeo_id);
+  useEffect(() => {
+    if (!open) return;
+    const send = vimeoSender(ref);
+    const onMsg = (e: MessageEvent) => {
+      const d = parseVimeoMsg(e, ref);
+      if (!d) return;
+      if (d.event === "ready") send("addEventListener", "timeupdate");
+      if (d.event === "timeupdate") setNow(d.data?.seconds ?? 0);
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [open]);
+  const activeIdx = chapters.reduce((acc, c, i) => ((c.start_sec ?? 0) <= now + 1 ? i : acc), -1);
+  const jump = (sec: number) => {
+    const send = vimeoSender(ref);
+    send("setCurrentTime", sec);
+    send("play");
+    setNow(sec);
+  };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto p-4 sm:p-6">
+        <DialogHeader>
+          <DialogTitle className="pr-8 text-left">
+            {name ? `Celý záznam: ${name}` : "Celý záznam přednášky"}
+          </DialogTitle>
+          <DialogDescription className="text-left">
+            Klikněte na kapitolu a záznam skočí na danou minutu. Video běží dál.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
+          <div className="aspect-video w-full overflow-hidden rounded-xl bg-black">
+            {open && (
+              <iframe
+                ref={ref}
+                src={vimeoSrc({ ...video, start_sec: video.start_sec }, true)}
+                className="h-full w-full"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+                title={`Celý záznam: ${name ?? video.title}`}
+              />
+            )}
+          </div>
+          <ol className="max-h-[60vh] space-y-0.5 overflow-y-auto lg:max-h-[28rem]" aria-label="Rozpis minut">
+            {chapters.map((c, i) => (
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => jump(c.start_sec ?? 0)}
+                  aria-current={i === activeIdx ? "true" : undefined}
+                  className={`flex w-full gap-3 rounded-lg px-2 py-1.5 text-left text-sm ${
+                    i === activeIdx ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                  }`}
+                >
+                  <span className={`w-14 shrink-0 tabular-nums ${i === activeIdx ? "" : "text-muted-foreground"}`}>
+                    {fmtTime(c.start_sec ?? 0)}
+                  </span>
+                  <span className="min-w-0">{c.title}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function VideoPlaylist({
   block,
   area,
   videos,
@@ -146,6 +291,7 @@ function VideoPlaylist({
   const firstOpen = videos.find((v) => !watched.has(v.id)) ?? videos[0];
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [play, setPlay] = useState(false);
+  const [lecture, setLecture] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
   const linked = useDeepLinkLesson(videos.map((v) => v.id));
 
@@ -172,15 +318,42 @@ function VideoPlaylist({
   return (
     <div ref={boxRef} className="min-w-0 scroll-mt-24 space-y-3">
       {play ? (
-        <PlayerFrame video={current} title={current.title} onEnded={() => setWatched(current.id, true)} />
+        <PlayerFrame
+          video={current}
+          title={current.title}
+          onEnded={() => setWatched(current.id, true)}
+          onNext={idx < videos.length - 1 ? () => start(videos[idx + 1]) : undefined}
+        />
       ) : (
         <Poster
           cover={cover}
           title={current.title}
-          label={[lectureName(current.vimeo_id) && `Přednáška: ${lectureName(current.vimeo_id)}`, videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title].filter(Boolean).join(" · ")}
+          label={[
+            lectureName(current.vimeo_id) && `Přednáška: ${lectureName(current.vimeo_id)}`,
+            videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
           minutes={current.minutes}
           onPlay={() => start(current)}
         />
+      )}
+
+      {current.start_sec != null && (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              track("lecture_open", { block: block.id, video: current.vimeo_id });
+              setPlay(false);
+              setLecture(true);
+            }}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+          >
+            <ListVideo className="h-4 w-4" aria-hidden="true" /> Celý záznam přednášky s rozpisem minut
+          </button>
+          <LectureDialog video={current} open={lecture} onOpenChange={setLecture} />
+        </>
       )}
 
       {videos.length > 1 && (

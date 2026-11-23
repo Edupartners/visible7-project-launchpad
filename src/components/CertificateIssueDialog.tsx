@@ -133,7 +133,7 @@ export const CertificateIssueDialog = ({ open, onOpenChange, kind, phase = null 
               </DialogDescription>
             </DialogHeader>
             <p className="my-5 text-sm text-muted-foreground">
-              Na kartě „Založte živnost online“ v bráně 5 nebo 6 zadáte IČO – nové i to, pod kterým už podnikáte.
+              Na kartě „Založte živnost online“ v Mém podniku nebo v bráně 6 zadáte IČO – nové i to, pod kterým už podnikáte.
               Ověření trvá pár vteřin.
             </p>
             <DialogFooter>
