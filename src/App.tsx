@@ -6,7 +6,8 @@ import MembershipPage from "./pages/MembershipPage";
 import UnsubscribePage from "./pages/UnsubscribePage";
 import { PromoAutoRedeem } from "@/components/access/PromoRedeem";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
+import { courseById, courseGate } from "@/lib/courses";
 import { AuthGate } from "@/components/AuthGate";
 import LauncherPage from "./pages/LauncherPage";
 import HomePage from "./pages/HomePage";
@@ -51,6 +52,7 @@ import SeminarsPage from "./pages/SeminarsPage";
 import MyStudyPage from "./pages/MyStudyPage";
 import BonusesPage from "./pages/BonusesPage";
 import EntryDiagnosisPage from "./pages/EntryDiagnosisPage";
+import CoursePage from "./pages/CoursePage";
 import MarketRentgenPage from "./pages/MarketRentgenPage";
 import CashflowPage from "./pages/CashflowPage";
 import MockBankPage from "./pages/MockBankPage";
@@ -61,6 +63,20 @@ import { GateLock, PremiumGate } from "@/components/access/Locks";
 import { PRIVACY, TERMS } from "./lib/legal";
 
 const queryClient = new QueryClient();
+
+// Kurz je zamčený stejně jako brána, do které patří (bonusy bez zámku).
+const CourseGate = () => {
+  const { courseId = "" } = useParams();
+  const c = courseById(courseId);
+  const gate = c ? courseGate(c) : null;
+  return gate ? (
+    <GateLock gate={gate}>
+      <CoursePage />
+    </GateLock>
+  ) : (
+    <CoursePage />
+  );
+};
 
 // Rentgen nápadu je skrytý (nahradila ho vstupní diagnostika). Zůstává jen rentgen podniku pro ty, kdo už podnikají.
 const BusinessRentgenOnly = () =>
@@ -84,6 +100,7 @@ const ProtectedRoutes = () => (
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/diagnostika" element={<EntryDiagnosisPage />} />
+      <Route path="/kurz/:courseId" element={<CourseGate />} />
       <Route path="/rentgen" element={<BusinessRentgenOnly />} />
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />

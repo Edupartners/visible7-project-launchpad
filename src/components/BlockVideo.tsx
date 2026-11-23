@@ -132,7 +132,7 @@ function PlayerFrame({ video, title, onEnded }: { video: BlockVideoRow; title: s
   );
 }
 
-function VideoPlaylist({
+export function VideoPlaylist({
   block,
   area,
   videos,
@@ -177,7 +177,12 @@ function VideoPlaylist({
         <Poster
           cover={cover}
           title={current.title}
-          label={[lectureName(current.vimeo_id) && `Přednáška: ${lectureName(current.vimeo_id)}`, videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title].filter(Boolean).join(" · ")}
+          label={[
+            lectureName(current.vimeo_id) && `Přednáška: ${lectureName(current.vimeo_id)}`,
+            videos.length > 1 ? `${idx + 1}. díl z ${videos.length}` : block.title,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
           minutes={current.minutes}
           onPlay={() => start(current)}
         />

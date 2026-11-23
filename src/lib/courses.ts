@@ -6,6 +6,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/visible7/client";
+import type { BlockVideoRow } from "@/lib/blockVideos";
 
 /** Za kolik se kurz prodává samostatně (LearnWorlds), vč. DPH. */
 export const COURSE_PRICE = 3780;
@@ -193,11 +194,15 @@ async function loadLessons() {
   const { data, error } = await (supabase as any).rpc("lesson_stats");
   const r = Array.isArray(data) ? data[0] : null;
   if (error || !r) return LESSONS_SNAPSHOT;
-  return { lessons: Number(r.lessons) || LESSONS_SNAPSHOT.lessons, minutes: Number(r.minutes) || LESSONS_SNAPSHOT.minutes };
+  return {
+    lessons: Number(r.lessons) || LESSONS_SNAPSHOT.lessons,
+    minutes: Number(r.minutes) || LESSONS_SNAPSHOT.minutes,
+  };
 }
 
 export function useLessonStats() {
-  const s = useQuery({ queryKey: ["lesson_stats"], queryFn: loadLessons, staleTime: 60 * 60_000 }).data ?? LESSONS_SNAPSHOT;
+  const s =
+    useQuery({ queryKey: ["lesson_stats"], queryFn: loadLessons, staleTime: 60 * 60_000 }).data ?? LESSONS_SNAPSHOT;
   return { lessons: s.lessons, hours: Math.floor(s.minutes / 60) };
 }
 
@@ -217,3 +222,54 @@ export const durationLabel = ({ minutes, missing }: { minutes: number; missing: 
 
 /** Celkové hodiny zaokrouhlené dolů na desítky pro nadpis („přes 40 hodin“). */
 export const hoursFloor10 = (h: number) => Math.max(10, Math.floor(h / 10) * 10);
+
+/* ---------- Kurzy v bráně 5 (katalog jako v LMS) ---------- */
+
+/** Kurzy marketingu v bráně 5, v pořadí, jak je ukazujeme. */
+export const MARKETING_COURSE_IDS = ["ppc", "meta", "ga4", "seo", "copy", "affiliate"];
+
+/** Ke kterým kanálům kurz patří (doporučení podle projektu). GA4 doporučujeme všem. */
+export const COURSE_CHANNELS: Record<string, string[]> = {
+  ppc: ["google-ads", "sklik"],
+  meta: ["meta"],
+  seo: ["seo"],
+  affiliate: ["affiliate"],
+  copy: [],
+  ga4: [],
+};
+export const ALWAYS_RECOMMENDED = ["ga4"];
+
+/** Kanály, které mají vlastní kurz – v seznamu kanálů se už neukazují zvlášť. */
+export const CHANNELS_WITH_COURSE = Object.values(COURSE_CHANNELS).flat();
+
+export const courseById = (id: string) => FEATURED_COURSES.find((c) => c.id === id) ?? null;
+
+/** Číslo brány kurzu (první číslo ze štítku „Brány 4–5“), bonus = null. */
+export const courseGate = (c: FeaturedCourse) => {
+  const m = c.gate.match(/\d/);
+  return m ? Number(m[0]) : null;
+};
+
+/** Lekce kurzu: videa ze všech jeho karet, bez zdvojení (stejná kapitola ve dvou kartách jednou). */
+export function courseVideos(c: FeaturedCourse, all: BlockVideoRow[]) {
+  const seen = new Set<string>();
+  const out: BlockVideoRow[] = [];
+  for (const key of c.keys) {
+    const rows = all.filter((v) => v.block_key === key).sort((a, b) => a.position - b.position);
+    for (const v of rows) {
+      const sig = `${v.vimeo_id}:${v.start_sec ?? ""}:${v.end_sec ?? ""}`;
+      if (seen.has(sig)) continue;
+      seen.add(sig);
+      out.push(v);
+    }
+  }
+  return out;
+}
+
+export const videoMinutes = (v: BlockVideoRow) =>
+  v.start_sec != null && v.end_sec != null ? Math.max(1, Math.round((v.end_sec - v.start_sec) / 60)) : (v.minutes ?? 0);
+
+export const hoursLabel = (min: number) =>
+  min >= 60 ? `${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ""}` : `${min} min`;
+
+export const lessonsLabel = (n: number) => `${n} ${n === 1 ? "lekce" : n >= 2 && n <= 4 ? "lekce" : "lekcí"}`;

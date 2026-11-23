@@ -12,6 +12,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
+import { TradeLicenseCard } from "@/components/TradeLicenseCard";
 import { BusinessTabs } from "@/components/business/BusinessTabs";
 import { Kpi } from "@/components/business/Kpi";
 import { MyDeadlines } from "@/components/deadlines/MyDeadlines";
@@ -139,6 +140,9 @@ const MyBusinessPage = () => {
             se svou účetní.
           </p>
         </section>
+
+        {/* Živnost: tahák k formuláři a ověření IČO (dřív v bráně 5) */}
+        <TradeLicenseCard placement="gate6" />
 
         {/* Nástroje podniku */}
         <section aria-labelledby="nastroje-h" className="space-y-3">
