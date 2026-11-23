@@ -531,7 +531,7 @@ const CaseStudyWebSpecialistPage = () => {
               onClick={start}
               className="v7-trap-btn v7-phi-lg mt-8 inline-flex h-14 items-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
             >
-              Začít plán zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              Diagnostika zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         </section>

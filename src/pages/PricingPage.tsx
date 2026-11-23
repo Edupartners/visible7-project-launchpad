@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
-import { FREE_CONSULT_URL, canBuy, kc, monthsLabel, nbsp, perMonth, useShop } from "@/lib/shop";
+import { FREE_CONSULT_URL, MEMBER_ITEMS, canBuy, kc, monthsLabel, nbsp, perMonth, useShop } from "@/lib/shop";
+import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { supabase } from "@/integrations/visible7/client";
 import { track } from "@/lib/track";
 import { CONSULTATION } from "@/lib/advisors";
@@ -16,12 +17,12 @@ import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 type Cell = boolean | string;
 const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, string?][] }[] => [
   {
-    group: "Vstupní diagnostika a podnikatelský plán",
+    group: "Diagnostika a podnikatelský plán",
     rows: [
       ["Vstupní diagnostika: na co máte talent, co už umíte a co se ke startu doučíte", true, true],
       ["Rentgen podniku pro ty, kdo už podnikají", true, true],
-      ["Brána 1 Vize: strategie modrého oceánu, ERRC matice, hodnotová křivka a USP", true, true],
-      ["Brána 2 Ideace: Lean Canvas a výběr z 13 typů online byznysu", true, true],
+      ["Brána 1 Vize: strategie modrého oceánu, ERRC matice, hodnotová křivka a USP", false, true],
+      ["Brána 2 Ideace: Lean Canvas a výběr z 13 typů online byznysu", false, true],
     ],
   },
   {
@@ -93,17 +94,17 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
   {
     group: "AI asistence",
     rows: [
-      ["AI Michal navrhne obsah a zhodnotí výsledek", "brány 1–2", true],
+      ["AI Michal navrhne obsah a zhodnotí výsledek", false, true],
       ["AI návrh čísel, nákladů a textů webu projektu", false, true],
     ],
   },
   {
     group: "Vzdělávání",
     rows: [
-      ["Úvodní video ke každé bráně", "brány 1–2", true],
+      ["E-learning: lekce od lektorů z praxe ke každé bráně", false, true],
       ["Videonávody krok za krokem (100+ videí)", false, true],
       ["Pracovní listy k vyplnění a tisku", "13 listů", "všechny"],
-      ["Živé online semináře jednou měsíčně a jejich záznamy", "vybrané", true],
+      ["Živé online semináře s praktiky", false, "4 vybrané"],
     ],
   },
   {
@@ -116,8 +117,7 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
   {
     group: "Osvědčení a certifikace",
     rows: [
-      ["Osvědčení za brány 1 a 2", true, true],
-      ["Osvědčení za brány 3–5", false, true],
+      ["Osvědčení za brány 1–5", false, true],
       [`${specialist}: certifikace po bráně 5`, false, true],
       ["VISIBLE7 Gold za spuštěný projekt", false, true],
       [
@@ -131,8 +131,8 @@ const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, s
   {
     group: "Digitální kancelář",
     rows: [
-      ["Úřady online a doporučené nástroje na jednom místě", true, true],
-      ["Moje termíny: daně a pojištění s připomínkou e-mailem týden předem", true, true],
+      ["Úřady online a doporučené nástroje na jednom místě", false, true],
+      ["Moje termíny: daně a pojištění s připomínkou e-mailem týden předem", false, true],
     ],
   },
 ];
@@ -147,14 +147,6 @@ const CellMark = ({ v }: { v: Cell }) =>
   ) : (
     <span className="text-xs font-semibold text-muted-foreground">{v}</span>
   );
-
-const MEMBER_ITEMS = [
-  "Všech 7 bran a přes 100 videonávodů",
-  "Živé online semináře jednou měsíčně a jejich záznamy",
-  "AI Michal u každé brány",
-  "Byznys case, Excel a pitch na A4",
-  "Osvědčení za každou bránu",
-];
 
 /** Veřejná stránka s ceníkem. Cenu a odkaz na objednávku nastavuje správce (Administrace → Platby). */
 const PricingPage = () => {
@@ -175,6 +167,10 @@ const PricingPage = () => {
       `Ne. Zaplatíte jednou na ${monthsLabel(shop.months)} a pak se rozhodnete, jestli prodloužíte.`,
     ],
     [
+      "Kolik projektů můžu mít?",
+      "Členství je na jeden vlastní projekt. Ten provedete všemi sedmi branami, od nápadu po první zákazníky.",
+    ],
+    [
       "Co se stane, když členství skončí?",
       "Vaše projekty i data zůstanou uložené. Placené brány a výstupy se zamknou do dalšího zaplacení.",
     ],
@@ -185,7 +181,7 @@ const PricingPage = () => {
     ["Dostanu doklad?", "Ano. Ke každé platbě dostanete daňový doklad od Edu Partners s.r.o."],
     [
       "Mohu nejdřív vyzkoušet?",
-      "Ano. Vstupní diagnostika a brány 1 a 2 jsou zdarma bez platební karty. Když zjistíte, jaký jste typ podnikatele (krátký kvíz), získáte navíc 3 dny plného přístupu zdarma.",
+      "Zdarma si uděláte vstupní diagnostiku: zjistíte, na co máte talent a co se ke startu doučíte. Když si nejste jistí, domluvte si 20 minut s expertem zdarma.",
     ],
     [
       "Jak se členství aktivuje?",
@@ -202,61 +198,22 @@ const PricingPage = () => {
       <main>
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
           <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
-            Začněte zdarma. Plaťte, až budete chtít dál.
+            Jedno členství na rok. Nebo studium s lektory.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Jedno členství, žádné předplatné, které by se samo obnovovalo. Ceny jsou konečné, včetně DPH.
+            Žádné předplatné, které by se samo obnovovalo. Ceny jsou konečné, včetně DPH.
           </p>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr_1.15fr_1.15fr]">
-            <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
-              <h2 className="font-semibold text-muted-foreground">Zdarma</h2>
-              <p className="mt-3 text-4xl font-extrabold tracking-tight">0 Kč</p>
-              <p className="text-sm text-muted-foreground">bez platební karty</p>
-              <ul className="mt-6 flex-1 space-y-2.5 text-sm">
-                {[
-                  "Vstupní diagnostika (4 minuty)",
-                  "Brána 1 Vize (modrý oceán)",
-                  "Brána 2 Ideace (Lean Canvas) s AI",
-                  "Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma",
-                ].map((it) => (
-                  <li key={it} className="flex gap-2">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={3} />
-                    {it}
-                  </li>
-                ))}
-                <li className="flex gap-2 rounded-lg bg-leaf-50 px-2 py-1.5 -mx-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} />
-                  <span>
-                    <b>Úvodní konzultace s expertem, 20 minut zdarma.</b>{" "}
-                    <a
-                      href={FREE_CONSULT_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => track("free_consult_click", { from: "cenik" })}
-                      className="font-semibold text-leaf-700 underline underline-offset-2 hover:no-underline"
-                    >
-                      Vybrat termín
-                    </a>
-                  </span>
-                </li>
-              </ul>
-              <button
-                type="button"
-                onClick={start}
-                className="mt-6 h-11 rounded-xl border border-border text-sm font-semibold hover:border-primary hover:text-primary"
-              >
-                Začít zdarma
-              </button>
-            </div>
-
+          <div className="mt-12 grid gap-4 md:grid-cols-2">
             <div className="flex flex-col rounded-2xl bg-primary p-6 text-white">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-white/80">Členství na {monthsLabel(shop.months)}</h2>
                 <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold">Celá cesta</span>
               </div>
               <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(shop.price)}</p>
-              <p className="text-sm text-white/70">jednorázově, vychází na {perMonth(shop)} měsíčně</p>
+              <p className="text-sm text-white/70">
+                na {monthsLabel(shop.months)}, vychází na {perMonth(shop)} měsíčně
+              </p>
               {shop.anchor && <p className="mt-3 text-sm text-white/80">{nbsp(shop.anchor)}</p>}
               <ul className="mt-6 flex-1 space-y-2.5 text-sm">
                 {MEMBER_ITEMS.map((it) => (
@@ -289,10 +246,7 @@ const PricingPage = () => {
               )}
             </div>
 
-            <div
-              id="studium"
-              className="flex scroll-mt-24 flex-col rounded-2xl border-2 border-leaf-500 bg-card p-6 md:col-span-2 lg:col-span-1"
-            >
+            <div id="studium" className="flex scroll-mt-24 flex-col rounded-2xl border-2 border-leaf-500 bg-card p-6">
               <div className="flex items-center justify-between gap-2">
                 <h2 className="font-semibold text-muted-foreground">Studium s lektory</h2>
                 <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">
@@ -329,6 +283,30 @@ const PricingPage = () => {
               </p>
             </div>
           </div>
+          <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm">
+              <b>Než se rozhodnete:</b> vstupní diagnostika (4 minuty) a úvodní konzultace s expertem (20 minut) jsou
+              zdarma.
+            </p>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={start}
+                className="h-10 rounded-[10px] border border-border px-4 text-sm font-semibold hover:border-primary hover:text-primary"
+              >
+                Udělat diagnostiku
+              </button>
+              <a
+                href={FREE_CONSULT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track("free_consult_click", { from: "cenik" })}
+                className="inline-flex h-10 items-center rounded-[10px] border border-border px-4 text-sm font-semibold hover:border-primary hover:text-primary"
+              >
+                Vybrat termín konzultace
+              </a>
+            </div>
+          </div>
           <p className="mt-4 text-sm text-muted-foreground">
             Zkouška profesní kvalifikace {NSK_QUALIFICATION.code} (nepovinná): <s>{kc(EXAM_PRICES.regular)}</s>{" "}
             <b className="text-foreground">{kc(EXAM_PRICES.member)} pro členy</b> · s jednodenní přípravou{" "}
@@ -337,11 +315,13 @@ const PricingPage = () => {
           </p>
         </section>
 
+        <SavingsCalculator onStart={() => navigate(buy ? "/clenstvi" : "/cenik")} />
+
         <section id="funkce" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-muted/50 py-16 md:py-20">
             <div className="mx-auto max-w-4xl px-4 sm:px-8 lg:px-12">
               <h2 className="text-3xl font-extrabold tracking-tight">Všechno, co VISIBLE7 umí</h2>
-              <p className="mt-3 text-lg text-muted-foreground">Kompletní přehled funkcí a co z toho máte zdarma.</p>
+              <p className="mt-3 text-lg text-muted-foreground">Kompletní přehled toho, co dostanete v členství.</p>
               <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
                 <table className="w-full min-w-[520px] text-left">
                   <thead>
@@ -350,7 +330,7 @@ const PricingPage = () => {
                         <span className="sr-only">Funkce</span>
                       </th>
                       <th scope="col" className="w-28 p-4 text-center font-semibold text-muted-foreground">
-                        Zdarma
+                        Bez členství
                       </th>
                       <th scope="col" className="w-28 bg-primary p-4 text-center font-bold text-white">
                         Členství
@@ -409,10 +389,10 @@ const PricingPage = () => {
           </div>
           <button
             type="button"
-            onClick={start}
+            onClick={() => navigate(buy ? "/clenstvi" : "/cenik")}
             className="v7-trap-btn v7-phi-lg mt-10 inline-flex h-14 items-center gap-2 pl-7 pr-12 font-bold text-signal-foreground"
           >
-            Začít zdarma <ArrowRight className="h-5 w-5" />
+            Získat členství <ArrowRight className="h-5 w-5" />
           </button>
           <p className="mt-4 text-sm text-muted-foreground">
             Podrobnosti najdete v{" "}

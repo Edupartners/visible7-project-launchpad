@@ -38,7 +38,7 @@ export const FEARS = [
     fear: "Podnikání je drahé.",
     faq: "Není rozjezd podnikání moc drahý?",
     answer:
-      "Online podnikání se dá rozjet s malým rozpočtem. Byznys case ukáže každou položku nákladů a AI vám připomene, na co jste zapomněli. Začátek s VISIBLE7 je zdarma.",
+      "Online podnikání se dá rozjet s malým rozpočtem. Byznys case ukáže každou položku nákladů a AI vám připomene, na co jste zapomněli. Vstupní diagnostika je zdarma.",
   },
   {
     icon: RotateCcw,

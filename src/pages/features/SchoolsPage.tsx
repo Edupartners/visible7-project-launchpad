@@ -163,7 +163,7 @@ const SchoolsPage = () => {
     ),
     lead: "Místo teorie z učebnice si každý žák projde vlastní nápad: od testu nápadu přes byznys model a finanční plán až po web a marketing. Vy dostanete hotovou osnovu, videa a pracovní listy do výuky.",
     cta: "Vyzkoušet zdarma",
-    note: "Vstupní diagnostika a brány 1–2 si můžete vyzkoušet zdarma. Licenci pro třídu poptáte níže.",
+    note: "Vstupní diagnostiku si můžete vyzkoušet zdarma. Licenci pro třídu poptáte níže.",
     heroImage: `${IMG}vstupni-diagnostika.webp`,
     heroAlt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
     heroStats: [

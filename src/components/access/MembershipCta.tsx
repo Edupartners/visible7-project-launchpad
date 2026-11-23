@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Crown, Gift, Lock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/AuthGate";
-import { daysLeft, useAccess } from "@/lib/access";
+import { TRIAL_OFFER, daysLeft, useAccess } from "@/lib/access";
 import { canBuy, kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
@@ -60,10 +60,10 @@ export function MembershipCard({
     state === "trial"
       ? "Máte otevřené všechny brány a videa. Aby vám po skončení nic nezamklo, zajistěte si členství."
       : state === "after"
-        ? "Zkušební přístup skončil, vaše data zůstávají. Členstvím odemknete brány 3–7, videa, Excel, pitch a osvědčení."
+        ? "Zkušební přístup skončil, vaše data zůstávají. Členstvím odemknete brány, e-learning, Excel, pitch a osvědčení."
         : state === "pilot"
-          ? "Teď v pilotním provozu máte vše odemčené. Členstvím si zajistíte brány 3–7, videa, Excel, pitch a osvědčení i po jeho skončení."
-          : "Brány 3–7, přes 100 videonávodů, byznys case v Excelu, pitch na A4 a osvědčení za každou bránu.";
+          ? "Teď v pilotním provozu máte vše odemčené. Členstvím si zajistíte brány, e-learning, Excel, pitch a osvědčení i po jeho skončení."
+          : "Všech 7 bran, e-learning, byznys case v Excelu, 4 vybrané semináře a osvědčení za každou bránu.";
 
   return (
     <section
@@ -96,7 +96,7 @@ export function MembershipCard({
       </div>
       <div className="flex shrink-0 flex-col gap-2 sm:items-end">
         <BuyButton source={`dashboard_${state}`} />
-        {state === "free" && (
+        {state === "free" && TRIAL_OFFER && (
           <Link to="/kviz" className="text-center text-sm font-semibold text-primary hover:underline">
             Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma
           </Link>
@@ -144,10 +144,10 @@ export function CelebrationMembership({ gate }: { gate: number }) {
   if (gate !== 2 || access.loading || access.paid) return null;
   return (
     <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-left">
-      <p className="font-semibold">Bezplatnou část máte za sebou. Co dál?</p>
+      <p className="font-semibold">Brány 1 a 2 máte za sebou. Co dál?</p>
       <p className="mt-1 text-sm text-muted-foreground">
         Další na řadě je byznys case: kolik potřebujete peněz a kdy vás projekt uživí. Členství na{" "}
-        {monthsLabel(shop.months)} za {kc(shop.price)} odemkne brány 3–7 i všechna videa.
+        {monthsLabel(shop.months)} za {kc(shop.price)} vám odemkne všech 7 bran i e-learning na celý rok.
       </p>
       <BuyButton source="celebration_gate2" className="mt-3 w-full" />
     </div>

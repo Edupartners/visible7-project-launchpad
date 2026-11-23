@@ -11,7 +11,7 @@ const sheet = (slug: string) => `/pracovni-listy?list=${slug}`;
 /** Rozcestník na konci veřejných stránek: vše důležité ještě jednou na první klik. */
 const COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
-    title: "Začněte zdarma",
+    title: "Vyzkoušejte zdarma",
     links: [
       { label: "Vstupní diagnostika", to: "/home?novy", strong: true },
       { label: "Kvíz: Jaký jste typ podnikatele", to: "/kviz" },

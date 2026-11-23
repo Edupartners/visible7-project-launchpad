@@ -4,16 +4,10 @@ import { Check, PartyPopper, ShieldCheck } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/integrations/visible7/client";
-import { kc, monthsLabel, nbsp, perMonth, useShop } from "@/lib/shop";
+import { MEMBER_ITEMS, kc, monthsLabel, nbsp, perMonth, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
-const ITEMS = [
-  "Všech 7 bran metodiky VISIBLE7 MICEK®",
-  "Přes 100 videonávodů, kde je vidět každé kliknutí",
-  "AI Michal u každé brány",
-  "Byznys case v Excelu a pitch na A4",
-  "Osvědčení za každou bránu",
-];
+const ITEMS = MEMBER_ITEMS;
 
 /** Objednávkový formulář SimpleShopu v iframu.
  *  Jejich zavaděč (SimpleShopService.js) v React aplikaci padal („Načítám objednávkový formulář…“ beze změny),

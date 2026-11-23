@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { TRIAL_OFFER } from "@/lib/access";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Check, Gift, Loader2, Share2, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -225,7 +226,7 @@ const QuizPage = () => {
       currentProject.id,
     );
     let reward: Reward = null;
-    if (stage === "start") {
+    if (stage === "start" && TRIAL_OFFER) {
       const { data: r } = await supabase.rpc("start_trial");
       reward = (r as Reward) ?? null;
     }

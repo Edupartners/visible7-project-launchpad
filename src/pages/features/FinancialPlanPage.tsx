@@ -24,8 +24,8 @@ const FinancialPlanPage = () => {
       </>
     ),
     lead: "Finanční plán na 24 měsíců hotový za odpoledne. AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy je jen potvrdíte nebo přepíšete.",
-    cta: "Začít plán zdarma",
-    note: `Vstupní diagnostika a brány 1–2 zdarma. Finanční plán je brána 3, součást členství za ${price}.`,
+    cta: "Diagnostika zdarma",
+    note: `Vstupní diagnostika zdarma. Finanční plán je brána 3, součást členství za ${price}.`,
     heroImage: `${IMG}graf.webp`,
     heroAlt: "Graf peněz v projektu: kolik kapitálu potřebujete a kdy se vám peníze vrátí",
     heroStats: [
@@ -155,7 +155,7 @@ const FinancialPlanPage = () => {
       ],
       [
         "Kolik to stojí?",
-        `Vstupní diagnostika a brány 1 a 2 jsou zdarma, bez platební karty. Finanční plán je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Vstupní diagnostika je zdarma, bez platební karty. Finanční plán je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
     ],
   };

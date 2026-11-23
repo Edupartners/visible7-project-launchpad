@@ -103,8 +103,22 @@ const ProtectedRoutes = () => (
           </GateLock>
         }
       />
-      <Route path="/vision" element={<VisionPage />} />
-      <Route path="/ideation" element={<IdeationPage />} />
+      <Route
+        path="/vision"
+        element={
+          <GateLock gate={1}>
+            <VisionPage />
+          </GateLock>
+        }
+      />
+      <Route
+        path="/ideation"
+        element={
+          <GateLock gate={2}>
+            <IdeationPage />
+          </GateLock>
+        }
+      />
       <Route
         path="/strategy"
         element={

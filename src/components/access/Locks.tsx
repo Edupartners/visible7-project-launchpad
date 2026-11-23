@@ -3,7 +3,7 @@ import { Award, Check, FileSpreadsheet, FileText, Gift, Globe2, Loader2, Lock } 
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { GATE_NAMES } from "@/lib/certificates";
-import { FREE_GATES, useAccess } from "@/lib/access";
+import { FREE_GATES, TRIAL_OFFER, useAccess } from "@/lib/access";
 import { PromoRedeem } from "./PromoRedeem";
 import { useState } from "react";
 
@@ -12,7 +12,7 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
   const navigate = useNavigate();
   return (
     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-      {!trialUsed && (
+      {TRIAL_OFFER && !trialUsed && (
         <Button
           onClick={() => navigate("/kviz")}
           className="v7-trap-btn v7-phi-sm h-12 pl-6 pr-12 text-base font-bold text-signal-foreground"
@@ -23,7 +23,7 @@ const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
       <Link
         to="/cenik"
         className={`inline-flex h-12 items-center justify-center rounded-[10px] px-6 text-base font-semibold ${
-          trialUsed
+          trialUsed || !TRIAL_OFFER
             ? "v7-trap-btn v7-phi-sm pr-9 font-bold text-signal-foreground"
             : "border-2 border-white/40 text-white hover:bg-white/10"
         }`}
@@ -74,15 +74,14 @@ export const GateLock = ({ gate, children }: { gate: number; children: React.Rea
           <p className="mt-6 font-semibold text-orange-300">Brána {gate} ze 7</p>
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{GATE_NAMES[gate]} je v plném přístupu</h1>
           <p className="mt-3 text-lg text-white/80">
-            {access.trialUsed
-              ? "Zkušební přístup už jste využili. Vaše data jsou uložená a čekají na vás – stačí odemknout plný přístup."
-              : "Brány 1 a 2 jsou zdarma. Další brány odemknete na 3 dny zdarma, když vyplníte krátký kvíz o tom, jaký jste typ podnikatele."}
+            Brány, e-learning a AI pomocníka odemkne členství VISIBLE7. Vaše vstupní diagnostika je uložená a čeká na
+            vás.
           </p>
           <ul className="mt-6 space-y-2 text-white/90">
             {[
-              "Všechny brány a videonávody",
+              "Všech 7 bran a e-learning",
               "Byznys case, plán tvorby, marketing, spuštění a růst",
-              "AI Michal u každé brány",
+              "4 vybrané živé semináře v ceně",
             ].map((t) => (
               <li key={t} className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-emerald-400" strokeWidth={3} /> {t}

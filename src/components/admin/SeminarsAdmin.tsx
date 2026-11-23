@@ -6,6 +6,9 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { GATE_NAMES } from "@/lib/certificates";
 import {
+  INCLUDED_MAX,
+  loadIncluded,
+  saveIncluded,
   AdminSeminar,
   SeminarAccess,
   SeminarInput,
@@ -86,6 +89,21 @@ export function SeminarsAdmin() {
   const [editing, setEditing] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [included, setIncluded] = useState<string[]>([]);
+  useEffect(() => {
+    loadIncluded().then(setIncluded);
+  }, []);
+  const toggleIncluded = async (id: string) => {
+    const next = included.includes(id) ? included.filter((x) => x !== id) : [...included, id];
+    if (next.length > INCLUDED_MAX) return setMsg(`V ceně členství může být nejvýš ${INCLUDED_MAX} seminářů.`);
+    try {
+      await saveIncluded(next);
+      setIncluded(next);
+      setMsg(null);
+    } catch {
+      setMsg("Uložení se nepodařilo.");
+    }
+  };
 
   const load = useCallback(() => {
     loadAdminSeminars()
@@ -143,7 +161,8 @@ export function SeminarsAdmin() {
       </h2>
       <p className="text-sm text-muted-foreground">
         Bez data se seminář ukáže jako „Termín brzy vypíšeme“. Odkaz na připojení uvidí jen přihlášení členové (u
-        semináře zdarma všichni přihlášení). Po semináři vložte odkaz na záznam.
+        semináře zdarma všichni přihlášení). Po semináři vložte odkaz na záznam. Přepínačem „V ceně členství“ vyberete 4
+        semináře, které jsou v ceně ročního členství.
       </p>
 
       <form onSubmit={submit} className="mt-4 grid gap-3 rounded-2xl bg-muted/50 p-4 sm:grid-cols-2">
@@ -278,6 +297,9 @@ export function SeminarsAdmin() {
                 {s.recording_url ? " · záznam ✓" : ""}
               </p>
             </div>
+            <label className="inline-flex items-center gap-2 text-sm">
+              <Switch checked={included.includes(s.id)} onCheckedChange={() => toggleIncluded(s.id)} />V ceně členství
+            </label>
             <span className="inline-flex items-center gap-1 text-sm text-muted-foreground" title="Přihlášení">
               <Users className="h-4 w-4" /> {s.registrations}
             </span>

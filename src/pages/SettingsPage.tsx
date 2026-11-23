@@ -27,7 +27,7 @@ import { DeleteAccount } from "@/components/settings/DeleteAccount";
 import { BusinessProfileForm } from "@/components/deadlines/BusinessProfileForm";
 
 const PLAN_LABELS: Record<string, string> = {
-  free: "Zdarma (fáze 1 a 2)",
+  free: "Bez členství",
   trial: "Zkušební přístup – 3 dny",
   mesic: "Placený přístup – 1 měsíc",
   ctvrtleti: "Placený přístup – 3 měsíce",

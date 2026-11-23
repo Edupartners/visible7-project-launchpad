@@ -6,9 +6,9 @@ const IMG = "/funkce/";
 const BusinessPlanPage = () => {
   const d: FeaturePageData = {
     slug: "podnikatelsky-plan",
-    metaTitle: "Podnikatelský plán a Lean Canvas s AI zdarma | VISIBLE7 MICEK",
+    metaTitle: "Podnikatelský plán a Lean Canvas s AI | VISIBLE7 MICEK",
     metaDescription:
-      "Podnikatelský plán krok za krokem: strategie modrého oceánu, ERRC matice, hodnotová křivka, USP a Lean Canvas. AI navrhne obsah, vy ho upravíte. Brány 1 a 2 zdarma.",
+      "Podnikatelský plán krok za krokem: strategie modrého oceánu, ERRC matice, hodnotová křivka, USP a Lean Canvas. AI navrhne obsah, vy ho upravíte.",
     eyebrow: "Podnikatelský plán",
     title: (
       <>
@@ -20,13 +20,13 @@ const BusinessPlanPage = () => {
       </>
     ),
     lead: "Strategie modrého oceánu a Lean Canvas krok za krokem, na vašem vlastním nápadu. AI navrhne obsah z toho, co už víte, vy ho jen upravíte.",
-    cta: "Začít plán zdarma",
-    note: "Brány 1 a 2 jsou zdarma, bez platební karty. Pro registraci stačí e-mail.",
+    cta: "Diagnostika zdarma",
+    note: "Brány 1 a 2 jsou součástí ročního členství. Vstupní diagnostika je zdarma.",
     heroImage: `${IMG}plan-krivka.webp`,
     heroAlt: "Hodnotová křivka: váš projekt proti levné a prémiové konkurenci",
     heroStats: [
       ["Lean Canvas", "8 z 8 polí"],
-      ["Brány 1 a 2", "zdarma"],
+      ["Brány 1 a 2", "v členství"],
     ],
     problemTitle: "Podnikatelský plán, který nikdo nečte, vám nepomůže.",
     problems: [
@@ -96,7 +96,10 @@ const BusinessPlanPage = () => {
     ],
     finalTitle: "Začněte plánem na jedné stránce, ne na třiceti.",
     faq: [
-      ["Je to opravdu zdarma?", "Ano. Brány 1 a 2 jsou zdarma, bez platební karty. Stačí registrace e-mailem."],
+      [
+        "Kolik to stojí?",
+        "Brány 1 a 2 jsou součástí ročního členství spolu se všemi ostatními branami a e-learningem. Vstupní diagnostika je zdarma.",
+      ],
       [
         "Co je strategie modrého oceánu?",
         "Metoda W. Chan Kima a Renée Mauborgne. Místo boje s konkurencí cenou hledáte místo, kde dáte zákazníkovi víc hodnoty jinak než ostatní.",

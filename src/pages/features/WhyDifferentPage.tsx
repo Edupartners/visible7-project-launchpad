@@ -206,8 +206,8 @@ const WhyDifferentPage = () => {
       </>
     ),
     lead: "Plán, čísla, AI asistence, tvorba webu nebo e-shopu, marketing, e-learning, poradci i osvědčení. Ne deset nástrojů a tři kurzy, ale jedna aplikace, která vás provede od nápadu po spuštěný projekt.",
-    cta: "Začít zdarma",
-    note: "Vstupní diagnostika a brány 1–2 zdarma, bez platební karty. Pro registraci stačí e-mail.",
+    cta: "Diagnostika zdarma",
+    note: "Vstupní diagnostika zdarma, bez platební karty. Pro registraci stačí e-mail.",
     heroImage: `${IMG}jini-implementace.webp`,
     heroAlt: "Plán tvorby e-shopu v aplikaci: doména, založení e-shopu, produkty, platby, právní minimum",
     heroStats: [
@@ -295,7 +295,7 @@ const WhyDifferentPage = () => {
         text: "Jednou měsíčně online s lektory Edu Partners, s prostorem na vaše otázky.",
       },
     ],
-    finalTitle: "Jedna aplikace místo deseti. Začněte zdarma.",
+    finalTitle: "Jedna aplikace místo deseti.",
     faq: [
       [
         "Pro koho je VISIBLE7?",
@@ -315,7 +315,7 @@ const WhyDifferentPage = () => {
       ],
       [
         "Kolik to stojí?",
-        `Vstupní diagnostika a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Vstupní diagnostika je zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
       [
         "Jak AI pracuje s mými daty?",

@@ -75,7 +75,13 @@ const phases = [
     time: "35 min",
     route: "/benchmarking-phase",
   },
-  { id: 6, description: "Spustíte projekt a víte, co na něm sledovat.", icon: Rocket, time: "40 min", route: "/launch" },
+  {
+    id: 6,
+    description: "Spustíte projekt a víte, co na něm sledovat.",
+    icon: Rocket,
+    time: "40 min",
+    route: "/launch",
+  },
   { id: 7, description: "Jak růst, když už projekt běží.", icon: Layers, time: "50 min", route: "/expansion" },
 ];
 
@@ -207,6 +213,9 @@ export const Dashboard = (_props: DashboardProps) => {
 
         {/* Na začátku cesty: vstupní diagnostika je první krok */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 && <EntryDiagnosisCard />}
+
+        {/* Po diagnostice nabídka členství (neplatícím) */}
+        {!diagnosisLoading && Boolean(diagnosis) && <MembershipCard placement="below" hasProgress />}
 
         {/* Co dělat teď – jedna jasná akce */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 ? null : next && NextIcon ? (

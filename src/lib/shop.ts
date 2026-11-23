@@ -24,13 +24,22 @@ export interface ShopSettings {
 }
 
 export const SHOP_DEFAULT: ShopSettings = {
-  price: 2990,
-  months: 6,
-  days: 183,
+  price: 6990,
+  months: 12,
+  days: 365,
   checkout_url: "",
   anchor: "Kurzy Specialista internetového obchodu s lektorem stojí jednotlivě přes 60 000 Kč.",
   form_id: "",
 };
+
+/** Co obsahuje roční členství (od 11/2026). */
+export const MEMBER_ITEMS = [
+  "Všech 7 bran metodiky VISIBLE7 MICEK® pro jeden vlastní projekt",
+  "E-learning s lekcemi od lektorů z praxe",
+  "4 vybrané živé semináře s praktiky",
+  "AI pomocník, byznys case v Excelu a pitch na A4",
+  "Osvědčení za každou bránu, zkouška profesní kvalifikace za zvýhodněnou cenu",
+];
 
 export const kc = (n: number) => `${Math.round(n).toLocaleString("cs-CZ")} Kč`;
 export const perMonth = (s: ShopSettings) => kc(s.price / Math.max(1, s.months));

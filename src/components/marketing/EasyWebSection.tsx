@@ -80,7 +80,7 @@ export const EasyWebSection = ({ onStart }: { onStart: () => void }) => {
               }}
               className="v7-trap-btn v7-phi-lg mt-8 inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-leaf-300"
             >
-              Začít zdarma
+              Diagnostika zdarma
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>

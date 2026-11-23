@@ -25,12 +25,12 @@ const StartBusinessPage = () => {
     ),
     lead: "Od nápadu po prvního platícího zákazníka v sedmi branách. Víte, co udělat dnes, kolik to bude stát a kdy vás podnikání může uživit. S videi, AI pomocníkem a poradci z praxe.",
     cta: "Zjistit, co mi chybí ke startu",
-    note: "Vstupní diagnostika a brány 1–2 zdarma, bez platební karty. Pro registraci stačí e-mail.",
+    note: "Vstupní diagnostika zdarma, bez platební karty. Pro registraci stačí e-mail.",
     heroImage: `${IMG}vstupni-diagnostika.webp`,
     heroAlt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
     heroStats: [
       ["Cesta", "7 bran"],
-      ["Start", "zdarma"],
+      ["Diagnostika", "zdarma"],
     ],
     problemTitle: "Proč většina lidí s podnikáním nikdy nezačne?",
     problems: [
@@ -58,7 +58,7 @@ const StartBusinessPage = () => {
         alt: "Mapa ke startu: co už umíte a co se doučíte, s odkazem na konkrétní bránu",
       },
       {
-        eyebrow: "Brány 1 a 2 · zdarma",
+        eyebrow: "Brány 1 a 2",
         title: "Najděte místo na trhu a sestavte byznys model",
         text: "Strategií modrého oceánu najdete, čím budete jiní než konkurence. Lean Canvas pak shrne celý byznys na jednu stránku. AI navrhne obsah, vy ho upravíte.",
         image: `${IMG}plan-canvas.webp`,
@@ -107,7 +107,7 @@ const StartBusinessPage = () => {
         text: "Jednou měsíčně online s lektory Edu Partners, s prostorem na vaše otázky.",
       },
     ],
-    finalTitle: "Začněte malým krokem. Prvních pět minut je zdarma.",
+    finalTitle: "Začněte malým krokem: vstupní diagnostika je zdarma.",
     faq: [
       [
         "Potřebuji mít hotový nápad?",
@@ -127,7 +127,7 @@ const StartBusinessPage = () => {
       ],
       [
         "Kolik to stojí?",
-        `Vstupní diagnostika a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Vstupní diagnostika je zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
       [
         "Jak AI pracuje s mými daty?",

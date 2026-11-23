@@ -140,7 +140,7 @@ export const NAV_MENUS: NavMenu[] = [
             to: "/marketingove-kanaly",
           },
         ],
-        more: { label: "Všechny funkce a co je zdarma", to: "/cenik#funkce" },
+        more: { label: "Všechny funkce v členství", to: "/cenik#funkce" },
       },
       {
         heading: "Napojení a nástroje",
@@ -165,7 +165,7 @@ export const NAV_MENUS: NavMenu[] = [
       image: "/landing/ukazka-byznys-case.webp",
       title: "Prohlédněte si VISIBLE7",
       text: "Finanční plán na 24 měsíců hotový za odpoledne. AI navrhne čísla, vy je jen potvrdíte.",
-      cta: "Začít plán zdarma",
+      cta: "Diagnostika zdarma",
       start: true,
     },
   },

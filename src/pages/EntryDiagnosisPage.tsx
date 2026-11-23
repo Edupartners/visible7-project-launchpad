@@ -9,6 +9,8 @@ import { useProject } from "@/contexts/ProjectContext";
 import { useIsStudent } from "@/lib/studySchedule";
 import { celebrate } from "@/lib/celebrate";
 import { track } from "@/lib/track";
+import { useAccess } from "@/lib/access";
+import { canBuy, kc, monthsLabel, useShop } from "@/lib/shop";
 import {
   EMPTY_ENTRY,
   ENTRY_KEY,
@@ -110,6 +112,9 @@ const EntryResult = ({ d, onEdit, onTalent }: { d: EntryDiagnosis; onEdit: () =>
     .filter((g) => g.items.length);
   const [completed] = useSupabaseProgress<number[]>("completed_phases", []);
   const nextGate = [1, 2, 3, 4, 5, 6, 7].find((g) => !completed.includes(g)) ?? null;
+  const access = useAccess();
+  const shop = useShop();
+  const locked = !access.loading && !access.full;
   const level = LEVELS.find((l) => l.id === d.answers.level);
   const t = r.talent;
   const count = (n: number) => (n === 1 ? "1 věc" : `${n} ${n < 5 ? "věci" : "věcí"}`);
@@ -275,12 +280,32 @@ const EntryResult = ({ d, onEdit, onTalent }: { d: EntryDiagnosis; onEdit: () =>
         </ul>
       </section>
 
+      {locked && (
+        <section className="rounded-3xl border-[3px] border-signal bg-card p-5 sm:p-6">
+          <h2 className="text-lg font-bold">Další krok: členství VISIBLE7</h2>
+          <p className="mt-1 text-muted-foreground">
+            Všech 7 bran, e-learning a 4 vybrané semináře na {monthsLabel(shop.months)} za {kc(shop.price)}. Vaše
+            diagnostika zůstává uložená a brány na ni navážou.
+          </p>
+        </section>
+      )}
+
       <div className="flex flex-wrap items-center gap-3">
         <Button
-          onClick={() => navigate(nextGate ? gateRoute(nextGate) : "/home")}
+          onClick={() =>
+            locked
+              ? navigate(canBuy(shop) ? "/clenstvi" : "/cenik")
+              : navigate(nextGate ? gateRoute(nextGate) : "/home")
+          }
           className="v7-trap-btn h-12 pl-6 pr-11 text-base font-bold text-signal-foreground"
         >
-          {!nextGate ? "Na přehled" : nextGate === 1 ? "Začít bránou 1" : `Pokračovat bránou ${nextGate}`}{" "}
+          {locked
+            ? "Získat členství"
+            : !nextGate
+              ? "Na přehled"
+              : nextGate === 1
+                ? "Začít bránou 1"
+                : `Pokračovat bránou ${nextGate}`}{" "}
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
         {isStudent && (
@@ -355,8 +380,8 @@ const EntryDiagnosisPage = () => {
               Co už umíte a co vám chybí ke startu
             </h1>
             <p className="mt-3 text-lg text-muted-foreground">
-              Ke spuštění vlastního projektu obvykle stačí méně, než si myslíte. Zjistíme spolu, na co máte talent a co vám
-              ke startu opravdu chybí.
+              Ke spuštění vlastního projektu obvykle stačí méně, než si myslíte. Zjistíme spolu, na co máte talent a co
+              vám ke startu opravdu chybí.
             </p>
             <p className="mt-3 text-lg text-muted-foreground">
               Pak si vyberete cestu rychlého startu, nebo cestu kompletního studia e-commerce.

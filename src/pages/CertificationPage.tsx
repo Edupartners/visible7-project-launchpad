@@ -569,7 +569,7 @@ const CertificationPage = () => {
             </div>
           </div>
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            Chcete začít sami a zdarma?{" "}
+            Chcete začít sami?{" "}
             <button type="button" onClick={start} className="font-semibold text-primary underline underline-offset-4">
               Zjistit, co mi chybí ke startu
             </button>{" "}

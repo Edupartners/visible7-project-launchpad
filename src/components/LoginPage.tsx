@@ -163,7 +163,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
           </p>
           {!isLogin && (
             <ul className="mt-8 space-y-3">
-              {["Vstupní diagnostika a brány 1 a 2 zdarma", "Bez platební karty", "Data uložená v EU"].map((t) => (
+              {["Vstupní diagnostika zdarma", "Bez platební karty", "Data uložená v EU"].map((t) => (
                 <li key={t} className="flex items-center gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500">
                     <Check className="h-3.5 w-3.5" strokeWidth={3} />

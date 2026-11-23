@@ -118,7 +118,7 @@ const ExistingBusinessPage = () => {
       ],
       [
         "Kolik to stojí?",
-        `Rentgen podniku a brány 1 a 2 jsou zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
+        `Rentgen podniku je zdarma, bez platební karty. Celá cesta je součástí členství za ${price}, platíte jednorázově, nic se samo neobnovuje.`,
       ],
       [
         "Jak AI pracuje s mými daty?",

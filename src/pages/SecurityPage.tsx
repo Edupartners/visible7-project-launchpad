@@ -205,7 +205,7 @@ const SecurityPage = () => {
               onClick={start}
               className="v7-trap-btn v7-phi-lg mt-8 inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
             >
-              Začít zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              Diagnostika zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </button>
             <p className="mt-3 text-sm text-muted-foreground">
               Pro registraci stačí e-mail. Platební kartu nezadáváte.

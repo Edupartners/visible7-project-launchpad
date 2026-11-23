@@ -236,7 +236,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
                 onClick={start}
                 className="v7-trap-btn v7-phi-sm hidden whitespace-nowrap py-2.5 pl-5 pr-9 font-bold text-signal-foreground sm:inline-flex"
               >
-                Začít zdarma
+                Diagnostika zdarma
               </button>
             </>
           )}
@@ -295,7 +295,7 @@ export const PublicHeader = ({ onStart }: { onStart: () => void }) => {
             onClick={start}
             className="v7-trap-btn v7-phi-sm mt-6 w-full py-3.5 pl-5 pr-9 font-bold text-signal-foreground"
           >
-            Začít plán zdarma
+            Diagnostika zdarma
           </button>
         </div>
       )}

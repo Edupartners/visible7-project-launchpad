@@ -5,7 +5,14 @@ import { ArrowRight, Lock, PlayCircle, Search } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/integrations/visible7/client";
-import { GLOSSARY, GLOSSARY_CATEGORIES, glossarySlug, termMatches, type GlossaryCategory, type GlossaryTerm } from "@/lib/glossary";
+import {
+  GLOSSARY,
+  GLOSSARY_CATEGORIES,
+  glossarySlug,
+  termMatches,
+  type GlossaryCategory,
+  type GlossaryTerm,
+} from "@/lib/glossary";
 import { fold, lessonHref, routeOf } from "@/lib/lessonSearch";
 import { track } from "@/lib/track";
 
@@ -130,7 +137,11 @@ const GlossaryPage = () => {
     supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
   }, []);
 
-  const { data: lessons = [] } = useQuery({ queryKey: ["glossary-lessons"], queryFn: loadLessons, staleTime: 10 * 60_000 });
+  const { data: lessons = [] } = useQuery({
+    queryKey: ["glossary-lessons"],
+    queryFn: loadLessons,
+    staleTime: 10 * 60_000,
+  });
 
   /* Hesla → lekce */
   const byTerm = useMemo(() => {
@@ -144,7 +155,13 @@ const GlossaryPage = () => {
         const route = routeOf(l.block_key, null);
         if (!route) continue;
         seen.add(fold(l.title));
-        list.push({ id: l.id, title: l.title, place: route.place, minutes: l.minutes, href: lessonHref(route.path, l.block_key.split(":")[1], l.id) });
+        list.push({
+          id: l.id,
+          title: l.title,
+          place: route.place,
+          minutes: l.minutes,
+          href: lessonHref(route.path, l.block_key.split(":")[1], l.id),
+        });
       }
       map.set(t.term, list);
     }
@@ -230,13 +247,16 @@ const GlossaryPage = () => {
               Pojmy z webu, marketingu a AI. Česky a k věci.
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              {GLOSSARY.length} hesel, která potkáte při rozjezdu podnikání: od domény a GA4 po PNO, E‑E‑A‑T a AI Act. Ke
-              každému heslu najdete videolekce, kde se téma probírá do hloubky
+              {GLOSSARY.length} hesel, která potkáte při rozjezdu podnikání: od domény a GA4 po PNO, E‑E‑A‑T a AI Act.
+              Ke každému heslu najdete videolekce, kde se téma probírá do hloubky
               {lessonTotal > 0 ? ` (celkem ${lessonTotal.toLocaleString("cs-CZ")} lekcí)` : ""}.
             </p>
             <label className="relative mt-7 block max-w-xl">
               <span className="sr-only">Hledat pojem</span>
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <Search
+                className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
               <input
                 type="search"
                 value={q}
@@ -253,7 +273,9 @@ const GlossaryPage = () => {
                   aria-pressed={cat === c}
                   onClick={() => setCat(c)}
                   className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
-                    cat === c ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"
+                    cat === c
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background hover:border-primary"
                   }`}
                 >
                   {c ? GLOSSARY_CATEGORIES[c] : "Vše"}
@@ -294,10 +316,21 @@ const GlossaryPage = () => {
             </p>
           )}
           {groups.map(([letter, terms]) => (
-            <section key={letter} id={`pismeno-${letter}`} className="scroll-mt-16 pt-8" aria-label={`Písmeno ${letter}`}>
+            <section
+              key={letter}
+              id={`pismeno-${letter}`}
+              className="scroll-mt-16 pt-8"
+              aria-label={`Písmeno ${letter}`}
+            >
               <h2 className="text-3xl font-extrabold text-primary">{letter}</h2>
               {terms.map((t) => (
-                <TermCard key={t.term} term={t} lessons={byTerm.get(t.term) ?? []} signedIn={signedIn} onLocked={start} />
+                <TermCard
+                  key={t.term}
+                  term={t}
+                  lessons={byTerm.get(t.term) ?? []}
+                  signedIn={signedIn}
+                  onLocked={start}
+                />
               ))}
             </section>
           ))}
@@ -309,8 +342,8 @@ const GlossaryPage = () => {
               <div>
                 <h2 className="text-2xl font-extrabold tracking-tight">Pojem je jen začátek.</h2>
                 <p className="mt-2 max-w-2xl text-muted-foreground">
-                  Lekce se zámkem si pustíte po registraci. Každá sedí ke kroku v aplikaci, takže to, co se naučíte, hned
-                  uděláte na svém plánu, webu nebo kampani.
+                  Lekce se zámkem si pustíte po registraci. Každá sedí ke kroku v aplikaci, takže to, co se naučíte,
+                  hned uděláte na svém plánu, webu nebo kampani.
                 </p>
               </div>
               <button
@@ -318,7 +351,7 @@ const GlossaryPage = () => {
                 onClick={() => start("footer")}
                 className="v7-trap-btn v7-phi-lg inline-flex h-14 shrink-0 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
               >
-                Začít zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                Diagnostika zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
           </section>

@@ -4,7 +4,7 @@ import { useAuth } from "@/components/AuthGate";
 
 /**
  * Úroveň přístupu přihlášeného uživatele.
- *  - zdarma: brány 1–2, rentgen, kvíz
+ *  - zdarma: jen vstupní diagnostika, rentgen podniku a kvíz (od 11/2026 žádné brány zdarma)
  *  - trial: 3 dny (nastavení trial_days) všechny brány a videa (bez prémiových výstupů)
  *  - placený: vše včetně Excelu, osvědčení 3–7, pitche a plného limitu AI
  * Dokud je v databázi vypnutý přepínač paywall_enabled, je odemčeno všechno (pilot bez plateb).
@@ -84,8 +84,11 @@ export function useAccess(): Access {
   return { ...state, refresh };
 }
 
-/** Brány 1 a 2 jsou zdarma. */
-export const FREE_GATES = [1, 2];
+/** Brány zdarma: od 11/2026 žádné, zdarma je jen vstupní diagnostika. */
+export const FREE_GATES: number[] = [];
+
+/** Kvíz za 3 dny plného přístupu zdarma: od 11/2026 vypnuto (žádný vstup zdarma). */
+export const TRIAL_OFFER = false;
 
 export const daysLeft = (until: string | null) =>
   until ? Math.max(0, Math.ceil((new Date(until).getTime() - Date.now()) / 86_400_000)) : null;

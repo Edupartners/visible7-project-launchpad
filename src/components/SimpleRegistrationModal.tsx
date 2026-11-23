@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,11 +11,7 @@ interface SimpleRegistrationModalProps {
   onRegister: (email: string, name: string) => void;
 }
 
-export const SimpleRegistrationModal = ({ 
-  isOpen, 
-  onClose, 
-  onRegister 
-}: SimpleRegistrationModalProps) => {
+export const SimpleRegistrationModal = ({ isOpen, onClose, onRegister }: SimpleRegistrationModalProps) => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,9 +19,9 @@ export const SimpleRegistrationModal = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !name) return;
-    
+
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Small delay for UX
     onRegister(email, name);
     setIsSubmitting(false);
   };
@@ -41,10 +36,10 @@ export const SimpleRegistrationModal = ({
                 <span className="text-xl font-bold text-primary-foreground">V7</span>
               </div>
             </div>
-            Začněte s VISIBLE7 zdarma
+            Začněte vstupní diagnostikou zdarma
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -57,7 +52,7 @@ export const SimpleRegistrationModal = ({
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="name">Jméno</Label>
             <Input
@@ -74,27 +69,17 @@ export const SimpleRegistrationModal = ({
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               <div>
-                <p className="text-sm font-medium text-green-800">
-                  Vstupní diagnostika a brány 1–2 zdarma
-                </p>
-                <p className="text-xs text-green-600">
-                  Bez platební karty
-                </p>
+                <p className="text-sm font-medium text-green-800">Vstupní diagnostika zdarma</p>
+                <p className="text-xs text-green-600">Bez platební karty</p>
               </div>
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={isSubmitting || !email || !name}
-          >
-            {isSubmitting ? "Registruji..." : "Začít zdarma"}
+          <Button type="submit" className="w-full" disabled={isSubmitting || !email || !name}>
+            {isSubmitting ? "Registruji..." : "Diagnostika zdarma"}
           </Button>
-          
-          <p className="text-xs text-muted-foreground text-center">
-            Registrací souhlasíte s našimi podmínkami použití
-          </p>
+
+          <p className="text-xs text-muted-foreground text-center">Registrací souhlasíte s našimi podmínkami použití</p>
         </form>
       </DialogContent>
     </Dialog>

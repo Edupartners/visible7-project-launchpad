@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
 import { ADVISORS, CONSULTATION } from "@/lib/advisors";
-import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useFounderOffer, useShop } from "@/lib/shop";
+import { FREE_CONSULT_URL, kc, monthsLabel, perMonth, useShop } from "@/lib/shop";
 import { SPECIALIST_TITLE } from "@/lib/certificates";
 import { track } from "@/lib/track";
 import { useLessonStats } from "@/lib/courses";
@@ -11,7 +11,6 @@ import { StudySection } from "@/components/marketing/StudySection";
 import { FearsSection } from "@/components/marketing/FearsSection";
 import { FEARS } from "@/lib/fears";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
-import { SavingsCalculator } from "@/components/marketing/SavingsCalculator";
 import { TrustBand } from "@/components/marketing/TrustBand";
 import { FeaturedCourses } from "@/components/marketing/FeaturedCourses";
 import { EasyWebSection } from "@/components/marketing/EasyWebSection";
@@ -102,7 +101,7 @@ const STEPS = [
     meta: "zdarma",
     text: "Za 4 minuty uvidíte, na co máte talent a co se ke startu doučíte.",
   },
-  { title: "Čísla, která sedí", meta: "zdarma", text: "Tržby, náklady, daně a bod zvratu spočítané za vás." },
+  { title: "Čísla, která sedí", meta: "v členství", text: "Tržby, náklady, daně a bod zvratu spočítané za vás." },
   { title: "Hotový plán", meta: "PRICE", text: "Sedm fází od vize po škálování, s videi, AI a poradci." },
 ];
 
@@ -132,7 +131,7 @@ const SHOWCASE = [
 const FAQ = [
   [
     "Je vstupní diagnostika opravdu zdarma?",
-    "Ano. Stačí registrace e-mailem, platební kartu nezadáváte. Zdarma jsou i brány 1 a 2.",
+    "Ano. Stačí registrace e-mailem, platební kartu nezadáváte. Brány, e-learning a semináře jsou v členství.",
   ],
   [
     "Udělá AI projekt za mě?",
@@ -179,7 +178,10 @@ const FAQ = [
     "Zkouška je nepovinná a platí se zvlášť: 5 000 Kč, pro členy VISIBLE7 3 500 Kč. Ve studiu Specialista internetového obchodu je zkouška v ceně. Jeden den přípravy se zkouškou stojí 8 000 Kč. Ceny jsou včetně DPH. Zkoušku pořádá Edu Partners jako autorizovaná osoba (autorizující orgán: Ministerstvo průmyslu a obchodu).",
   ],
   ["Obnovuje se předplatné samo?", "Ne. Platíte jednorázově za zvolené období. Po jeho skončení vaše data zůstanou."],
-  ["Mohu mít víc projektů?", "Ano. Každý projekt má vlastní cestu přes 7 bran."],
+  [
+    "Mohu mít víc projektů?",
+    "Členství je na jeden vlastní projekt. Projekt si vyberete na začátku a provedete ho všemi branami.",
+  ],
   ...FEARS.map((f) => [f.faq, f.answer]),
 ];
 
@@ -328,7 +330,7 @@ const VERBS = ["Vymyslete.", "Naučte se.", "Zkonzultujte.", "Vydělávejte."];
 
 export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
   const shop = useShop();
-  const offer = useFounderOffer();
+  const navigate = useNavigate();
   const { lessons } = useLessonStats();
   const author = ADVISORS.find((a) => a.name.includes("Míček"));
   // Odkaz /#jak z jiné stránky: po načtení posunout na sekci.
@@ -609,10 +611,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                       {i + 1}
                     </span>
                     <div className="lg:mt-4">
-                      <h3 className="font-bold leading-tight lg:text-lg">
-                        {g.name}
-                        {i < 2 && <span className="ml-1.5 text-xs font-semibold text-emerald-300">zdarma</span>}
-                      </h3>
+                      <h3 className="font-bold leading-tight lg:text-lg">{g.name}</h3>
                       <p className="mt-1 text-sm text-white/65">
                         <Check className="mr-1 inline h-3.5 w-3.5 text-emerald-300" aria-hidden="true" />
                         {g.get}
@@ -735,32 +734,34 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
 
         <FearsSection from="landing" />
 
-        <SavingsCalculator onStart={onAccessGranted} />
-
         {/* Ceník – krátce, celý ceník je na /cenik */}
         <section id="cenik" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-8 lg:px-12 md:py-28">
           <div className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
             <div>
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                Začněte zdarma. Celá cesta za {kc(shop.price)}.
+                Celá cesta na rok za {kc(shop.price)}.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Vstupní diagnostiku a brány 1 a 2 vyzkoušíte zdarma, bez platební karty. Členství odemkne všech 7 bran a
-                živé semináře jednou měsíčně. Platíte jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje.{" "}
-                {shop.anchor}
+                Členství odemkne všech 7 bran, e-learning, jeden vlastní projekt a 4 vybrané živé semináře. Platíte
+                jednou na {monthsLabel(shop.months)}, nic se samo neobnovuje. Vstupní diagnostiku si vyzkoušíte zdarma.
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <Cta onClick={onAccessGranted}>Začít zdarma</Cta>
-                <Link to="/cenik" className="px-2 font-semibold text-primary underline-offset-4 hover:underline">
-                  Zobrazit celý ceník
-                </Link>
+                <Cta onClick={() => navigate("/cenik")}>Zobrazit ceník</Cta>
+                <button
+                  type="button"
+                  onClick={onAccessGranted}
+                  className="px-2 text-left font-semibold text-primary underline-offset-4 hover:underline"
+                >
+                  Vstupní diagnostika zdarma
+                </button>
               </div>
             </div>
             <dl className="divide-y divide-border rounded-2xl border border-border">
               {[
-                ["Vstupní diagnostika (4 minuty) a brány 1–2", "0 Kč"],
-                ["Zjistěte, jaký jste typ podnikatele, a získejte 3 dny zdarma", "0 Kč"],
-                [`Členství na ${monthsLabel(shop.months)}: 7 bran a živé semináře`, `${kc(shop.price)}`],
+                [
+                  `Členství na ${monthsLabel(shop.months)}: 7 bran, e-learning, 1 projekt, 4 vybrané semináře`,
+                  `${kc(shop.price)}`,
+                ],
               ].map(([name, price]) => (
                 <div key={name} className="flex items-baseline justify-between gap-4 px-5 py-4">
                   <dt className="font-semibold">{name}</dt>
@@ -809,12 +810,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 <dd className="whitespace-nowrap text-xl font-extrabold tracking-tight text-leaf-700">Zdarma</dd>
               </div>
               <div className="space-y-1 px-5 py-3 text-sm text-muted-foreground">
-                {offer && offer.left > 0 && (
-                  <p className="font-semibold text-leaf-800">
-                    Startovací cena pro prvních {offer.seats} lidí a k ní 20 minut konzultace zdarma. Pak{" "}
-                    {kc(offer.next_price)}.
-                  </p>
-                )}
                 <p>vychází na {perMonth(shop)} měsíčně, včetně DPH</p>
                 <p>Další konzultace se seniorními poradci nejsou součástí členství, platí se zvlášť.</p>
               </div>

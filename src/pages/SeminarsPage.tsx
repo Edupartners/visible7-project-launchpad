@@ -16,6 +16,7 @@ import {
   isLiveNow,
   loadMyRegistrations,
   loadSeminars,
+  loadIncluded,
   register,
   seminarLinks,
   sortSeminars,
@@ -57,8 +58,10 @@ function downloadIcs(s: Seminar) {
   URL.revokeObjectURL(a.href);
 }
 
-const Badge = ({ s }: { s: Seminar }) =>
-  s.access === "zdarma" ? (
+const Badge = ({ s, included }: { s: Seminar; included?: boolean }) =>
+  included ? (
+    <span className="rounded-full bg-signal px-2.5 py-1 text-xs font-bold text-signal-foreground">V ceně členství</span>
+  ) : s.access === "zdarma" ? (
     <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">Zdarma</span>
   ) : (
     <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-800">
@@ -75,6 +78,10 @@ const SeminarsPage = () => {
   const [mine, setMine] = useState<Set<string>>(new Set());
   const [links, setLinks] = useState<Record<string, Links>>({});
   const [busy, setBusy] = useState<string | null>(null);
+  const [included, setIncluded] = useState<string[]>([]);
+  useEffect(() => {
+    loadIncluded().then(setIncluded);
+  }, []);
   const member = access.premium;
 
   const load = useCallback(async () => {
@@ -137,7 +144,7 @@ const SeminarsPage = () => {
       >
         <div className="flex flex-wrap items-center gap-2">
           {highlight && <span className="text-sm font-semibold text-orange-300">Nejbližší seminář</span>}
-          <Badge s={s} />
+          <Badge s={s} included={included.includes(s.id)} />
           {s.gate && (
             <span
               className={`rounded-full px-2.5 py-1 text-xs font-semibold ${

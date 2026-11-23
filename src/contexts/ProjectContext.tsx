@@ -122,7 +122,7 @@ export const ProjectProvider = ({ userId, children }: { userId: string; children
           toast({
             title: "Máte maximální počet aktivních projektů",
             description:
-              "Ve verzi zdarma a ve zkušebním přístupu můžete mít jeden aktivní projekt. Nový založíte, když starý smažete v Nastavení → Projekty.",
+              "Členství je na jeden vlastní projekt. Nový založíte, když starý smažete v Nastavení → Projekty.",
             variant: "destructive",
           });
         }

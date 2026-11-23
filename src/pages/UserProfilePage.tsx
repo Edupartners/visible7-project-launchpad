@@ -14,7 +14,7 @@ import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
 import { CertificatesPanel } from "@/components/CertificatesPanel";
 
 const PLAN_LABELS: Record<string, string> = {
-  free: "Zdarma (fáze 1 a 2)",
+  free: "Bez členství",
   mesic: "Placený přístup – 1 měsíc",
   ctvrtleti: "Placený přístup – 3 měsíce",
   rok: "Placený přístup – 1 rok",

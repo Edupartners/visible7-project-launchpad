@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Gift, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
-import { useAccess } from "@/lib/access";
+import { TRIAL_OFFER, useAccess } from "@/lib/access";
 import { QUIZ_KEY, QuizData, QuizStage } from "@/lib/quiz";
 
 /** Text odměny podle stavu přístupu: 3 dny zdarma jen když ještě nebyly využity a platby jsou zapnuté. */
 const useRewardText = () => {
   const access = useAccess();
-  return access.paywall && !access.trialUsed && !access.paid
+  return TRIAL_OFFER && access.paywall && !access.trialUsed && !access.paid
     ? "odznak a 3 dny plného přístupu zdarma"
     : "odznak a osobní tipy";
 };

@@ -19,7 +19,7 @@ const BankConnectPage = () => {
       </>
     ),
     lead: "Když už podnikáte, nemusíte čísla odhadovat. Připravujeme bezpečné napojení bankovního účtu, aby VISIBLE7 spočítal predikci podle toho, jak vaše firma opravdu funguje.",
-    cta: "Začít plán zdarma",
+    cta: "Diagnostika zdarma",
     note: "Napojení banky připravujeme. Finanční plán z vlastních čísel můžete udělat už teď.",
     heroImage: "/funkce/financni-plan-graf.webp",
     heroAlt: "Graf peněz v projektu, který po napojení banky vyjde ze skutečných pohybů",

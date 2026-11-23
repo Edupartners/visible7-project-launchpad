@@ -1,23 +1,22 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { kc, useFounderOffer, useShop } from "@/lib/shop";
+import { kc, useShop } from "@/lib/shop";
 import { studyOffer } from "@/lib/study";
 import { track } from "@/lib/track";
 
 /**
- * Kalkulačka úspory na úvodní stránce: kolik člověk ušetří, když web, marketing a plán zvládne sám.
+ * Kalkulačka úspory v ceníku: kolik člověk ušetří, když web, marketing a plán zvládne sám s členstvím.
  * Ceny jsou orientační z praxe (Michal, 10/2026); kotva „přes 60 000 Kč“ patří k ceně členství.
  */
 const WEB = 25_000;
 const CARE_MONTHLY = 1_000;
-const WEBINARS = 6; // živé webináře v rámci členství
+const WEBINARS = 4; // vybrané živé semináře v ceně členství
 const WEBINAR_PRICE = 1_500;
 const PLAN_HOURS = 56; // byznys plán, Lean Canvas a ideace: z měsíců (~80 h) na 3 dny (~24 h)
 const ADVISOR_HOURS = 5; // hledání a ověřování poradce
 
-export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
+export const SavingsCalculator = ({ onStart, cta = "Získat členství" }: { onStart: () => void; cta?: string }) => {
   const shop = useShop();
-  const offer = useFounderOffer();
   const [rate, setRate] = useState(400);
   const [off, setOff] = useState<Record<string, boolean>>({});
 
@@ -26,8 +25,8 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
     { id: "care", title: "Správa webu", how: `${kc(CARE_MONTHLY)} měsíčně × 12 měsíců`, value: CARE_MONTHLY * 12 },
     {
       id: "webinar",
-      title: "Živé webináře s praktiky",
-      how: `${WEBINARS} webinářů po ${kc(WEBINAR_PRICE)}`,
+      title: "Živé semináře s praktiky",
+      how: `${WEBINARS} vybrané semináře po ${kc(WEBINAR_PRICE)}`,
       value: WEBINARS * WEBINAR_PRICE,
     },
     {
@@ -45,15 +44,12 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
   ];
   const total = items.filter((i) => !off[i.id]).reduce((s, i) => s + i.value, 0);
   const times = shop.price > 0 ? Math.floor(total / shop.price) : 0;
-  const founder = offer && offer.left > 0;
 
   return (
     <section id="kalkulacka" className="scroll-mt-20 border-y border-border bg-muted/40">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8 lg:px-12">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-leaf-700">Kalkulačka úspory</p>
-        <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight sm:text-[2rem]">
-          Kolik ušetříte, když to zvládnete sami?
-        </h2>
+        <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight sm:text-[2rem]">Kolik vám členství ušetří?</h2>
         <p className="mt-2 text-muted-foreground">Odškrtněte, co byste jinak platili, a nastavte cenu své hodiny.</p>
 
         <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-10">
@@ -118,14 +114,8 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
             )}
             <div className="mt-5 rounded-xl bg-white/[0.07] px-4 py-3 text-sm">
               <p>
-                Členství VISIBLE7: <b>{kc(shop.price)}</b>
-                {founder && <span className="text-white/70"> (pak {kc(offer.next_price)})</span>}
+                Členství VISIBLE7 na rok: <b>{kc(shop.price)}</b>
               </p>
-              {founder && (
-                <p className="mt-1 font-semibold text-leaf-300">
-                  Startovací cena pro prvních {offer.seats} + 20 min konzultace zdarma
-                </p>
-              )}
             </div>
             <button
               type="button"
@@ -135,14 +125,14 @@ export const SavingsCalculator = ({ onStart }: { onStart: () => void }) => {
               }}
               className="v7-trap-btn v7-phi-sm mt-6 inline-flex w-full items-center justify-center gap-2 pl-5 pr-12 py-3.5 text-[15px] font-bold text-signal-foreground"
             >
-              Začít plán zdarma <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">
           Chcete stejnou cestu s lektory a zkouškou?{" "}
-          <a href="#studium" className="font-semibold text-foreground underline underline-offset-4">
+          <a href="/studium" className="font-semibold text-foreground underline underline-offset-4">
             Studium Specialista internetového obchodu
           </a>{" "}
           od {kc(studyOffer(shop).monthly)} měsíčně.

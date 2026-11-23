@@ -111,3 +111,21 @@ export async function deleteSeminar(id: string) {
   const { error } = await db.from("seminars").delete().eq("id", id);
   if (error) throw error;
 }
+
+/* ---------- 4 vybrané semináře v ceně ročního členství (app_settings.seminars_included) ---------- */
+
+export const INCLUDED_MAX = 4;
+
+export async function loadIncluded(): Promise<string[]> {
+  const { data } = await db.from("app_settings").select("value").eq("key", "seminars_included").maybeSingle();
+  const v = (data as { value?: unknown } | null)?.value;
+  return Array.isArray(v) ? (v as string[]) : [];
+}
+
+export async function saveIncluded(ids: string[]) {
+  const { error } = await db
+    .from("app_settings")
+    .update({ value: ids, updated_at: new Date().toISOString() })
+    .eq("key", "seminars_included");
+  if (error) throw error;
+}
