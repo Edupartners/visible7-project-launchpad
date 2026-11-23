@@ -51,6 +51,7 @@ import SeminarsPage from "./pages/SeminarsPage";
 import MyStudyPage from "./pages/MyStudyPage";
 import BonusesPage from "./pages/BonusesPage";
 import EntryDiagnosisPage from "./pages/EntryDiagnosisPage";
+import StudyLandingPage from "./pages/StudyLandingPage";
 import MarketRentgenPage from "./pages/MarketRentgenPage";
 import CashflowPage from "./pages/CashflowPage";
 import MockBankPage from "./pages/MockBankPage";
@@ -184,6 +185,8 @@ const App = () => (
         <Routes>
           {/* Veřejná marketingová landing page - bez přihlášení */}
           <Route path="/" element={<LauncherPage />} />
+          {/* Náhled nové úvodní stránky kolem studia */}
+          <Route path="/novy-web" element={<StudyLandingPage />} />
           {/* OAuth consent pro MCP klienty (vlastní přihlášení uvnitř stránky) */}
           <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
           {/* Veřejné ověření osvědčení – bez přihlášení */}
