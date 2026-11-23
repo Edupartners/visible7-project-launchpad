@@ -326,7 +326,7 @@ export default function StudyLandingPage() {
         {/* 05 Otázky */}
         <section className="mx-auto max-w-6xl px-4 py-24 sm:px-8">
           <SectionHead n="05 / Otázky" title="Na co se lidé ptají nejčastěji." />
-          <div className="mt-8 md:ml-[10rem]">
+          <div className="mt-8 md:ml-[10.75rem]">
             {FAQ.map(([q, a]) => (
               <details key={q} className="group border-b border-foreground/15 py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold">
