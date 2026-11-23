@@ -213,7 +213,7 @@ const PricingPage = () => {
       <main>
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-8 lg:px-12 md:pt-20">
           <h1 className="max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl">
-            Jedno členství na rok. Nebo studium s lektory.
+            Studujte sami, nebo s lektory.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
             Žádné předplatné, které by se samo obnovovalo. Ceny jsou konečné, včetně DPH.
@@ -222,7 +222,7 @@ const PricingPage = () => {
           <div className="mt-12 grid gap-4 md:grid-cols-2">
             <div className="flex flex-col rounded-2xl bg-primary p-6 text-white">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-white/80">Členství na {monthsLabel(shop.months)}</h2>
+                <h2 className="font-semibold text-white/80">Studuju sám · {monthsLabel(shop.months)}</h2>
                 <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold">Celá cesta</span>
               </div>
               <p className="mt-3 text-5xl font-extrabold tracking-tight">{kc(shop.price)}</p>
@@ -244,7 +244,7 @@ const PricingPage = () => {
                   onClick={() => track("checkout_click", { source: "cenik", price: shop.price })}
                   className="v7-trap-btn v7-phi-sm mt-6 flex h-12 items-center justify-center text-base font-bold text-signal-foreground"
                 >
-                  Koupit členství
+                  Studovat sám
                 </Link>
               ) : (
                 <div className="mt-6 rounded-xl bg-white/10 p-3 text-center text-sm">
@@ -337,8 +337,8 @@ const PricingPage = () => {
             <div className="mx-auto max-w-4xl px-4 sm:px-8 lg:px-12">
               <h2 className="text-3xl font-extrabold tracking-tight">Všechno, co VISIBLE7 umí</h2>
               <p className="mt-3 text-lg text-muted-foreground">
-                Co dostanete bez členství, v členství a ve studiu s lektory. Studium obsahuje celé členství a k tomu
-                výuku s lektory a zkoušku.
+                Co dostanete zdarma, když studujete sami, a ve studiu s lektory. Studium s lektory obsahuje všechno ze
+                samostudia a k tomu výuku s lektory a zkoušku.
               </p>
               <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
                 <table className="w-full min-w-[600px] text-left">
@@ -348,13 +348,13 @@ const PricingPage = () => {
                         <span className="sr-only">Funkce</span>
                       </th>
                       <th scope="col" className="w-28 p-4 text-center font-semibold text-muted-foreground">
-                        Bez členství
+                        Zdarma
                       </th>
                       <th scope="col" className="w-28 bg-primary p-4 text-center font-bold text-white">
-                        Členství
+                        Studuju sám
                       </th>
                       <th scope="col" className="w-28 p-4 text-center font-bold text-leaf-700">
-                        Studium
+                        S lektory
                       </th>
                     </tr>
                   </thead>
