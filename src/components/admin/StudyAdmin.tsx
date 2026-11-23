@@ -222,7 +222,8 @@ export function StudyAdmin() {
           <Users className="h-5 w-5" /> Studenti semestru ({students.length})
         </h2>
         <p className="text-sm text-muted-foreground">
-          Jen studenti vidí stránku Studium a odkazy na povinná setkání. Člověk musí mít účet na visible7.io.
+          Jen studenti vidí stránku Studium a odkazy na povinná setkání. Člověk musí mít účet na visible7.io. Při
+          přidání dostane i členství VISIBLE7 na rok.
         </p>
         <form onSubmit={add} className="mt-4 flex flex-wrap gap-2">
           <Input
