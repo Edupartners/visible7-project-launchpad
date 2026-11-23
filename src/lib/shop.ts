@@ -45,9 +45,13 @@ export const kc = (n: number) => `${Math.round(n).toLocaleString("cs-CZ")} Kč`;
 export const perMonth = (s: ShopSettings) => kc(s.price / Math.max(1, s.months));
 export const monthsLabel = (m: number) => (m === 1 ? "1 měsíc" : m < 5 ? `${m} měsíce` : `${m} měsíců`);
 
+/** Roční členství od 11/2026. Dokud je v administraci stará cena 2 990 Kč na půl roku, platí tahle. */
+const MEMBERSHIP_2027 = { price: 6990, months: 12, days: 365 };
+
 export async function loadShop(): Promise<ShopSettings> {
   const { data } = await supabase.from("app_settings").select("value").eq("key", "shop").maybeSingle();
-  return { ...SHOP_DEFAULT, ...((data as { value?: Partial<ShopSettings> } | null)?.value ?? {}) };
+  const db = (data as { value?: Partial<ShopSettings> } | null)?.value ?? {};
+  return { ...SHOP_DEFAULT, ...db, ...(db.price === 2990 ? MEMBERSHIP_2027 : {}) };
 }
 
 export const useShop = () =>

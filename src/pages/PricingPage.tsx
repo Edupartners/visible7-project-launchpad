@@ -15,7 +15,22 @@ import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 
 /** Hodnota v buňce: true = ano, false = ne, text = částečně nebo s podmínkou. */
 type Cell = boolean | string;
+/** Třetí sloupec (studium): když není uvedeno jinak, platí stejné jako u členství (studium členství obsahuje). */
+const STUDY_CELL: Record<string, Cell> = {
+  "Živé online semináře s praktiky": "všechny",
+  "Zkouška profesní kvalifikace Specialista internetového obchodu (66-043-N), nepovinná": "v ceně",
+};
+
 const ROWS = (specialist: string): { group: string; rows: [string, Cell, Cell, string?][] }[] => [
+  {
+    group: "Jen ve studiu s lektory",
+    rows: [
+      [`${STUDY.sessions} online setkání s lektory, každý čtvrtek 17:00–20:00 (${STUDY.period})`, false, false],
+      ["Konzultace vašeho projektu s lektory", false, false],
+      ["Závěrečný den v Praze: obhajoba projektu a zkouška", false, false],
+      ["Opakování zkoušky zdarma, dokud ji nesložíte (do konce roku 2027)", false, false],
+    ],
+  },
   {
     group: "Diagnostika a podnikatelský plán",
     rows: [
@@ -321,9 +336,12 @@ const PricingPage = () => {
           <div className="mx-auto max-w-[1280px] rounded-[2rem] bg-muted/50 py-16 md:py-20">
             <div className="mx-auto max-w-4xl px-4 sm:px-8 lg:px-12">
               <h2 className="text-3xl font-extrabold tracking-tight">Všechno, co VISIBLE7 umí</h2>
-              <p className="mt-3 text-lg text-muted-foreground">Kompletní přehled toho, co dostanete v členství.</p>
+              <p className="mt-3 text-lg text-muted-foreground">
+                Co dostanete bez členství, v členství a ve studiu s lektory. Studium obsahuje celé členství a k tomu
+                výuku s lektory a zkoušku.
+              </p>
               <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
-                <table className="w-full min-w-[520px] text-left">
+                <table className="w-full min-w-[600px] text-left">
                   <thead>
                     <tr className="border-b border-border text-sm">
                       <th scope="col" className="p-4">
@@ -335,13 +353,16 @@ const PricingPage = () => {
                       <th scope="col" className="w-28 bg-primary p-4 text-center font-bold text-white">
                         Členství
                       </th>
+                      <th scope="col" className="w-28 p-4 text-center font-bold text-leaf-700">
+                        Studium
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {ROWS(SPECIALIST_TITLE).map(({ group, rows }) => (
                       <Fragment key={group}>
                         <tr className="border-b border-border bg-muted/60">
-                          <th scope="colgroup" colSpan={3} className="px-4 py-2.5 text-sm font-bold text-primary">
+                          <th scope="colgroup" colSpan={4} className="px-4 py-2.5 text-sm font-bold text-primary">
                             {group}
                           </th>
                         </tr>
@@ -360,6 +381,9 @@ const PricingPage = () => {
                             </td>
                             <td className="bg-primary/[0.04] p-4 text-center">
                               <CellMark v={member} />
+                            </td>
+                            <td className="p-4 text-center">
+                              <CellMark v={group === "Jen ve studiu s lektory" ? true : (STUDY_CELL[row] ?? member)} />
                             </td>
                           </tr>
                         ))}
