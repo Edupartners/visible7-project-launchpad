@@ -11,7 +11,7 @@ begin
   if not public.is_admin() then raise exception 'Jen pro správce'; end if;
   select id into v_id from auth.users where lower(email) = lower(btrim(p_email));
   if v_id is null then
-    raise exception 'Uživatel s tímto e-mailem není registrovaný. Ať se nejdřív zaregistruje na visible7.io.';
+    raise exception 'Uživatel s tímto e-mailem není registrovaný. Ať se nejdřív zaregistruje na micek.academy.';
   end if;
   insert into study_students (user_id, email) values (v_id, lower(btrim(p_email)))
   on conflict (user_id) do nothing;
