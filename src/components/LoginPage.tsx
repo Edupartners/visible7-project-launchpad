@@ -28,7 +28,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  // Z výzev „Otestovat nápad“ přichází nový uživatel (?novy) – rovnou registrace.
+  // Z výzev ke vstupní diagnostice přichází nový uživatel (?novy) – rovnou registrace.
   const [isLogin, setIsLogin] = useState(() => !new URLSearchParams(window.location.search).has("novy"));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -154,12 +154,12 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
         </Link>
         <div className="max-w-md">
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight">
-            {isLogin ? "Vítejte zpátky." : "Otestujte svůj nápad za 5 minut."}
+            {isLogin ? "Vítejte zpátky." : "Zjistěte, jak málo stačí ke startu."}
           </h1>
           <p className="mt-4 text-lg text-white/75">
             {isLogin
               ? "Pokračujte tam, kde jste skončili. Váš projekt i všechna čísla na vás čekají."
-              : "Po registraci vás čeká vstupní diagnostika: za 4 minuty uvidíte, na co máte talent, co už umíte a co se ke startu doučíte. Projekt pak vyplňujete vy, AI vám jen pomáhá."}
+              : "Po registraci vás čeká vstupní diagnostika. Za 4 minuty uvidíte, na co máte talent, co už umíte a co se doučíte. Pak si vyberete rychlý start, nebo kompletní studium e-commerce."}
           </p>
           {!isLogin && (
             <ul className="mt-8 space-y-3">
