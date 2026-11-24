@@ -355,7 +355,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                 Naučte se online byznys na vlastním projektu.
               </span>
               <span className="mt-8 block text-lg font-bold leading-relaxed sm:text-xl tracking-normal text-foreground sm:text-[1.375rem]">
-                Získejte státem uznanou kvalifikaci{" "}
+                Získejte profesní kvalifikaci{" "}
                 <span className="box-decoration-clone bg-[linear-gradient(transparent_58%,hsl(var(--signal))_58%,hsl(var(--signal))_92%,transparent_92%)] px-[0.15em] text-primary">
                   Specialista internetového obchodu.
                 </span>
