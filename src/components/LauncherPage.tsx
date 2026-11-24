@@ -13,7 +13,6 @@ import { FEARS } from "@/lib/fears";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { TrustBand } from "@/components/marketing/TrustBand";
 import { FeaturedCourses } from "@/components/marketing/FeaturedCourses";
-import { EasyWebSection } from "@/components/marketing/EasyWebSection";
 import { EXAM_PRICES, NSK_QUALIFICATION } from "@/lib/qualification";
 import {
   ArrowRight,
@@ -103,29 +102,6 @@ const STEPS = [
   },
   { title: "Čísla, která sedí", meta: "v členství", text: "Tržby, náklady, daně a bod zvratu spočítané za vás." },
   { title: "Hotový plán", meta: "PRICE", text: "Sedm fází od vize po škálování, s videi, AI a poradci." },
-];
-
-const SHOWCASE = [
-  {
-    eyebrow: "Finanční plán na 24 měsíců",
-    title: "Zjistěte, kdy začnete vydělávat",
-    text: "AI navrhne ceny, marže a náklady obvyklé ve vašem oboru a vysvětlí proč. Vy jen potvrdíte nebo přepíšete. Uvidíte, kolik potřebujete na start, kdy se vám peníze vrátí a kolik smíte dát za získání zákazníka.",
-    cta: "Spočítat můj plán",
-    image: "/landing/ukazka-financni-plan.webp",
-    alt: "Výsledek za 2 roky: obrat, zisk, potřebný kapitál, bod zvratu a graf peněz v projektu na 24 měsíců",
-    width: 1400,
-    height: 1157,
-  },
-  {
-    eyebrow: "12 marketingových kanálů",
-    title: "Marketing, který přivede zákazníky",
-    text: "Aplikace vybere kanály podle vašeho byznysu, zákazníka a rozpočtu: Meta, Google Ads, Sklik, srovnávače, e-mail, SEO, ChatGPT Ads a další. Ke každému máte postup krok za krokem a záznamy z přednášek. Víte, kam dát peníze, aby se vám vrátily.",
-    cta: "Najít moje kanály",
-    image: "/landing/ukazka-kanaly.webp",
-    alt: "Začněte tady: tři doporučené marketingové kanály seřazené podle typu byznysu, hodnocení AI a rozpočtu",
-    width: 1400,
-    height: 632,
-  },
 ];
 
 const FAQ = [
@@ -652,52 +628,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </div>
           </div>
         </section>
-
-        {/* Ukázky z aplikace */}
-        <section id="ukazky" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-20 sm:px-8 md:pt-28 lg:px-12">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Od prvního nápadu k hotovému plánu. A dál.
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Podnikatelský plán, kterému můžete věřit. Bez Excelu a bez teorie, každý krok je hotový výstup.
-            </p>
-          </div>
-          {SHOWCASE.map((b, i) => (
-            <div
-              key={b.title}
-              className="mt-16 grid grid-cols-1 items-center gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16"
-            >
-              <div className={i % 2 ? "lg:order-2" : ""}>
-                <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">{b.eyebrow}</p>
-                <h3 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight sm:text-[2.1rem]">
-                  {b.title}
-                </h3>
-                <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{b.text}</p>
-                <button
-                  type="button"
-                  onClick={onAccessGranted}
-                  className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 font-semibold text-primary hover:bg-primary hover:text-white"
-                >
-                  {b.cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </button>
-              </div>
-              <figure className={i % 2 ? "lg:order-1" : ""}>
-                <img
-                  src={b.image}
-                  alt={b.alt}
-                  width={b.width}
-                  height={b.height}
-                  loading="lazy"
-                  className="h-auto w-full rounded-2xl border border-border bg-card shadow-[0_24px_50px_-30px_hsl(160_61%_15%/0.5)]"
-                />
-                <figcaption className="mt-2 text-center text-xs text-muted-foreground">Ukázka z aplikace</figcaption>
-              </figure>
-            </div>
-          ))}
-        </section>
-
-        <EasyWebSection onStart={onAccessGranted} />
 
         {/* Poradci */}
         <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">

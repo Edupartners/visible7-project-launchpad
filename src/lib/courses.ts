@@ -23,7 +23,7 @@ export interface FeaturedCourse {
 export const FEATURED_COURSES: FeaturedCourse[] = [
   {
     id: "web",
-    title: "Web a e-shop na WordPressu",
+    title: "Tvorba webu na WordPressu s AI",
     gate: "Brána 4",
     lecturer: "Michal Míček",
     cover: "/video-covers/web.webp",
@@ -64,7 +64,7 @@ export const FEATURED_COURSES: FeaturedCourse[] = [
   },
   {
     id: "ppc",
-    title: "Google Ads a Sklik",
+    title: "PPC: výkonnostní reklama v Google Ads a Skliku",
     gate: "Brána 5",
     lecturer: "Veronika Miklová",
     cover: "/video-covers/ppc.webp",
@@ -147,6 +147,8 @@ const SNAPSHOT: Totals = {
   "marketing:meta_kampan": { minutes: 119, missing: 0 },
   "marketing:meta_ucet": { minutes: 105, missing: 0 },
   "marketing:seo_obsah": { minutes: 28, missing: 1 },
+  "marketing:mereni": { minutes: 147, missing: 0 },
+  "tvorba:mereni": { minutes: 60, missing: 0 },
   "marketing:seo_zaklad": { minutes: 84, missing: 6 },
   "marketing:sklik_kampan": { minutes: 34, missing: 0 },
   "marketing:texty": { minutes: 59, missing: 0 },
