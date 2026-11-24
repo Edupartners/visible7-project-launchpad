@@ -505,6 +505,48 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
           </div>
         </section>
 
+        {/* Poradci */}
+        <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
+          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
+            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">Lektoři a poradci</p>
+                <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Učí vás lidé, kteří se tím živí. Nejste na to sami.
+                </h2>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
+                  i AI. Ve studiu s lektory se s nimi potkáte na {STUDY.sessions} setkáních. A když se zaseknete,
+                  domluvíte si konzultaci: {CONSULTATION.minutes} minut, orientačně{" "}
+                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
+                </p>
+                <Link
+                  to="/studium#program"
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary px-5 py-2 font-semibold text-primary hover:bg-primary hover:text-white"
+                >
+                  Lektoři studia <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+              <ul className="grid grid-cols-4 gap-x-2 gap-y-3 sm:gap-3" aria-label="Seniorní poradci">
+                {photos.map((a) => (
+                  <li key={a.id} className="min-w-0">
+                    <img
+                      src={a.photo}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
+                    />
+                    <p className="mt-1.5 line-clamp-2 text-[11px] font-semibold leading-tight sm:truncate sm:text-xs">
+                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
+                    </p>
+                    <p className="hidden truncate text-xs text-muted-foreground sm:block">{a.focus}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
         {/* Jak to funguje */}
         <section id="uvnitr" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
           <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50">
@@ -625,39 +667,6 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
                   Brány 6–7: VISIBLE7 Gold
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Poradci */}
-        <section id="poradci" className="scroll-mt-20 px-3 py-2 sm:px-6 lg:px-10">
-          <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[2rem] bg-muted/50 py-20 md:py-24">
-            <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-8 lg:px-12 md:grid-cols-[1fr_1.1fr]">
-              <div>
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Po celé cestě máte podporu</h2>
-                <p className="mt-4 text-lg text-muted-foreground">
-                  Jednou měsíčně živý seminář s lektory Edu Partners, v ceně členství. A když se zaseknete, zavoláte
-                  člověku: 16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo,
-                  e-shopy i AI. Konzultace {CONSULTATION.minutes} minut, orientačně{" "}
-                  {CONSULTATION.price.toLocaleString("cs-CZ")} Kč.
-                </p>
-              </div>
-              <ul className="flex flex-wrap gap-3" aria-label="Seniorní poradci">
-                {photos.map((a) => (
-                  <li key={a.id} className="w-[calc(25%-0.6rem)] min-w-[4.5rem]">
-                    <img
-                      src={a.photo}
-                      alt=""
-                      loading="lazy"
-                      className="aspect-square w-full rounded-2xl bg-muted object-cover object-top"
-                    />
-                    <p className="mt-1.5 truncate text-xs font-semibold">
-                      {a.name.replace(/^(Mgr\.|Ing\.|Bc\.)( et Mgr\.)?\s/, "")}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{a.focus}</p>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </section>
