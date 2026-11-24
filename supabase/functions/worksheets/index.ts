@@ -6,7 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const BREVO_KEY = Deno.env.get("BREVO_API_KEY");
-const APP_URL = Deno.env.get("APP_URL") ?? "https://visible7.io";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://micek.academy";
 const SENDER = { name: "VISIBLE7 MICEK", email: Deno.env.get("REMINDER_SENDER") ?? "info@visible7.io" };
 
 const cors = {
@@ -31,7 +31,7 @@ function mail(title: string, file: string) {
   <p style="margin:22px 0"><a href="${link}" style="background:#173663;color:#fff;text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold">Stáhnout PDF</a></p>
   <p style="font-size:15px;line-height:1.5">Ke každému listu najdete ve VISIBLE7 video, jak ho vyplnit. A když si chcete nápad rovnou otestovat, rentgen nápadu zdarma zabere do 5 minut:</p>
   <p><a href="${APP_URL}/?utm_source=email&utm_medium=pracovni-listy" style="color:#173663;font-weight:bold">Otestovat nápad zdarma →</a></p>
-  <p style="font-size:12px;color:#6b7280;margin-top:28px">Tento e-mail jste dostali, protože jste si na visible7.io vyžádali pracovní listy. Edu Partners s.r.o., Raisova 889/5, Ostrava.</p>
+  <p style="font-size:12px;color:#6b7280;margin-top:28px">Tento e-mail jste dostali, protože jste si na micek.academy vyžádali pracovní listy. Edu Partners s.r.o., Raisova 889/5, Ostrava.</p>
 </div>`;
   return { subject: `Pracovní listy VISIBLE7: ${title}`, html };
 }

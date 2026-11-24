@@ -1,4 +1,4 @@
-# VISIBLE7 MICEK – visible7.io
+# VISIBLE7 MICEK – micek.academy
 # Veřejné stránky může procházet každý vyhledávač i AI asistent.
 # Aplikace po přihlášení a testovací stránky uživatelů se neindexují.
 
@@ -38,4 +38,4 @@ Disallow: /testovaci-stranka
 Disallow: /odhlasit
 Disallow: /t/
 
-Sitemap: https://visible7.io/sitemap.xml
+Sitemap: https://micek.academy/sitemap.xml

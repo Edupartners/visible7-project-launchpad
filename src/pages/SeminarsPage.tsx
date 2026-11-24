@@ -46,7 +46,7 @@ function downloadIcs(s: Seminar) {
     `DTSTART:${f(start)}`,
     `DTEND:${f(end)}`,
     `SUMMARY:${esc(`VISIBLE7: ${s.title}`)}`,
-    `DESCRIPTION:${esc(`${s.description}\n\nOdkaz na připojení najdete na https://visible7.io/seminare`)}`,
+    `DESCRIPTION:${esc(`${s.description}\n\nOdkaz na připojení najdete na https://micek.academy/seminare`)}`,
     `LOCATION:${esc(s.place)}`,
     "END:VEVENT",
     "END:VCALENDAR",

@@ -83,7 +83,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: "Doména",
     cat: "web",
-    def: "Adresa webu, například visible7.io. Registruje se na rok a dál a je potřeba ji včas prodlužovat, jinak o ni můžete přijít.",
+    def: "Adresa webu, například micek.academy. Registruje se na rok a dál a je potřeba ji včas prodlužovat, jinak o ni můžete přijít.",
     match: ["domen", "domeny"],
   },
   {

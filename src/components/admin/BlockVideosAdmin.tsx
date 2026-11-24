@@ -170,7 +170,7 @@ export function BlockVideosAdmin() {
       </h2>
       <p className="text-sm text-muted-foreground">
         Vyberte kartu, vložte odkaz z Vimea a video se na kartě hned ukáže. Pořadí změníte přetažením nebo šipkami –
-        nejdřív základy, pak to, co na nich staví. Ve Vimeu musí mít video povolené vkládání na doméně visible7.io.
+        nejdřív základy, pak to, co na nich staví. Ve Vimeu musí mít video povolené vkládání na doméně micek.academy.
       </p>
 
       <label className="mt-4 block space-y-1 text-sm">

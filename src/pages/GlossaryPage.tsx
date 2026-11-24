@@ -204,14 +204,14 @@ const GlossaryPage = () => {
       "@context": "https://schema.org",
       "@type": "DefinedTermSet",
       name: "Slovník podnikatele VISIBLE7",
-      url: "https://visible7.io/slovnik",
+      url: "https://micek.academy/slovnik",
       inLanguage: "cs",
       hasDefinedTerm: GLOSSARY.map((t) => ({
         "@type": "DefinedTerm",
         name: t.term,
         ...(t.aka ? { alternateName: t.aka } : {}),
         description: t.def,
-        url: `https://visible7.io/slovnik#${glossarySlug(t.term)}`,
+        url: `https://micek.academy/slovnik#${glossarySlug(t.term)}`,
       })),
     });
     document.head.appendChild(ld);

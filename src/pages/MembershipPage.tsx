@@ -31,7 +31,7 @@ function SimpleShopForm({ formId, url }: { formId: string; url?: string }) {
   );
 }
 
-/** Stránka s nákupem členství – zákazník zůstává na visible7.io. */
+/** Stránka s nákupem členství – zákazník zůstává na micek.academy. */
 const MembershipPage = () => {
   const shop = useShop();
   const navigate = useNavigate();

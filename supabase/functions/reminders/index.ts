@@ -10,7 +10,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const BREVO_KEY = Deno.env.get("BREVO_API_KEY");
-const APP_URL = Deno.env.get("APP_URL") ?? "https://visible7.io";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://micek.academy";
 const SENDER = { name: "VISIBLE7 MICEK", email: Deno.env.get("REMINDER_SENDER") ?? "info@visible7.io" };
 
 const cors = {
@@ -48,7 +48,7 @@ function layout(title: string, paragraphs: string[], cta: string, href: string, 
   <p style="font-size:13px;color:#6b7280;line-height:1.5;margin:0">
     Tuhle připomínku posíláme, protože máte účet ve VISIBLE7. Nechcete je dostávat?
     <a href="${unsubscribe}" style="color:#6b7280">Odhlásit připomínky</a>.<br>
-    Edu Partners s.r.o., Raisova 889/5, Ostrava · visible7.io
+    Edu Partners s.r.o., Raisova 889/5, Ostrava · micek.academy
   </p>
 </div>`;
 }

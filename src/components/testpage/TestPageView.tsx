@@ -509,7 +509,7 @@ export function TestPageView({
         <p className="mt-1">
           Vytvořeno ve{" "}
           <a
-            href="https://visible7.io"
+            href="https://micek.academy"
             className="underline underline-offset-2"
             target="_blank"
             rel="noopener noreferrer"

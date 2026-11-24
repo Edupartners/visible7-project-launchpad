@@ -58,6 +58,8 @@
     <!-- End Google Tag Manager -->
 
     <!-- Statický text v #root je pro roboty bez JavaScriptu; s JavaScriptem ho uživatel nevidí (žádné probliknutí). -->
+    <!-- Stará doména visible7.io -> micek.academy (záloha k přesměrování 301 v Cloudflare). -->
+    <script>if(/(^|\.)visible7\.io$/.test(location.hostname))location.replace("https://micek.academy"+location.pathname+location.search+location.hash)</script>
     <script>document.documentElement.classList.add("js")</script>
     <style>.js .seo-static{display:none}</style>
     <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -65,11 +67,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
     <meta name="theme-color" content="#0f3e2e">
-    <link rel="canonical" href="https://visible7.io/" />
+    <link rel="canonical" href="https://micek.academy/" />
 
     <meta property="og:title" content="Naučte se online byznys na vlastním projektu. Získejte profesní kvalifikaci. | VISIBLE7" />
     <meta property="og:description" content="Ověřený nápad, reálná čísla a AI. Plán, přes 50 hodin videí ve více než 400 krátkých lekcích a vytvoření projektu svépomocí na jednom místě. Vstupní diagnostika zdarma." />
-    <meta property="og:url" content="https://visible7.io/" />
+    <meta property="og:url" content="https://micek.academy/" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
 
@@ -80,7 +82,7 @@
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://visible7.io/#edu-partners",
+      "@id": "https://micek.academy/#edu-partners",
       "name": "Edu Partners s.r.o.",
       "url": "https://www.edu-partners.cz/",
       "foundingDate": "2011",
@@ -96,37 +98,38 @@
     },
     {
       "@type": "Person",
-      "@id": "https://visible7.io/#michal-micek",
+      "@id": "https://micek.academy/#michal-micek",
       "name": "Michal Míček",
       "honorificPrefix": "Mgr.",
       "honorificSuffix": "LL.M.",
       "jobTitle": "Autor metodiky VISIBLE7 MICEK",
+      "sameAs": ["https://michalmicek.cz/", "https://mbamicek.cz/"],
       "worksFor": {
-        "@id": "https://visible7.io/#edu-partners"
+        "@id": "https://micek.academy/#edu-partners"
       }
     },
     {
       "@type": "WebSite",
-      "@id": "https://visible7.io/#website",
-      "url": "https://visible7.io/",
+      "@id": "https://micek.academy/#website",
+      "url": "https://micek.academy/",
       "name": "VISIBLE7 MICEK",
       "inLanguage": "cs",
       "publisher": {
-        "@id": "https://visible7.io/#edu-partners"
+        "@id": "https://micek.academy/#edu-partners"
       }
     },
     {
       "@type": "Course",
-      "@id": "https://visible7.io/#kurz",
+      "@id": "https://micek.academy/#kurz",
       "name": "VISIBLE7 – kompletní kurz online podnikání a marketingu",
       "description": "Online kurz a aplikace, která provede od podnikatelského nápadu po první zákazníky a růst v 7 branách metodiky V-I-S-I-B-L-E (Vize, Ideace, Strategie a čísla, Implementace, Budování poptávky, Launch, Expanze): přes 50 hodin videí ve více než 400 krátkých lekcích od lektorů z praxe, AI asistent, kalkulačky, živé semináře, poradci a možnost zkoušky profesní kvalifikace Specialista internetového obchodu (66-043-N).",
-      "url": "https://visible7.io/",
+      "url": "https://micek.academy/",
       "inLanguage": "cs",
       "provider": {
-        "@id": "https://visible7.io/#edu-partners"
+        "@id": "https://micek.academy/#edu-partners"
       },
       "creator": {
-        "@id": "https://visible7.io/#michal-micek"
+        "@id": "https://micek.academy/#michal-micek"
       },
       "teaches": [
         "Strategie modrého oceánu",
@@ -147,7 +150,7 @@
           "price": "6990",
           "priceCurrency": "CZK",
           "category": "Paid",
-          "url": "https://visible7.io/cenik"
+          "url": "https://micek.academy/cenik"
         },
         {
           "@type": "Offer",
@@ -155,7 +158,7 @@
           "price": "3500",
           "priceCurrency": "CZK",
           "category": "Paid",
-          "url": "https://visible7.io/cenik"
+          "url": "https://micek.academy/cenik"
         },
         {
           "@type": "Offer",
@@ -163,7 +166,7 @@
           "price": "20000",
           "priceCurrency": "CZK",
           "category": "Paid",
-          "url": "https://visible7.io/cenik#studium"
+          "url": "https://micek.academy/cenik#studium"
         }
       ],
       "hasCourseInstance": {
@@ -175,7 +178,7 @@
     },
     {
       "@type": "FAQPage",
-      "@id": "https://visible7.io/#faq",
+      "@id": "https://micek.academy/#faq",
       "mainEntity": [
         {
           "@type": "Question",

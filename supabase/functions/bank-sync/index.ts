@@ -30,7 +30,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const CRON_SECRET = Deno.env.get("CRON_SECRET");
-const APP_URL = Deno.env.get("APP_URL") ?? "https://visible7.io";
+const APP_URL = Deno.env.get("APP_URL") ?? "https://micek.academy";
 const ACCESS = Deno.env.get("BANK_SYNC_ACCESS") ?? "admins"; // „admins“ (pilot) | „paid“
 
 // Goodveri – přístupy dodá SokordiaTech (Petr Bartošek). Bez nich běží testovací režim (mockGv).
