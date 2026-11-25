@@ -1,6 +1,6 @@
 import { track } from "@/lib/track";
 import React, { useState } from "react";
-import { ArrowRight, Award, Check, Clock, ListChecks, Play, Sparkles, Video } from "lucide-react";
+import { ArrowRight, Play, Video } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/components/AuthGate";
 import { BadgeIcon, LEVELS, mottoOfDay } from "@/components/GrowthBadge";
@@ -51,7 +51,7 @@ export const PhaseIntroTemplate = ({
   subtitle,
   description,
   phaseNumber,
-  icon: Icon,
+  icon: _icon,
   learningPoints,
   estimatedTime,
   steps,
@@ -83,103 +83,90 @@ export const PhaseIntroTemplate = ({
       : `Začít bránu ${phaseNumber}`;
 
   const greeting = thisDone
-    ? `${firstName ? `${firstName}, tuhle` : "Tuhle"} bránu už máte otevřenou. Kdykoli se k ní můžete vrátit.`
+    ? `${firstName ? `${firstName}, tuhle` : "Tuhle"} bránu máte hotovou. Můžete se k ní kdykoli vrátit.`
     : doneCount === 0
       ? `Vítejte${firstName ? `, ${firstName}` : ""}. Před vámi je sedm bran.`
       : `Paráda${firstName ? `, ${firstName}` : ""}. Za sebou máte už ${doneCount} ${doneCount === 1 ? "bránu" : doneCount < 5 ? "brány" : "bran"}.`;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
-      {/* Hero: kde jsem, o čem brána je, video vedle */}
-      <section className="overflow-hidden rounded-[28px] bg-primary p-5 text-white sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center">
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <ol className="flex items-center gap-1" aria-label={`Brána ${phaseNumber} ze 7`}>
-                {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-                  <li
-                    key={n}
-                    className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${
-                      done.has(n)
-                        ? "bg-emerald-500 text-white"
-                        : n === phaseNumber
-                          ? "bg-signal text-signal-foreground ring-4 ring-signal/30"
-                          : "border border-white/25 text-white/50"
-                    }`}
-                    title={GATE_NAMES[n]}
-                  >
-                    {done.has(n) ? <Check className="h-3 w-3" strokeWidth={3} /> : n}
-                  </li>
-                ))}
-              </ol>
-              <span className="text-sm font-semibold text-white/70">Brána {phaseNumber} ze 7</span>
-            </div>
-
-            <p className="mt-4 text-sm font-semibold text-signal">{greeting}</p>
-            <h1 className="mt-1 flex items-center gap-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
-              <Icon className="h-6 w-6 shrink-0 text-white/80" />
-              {name}
-            </h1>
-            <p className="mt-2 max-w-xl leading-snug text-white/85">{HOOK[phaseNumber]}</p>
-
-            <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/70">
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="h-4 w-4" aria-hidden="true" /> {estimatedTime}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <ListChecks className="h-4 w-4" aria-hidden="true" /> {steps}{" "}
-                {steps === 1 ? "krok" : steps >= 2 && steps <= 4 ? "kroky" : "kroků"}
-              </span>
-              {hasAiValidation && (
-                <span className="inline-flex items-center gap-1.5">
-                  <Sparkles className="h-4 w-4" aria-hidden="true" /> AI Michal
+      {/* Hero: postup přes celou šířku, vlevo text a tlačítko, vpravo odměna a video */}
+      <section className="overflow-hidden rounded-[28px] bg-primary p-5 text-white sm:p-7">
+        <div className="flex items-center gap-4">
+          <ol className="flex flex-1 gap-1.5" aria-label={`Brána ${phaseNumber} ze 7`}>
+            {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+              <li
+                key={n}
+                title={GATE_NAMES[n]}
+                className={`h-1.5 flex-1 rounded-full ${
+                  done.has(n) ? "bg-emerald-400" : n === phaseNumber ? "bg-signal" : "bg-white/15"
+                }`}
+              >
+                <span className="sr-only">
+                  {GATE_NAMES[n]}
+                  {done.has(n) ? " (hotovo)" : ""}
                 </span>
-              )}
+              </li>
+            ))}
+          </ol>
+          <span className="shrink-0 text-sm font-semibold text-white/70">Brána {phaseNumber} ze 7</span>
+        </div>
+
+        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          <div className="flex flex-col">
+            <p className="text-sm font-semibold text-signal">{greeting}</p>
+            <h1 className="mt-2 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{name}</h1>
+            <p className="mt-3 max-w-xl text-lg leading-snug text-white/85">{HOOK[phaseNumber]}</p>
+            <p className="mt-3 text-sm text-white/60">
+              {estimatedTime} · {steps} {steps === 1 ? "krok" : steps >= 2 && steps <= 4 ? "kroky" : "kroků"}
+              {hasAiValidation ? " · AI Michal" : ""}
             </p>
-
-            <button
-              type="button"
-              onClick={start}
-              className="mt-5 v7-trap-btn v7-phi-sm inline-flex h-12 items-center justify-center gap-2 pl-7 pr-11 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
-            >
-              {ctaLabel}
-              <ArrowRight className="h-5 w-5" />
-            </button>
-
-            <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
-              <BadgeIcon level={phaseNumber} size={32} />
-              <p className="text-sm text-white/80">
-                {thisDone ? "Máte" : "Získáte"} <span className="font-bold text-white">odznak {level?.name}</span> a
-                osvědčení s ověřovacím kódem pro LinkedIn.
-              </p>
+            <div className="mt-auto pt-6">
+              <button
+                type="button"
+                onClick={start}
+                className="v7-trap-btn v7-phi-sm inline-flex h-12 items-center justify-center gap-2 pl-7 pr-11 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/60"
+              >
+                {ctaLabel}
+                <ArrowRight className="h-5 w-5" />
+              </button>
             </div>
           </div>
 
-          {withVideo ? (
-            <button
-              type="button"
-              onClick={() => {
-                track("video_play", { where: "phase_intro", phase: phaseNumber });
-                setPlaying(true);
-              }}
-              className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-black/25 ring-1 ring-white/15"
-              aria-label={`Přehrát úvodní video k bráně ${name}`}
-            >
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-transform group-hover:scale-110">
-                <Play className="ml-1 h-7 w-7 fill-current" />
-              </span>
-              {video?.minutes ? (
-                <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-semibold">
-                  {video.minutes} min
-                </span>
-              ) : null}
-            </button>
-          ) : (
-            <div className="flex aspect-video w-full flex-col items-center justify-center rounded-2xl bg-black/25 text-center ring-1 ring-white/15">
-              <Video className="h-8 w-8 text-white/50" />
-              <p className="mt-2 font-semibold">Úvodní video připravujeme</p>
+          <div>
+            <div className="flex items-center gap-3">
+              <BadgeIcon level={phaseNumber} size={36} />
+              <p className="text-sm leading-snug text-white/75">
+                {thisDone ? "Máte" : "Získáte"} <span className="font-bold text-white">odznak {level?.name}</span>
+                <span className="block">a osvědčení s ověřovacím kódem pro LinkedIn</span>
+              </p>
             </div>
-          )}
+            {withVideo ? (
+              <button
+                type="button"
+                onClick={() => {
+                  track("video_play", { where: "phase_intro", phase: phaseNumber });
+                  setPlaying(true);
+                }}
+                className="group relative mt-4 flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-black/25"
+                aria-label={`Přehrát úvodní video k bráně ${name}`}
+              >
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-transform group-hover:scale-110">
+                  <Play className="ml-1 h-7 w-7 fill-current" />
+                </span>
+                {video?.minutes ? (
+                  <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-semibold">
+                    {video.minutes} min
+                  </span>
+                ) : null}
+              </button>
+            ) : (
+              <div className="mt-4 flex aspect-video w-full flex-col items-center justify-center rounded-2xl bg-black/25 text-center">
+                <Video className="h-7 w-7 text-white/40" aria-hidden="true" />
+                <p className="mt-2 text-sm font-semibold text-white/70">Úvodní video připravujeme</p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
