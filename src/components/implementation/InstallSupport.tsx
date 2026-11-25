@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Check, CreditCard, ExternalLink, Loader2, Wrench, Hammer, PartyPopper } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Check, ChevronDown, CreditCard, ExternalLink, Loader2, Wrench, Hammer, PartyPopper } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,6 +36,7 @@ export const InstallSupport = () => {
   const [req, setReq] = useState<InstallRequest | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
+  const [pick, setPick] = useState<"sam" | "podpora" | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -59,89 +60,108 @@ export const InstallSupport = () => {
       {loaded && active ? (
         <InstallStatusCard req={req} price={price} checkoutUrl={shop.install_checkout_url} />
       ) : (
-        <div className="mt-5 grid gap-4 md:grid-cols-2 md:items-start">
-          <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted text-foreground">
-              <Hammer className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <h3 className="mt-4 text-lg font-bold">Nainstaluji si sám</h3>
-            <p className="mt-1 flex-1 text-muted-foreground">
-              Krok za krokem podle videonávodů níže: hosting, doména, WordPress a Elementor. Platíte jen hosting a
-              doménu.
-            </p>
-            <a href="#plan" className="mt-4 font-semibold text-primary underline-offset-4 hover:underline">
-              Pokračovat podle návodů
-            </a>
+        <div className="mt-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            <PathToggle
+              open={pick === "sam"}
+              onClick={() => setPick(pick === "sam" ? null : "sam")}
+              icon={<Hammer className="h-5 w-5" aria-hidden="true" />}
+              title="Nainstaluji si sám"
+              meta="Podle videonávodů · platíte jen hosting a doménu"
+            />
+            <PathToggle
+              open={pick === "podpora"}
+              onClick={() => {
+                if (pick !== "podpora") track("install_expand", {});
+                setPick(pick === "podpora" ? null : "podpora");
+              }}
+              icon={<Wrench className="h-5 w-5" aria-hidden="true" />}
+              title="Instalace s podporou"
+              meta={`Web vám připravíme · ${kc(price)}`}
+              highlight
+            />
           </div>
 
-          <div className="flex flex-col rounded-2xl border-[3px] border-signal bg-leaf-50 p-6">
-            <div className="flex items-start justify-between gap-2">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-leaf-500 text-white">
-                <Wrench className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">
-                Bez starostí
-              </span>
-            </div>
-            <h3 className="mt-4 text-lg font-bold">Instalace s podporou</h3>
-            <p className="mt-1 text-muted-foreground">
-              Vyplníte krátký formulář a web vám připravíme. Vy se pak věnujete obsahu, ne technice.
-            </p>
-            <ul className="mt-4 space-y-1.5 text-sm">
-              {INCLUDED.map((t) => (
-                <li key={t} className="flex gap-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <dl className="mt-4 divide-y divide-leaf-200 rounded-xl bg-white text-sm">
-              <div className="flex justify-between gap-3 px-4 py-2.5">
-                <dt>Instalace a nastavení</dt>
-                <dd className="font-bold">{kc(price)}</dd>
-              </div>
-              <div className="flex justify-between gap-3 px-4 py-2.5">
-                <dt>Licence Elementor Pro na 1 rok</dt>
-                <dd className="font-bold text-leaf-700">zdarma</dd>
-              </div>
-              <div className="flex justify-between gap-3 px-4 py-2.5">
-                <dt>
-                  Hosting na 1 rok
-                  <span className="block text-xs text-muted-foreground">platíte přímo WEDOSu, na své jméno</span>
-                </dt>
-                <dd className="whitespace-nowrap">cca {kc(HOSTING_YEAR)}</dd>
-              </div>
-              <div className="flex justify-between gap-3 px-4 py-2.5">
-                <dt>
-                  Doména na 1 rok
-                  <span className="block text-xs text-muted-foreground">platíte přímo WEDOSu, na své jméno</span>
-                </dt>
-                <dd className="whitespace-nowrap">cca {kc(DOMAIN_YEAR)}</dd>
-              </div>
-              <div className="flex justify-between gap-3 bg-leaf-50/60 px-4 py-2.5">
-                <dt className="font-semibold">První rok celkem</dt>
-                <dd className="whitespace-nowrap font-bold">cca {kc(price + HOSTING_YEAR + DOMAIN_YEAR)}</dd>
-              </div>
-            </dl>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Hosting a doména podle{" "}
-              <a href={WEDOS_PRICES_URL} target="_blank" rel="noopener noreferrer" className="underline">
-                aktuálního ceníku WEDOS
+          {pick === "sam" && (
+            <div id="cesta-sam" className="mt-3 rounded-2xl border border-border bg-card p-5 sm:p-6">
+              <p className="text-muted-foreground">
+                Krok za krokem podle videonávodů níže: hosting, doména, WordPress a Elementor. Platíte jen hosting a
+                doménu.
+              </p>
+              <a
+                href="#typy"
+                className="mt-3 inline-block font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                Vybrat typ byznysu a pokračovat
               </a>
-              . Máte-li je už, platíte jen instalaci.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                track("install_open", {});
-                setOpen(true);
-              }}
-              className="v7-trap-btn mt-5 inline-flex h-12 items-center justify-center gap-2 pl-6 pr-11 font-bold text-signal-foreground"
-            >
-              Chci web nainstalovat
-            </button>
-            <p className="mt-2 text-xs text-muted-foreground">Ceny vč. DPH. Ozveme se do 2 pracovních dnů.</p>
-          </div>
+            </div>
+          )}
+
+          {pick === "podpora" && (
+            <div id="cesta-podpora" className="mt-3 rounded-2xl border-[3px] border-signal bg-leaf-50 p-5 sm:p-6">
+              <p className="text-muted-foreground">
+                Vyplníte krátký formulář a web vám připravíme. Vy se pak věnujete obsahu, ne technice.
+              </p>
+              <div className="mt-4 grid gap-5 lg:grid-cols-2">
+                <ul className="space-y-1.5 text-sm">
+                  {INCLUDED.map((t) => (
+                    <li key={t} className="flex gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+                <div>
+                  <dl className="divide-y divide-leaf-200 rounded-xl bg-white text-sm">
+                    <div className="flex justify-between gap-3 px-4 py-2.5">
+                      <dt>Instalace a nastavení</dt>
+                      <dd className="font-bold">{kc(price)}</dd>
+                    </div>
+                    <div className="flex justify-between gap-3 px-4 py-2.5">
+                      <dt>Licence Elementor Pro na 1 rok</dt>
+                      <dd className="font-bold text-leaf-700">zdarma</dd>
+                    </div>
+                    <div className="flex justify-between gap-3 px-4 py-2.5">
+                      <dt>
+                        Hosting na 1 rok
+                        <span className="block text-xs text-muted-foreground">platíte přímo WEDOSu, na své jméno</span>
+                      </dt>
+                      <dd className="whitespace-nowrap">cca {kc(HOSTING_YEAR)}</dd>
+                    </div>
+                    <div className="flex justify-between gap-3 px-4 py-2.5">
+                      <dt>
+                        Doména na 1 rok
+                        <span className="block text-xs text-muted-foreground">platíte přímo WEDOSu, na své jméno</span>
+                      </dt>
+                      <dd className="whitespace-nowrap">cca {kc(DOMAIN_YEAR)}</dd>
+                    </div>
+                    <div className="flex justify-between gap-3 bg-leaf-50/60 px-4 py-2.5">
+                      <dt className="font-semibold">První rok celkem</dt>
+                      <dd className="whitespace-nowrap font-bold">cca {kc(price + HOSTING_YEAR + DOMAIN_YEAR)}</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Hosting a doména podle{" "}
+                    <a href={WEDOS_PRICES_URL} target="_blank" rel="noopener noreferrer" className="underline">
+                      aktuálního ceníku WEDOS
+                    </a>
+                    . Máte-li je už, platíte jen instalaci. Ceny vč. DPH.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  track("install_open", {});
+                  setOpen(true);
+                }}
+                className="v7-trap-btn mt-5 inline-flex h-12 items-center justify-center gap-2 pl-6 pr-11 font-bold text-signal-foreground"
+              >
+                Chci web nainstalovat
+              </button>
+              <p className="mt-2 text-xs text-muted-foreground">Ozveme se do 2 pracovních dnů.</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -158,6 +178,52 @@ export const InstallSupport = () => {
     </section>
   );
 };
+
+/** Sbalená volba cesty: klik rozbalí detail pod oběma kartami. */
+const PathToggle = ({
+  open,
+  onClick,
+  icon,
+  title,
+  meta,
+  highlight = false,
+}: {
+  open: boolean;
+  onClick: () => void;
+  icon: ReactNode;
+  title: string;
+  meta: string;
+  highlight?: boolean;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-expanded={open}
+    className={`flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+      open
+        ? highlight
+          ? "border-transparent bg-leaf-50 ring-[3px] ring-signal"
+          : "border-transparent bg-card ring-2 ring-primary"
+        : "border-border bg-card hover:bg-muted/50"
+    }`}
+  >
+    <span
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+        highlight ? "bg-leaf-500 text-white" : "bg-muted text-foreground"
+      }`}
+    >
+      {icon}
+    </span>
+    <span className="min-w-0 flex-1">
+      <span className="block font-bold">{title}</span>
+      <span className="block text-sm text-muted-foreground">{meta}</span>
+    </span>
+    <ChevronDown
+      className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+      aria-hidden="true"
+    />
+  </button>
+);
 
 const InstallStatusCard = ({
   req,
