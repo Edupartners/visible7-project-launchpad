@@ -12,7 +12,6 @@ import {
   Lock,
   LogOut,
   Map,
-  Megaphone,
   Plus,
   Presentation,
   Settings,
@@ -215,9 +214,6 @@ export const AppHeader = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/rentgen-trhu")}>
                   <Globe2 className="mr-2.5 h-4 w-4 text-muted-foreground" /> Rentgen trhu
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/benchmarking-phase")}>
-                  <Megaphone className="mr-2.5 h-4 w-4 text-muted-foreground" /> Marketingové kanály
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/investor-pitch")} disabled={!pitchReady}>
                   <Presentation className="mr-2.5 h-4 w-4 text-muted-foreground" /> Pitch pro investory

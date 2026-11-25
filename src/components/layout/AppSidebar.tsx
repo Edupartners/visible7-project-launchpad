@@ -7,7 +7,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Lock,
-  Megaphone,
   Calculator,
   LayoutDashboard,
   Check,
@@ -79,7 +78,6 @@ const BUSINESS_PATHS = ["/muj-podnik", "/cash-flow", "/financni-report"];
 const TOOLS: [string, string, typeof Award][] = [
   ["Mapa ke startu", "/diagnostika", Map],
   ["Rentgen trhu", "/rentgen-trhu", Globe2],
-  ["Marketingové kanály", "/benchmarking-phase", Megaphone],
   ["Pitch pro investory", "/investor-pitch", Presentation],
   ["Pracovní listy", "/listy", FileText],
   ["Web projektu (test zájmu)", "/testovaci-stranka", FlaskConical],
