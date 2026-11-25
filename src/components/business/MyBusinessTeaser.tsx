@@ -24,7 +24,7 @@ export const MyBusinessTeaser = () => {
       </span>
       <span className="flex-1">
         <span className="block text-lg font-bold">Začínám podnikat</span>
-        <span className="block text-sm text-white/75">Peníze, nejbližší termíny a úřady na jednom místě.</span>
+        <span className="block text-sm text-white/75">Živnost, úřady, peníze a termíny na jednom místě.</span>
       </span>
       <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
     </Link>

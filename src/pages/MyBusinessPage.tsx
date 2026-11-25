@@ -73,7 +73,7 @@ const MyBusinessPage = () => {
         <header>
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Začínám podnikat</h1>
           <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
-            Peníze, termíny a úřady na jednom místě. Co potřebuje pozornost, uvidíte hned nahoře.
+            Živnost, úřady, peníze a termíny na jednom místě. Co potřebuje pozornost, uvidíte hned nahoře.
           </p>
         </header>
 
