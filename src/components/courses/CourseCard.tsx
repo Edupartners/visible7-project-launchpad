@@ -3,7 +3,7 @@ import { Check, Sparkles } from "lucide-react";
 import type { BlockVideoRow } from "@/lib/blockVideos";
 import { FeaturedCourse, hoursLabel, lessonsLabel, videoMinutes } from "@/lib/courses";
 
-/** Karta kurzu jako v katalogu LMS: obrázek, název, lektor, délka a kolik máte zhlédnuto. */
+/** Karta kurzu jako v katalogu LMS: obrázek, název, lektor, délka, postup a tlačítko (stejně jako typy byznysu v bráně 4). */
 export const CourseCard = ({
   course,
   videos,
@@ -51,13 +51,22 @@ export const CourseCard = ({
           {minutes > 0 ? ` · ${hoursLabel(minutes)}` : ""}
         </p>
         {seen > 0 && !done && (
-          <div
-            className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted"
-            aria-label={`Zhlédnuto ${seen} z ${videos.length}`}
-          >
-            <div className="h-full bg-leaf-500" style={{ width: `${(seen / videos.length) * 100}%` }} />
+          <div className="mt-3">
+            <p className="text-sm font-semibold">Hotovo {Math.round((seen / videos.length) * 100)} %</p>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className="h-full bg-leaf-500" style={{ width: `${(seen / videos.length) * 100}%` }} />
+            </div>
           </div>
         )}
+        <span
+          className={`mt-4 inline-flex h-10 items-center justify-center rounded-xl text-sm font-bold transition-colors ${
+            recommended || seen > 0
+              ? "bg-primary text-white group-hover:bg-primary/90"
+              : "border border-border text-foreground group-hover:bg-muted"
+          }`}
+        >
+          {done ? "Pustit znovu" : seen > 0 ? "Pokračovat" : "Otevřít kurz"}
+        </span>
       </div>
     </Link>
   );
