@@ -29,7 +29,7 @@
   - SEO: základ a obsah (brána 5)
   - Ochranná známka a legislativa (brána 6)
   - Data a Power BI (brána 7)
-  - Bonusy: Grafika zdarma ve Photopea, AI Act v praxi s osvědčením
+  - Bonusy: Grafika ve Photopea, AI Act v praxi s osvědčením
 - AI asistent napojený na data projektu
 - Kalkulačky: finanční plán, daně, PNO, cash-flow, nábor
 - Živé online semináře (90 minut), 4 vybrané v ceně členství: AI nástroje pro zrychlení práce, Google Analytics 4, SEO/GEO/AIO a AI trendy, Facebook reklama, WordPress + MCP AI, byznysové strategie (Modrý oceán, Hooked)

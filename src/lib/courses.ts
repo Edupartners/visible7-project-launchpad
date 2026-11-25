@@ -120,7 +120,7 @@ export const FEATURED_COURSES: FeaturedCourse[] = [
   },
   {
     id: "grafika",
-    title: "Grafika zdarma ve Photopea",
+    title: "Grafika ve Photopea",
     gate: "Bonus",
     lecturer: "Hana Antonová",
     cover: "/video-covers/grafika.webp",

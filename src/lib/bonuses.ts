@@ -36,7 +36,7 @@ export const BONUSES: Bonus[] = [
   },
   {
     id: "grafika",
-    title: "Grafika zdarma ve Photopea",
+    title: "Grafika ve Photopea",
     lead: "Dva celodenní workshopy krok za krokem: reklamní banner a produktový vizuál v bezplatné kopii Photoshopu.",
     why: "Banner do reklamy nebo obrázek na web si upravíte sami, bez grafika a bez placeného Photoshopu.",
     certificateFor: "za absolvování workshopu grafiky ve Photopea (tvorba bannerů a úprava fotografií)",
