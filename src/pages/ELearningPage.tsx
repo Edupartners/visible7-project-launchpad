@@ -116,7 +116,7 @@ function CatalogCard({ c, onOpen }: { c: Course; onOpen: () => void }) {
 export default function ELearningPage() {
   const navigate = useNavigate();
   const shop = useShop();
-  const { hours, lessons: lessonCount } = useLessonStats();
+  const { hours } = useLessonStats();
   const { data: catalog = [], isLoading } = useQuery({
     queryKey: ["lesson_catalog"],
     queryFn: loadCatalog,
@@ -177,8 +177,12 @@ export default function ELearningPage() {
                 {count} kurzů od lektorů z praxe.
               </h1>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                {lessonCount.toLocaleString("cs-CZ")} krátkých video lekcí, přes {hoursFloor10(hours)} hodin. Web a
-                e-shop, reklama, SEO, měření, texty, legislativa i data. Učí lidé, kteří se tím živí.
+                Naučíte se postavit web nebo e-shop, spustit reklamu, měřit výsledky a ohlídat legislativu. Učí lidé,
+                kteří se tím živí.
+              </p>
+              <p className="mt-3 max-w-xl text-muted-foreground">
+                Přes {hoursFloor10(hours)} hodin videí: e-learningové kurzy i záznamy přednášek rozdělené do kapitol,
+                abyste našli přesně to, co potřebujete. Za dokončený kurz získáte osvědčení o absolvování.
               </p>
             </div>
             <div className="rounded-2xl bg-primary p-6 text-white">
