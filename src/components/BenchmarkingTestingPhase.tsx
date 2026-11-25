@@ -73,7 +73,7 @@ export function BenchmarkingTestingPhase({ onChannelSelect }: BenchmarkingTestin
 
       <header>
         <p className="text-sm font-semibold text-primary">Fáze 5 ze 7</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Budování poptávky</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Marketing a budování poptávky</h1>
         <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
           Vyberte si kurzy, které se hodí k vašemu projektu. Zeleně jsou ty, které vám doporučujeme.
         </p>
