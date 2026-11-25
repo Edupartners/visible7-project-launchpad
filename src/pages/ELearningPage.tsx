@@ -1,11 +1,21 @@
-import { useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, ChevronLeft, ChevronRight, Clock, Lock, PlayCircle } from "lucide-react";
+import { ArrowRight, Check, Lock, PlayCircle } from "lucide-react";
 import { PublicHeader } from "@/components/marketing/PublicHeader";
 import { Footer } from "@/components/layout/Footer";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/visible7/client";
-import { FEATURED_COURSES, firstNames, hoursFloor10, useLessonStats, type FeaturedCourse } from "@/lib/courses";
+import { ADVISORS } from "@/lib/advisors";
+import {
+  COURSE_PRICE,
+  FEATURED_COURSES,
+  firstNames,
+  hoursFloor10,
+  useLessonStats,
+  type FeaturedCourse,
+} from "@/lib/courses";
+import { MEMBER_ITEMS, canBuy, kc, nbsp, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
 interface CatalogLesson {
@@ -15,8 +25,24 @@ interface CatalogLesson {
   minutes: number | null;
 }
 
-/** Pořadí řad: tak, jak je člověk potřebuje na cestě (brána 4 → 7, bonusy na konec). */
-const ORDER = ["web", "shoptet", "copy", "ga4", "affiliate", "meta", "ppc", "seo", "znacka", "data", "ai_viditelnost", "grafika", "aiact"];
+/** Pořadí kurzů v katalogu a jejich kategorie. */
+const CATEGORY: Record<string, string> = {
+  web: "Web a e-shop",
+  shoptet: "Web a e-shop",
+  copy: "Marketing",
+  ppc: "Marketing",
+  meta: "Marketing",
+  seo: "Marketing",
+  ga4: "Marketing",
+  affiliate: "Marketing",
+  znacka: "Právo a data",
+  data: "Právo a data",
+  ai_viditelnost: "Bonusy",
+  grafika: "Bonusy",
+  aiact: "Bonusy",
+};
+const ORDER = Object.keys(CATEGORY);
+const CATEGORIES = ["Vše", "Web a e-shop", "Marketing", "Právo a data", "Bonusy"];
 
 async function loadCatalog(): Promise<CatalogLesson[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,104 +51,87 @@ async function loadCatalog(): Promise<CatalogLesson[]> {
   return data as CatalogLesson[];
 }
 
-const fmtLen = (min: number) =>
-  min < 60 ? `${Math.max(1, Math.round(min))} min` : `${(Math.round((min / 60) * 10) / 10).toLocaleString("cs-CZ")} h`;
+const fmtLen = (min: number) => {
+  if (min < 60) return `${Math.max(1, Math.round(min))} min`;
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return m ? `${h} h ${m} min` : `${h} h`;
+};
 
 const lessonsWord = (n: number) => (n === 1 ? "lekce" : n >= 2 && n <= 4 ? "lekce" : "lekcí");
 
-interface Row {
+/** Fotka lektora z přehledu poradců (podle příjmení prvního lektora). */
+const lecturerPhoto = (lecturer: string) => {
+  const first = lecturer.split(/,| a /)[0].trim();
+  const last = first.split(" ").pop() ?? first;
+  return ADVISORS.find((a) => a.photo && a.name.includes(last))?.photo ?? null;
+};
+
+interface Course {
   course: FeaturedCourse;
   lessons: CatalogLesson[];
   minutes: number;
 }
 
-/** Jedna řada „jako Netflix“: hlavička kurzu a lekce posuvné do strany. */
-function CourseRow({ row, onPick }: { row: Row; onPick: (where: string) => void }) {
-  const ref = useRef<HTMLUListElement>(null);
-  const scroll = (dir: 1 | -1) => {
-    const el = ref.current;
-    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
-  };
-  const { course: c, lessons } = row;
+/** Karta kurzu jako v katalogu e-learningu: obrázek, kategorie, název, lektor s fotkou, rozsah a osnova. */
+function CatalogCard({ c, onOpen }: { c: Course; onOpen: () => void }) {
+  const photo = lecturerPhoto(c.course.lecturer);
   return (
-    <section aria-labelledby={`r-${c.id}`} className="group/row">
-      <div className="mx-auto flex max-w-[90rem] items-end justify-between gap-4 px-4 sm:px-8 lg:px-12">
-        <div className="min-w-0">
-          <h2 id={`r-${c.id}`} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xl font-extrabold tracking-tight text-white sm:text-2xl">
-            {c.title.replace(/ /g, " ")}
-            <span className="v7-para-sm bg-signal px-2.5 py-0.5 text-xs font-bold text-signal-foreground">{c.gate}</span>
-          </h2>
-          <p className="mt-1 text-sm text-white/60">
-            {c.lecturer && <>{firstNames(c.lecturer)} · </>}
-            {lessons.length} {lessonsWord(lessons.length)} · {fmtLen(row.minutes)}
-          </p>
-        </div>
-        <div className="hidden shrink-0 gap-2 sm:flex">
-          <button
-            type="button"
-            onClick={() => scroll(-1)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white/80 hover:border-signal hover:text-signal"
-            aria-label={`Posunout ${c.title} doleva`}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => scroll(1)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 text-white/80 hover:border-signal hover:text-signal"
-            aria-label={`Posunout ${c.title} doprava`}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-left transition-shadow hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+        <img
+          src={c.course.cover}
+          alt=""
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+        <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground">
+          {CATEGORY[c.course.id]}
+        </span>
       </div>
-      <ul
-        ref={ref}
-        className="mt-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto scroll-smooth px-4 pb-4 [scrollbar-width:none] sm:scroll-px-8 sm:px-8 lg:scroll-px-[max(3rem,calc((100vw-90rem)/2+3rem))] lg:px-[max(3rem,calc((100vw-90rem)/2+3rem))] [&::-webkit-scrollbar]:hidden"
-      >
-        {lessons.map((l, i) => (
-          <li key={`${l.block_key}-${l.position}-${i}`} className="w-[15.5rem] shrink-0 snap-start sm:w-[17rem]">
-            <button
-              type="button"
-              onClick={() => onPick(c.id)}
-              className="group relative block aspect-video w-full overflow-hidden rounded-lg bg-[hsl(158_40%_15%)] text-left ring-signal transition duration-300 hover:z-10 hover:scale-[1.04] hover:ring-2 focus:outline-none focus-visible:ring-2"
-              aria-label={`${l.title} – lekce pro členy`}
-            >
-              <img src={c.cover} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-55 transition-opacity group-hover:opacity-40" />
-              <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-              <span className="absolute left-2.5 top-2 text-3xl font-black leading-none text-white/25">{i + 1}</span>
-              <span className="absolute right-2 top-2 flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[11px] font-semibold text-white">
-                <Lock className="h-3 w-3" aria-hidden="true" /> {l.minutes ? fmtLen(Number(l.minutes)) : "video"}
-              </span>
-              <span className="absolute inset-x-0 bottom-0 p-3">
-                <span className="line-clamp-3 text-sm font-bold leading-snug text-white">{l.title}</span>
-              </span>
-              <PlayCircle
-                aria-hidden="true"
-                className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2 text-signal opacity-0 transition-opacity group-hover:opacity-100"
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="text-lg font-bold leading-snug">{c.course.title}</h3>
+        <div className="mt-2 flex items-center gap-2">
+          {photo ? (
+            <img src={photo} alt="" loading="lazy" className="h-7 w-7 rounded-full bg-muted object-cover object-top" />
+          ) : null}
+          <p className="text-sm text-muted-foreground">{firstNames(c.course.lecturer)}</p>
+        </div>
+        <p className="mt-auto pt-3 text-sm text-muted-foreground">
+          {c.lessons.length} {lessonsWord(c.lessons.length)} · {fmtLen(c.minutes)}
+        </p>
+        <span className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-border text-sm font-bold transition-colors group-hover:bg-muted">
+          Zobrazit osnovu
+        </span>
+      </div>
+    </button>
   );
 }
 
-/** Veřejná stránka E-learning: všechny lekce v řadách podle kurzů, aby bylo vidět, kolik toho je. */
+/** Veřejný katalog e-learningu: kurzy v kartách, osnova v okně, vše v ceně ročního členství. */
 export default function ELearningPage() {
   const navigate = useNavigate();
+  const shop = useShop();
   const { hours, lessons: lessonCount } = useLessonStats();
-  const { data: catalog = [], isLoading } = useQuery({ queryKey: ["lesson_catalog"], queryFn: loadCatalog, staleTime: 60 * 60_000 });
+  const { data: catalog = [], isLoading } = useQuery({
+    queryKey: ["lesson_catalog"],
+    queryFn: loadCatalog,
+    staleTime: 60 * 60_000,
+  });
+  const [filter, setFilter] = useState("Vše");
+  const [open, setOpen] = useState<Course | null>(null);
 
   useEffect(() => {
-    const title = "E-learning pro podnikatele: přes 50 hodin videí v krátkých lekcích | VISIBLE7 MICEK";
-    document.title = title;
+    document.title = "E-learning: kurzy od lektorů z praxe, vše v ceně členství | micek.academy";
     const meta = document.querySelector('meta[name="description"]');
     const prev = meta?.getAttribute("content") ?? null;
     meta?.setAttribute(
       "content",
-      "Web a e-shop, Shoptet, GA4, reklama na Facebooku a Google, SEO, copywriting, legislativa a data. Stovky krátkých video lekcí od lektorů z praxe, seřazené podle toho, kdy je na cestě potřebujete.",
+      "Web na WordPressu, e-shop na Shoptetu, PPC, Facebook a Instagram, SEO, GA4, copywriting, affiliate, legislativa a data. Video kurzy od lektorů z praxe, všechny v ceně ročního členství.",
     );
     window.scrollTo(0, 0);
     return () => {
@@ -130,120 +139,195 @@ export default function ELearningPage() {
     };
   }, []);
 
-  const rows: Row[] = useMemo(() => {
+  const courses: Course[] = useMemo(() => {
     const byKey = new Map<string, CatalogLesson[]>();
     for (const l of catalog) byKey.set(l.block_key, [...(byKey.get(l.block_key) ?? []), l]);
     return ORDER.map((id) => FEATURED_COURSES.find((c) => c.id === id))
       .filter((c): c is FeaturedCourse => !!c)
       .map((course) => {
-        // Lekce v pořadí kurzu: karty tak, jak jdou v kurzu, uvnitř karty podle pozice.
         const lessons = course.keys.flatMap((k) => [...(byKey.get(k) ?? [])].sort((a, b) => a.position - b.position));
         return { course, lessons, minutes: lessons.reduce((s, l) => s + (Number(l.minutes) || 0), 0) };
       })
       .filter((r) => r.lessons.length > 0);
   }, [catalog]);
 
+  const shown = filter === "Vše" ? courses : courses.filter((c) => CATEGORY[c.course.id] === filter);
+  const count = courses.length || FEATURED_COURSES.length;
+  const price = kc(shop.price);
+
+  const buy = (where: string) => {
+    track("checkout_click", { source: `elearning:${where}`, price: shop.price });
+    navigate(canBuy(shop) ? "/clenstvi" : "/cenik");
+  };
   const start = (where: string) => {
     track("elearning_cta_click", { where });
     navigate("/home?novy");
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(158_58%_7%)] text-white">
-      <div className="bg-background text-foreground">
-        <PublicHeader onStart={() => start("header")} />
-      </div>
+    <div className="min-h-screen bg-background">
+      <PublicHeader onStart={() => start("header")} />
       <main>
-        {/* Úvod */}
-        <section className="relative overflow-hidden">
-          <img src="/video-covers/kurz.webp" alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-          <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-[hsl(158_58%_7%)] via-[hsl(158_58%_7%/0.85)] to-[hsl(158_58%_7%/0.3)]" />
-          <span aria-hidden className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[hsl(158_58%_7%)] to-transparent" />
-          <div className="relative mx-auto max-w-[90rem] px-4 pb-16 pt-14 sm:px-8 lg:px-12 lg:pb-24 lg:pt-20">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-signal">E-learning VISIBLE7</p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-6xl">
-              Přes {hoursFloor10(hours)} hodin videí. {lessonCount.toLocaleString("cs-CZ")} krátkých lekcí.
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">
-              Web a e-shop, Shoptet, měření, reklama, SEO, texty, legislativa i data. Od lektorů z praxe, seřazené podle
-              toho, kdy je na cestě k vlastnímu podnikání potřebujete. Každý měsíc přibývají další.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Úvod s cenou */}
+        <section className="border-b border-border bg-muted/40">
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-8 lg:grid-cols-[1.4fr_1fr] lg:items-center lg:py-16">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">E-learning</p>
+              <h1 className="mt-3 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl">
+                {count} kurzů od lektorů z praxe.
+              </h1>
+              <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
+                {lessonCount.toLocaleString("cs-CZ")} krátkých video lekcí, přes {hoursFloor10(hours)} hodin. Web a
+                e-shop, reklama, SEO, měření, texty, legislativa i data. Učí lidé, kteří se tím živí.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-primary p-6 text-white">
+              <p className="text-sm font-semibold text-white/70">Všechny kurzy v ceně členství</p>
+              <p className="mt-1 text-4xl font-extrabold tracking-tight">{nbsp(price)}</p>
+              <p className="text-sm text-white/70">na 12 měsíců, vč. DPH</p>
+              <p className="mt-3 text-sm text-white/80">
+                Samostatně stojí jeden kurz {nbsp(kc(COURSE_PRICE))}. Ke kurzům máte i aplikaci, semináře a osvědčení.
+              </p>
+              <button
+                type="button"
+                onClick={() => buy("hero")}
+                className="v7-trap-btn v7-phi-sm mt-5 inline-flex h-12 w-full items-center justify-center gap-2 text-base font-bold text-signal-foreground"
+              >
+                Získat přístup <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </button>
               <button
                 type="button"
                 onClick={() => start("hero")}
-                className="v7-trap-btn v7-phi-lg inline-flex h-14 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-signal/40"
+                className="mt-3 w-full text-center text-sm font-semibold text-white/80 underline-offset-4 hover:underline"
               >
-                Diagnostika zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                Nejdřív vstupní diagnostika zdarma
               </button>
-              <a
-                href="#kurzy"
-                className="inline-flex h-14 items-center justify-center gap-2 border-2 border-white/30 px-6 text-base font-semibold text-white transition-colors hover:border-signal hover:text-signal"
-              >
-                Prohlédnout lekce
-              </a>
             </div>
-            <dl className="mt-10 flex flex-wrap gap-x-10 gap-y-4">
-              {[
-                [`${rows.length || FEATURED_COURSES.length}`, "kurzů"],
-                [lessonCount.toLocaleString("cs-CZ"), "lekcí"],
-                [`${hoursFloor10(hours)}+`, "hodin videí"],
-              ].map(([v, l]) => (
-                <div key={l}>
-                  <dt className="sr-only">{l}</dt>
-                  <dd className="text-3xl font-extrabold tracking-tight text-signal">
-                    {v} <span className="text-base font-semibold text-white/70">{l}</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </section>
 
-        {/* Řady kurzů */}
-        <div id="kurzy" className="scroll-mt-20 space-y-10 pb-16 sm:space-y-12">
-          {isLoading &&
-            [0, 1, 2].map((i) => (
-              <div key={i} className="mx-auto max-w-[90rem] px-4 sm:px-8 lg:px-12" aria-hidden="true">
-                <div className="h-6 w-64 animate-pulse rounded bg-white/10" />
-                <div className="mt-4 flex gap-3 overflow-hidden">
-                  {[0, 1, 2, 3, 4, 5].map((j) => (
-                    <div key={j} className="aspect-video w-[17rem] shrink-0 animate-pulse rounded-lg bg-white/10" />
-                  ))}
-                </div>
-              </div>
+        {/* Katalog */}
+        <section id="kurzy" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-10 sm:px-8">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Kategorie kurzů">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                role="tab"
+                aria-selected={filter === cat}
+                onClick={() => setFilter(cat)}
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-colors ${
+                  filter === cat ? "bg-primary text-white" : "bg-muted text-foreground hover:bg-muted/70"
+                }`}
+              >
+                {cat}
+              </button>
             ))}
-          {rows.map((r) => (
-            <CourseRow key={r.course.id} row={r} onPick={(id) => start(`lekce:${id}`)} />
-          ))}
-        </div>
+          </div>
 
-        {/* Výzva */}
-        <section className="border-t border-white/10">
-          <div className="mx-auto flex max-w-[90rem] flex-col items-start gap-6 px-4 py-14 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-12">
+          <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {isLoading
+              ? [0, 1, 2, 3, 4, 5].map((i) => (
+                  <li key={i} aria-hidden="true" className="overflow-hidden rounded-2xl border border-border">
+                    <div className="aspect-[16/9] animate-pulse bg-muted" />
+                    <div className="space-y-2 p-4">
+                      <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+                    </div>
+                  </li>
+                ))
+              : shown.map((c) => (
+                  <li key={c.course.id}>
+                    <CatalogCard
+                      c={c}
+                      onOpen={() => {
+                        track("elearning_syllabus", { course: c.course.id });
+                        setOpen(c);
+                      }}
+                    />
+                  </li>
+                ))}
+          </ul>
+        </section>
+
+        {/* Co je v ceně */}
+        <section className="border-t border-border bg-muted/40">
+          <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-8 lg:grid-cols-[1fr_1fr] lg:items-center">
             <div>
-              <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Videa nejsou samoúčelná.</h2>
-              <p className="mt-2 max-w-2xl text-white/70">
-                Každá lekce sedí ke kroku v aplikaci: pustíte si video a hned ho uděláte na svém plánu, webu nebo kampani.
-                Lekce najdete i hledáním, třeba „jak nahodit GA4“.
+              <h2 className="text-3xl font-extrabold tracking-tight">Vše v ceně {nbsp(price)} na rok</h2>
+              <p className="mt-2 text-muted-foreground">
+                Přístup platí 12 měsíců od zaplacení. Ke kurzům dostanete i aplikaci a semináře.
+              </p>
+              <button
+                type="button"
+                onClick={() => buy("footer")}
+                className="v7-trap-btn v7-phi-sm mt-6 inline-flex h-12 items-center justify-center gap-2 pl-7 pr-11 text-base font-bold text-signal-foreground"
+              >
+                Získat přístup <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <p className="mt-3 text-sm">
+                <Link to="/cenik" className="font-semibold text-primary underline-offset-4 hover:underline">
+                  Porovnat se studiem s lektory
+                </Link>
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => start("footer")}
-              className="v7-trap-btn v7-phi-lg inline-flex h-14 shrink-0 items-center justify-center gap-2 pl-7 pr-12 text-base font-bold text-signal-foreground"
-            >
-              Diagnostika zdarma <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </button>
+            <ul className="space-y-2.5">
+              {MEMBER_ITEMS.map((it) => (
+                <li key={it} className="flex gap-2">
+                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-leaf-600" strokeWidth={3} aria-hidden="true" />
+                  {it}
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="mx-auto flex max-w-[90rem] items-center gap-2 px-4 pb-10 text-sm text-white/50 sm:px-8 lg:px-12">
-            <Clock className="h-4 w-4" aria-hidden="true" /> Lekce se zámkem jsou pro členy. Délky se počítají z publikovaných videí.
-          </p>
         </section>
       </main>
-      <div className="bg-background text-foreground">
-        <Footer variant="full" />
-      </div>
+      <Footer variant="full" />
+
+      {/* Osnova kurzu */}
+      <Dialog open={!!open} onOpenChange={(v) => !v && setOpen(null)}>
+        <DialogContent className="max-h-[90vh] max-w-2xl gap-0 overflow-hidden p-0 sm:rounded-2xl">
+          {open && (
+            <div className="flex max-h-[90vh] flex-col">
+              <div className="relative aspect-[16/6] shrink-0 overflow-hidden bg-muted">
+                <img src={open.course.cover} alt="" className="h-full w-full object-cover" />
+              </div>
+              <div className="shrink-0 px-5 pt-5 sm:px-6">
+                <p className="text-sm font-semibold text-leaf-700">{CATEGORY[open.course.id]}</p>
+                <DialogTitle className="mt-1 text-2xl font-extrabold tracking-tight">{open.course.title}</DialogTitle>
+                <DialogDescription className="mt-1">
+                  {firstNames(open.course.lecturer)} · {open.lessons.length} {lessonsWord(open.lessons.length)} ·{" "}
+                  {fmtLen(open.minutes)}
+                </DialogDescription>
+              </div>
+              <ol className="mt-4 min-h-0 flex-1 divide-y divide-border overflow-y-auto border-y border-border px-5 sm:px-6">
+                {open.lessons.map((l, i) => (
+                  <li key={`${l.block_key}-${l.position}-${i}`} className="flex items-center gap-3 py-2.5 text-sm">
+                    <span className="w-6 shrink-0 text-right font-semibold text-muted-foreground">{i + 1}</span>
+                    <PlayCircle className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <span className="min-w-0 flex-1">{l.title}</span>
+                    <span className="shrink-0 text-muted-foreground">{l.minutes ? fmtLen(Number(l.minutes)) : ""}</span>
+                    <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-label="Pro členy" />
+                  </li>
+                ))}
+              </ol>
+              <div className="flex shrink-0 flex-col gap-3 bg-muted/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <p className="text-sm">
+                  <span className="font-bold">V ceně členství {nbsp(price)} na rok</span>
+                  <span className="block text-muted-foreground">spolu s dalšími {count - 1} kurzy</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => buy(`osnova:${open.course.id}`)}
+                  className="v7-trap-btn v7-phi-sm inline-flex h-11 shrink-0 items-center justify-center gap-2 pl-6 pr-10 text-sm font-bold text-signal-foreground"
+                >
+                  Získat přístup <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
