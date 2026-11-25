@@ -25,7 +25,7 @@ export const FeaturedCourses = () => {
       <div className="max-w-3xl">
         <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">Kurzy</p>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Kurzy od lektorů, kteří se tím živí.
+          Lektoři z praxe.
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
           Přes {hoursFloor10(hours)} hodin videí v {lessons.toLocaleString("cs-CZ")} krátkých lekcích. Všechny jsou v
