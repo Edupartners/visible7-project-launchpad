@@ -396,3 +396,45 @@ export const COURSE_CERT: Record<string, CourseCertContent> = {
 /** Bonusový kurz (klíč "bonus:<id>") má osvědčení za bonus, ostatní osvědčení za kurz. */
 export const courseBonusId = (c: FeaturedCourse) =>
   c.keys.length === 1 && c.keys[0].startsWith("bonus:") ? c.keys[0].slice(6) : null;
+
+/** Kategorie kurzů v katalogu e-learningu (pořadí klíčů = pořadí v katalogu). */
+export const COURSE_CATEGORY: Record<string, string> = {
+  web: "Web a e-shop",
+  shoptet: "Web a e-shop",
+  copy: "Marketing",
+  ppc: "Marketing",
+  meta: "Marketing",
+  seo: "Marketing",
+  ga4: "Marketing",
+  affiliate: "Marketing",
+  znacka: "Právo a data",
+  data: "Právo a data",
+  ai_viditelnost: "Bonusy",
+  grafika: "Bonusy",
+  aiact: "Bonusy",
+};
+export const COURSE_ORDER = Object.keys(COURSE_CATEGORY);
+export const COURSE_CATEGORIES = ["Vše", "Web a e-shop", "Marketing", "Právo a data", "Bonusy"];
+
+const sigOf = (v: BlockVideoRow) => `${v.vimeo_id}:${v.start_sec ?? ""}:${v.end_sec ?? ""}`;
+
+/** Postup ve všech kurzech: kapitola se počítá jako zhlédnutá, když ji člověk viděl v kterékoli kartě. */
+export function coursesProgress(all: BlockVideoRow[], watched: Set<string>) {
+  const seen = new Set(all.filter((v) => watched.has(v.id)).map(sigOf));
+  return COURSE_ORDER.map((id) => courseById(id))
+    .filter((c): c is FeaturedCourse => !!c)
+    .map((course) => {
+      const videos = courseVideos(course, all);
+      const done = videos.filter((v) => seen.has(sigOf(v))).length;
+      const next = videos.find((v) => !seen.has(sigOf(v))) ?? null;
+      return {
+        course,
+        videos,
+        done,
+        total: videos.length,
+        pct: videos.length ? Math.round((done / videos.length) * 100) : 0,
+        next,
+      };
+    })
+    .filter((r) => r.total > 0);
+}

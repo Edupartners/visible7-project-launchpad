@@ -204,6 +204,32 @@ export const AppHeader = ({
               </>
             )}
 
+            {!withSidebar && (
+              <button type="button" onClick={() => navigate("/poradci")} className={navCls(pathname === "/poradci")}>
+                Poradci
+              </button>
+            )}
+            {(isStudent || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => navigate("/moje-studium")}
+                className={navCls(pathname === "/moje-studium")}
+              >
+                Studium
+              </button>
+            )}
+            {!isStudent && (
+              <button type="button" onClick={() => navigate("/seminare")} className={navCls(pathname === "/seminare")}>
+                Semináře
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/kurzy")}
+              className={navCls(pathname === "/kurzy" || pathname.startsWith("/kurz/"))}
+            >
+              E-learning
+            </button>
             <DropdownMenu>
               <DropdownMenuTrigger className={navCls(onTool)}>
                 Nástroje <ChevronDown className="h-4 w-4" />
@@ -235,25 +261,6 @@ export const AppHeader = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {!withSidebar && (
-              <button type="button" onClick={() => navigate("/poradci")} className={navCls(pathname === "/poradci")}>
-                Poradci
-              </button>
-            )}
-            {(isStudent || isAdmin) && (
-              <button
-                type="button"
-                onClick={() => navigate("/moje-studium")}
-                className={navCls(pathname === "/moje-studium")}
-              >
-                Studium
-              </button>
-            )}
-            {!isStudent && (
-              <button type="button" onClick={() => navigate("/seminare")} className={navCls(pathname === "/seminare")}>
-                Semináře
-              </button>
-            )}
           </nav>
 
           <div className="ml-auto flex items-center gap-1">

@@ -8,6 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { supabase } from "@/integrations/visible7/client";
 import { ADVISORS } from "@/lib/advisors";
 import {
+  COURSE_CATEGORIES,
+  COURSE_CATEGORY,
+  COURSE_ORDER,
   COURSE_PRICE,
   FEATURED_COURSES,
   firstNames,
@@ -25,24 +28,9 @@ interface CatalogLesson {
   minutes: number | null;
 }
 
-/** Pořadí kurzů v katalogu a jejich kategorie. */
-const CATEGORY: Record<string, string> = {
-  web: "Web a e-shop",
-  shoptet: "Web a e-shop",
-  copy: "Marketing",
-  ppc: "Marketing",
-  meta: "Marketing",
-  seo: "Marketing",
-  ga4: "Marketing",
-  affiliate: "Marketing",
-  znacka: "Právo a data",
-  data: "Právo a data",
-  ai_viditelnost: "Bonusy",
-  grafika: "Bonusy",
-  aiact: "Bonusy",
-};
-const ORDER = Object.keys(CATEGORY);
-const CATEGORIES = ["Vše", "Web a e-shop", "Marketing", "Právo a data", "Bonusy"];
+const CATEGORY = COURSE_CATEGORY;
+const ORDER = COURSE_ORDER;
+const CATEGORIES = COURSE_CATEGORIES;
 
 async function loadCatalog(): Promise<CatalogLesson[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

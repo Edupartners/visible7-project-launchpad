@@ -53,6 +53,7 @@ import MyStudyPage from "./pages/MyStudyPage";
 import BonusesPage from "./pages/BonusesPage";
 import EntryDiagnosisPage from "./pages/EntryDiagnosisPage";
 import CoursePage from "./pages/CoursePage";
+import ELearningAppPage from "./pages/ELearningAppPage";
 import MarketRentgenPage from "./pages/MarketRentgenPage";
 import CashflowPage from "./pages/CashflowPage";
 import MockBankPage from "./pages/MockBankPage";
@@ -101,6 +102,7 @@ const ProtectedRoutes = () => (
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/diagnostika" element={<EntryDiagnosisPage />} />
       <Route path="/kurz/:courseId" element={<CourseGate />} />
+      <Route path="/kurzy" element={<ELearningAppPage />} />
       <Route path="/rentgen" element={<BusinessRentgenOnly />} />
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />

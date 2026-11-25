@@ -8,6 +8,7 @@ import {
   PanelLeftOpen,
   Lock,
   Calculator,
+  GraduationCap,
   LayoutDashboard,
   Check,
   ChevronDown,
@@ -249,6 +250,16 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
           <li>
             <button
               type="button"
+              onClick={() => go("/kurzy")}
+              aria-current={pathname === "/kurzy" ? "page" : undefined}
+              className={mainCls(pathname === "/kurzy" || pathname.startsWith("/kurz/"))}
+            >
+              <GraduationCap className="h-[18px] w-[18px] text-muted-foreground" /> E-learning
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
               onClick={toggleCesta}
               aria-expanded={showGates}
               className={mainCls(onGate && !showGates)}
@@ -482,6 +493,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
       </button>
       <div className="flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto">
         {icon("Přehled", "/home", LayoutDashboard)}
+        {icon("E-learning", "/kurzy", GraduationCap)}
         {icon("Začínám podnikat", "/muj-podnik", Store)}
         <span className="my-1 h-px w-8 bg-border" />
         {GATE_ROUTES.map((g, i) => {

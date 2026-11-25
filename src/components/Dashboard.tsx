@@ -1,4 +1,5 @@
 import { MyBusinessTeaser } from "@/components/business/MyBusinessTeaser";
+import { ContinueCourse } from "@/components/courses/ContinueCourse";
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { MembershipCard } from "@/components/access/MembershipCta";
 import { DashboardAnnouncements } from "@/components/announcements/NotificationBell";
@@ -207,6 +208,9 @@ export const Dashboard = (_props: DashboardProps) => {
 
         {/* Jen naléhavé stavy členství (končí zkušební přístup) */}
         <MembershipCard placement="top" />
+
+        {/* Rozkoukaný kurz e-learningu */}
+        <ContinueCourse fallback />
 
         {/* Kdo už podniká: vstup do Můj podnik */}
         <MyBusinessTeaser />
