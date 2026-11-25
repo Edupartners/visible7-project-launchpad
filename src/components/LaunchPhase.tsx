@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RelatedCourses } from "@/components/courses/RelatedCourses";
 import { useNavigate } from "react-router-dom";
 import { Check, Crosshair, Flag, Loader2, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -307,6 +308,7 @@ export const LaunchPhase = () => {
           </p>
         </div>
         <TradeLicenseCard placement="gate6" launchDate={s.date || undefined} />
+        <RelatedCourses blockKeys={LAUNCH_BLOCKS.map((b) => `start:${b.id}`)} />
         <BlockList
           area="start"
           blocks={LAUNCH_BLOCKS}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RelatedCourses } from "@/components/courses/RelatedCourses";
 import { Check, ChevronDown, FlaskConical, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -147,6 +148,8 @@ export function MarketingChannelDetail({ channelId }: MarketingChannelDetailProp
           <Progress value={(doneBlocks / counted.length) * 100} className="h-2.5" />
         </div>
       </header>
+
+      <RelatedCourses blockKeys={blocks.map((b) => `marketing:${b.id}`)} />
 
       <ol className="space-y-3">
         {blocks.map((b, i) => {

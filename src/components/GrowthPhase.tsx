@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RelatedCourses } from "@/components/courses/RelatedCourses";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Check, Clock, Gauge, Loader2, Scissors, TrendingUp, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,8 @@ export const GrowthPhase = () => {
   );
   const scaling = tests.some((t) => t.verdict === "skalovat");
   const measured =
-    !!marketing["_mereni"]?.blocks?.includes("mereni") || CHANNELS.some((c) => marketing[c.id]?.blocks?.includes("mereni"));
+    !!marketing["_mereni"]?.blocks?.includes("mereni") ||
+    CHANNELS.some((c) => marketing[c.id]?.blocks?.includes("mereni"));
   const totalHours = s.growthHours + s.opsHours;
   const growthShare = totalHours > 0 ? (s.growthHours / totalHours) * 100 : 0;
   const readiness = [
@@ -495,6 +497,7 @@ export const GrowthPhase = () => {
           </h2>
           <p className="mt-1 text-muted-foreground">Ke každému bloku bude instruktážní video.</p>
         </div>
+        <RelatedCourses blockKeys={GROWTH_BLOCKS.map((b) => `rust:${b.id}`)} />
         <BlockList
           area="rust"
           blocks={GROWTH_BLOCKS}

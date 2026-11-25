@@ -13,6 +13,7 @@ import { useDeepLinkBlock } from "@/lib/deepLink";
 import { GATE_MAIN, useResume } from "@/lib/resume";
 import { PhaseCelebration } from "@/components/PhaseCelebration";
 import { CustomerJourney } from "@/components/CustomerJourney";
+import { RelatedCourses } from "@/components/courses/RelatedCourses";
 import {
   BuildBlock,
   BuildCost,
@@ -245,6 +246,8 @@ export const BusinessTypeRoadmap = ({ businessTypeId }: BusinessTypeRoadmapProps
           </div>
         )}
       </header>
+
+      <RelatedCourses blockKeys={blocks.map((b) => `tvorba:${b.id}`)} />
 
       <CustomerJourney steps={t.funnel} />
 
