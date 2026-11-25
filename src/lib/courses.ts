@@ -407,14 +407,14 @@ export const COURSE_CATEGORY: Record<string, string> = {
   seo: "Marketing",
   ga4: "Marketing",
   affiliate: "Marketing",
+  ai_viditelnost: "AI",
+  aiact: "AI",
   znacka: "Právo a data",
   data: "Právo a data",
-  ai_viditelnost: "Bonusy",
   grafika: "Bonusy",
-  aiact: "Bonusy",
 };
 export const COURSE_ORDER = Object.keys(COURSE_CATEGORY);
-export const COURSE_CATEGORIES = ["Vše", "Web a e-shop", "Marketing", "Právo a data", "Bonusy"];
+export const COURSE_CATEGORIES = ["Vše", "Web a e-shop", "Marketing", "AI", "Právo a data", "Bonusy"];
 
 const sigOf = (v: BlockVideoRow) => `${v.vimeo_id}:${v.start_sec ?? ""}:${v.end_sec ?? ""}`;
 
