@@ -102,14 +102,24 @@ export const ImplementationPhase = ({ onSelectBusinessType }: ImplementationPhas
   );
 };
 
-const STAGE_DOT: Record<FunnelStage, string> = {
-  zdroj: "bg-sky-500",
-  web: "bg-primary",
-  konverze: "bg-orange-500",
-  potom: "bg-leaf-500",
+/** Fotka ke každému typu (stejná sada jako u kurzů). Marketplace zatím sdílí fotku s affiliate. */
+const COVER: Record<string, string> = {
+  "web-prezentacni": "web",
+  eshop: "eshop",
+  "squeeze-page": "copywriting",
+  "web-eshop": "facebook",
+  "konverzni-web": "ppc",
+  lms: "kurz",
+  members: "grafika",
+  blog: "seo",
+  affiliate: "affiliate",
+  dropshipping: "znacka",
+  "forum-komunita": "ai",
+  marketplace: "affiliate",
+  "vlastni-napad-app": "data",
 };
 
-/** Karta typu byznysu jako v katalogu kurzů: náhled cesty zákazníka, název, platforma, délka a postup. */
+/** Karta typu byznysu jako v katalogu kurzů: fotka, název, platforma, délka, postup a tlačítko. */
 const BuildTypeCard = ({
   t,
   pct,
@@ -130,8 +140,13 @@ const BuildTypeCard = ({
         isMine ? "border-transparent ring-[3px] ring-leaf-500" : "border-border"
       }`}
     >
-      {/* Náhled: cesta zákazníka místo obrázku */}
-      <div className="relative aspect-[16/9] overflow-hidden bg-muted/60 px-5 pb-4 pt-11">
+      <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+        <img
+          src={`/video-covers/${COVER[t.id] ?? "web"}.webp`}
+          alt=""
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
         {isMine ? (
           <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-leaf-500 px-2.5 py-1 text-xs font-bold text-white">
             <Star className="h-3.5 w-3.5 fill-current" aria-hidden="true" /> Váš typ z fáze 2
@@ -146,14 +161,6 @@ const BuildTypeCard = ({
             <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" /> Hotovo
           </span>
         )}
-        <ol className="space-y-1.5" aria-label="Cesta zákazníka">
-          {t.funnel.slice(0, 4).map((f, i) => (
-            <li key={i} className="flex items-center gap-2 text-sm">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${STAGE_DOT[f.stage]}`} aria-hidden="true" />
-              <span className="truncate">{f.label}</span>
-            </li>
-          ))}
-        </ol>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h3 className="text-lg font-bold leading-snug">{t.name}</h3>
@@ -162,10 +169,22 @@ const BuildTypeCard = ({
           {t.platform} · {s.blocks} bloků s videem · {t.duration}
         </p>
         {pct > 0 && pct < 100 && (
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted" aria-label={`Hotovo ${pct} %`}>
-            <div className="h-full bg-leaf-500" style={{ width: `${pct}%` }} />
+          <div className="mt-3">
+            <p className="text-sm font-semibold">Hotovo {pct} %</p>
+            <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className="h-full bg-leaf-500" style={{ width: `${pct}%` }} />
+            </div>
           </div>
         )}
+        <span
+          className={`mt-4 inline-flex h-10 items-center justify-center rounded-xl text-sm font-bold transition-colors ${
+            isMine || pct > 0
+              ? "bg-primary text-white group-hover:bg-primary/90"
+              : "border border-border text-foreground group-hover:bg-muted"
+          }`}
+        >
+          {pct > 0 ? "Pokračovat" : "Otevřít plán"}
+        </span>
       </div>
     </button>
   );
