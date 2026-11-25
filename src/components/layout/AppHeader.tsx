@@ -210,7 +210,7 @@ export const AppHeader = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
                 <DropdownMenuItem onSelect={() => navigate("/diagnostika")}>
-                  <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa ke startu
+                  <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Vstupní diagnostika
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/rentgen-trhu")}>
                   <Globe2 className="mr-2.5 h-4 w-4 text-muted-foreground" /> Rentgen trhu
