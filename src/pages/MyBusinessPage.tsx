@@ -54,7 +54,7 @@ const MyBusinessPage = () => {
   const { hash } = useLocation();
 
   useEffect(() => {
-    document.title = "Můj podnik | VISIBLE7 MICEK";
+    document.title = "Začínám podnikat | micek.academy";
   }, []);
 
   // Odkaz z menu „Termíny“ vede na #terminy.
@@ -71,7 +71,7 @@ const MyBusinessPage = () => {
       <main className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-8">
         <BusinessTabs />
         <header>
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Můj podnik</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Začínám podnikat</h1>
           <p className="mt-2 max-w-2xl text-lg text-muted-foreground">
             Peníze, termíny a úřady na jednom místě. Co potřebuje pozornost, uvidíte hned nahoře.
           </p>

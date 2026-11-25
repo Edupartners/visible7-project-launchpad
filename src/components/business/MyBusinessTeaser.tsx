@@ -23,7 +23,7 @@ export const MyBusinessTeaser = () => {
         <Store className="h-5 w-5 text-leaf-300" aria-hidden="true" />
       </span>
       <span className="flex-1">
-        <span className="block text-lg font-bold">Můj podnik</span>
+        <span className="block text-lg font-bold">Začínám podnikat</span>
         <span className="block text-sm text-white/75">Peníze, nejbližší termíny a úřady na jednom místě.</span>
       </span>
       <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />

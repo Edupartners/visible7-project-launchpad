@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   Briefcase,
   Award,
-  Calculator,
   Check,
   ChevronDown,
   FileText,
@@ -89,7 +88,6 @@ export const AppHeader = ({
   const email = user?.email ?? "";
   const onGate = GATE_ROUTES.some((g) => g.route === pathname);
   const onTool = [
-    "/strategy",
     "/diagnostika",
     "/rentgen-trhu",
     "/investor-pitch",
@@ -212,9 +210,6 @@ export const AppHeader = ({
                 Nástroje <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
-                <DropdownMenuItem onSelect={() => navigate("/strategy")}>
-                  <Calculator className="mr-2.5 h-4 w-4 text-muted-foreground" /> Finanční plán
-                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/diagnostika")}>
                   <Map className="mr-2.5 h-4 w-4 text-muted-foreground" /> Mapa ke startu
                 </DropdownMenuItem>

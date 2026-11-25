@@ -77,7 +77,6 @@ const readCesta = () => {
 };
 const BUSINESS_PATHS = ["/muj-podnik", "/cash-flow", "/financni-report"];
 const TOOLS: [string, string, typeof Award][] = [
-  ["Finanční plán", "/strategy", Calculator],
   ["Mapa ke startu", "/diagnostika", Map],
   ["Rentgen trhu", "/rentgen-trhu", Globe2],
   ["Marketingové kanály", "/benchmarking-phase", Megaphone],
@@ -317,7 +316,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
               aria-current={onBusiness ? "page" : undefined}
               className={mainCls(onBusiness)}
             >
-              <Store className="h-[18px] w-[18px] text-muted-foreground" /> Můj podnik
+              <Store className="h-[18px] w-[18px] text-muted-foreground" /> Začínám podnikat
             </button>
           </li>
           <li>
@@ -485,7 +484,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
       </button>
       <div className="flex min-h-0 flex-1 flex-col items-center gap-1 overflow-y-auto">
         {icon("Přehled", "/home", LayoutDashboard)}
-        {icon("Můj podnik", "/muj-podnik", Store)}
+        {icon("Začínám podnikat", "/muj-podnik", Store)}
         <span className="my-1 h-px w-8 bg-border" />
         {GATE_ROUTES.map((g, i) => {
           const n = i + 1;

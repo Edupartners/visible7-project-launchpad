@@ -19,7 +19,7 @@ export const BusinessTabs = () => {
     return path !== "/muj-podnik" || hash !== "#terminy";
   };
   return (
-    <nav aria-label="Můj podnik" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+    <nav aria-label="Začínám podnikat" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
       {TABS.map(([label, to]) => {
         const active = isActive(to);
         return (
