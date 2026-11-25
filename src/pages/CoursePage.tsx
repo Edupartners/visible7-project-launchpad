@@ -2,6 +2,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { VideoPlaylist } from "@/components/BlockVideo";
+import { CourseCertificate } from "@/components/courses/CourseCertificate";
 import type { BuildBlock } from "@/lib/buildPlans";
 import { useAllBlockVideos } from "@/lib/blockVideos";
 import { courseById, courseGate, courseVideos, hoursLabel, lessonsLabel, videoMinutes } from "@/lib/courses";
@@ -36,9 +37,11 @@ export default function CoursePage() {
           <h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">{course.title}</h1>
           <p className="mt-2 text-muted-foreground">
             {lessonsLabel(videos.length)}
-            {minutes > 0 ? ` · ${hoursLabel(minutes)}` : ""}. Lekce jdou za sebou, můžete ale začít kdekoli.
+            {minutes > 0 ? ` · ${hoursLabel(minutes)}` : ""}. Lekce jdou za sebou, můžete ale začít kdekoli. Po
+            zhlédnutí všech lekcí si vystavíte osvědčení o absolvování.
           </p>
         </header>
+        {ready && <CourseCertificate course={course} videos={videos} all={all} watched={watched} />}
         {!ready ? (
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         ) : videos.length ? (

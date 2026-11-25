@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/visible7/client";
 import { bonusById } from "@/lib/bonuses";
+import { COURSE_CERT, courseById } from "@/lib/courses";
 
-export type CertificateKind = "phase" | "zamer" | "gold" | "bonus";
+export type CertificateKind = "phase" | "zamer" | "gold" | "bonus" | "course";
 
 export interface Certificate {
   code: string;
@@ -14,7 +15,7 @@ export interface Certificate {
   issued_at: string;
   /** Ověřené IČO (jen Gold) */
   ico?: string | null;
-  /** Jen u osvědčení za bonus (např. "ai_act") */
+  /** U osvědčení za bonus (např. "ai_act") a za kurz (např. "ga4") */
   bonus_key?: string | null;
 }
 
@@ -33,6 +34,7 @@ export const ISSUER_ORG = "Edu Partners s.r.o.";
 
 /** Název osvědčení tak, jak se zobrazí na osvědčení a na LinkedInu. */
 export const certificateTitle = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
+  if (kind === "course") return `Kurz ${courseById(bonusKey ?? "")?.title ?? ""}`.trim();
   if (kind === "bonus") return `VISIBLE7 Bonus – ${bonusById(bonusKey)?.title ?? "videokurz"}`;
   if (kind === "gold") return "VISIBLE7 Gold – Spuštěný projekt";
   if (kind === "zamer") return "Certifikovaný marketingový a projektový specialista";
@@ -40,6 +42,7 @@ export const certificateTitle = (kind: CertificateKind, phase: number | null, bo
 };
 
 export const certificateDescription = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
+  if (kind === "course") return COURSE_CERT[bonusKey ?? ""]?.certificateFor ?? "za absolvování kurzu";
   if (kind === "bonus") return bonusById(bonusKey)?.certificateFor ?? "za absolvování videokurzu";
   if (kind === "gold")
     return "za projití všech sedmi bran metodiky VISIBLE7 MICEK® a spuštění vlastního projektu na trh";
@@ -132,12 +135,19 @@ const phasesOf = (kind: CertificateKind, phase: number | null) =>
 
 /** Krátký výčet dovedností na přední stranu osvědčení. */
 export const certificateSkills = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) =>
-  kind === "bonus"
-    ? (bonusById(bonusKey)?.skills ?? [])
-    : phasesOf(kind, phase).flatMap((p) => PHASE_CONTENT[p]?.skills.slice(0, kind === "phase" ? 2 : 1) ?? []);
+  kind === "course"
+    ? (COURSE_CERT[bonusKey ?? ""]?.skills ?? [])
+    : kind === "bonus"
+      ? (bonusById(bonusKey)?.skills ?? [])
+      : phasesOf(kind, phase).flatMap((p) => PHASE_CONTENT[p]?.skills.slice(0, kind === "phase" ? 2 : 1) ?? []);
 
 /** Obsah po fázích pro přílohu osvědčení. */
 export const certificateSyllabus = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
+  if (kind === "course") {
+    const c = COURSE_CERT[bonusKey ?? ""];
+    const title = courseById(bonusKey ?? "")?.title ?? "Kurz";
+    return c ? [{ phase: 0, name: title, skills: c.skills, topics: c.topics, outputs: [] as string[] }] : [];
+  }
   if (kind === "bonus") {
     const b = bonusById(bonusKey);
     return b ? [{ phase: 0, name: b.title, skills: b.skills, topics: b.topics, outputs: [] as string[] }] : [];
@@ -182,8 +192,25 @@ export async function issueCertificate(args: {
   return { code: data as string };
 }
 
+/** Osvědčení za kurz: server ověří, že má člověk zhlédnuté všechny kapitoly kurzu. */
+export async function issueCourseCertificate(
+  courseId: string,
+  holderName: string,
+): Promise<{ code?: string; error?: string }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc("issue_course_certificate", {
+    p_course: courseId,
+    p_holder_name: holderName,
+  });
+  if (error) return { error: error.message };
+  return { code: data as string };
+}
+
 /** Osvědčení za bonus: server ověří, že má člověk zhlédnutá všechna videa bonusu. */
-export async function issueBonusCertificate(bonusId: string, holderName: string): Promise<{ code?: string; error?: string }> {
+export async function issueBonusCertificate(
+  bonusId: string,
+  holderName: string,
+): Promise<{ code?: string; error?: string }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any).rpc("issue_bonus_certificate", {
     p_bonus: bonusId,

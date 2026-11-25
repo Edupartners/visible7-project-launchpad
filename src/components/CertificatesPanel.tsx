@@ -106,7 +106,7 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
                     {certificateTitle(c.kind, c.phase, c.bonus_key)}
                   </Link>
                   <p className="truncate text-sm text-muted-foreground">
-                    {c.kind === "bonus" ? "Bonus" : c.project_name}, vystaveno {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
+                    {c.kind === "bonus" ? "Bonus" : c.kind === "course" ? "Kurz" : c.project_name}, vystaveno {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">

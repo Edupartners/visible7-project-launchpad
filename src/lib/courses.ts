@@ -275,3 +275,124 @@ export const hoursLabel = (min: number) =>
   min >= 60 ? `${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ""}` : `${min} min`;
 
 export const lessonsLabel = (n: number) => `${n} ${n === 1 ? "lekce" : n >= 2 && n <= 4 ? "lekce" : "lekcí"}`;
+
+/** Obsah osvědčení o absolvování kurzu (podle skutečných lekcí). Bonusové kurzy mají obsah v bonuses.ts. */
+export interface CourseCertContent {
+  certificateFor: string;
+  skills: string[];
+  topics: string[];
+}
+
+export const COURSE_CERT: Record<string, CourseCertContent> = {
+  web: {
+    certificateFor: "za absolvování kurzu tvorby webu a e-shopu na WordPressu s pomocí AI",
+    skills: ["tvorba webu na WordPressu", "nastavení e-shopu ve WooCommerce"],
+    topics: [
+      "Doména a webhosting, instalace WordPressu, SSL a FTP",
+      "Šablona a Elementor: úvodní stránka, menu, sekce a návrh webu s AI",
+      "E-shop ve WooCommerce: produkty, doprava, platby a platba kartou přes Stripe",
+      "Poptávkový formulář, blog a SEO pluginy",
+      "Cookies lišta a migrace webu z localhostu na server",
+    ],
+  },
+  shoptet: {
+    certificateFor: "za absolvování kurzu založení a nastavení e-shopu na platformě Shoptet",
+    skills: ["založení e-shopu na Shoptetu", "správa produktů a kategorií"],
+    topics: [
+      "Založení e-shopu, administrace, šablona, logo a bannery",
+      "Kategorie podle hledanosti, meta titulky a popisky s AI",
+      "Produkty: popis, cena, sklad, varianty a parametry",
+      "Doprava, příznaky, interní prolinkování a testovací objednávka",
+    ],
+  },
+  copy: {
+    certificateFor: "za absolvování kurzu copywritingu a psaní prodejních textů",
+    skills: ["psaní prodejních textů", "tvorba persony a tone of voice"],
+    topics: [
+      "Benefity místo funkcí, persona a tone of voice značky",
+      "Psaní pro web: skenování, obrácená pyramida a argumenty",
+      "Prodejní stránka: modely AIDA a PAS, výzva k akci, záruky",
+      "Titulky podle 4U, mocná slova a emoce v textu",
+      "Texty reklam na Facebooku a inspirace z Knihovny reklam",
+    ],
+  },
+  affiliate: {
+    certificateFor: "za absolvování kurzu affiliate marketingu pro inzerenty i publishery",
+    skills: ["spuštění affiliate programu", "tvorba affiliate webu"],
+    topics: [
+      "Jak affiliate funguje: inzerent, publisher, provize a sledování",
+      "Vlastní platforma, nebo affiliate síť a provizní model",
+      "Pravidla, propagační materiály a práce s partnery",
+      "Affiliate web: výběr tématu, obsah, pluginy a AI ve vyhledávání",
+    ],
+  },
+  ppc: {
+    certificateFor: "za absolvování kurzu výkonnostní reklamy v Google Ads a Skliku",
+    skills: ["správa kampaní v Google Ads", "správa kampaní ve Skliku"],
+    topics: [
+      "Základy PPC: CPC, CTR, konverze, PNO a skóre kvality",
+      "Klíčová slova: plánovač, typy shody a struktura sestav",
+      "Vyhledávací kampaň: nabídky, cílení, reklamy a rozšíření",
+      "Měření konverzí, Merchant Center a Performance Max",
+      "Sklik: import kampaní, vyhledávací a obsahová reklama, Zboží.cz",
+      "Pravidelná optimalizace kampaní",
+    ],
+  },
+  meta: {
+    certificateFor: "za absolvování kurzu reklamy na Facebooku a Instagramu",
+    skills: ["správa reklam na Facebooku a Instagramu", "tvorba reklamních kreativ"],
+    topics: [
+      "Strategie: nákupní cyklus, remarketing a rozpočet",
+      "Firemní portfolio, reklamní účet, Meta Pixel a Conversions API",
+      "Kreativy: bannery v Canvě, videa z telefonu, hook a výzva k akci",
+      "Kampaně: účel, cílení, umístění, A/B testy a katalog produktů",
+      "Vyhodnocení: metriky, atribuce a měření tržeb",
+    ],
+  },
+  seo: {
+    certificateFor: "za absolvování kurzu optimalizace webu pro vyhledávače (SEO)",
+    skills: ["technické SEO", "obsahová strategie a klíčová slova"],
+    topics: [
+      "Jak funguje vyhledávání, PageRank a zakázané techniky",
+      "Indexace, Search Console, robots, sitemap a kanonické URL",
+      "Struktura stránky, titulky, alt texty a audit v Lighthouse",
+      "E-E-A-T, klíčová slova, long tail a kanibalizace",
+      "Obsah podle See–Think–Do–Care a nástroje Screaming Frog a Ahrefs",
+    ],
+  },
+  znacka: {
+    certificateFor: "za absolvování kurzu ochranných známek a duševního vlastnictví",
+    skills: ["orientace v ochraně značky", "příprava přihlášky ochranné známky"],
+    topics: [
+      "Duševní vlastnictví, značka a ochranná známka v Česku, EU a ve světě",
+      "Výběr názvu, rešerše v databázi ÚPV a třídy výrobků a služeb",
+      "Přihláška krok za krokem, průběh řízení a námitky",
+      "Spory o zaměnitelnost, doménová jména a dotace na známku",
+    ],
+  },
+  data: {
+    certificateFor: "za absolvování kurzu práce s daty a reportingu v Power BI",
+    skills: ["vizualizace dat", "datové modelování v Power BI"],
+    topics: [
+      "Volba grafu a jak grafy klamou",
+      "Databázové tabulky, vazby a model hvězda",
+      "Power BI: import a čištění dat, propojení tabulek",
+      "Report tržeb a marketingových kanálů, publikování a export",
+    ],
+  },
+  ga4: {
+    certificateFor: "za absolvování kurzu měření webu v Google Analytics 4 a Google Tag Manageru",
+    skills: ["nastavení měření v GA4 a Tag Manageru", "vyhodnocování dat z webu"],
+    topics: [
+      "Konverze a mikrokonverze, účet GA4 a vložení měření na web",
+      "Tag Manager: značky, cookies, datová vrstva a DebugView",
+      "Akvizice, UTM parametry, zapojení a konverzní poměr",
+      "Nákupní trychtýř, vstupní stránky a Search Console",
+      "Reporty v Looker Studiu a nejčastější chyby při čtení dat",
+    ],
+  },
+};
+
+/** Bonusový kurz (klíč "bonus:<id>") má osvědčení za bonus, ostatní osvědčení za kurz. */
+export const courseBonusId = (c: FeaturedCourse) =>
+  c.keys.length === 1 && c.keys[0].startsWith("bonus:") ? c.keys[0].slice(6) : null;

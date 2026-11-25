@@ -76,7 +76,7 @@ const CertificatePage = () => {
   }
 
   const gold = cert.kind === "gold";
-  const bonus = cert.kind === "bonus";
+  const bonus = cert.kind === "bonus" || cert.kind === "course";
   const bk = cert.bonus_key;
   const skills = certificateSkills(cert.kind, cert.phase, bk);
   const syllabus = certificateSyllabus(cert.kind, cert.phase, bk);
