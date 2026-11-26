@@ -29,6 +29,7 @@ import {
   Store,
   Users,
   X,
+  ClipboardList,
 } from "lucide-react";
 import { useIsAdmin } from "@/lib/admin";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -348,6 +349,18 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
               <Award className="h-[18px] w-[18px] text-muted-foreground" /> Osvědčení
             </button>
           </li>
+          {(isStudent || isAdmin) && (
+            <li>
+              <button
+                type="button"
+                onClick={() => go("/zaverecny-projekt")}
+                aria-current={pathname === "/zaverecny-projekt" ? "page" : undefined}
+                className={mainCls(pathname === "/zaverecny-projekt")}
+              >
+                <ClipboardList className="h-[18px] w-[18px] text-muted-foreground" /> Závěrečný projekt
+              </button>
+            </li>
+          )}
           {/* Na mobilu není horní menu: semináře a nástroje jsou tady */}
           {isStudent ? (
             <li className="lg:hidden">
