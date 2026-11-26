@@ -27,7 +27,7 @@ const offerLabel = (o: Offer) =>
       : "VISIBLE7 Gold – spuštěný projekt";
 
 /** Osvědčení: co si uživatel může vystavit a co už má ke stažení. */
-export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
+export const CertificatesPanel = ({ completed, offersOnly = false }: { completed: number[]; offersOnly?: boolean }) => {
   const { currentProject } = useProject();
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [dialog, setDialog] = useState<Offer | null>(null);
@@ -52,14 +52,14 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
   return (
     <section className="rounded-2xl border border-border bg-card">
       <div className="px-6 pb-4 pt-6 sm:px-8">
-        <h2 className="text-xl font-bold">Osvědčení</h2>
+        <h2 className="text-xl font-bold">{offersOnly ? "Osvědčení za brány" : "Osvědčení"}</h2>
         <p className="mt-1 max-w-2xl text-muted-foreground">
           Za každou dokončenou fázi si vystavíte osvědčení s ověřovacím kódem. Stáhnete ho jako PDF a můžete ho přidat
           na LinkedIn nebo do životopisu.
         </p>
       </div>
 
-      {certs.length === 0 && offers.length === 0 && (
+      {(offersOnly || certs.length === 0) && offers.length === 0 && (
         <p className="border-t border-border px-6 py-4 text-sm text-muted-foreground sm:px-8">
           Zatím tu nic není. První osvědčení získáte po dokončení brány 1 – Vize.
         </p>
@@ -91,7 +91,7 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
         </ul>
       )}
 
-      {certs.length > 0 && (
+      {!offersOnly && certs.length > 0 && (
         <>
           <h3 className="border-t border-border px-6 pb-1 pt-4 text-sm font-semibold text-muted-foreground sm:px-8">
             Vaše osvědčení

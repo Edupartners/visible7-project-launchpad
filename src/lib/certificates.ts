@@ -40,7 +40,7 @@ export const certificateTitle = (kind: CertificateKind, phase: number | null, bo
     const t = courseTitleFor(bonusKey ?? "");
     return /kurz/i.test(t) ? t : `Kurz ${t}`.trim();
   }
-  if (kind === "bonus") return `VISIBLE7 Bonus – ${bonusById(bonusKey)?.title ?? "videokurz"}`;
+  if (kind === "bonus") return `Kurz ${bonusById(bonusKey)?.title ?? ""}`.trim();
   if (kind === "gold") return "VISIBLE7 Gold – Spuštěný projekt";
   if (kind === "zamer") return "Certifikovaný marketingový a projektový specialista";
   return `VISIBLE7 MICEK® – Fáze ${phase}: ${GATE_NAMES[phase ?? 0] ?? ""}`;

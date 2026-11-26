@@ -141,7 +141,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
   };
 
   const onBusiness = BUSINESS_PATHS.includes(pathname);
-  const onCerts = pathname === "/settings" && hash === "#osvedceni";
+  const onCerts = pathname === "/profil";
 
   return (
     <div className="flex h-full flex-col">
@@ -341,7 +341,7 @@ const SidebarBody = ({ onNavigate, onCollapse }: { onNavigate?: () => void; onCo
           <li>
             <button
               type="button"
-              onClick={() => go("/settings#osvedceni")}
+              onClick={() => go("/profil#osvedceni")}
               aria-current={onCerts ? "page" : undefined}
               className={mainCls(onCerts)}
             >
@@ -524,7 +524,7 @@ const SidebarRail = ({ onExpand }: { onExpand: () => void }) => {
         })}
         <span className="my-1 h-px w-8 bg-border" />
         {icon("Poradci", "/poradci", Users)}
-        {icon("Osvědčení", "/settings#osvedceni", Award)}
+        {icon("Osvědčení", "/profil#osvedceni", Award)}
       </div>
       <div className="flex flex-col items-center gap-1 border-t border-border pt-2">
         {done.size >= 2 && !access.loading && !access.paid && icon("Získat členství", "/clenstvi", Crown)}

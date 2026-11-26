@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { UserAvatar } from "@/components/profile/Avatar";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Briefcase,
@@ -15,6 +16,7 @@ import {
   Plus,
   Presentation,
   Settings,
+  UserRound,
   ShieldCheck,
 } from "lucide-react";
 import {
@@ -86,13 +88,9 @@ export const AppHeader = ({
   const [name, setName] = useState("");
   const email = user?.email ?? "";
   const onGate = GATE_ROUTES.some((g) => g.route === pathname);
-  const onTool = [
-    "/diagnostika",
-    "/rentgen-trhu",
-    "/investor-pitch",
-    "/listy",
-    "/testovaci-stranka",
-  ].includes(pathname);
+  const onTool = ["/diagnostika", "/rentgen-trhu", "/investor-pitch", "/listy", "/testovaci-stranka"].includes(
+    pathname,
+  );
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,7 +258,6 @@ export const AppHeader = ({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
@@ -272,17 +269,20 @@ export const AppHeader = ({
                 className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-xs font-semibold hover:ring-2 hover:ring-primary/20"
                 aria-label="Účet"
               >
-                {(email.split("@")[0] || "?").slice(0, 2).toUpperCase()}
+                <UserAvatar size={36} />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">
                 <DropdownMenuLabel className="truncate text-xs font-normal text-muted-foreground">
                   {email}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => navigate("/profil")}>
+                  <UserRound className="mr-2.5 h-4 w-4 text-muted-foreground" /> Můj profil
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/settings")}>
                   <Settings className="mr-2.5 h-4 w-4 text-muted-foreground" /> Nastavení
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => navigate("/settings#osvedceni")}>
+                <DropdownMenuItem onSelect={() => navigate("/profil#osvedceni")}>
                   <Award className="mr-2.5 h-4 w-4 text-muted-foreground" /> Moje osvědčení
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => navigate("/")}>
