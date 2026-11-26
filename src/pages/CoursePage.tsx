@@ -3,6 +3,7 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { VideoPlaylist } from "@/components/BlockVideo";
 import { CourseCertificate } from "@/components/courses/CourseCertificate";
+import { MyCourseToggle } from "@/components/courses/MyCourseToggle";
 import type { BuildBlock } from "@/lib/buildPlans";
 import { useAllBlockVideos } from "@/lib/blockVideos";
 import { courseById, courseGate, courseVideos, hoursLabel, lessonsLabel, videoMinutes } from "@/lib/courses";
@@ -40,6 +41,7 @@ export default function CoursePage() {
             {minutes > 0 ? ` · ${hoursLabel(minutes)}` : ""}. Lekce jdou za sebou, můžete ale začít kdekoli. Po
             zhlédnutí všech lekcí si vystavíte osvědčení o absolvování.
           </p>
+          <MyCourseToggle id={course.id} />
         </header>
         {ready && <CourseCertificate course={course} videos={videos} all={all} watched={watched} />}
         {!ready ? (
