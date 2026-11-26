@@ -248,7 +248,7 @@ const CertificatePage = () => {
                 Příloha k osvědčení
               </p>
               <h2 className="mt-1 text-[clamp(1rem,2vw,1.4rem)] font-semibold">
-                Obsah programu: {certificateTitle(cert.kind, cert.phase, bk)}
+                {bonus ? "Získané kompetence" : "Obsah programu"}: {certificateTitle(cert.kind, cert.phase, bk)}
               </h2>
             </div>
             <p className="font-mono text-xs text-slate-500">{cert.code}</p>
@@ -256,8 +256,8 @@ const CertificatePage = () => {
           <p className="mt-3 text-[clamp(0.7rem,1.2vw,0.85rem)] text-slate-600">
             {bonus ? (
               <>
-                {cert.holder_name} zhlédl(a) všechna videa videokurzu s níže
-                uvedeným obsahem.
+                {cert.holder_name} absolvoval(a) kurz a osvojil(a) si tyto
+                kompetence:
               </>
             ) : (
               <>
