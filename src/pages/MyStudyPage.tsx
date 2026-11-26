@@ -218,6 +218,18 @@ export default function MyStudyPage() {
                 Závěrečný den v Praze: obhajoba vlastního projektu a zkouška. Když napoprvé neuspějete, opakujete
                 zkoušku zdarma, dokud ji nesložíte (do konce roku 2027).
               </p>
+              <Link
+                to="/zaverecny-projekt"
+                className="mt-4 flex items-center gap-3 rounded-2xl bg-primary p-4 text-primary-foreground hover:opacity-95"
+              >
+                <span>
+                  <b className="block">Závěrečný projekt</b>
+                  <span className="text-sm opacity-90">
+                    Vyplňte ho podle kompetencí ze zkoušky a stáhněte jako dokument Word.
+                  </span>
+                </span>
+                <ArrowRight className="ml-auto h-5 w-5 flex-none" aria-hidden="true" />
+              </Link>
               <p className="mt-3 text-sm">
                 Připravte se průběžně: ke každé bráně 1–5 jsou v aplikaci kontrolní otázky, které otevřete u osvědčení.
               </p>

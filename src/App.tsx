@@ -50,6 +50,7 @@ import RentgenPage from "./pages/RentgenPage";
 import QuizPage from "./pages/QuizPage";
 import SeminarsPage from "./pages/SeminarsPage";
 import MyStudyPage from "./pages/MyStudyPage";
+import FinalProjectPage from "./pages/FinalProjectPage";
 import BonusesPage from "./pages/BonusesPage";
 import EntryDiagnosisPage from "./pages/EntryDiagnosisPage";
 import CoursePage from "./pages/CoursePage";
@@ -109,6 +110,7 @@ const ProtectedRoutes = () => (
       <Route path="/kviz" element={<QuizPage />} />
       <Route path="/seminare" element={<SeminarsPage />} />
       <Route path="/moje-studium" element={<MyStudyPage />} />
+      <Route path="/zaverecny-projekt" element={<FinalProjectPage />} />
       <Route path="/bonusy" element={<BonusesPage />} />
       <Route path="/mapa-cesty" element={<Navigate to="/diagnostika" replace />} />
       <Route path="/rentgen-trhu" element={<MarketRentgenPage />} />
