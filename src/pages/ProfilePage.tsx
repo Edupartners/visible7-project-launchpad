@@ -49,7 +49,7 @@ function Tile({
       type="button"
       onClick={onClick}
       aria-expanded={active}
-      className={`flex aspect-[4/3] flex-col justify-between p-4 text-left text-white transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:p-5 ${color} ${
+      className={`flex h-36 w-full flex-col justify-between overflow-hidden p-4 text-left text-white transition-[filter] hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-40 sm:p-5 ${color} ${
         active ? "ring-4 ring-signal ring-offset-2 ring-offset-background" : ""
       }`}
     >
@@ -60,8 +60,8 @@ function Tile({
         )}
       </span>
       <span>
-        <span className="block text-3xl font-extrabold leading-none tracking-tight sm:text-4xl">{value}</span>
-        <span className="mt-1 block text-sm font-semibold opacity-90">{label}</span>
+        <span className="block truncate text-3xl font-extrabold leading-none tracking-tight sm:text-4xl">{value}</span>
+        <span className="mt-1 block truncate text-xs font-semibold opacity-90 sm:text-sm">{label}</span>
       </span>
     </button>
   );
@@ -187,8 +187,8 @@ export default function ProfilePage() {
           />
           <Tile
             icon={<GraduationCap className="h-7 w-7" />}
-            value={ready ? String(started.length - finished.length) : "…"}
-            label="Rozkoukané kurzy"
+            value={ready ? String(started.length) : "…"}
+            label="Kurzy"
             color="bg-leaf-600"
             active={open === "kurzy"}
             onClick={() => toggle("kurzy")}
@@ -196,7 +196,7 @@ export default function ProfilePage() {
           <Tile
             icon={<Map className="h-7 w-7" />}
             value={`${gatesDone}/7`}
-            label="Moje cesta (brány)"
+            label="Moje cesta"
             color="bg-sky-700"
             active={open === "cesta"}
             onClick={() => toggle("cesta")}
@@ -212,7 +212,7 @@ export default function ProfilePage() {
           <Tile
             icon={<Settings className="h-7 w-7" />}
             value="Účet"
-            label="Nastavení a heslo"
+            label="Nastavení"
             color="bg-slate-700"
             onClick={() => navigate("/settings")}
           />
