@@ -3,6 +3,9 @@ import { Loader2 } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { CourseCard } from "@/components/courses/CourseCard";
 import { ContinueCourse } from "@/components/courses/ContinueCourse";
+import { useAccess } from "@/lib/access";
+import { useCourseAccess } from "@/lib/courseAccess";
+import { courseCheckoutUrl, coursePrice, kc, nbsp, useShop } from "@/lib/shop";
 import { useAllBlockVideos } from "@/lib/blockVideos";
 import { COURSE_CATEGORIES, COURSE_CATEGORY, coursesProgress, hoursLabel, videoMinutes } from "@/lib/courses";
 
@@ -10,6 +13,9 @@ import { COURSE_CATEGORIES, COURSE_CATEGORY, coursesProgress, hoursLabel, videoM
 export default function ELearningAppPage() {
   const { videos: all, watched, ready } = useAllBlockVideos();
   const [filter, setFilter] = useState("Vše");
+  const access = useAccess();
+  const own = useCourseAccess();
+  const shop = useShop();
   useEffect(() => {
     document.title = "E-learning | micek.academy";
   }, []);
@@ -65,7 +71,19 @@ export default function ELearningAppPage() {
             <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {shown.map((r) => (
                 <li key={r.course.id}>
-                  <CourseCard course={r.course} videos={r.videos} watched={watched} />
+                  <CourseCard
+                    course={r.course}
+                    videos={r.videos}
+                    watched={watched}
+                    price={
+                      !access.loading &&
+                      !access.full &&
+                      !own.courses[r.course.id] &&
+                      courseCheckoutUrl(shop, r.course.id)
+                        ? nbsp(kc(coursePrice(shop)))
+                        : undefined
+                    }
+                  />
                 </li>
               ))}
             </ul>

@@ -1,4 +1,4 @@
-// VISIBLE7 – webhook SimpleShopu „po uhrazení“: kupující dostane placené členství.
+// VISIBLE7 – webhook SimpleShopu „po uhrazení“: kupující dostane placené členství, nebo jeden kurz.
 // Adresu i s tajným klíčem zkopíruje správce v administraci (Platby) do produktu v SimpleShopu
 // (záložka Ostatní → Webhook po uhrazení). SimpleShop do ní dosadí {mail}, {id_product}, {id}, {total}.
 
@@ -50,15 +50,39 @@ Deno.serve(async (req) => {
   const total = Number(clean(p.total).replace(",", ".")) || null;
 
   const { data: setting } = await admin.from("app_settings").select("value").eq("key", "shop").maybeSingle();
-  const shop = (setting?.value ?? {}) as { days?: number; product_id?: string };
-  // Pokud je nastavené ID produktu, členství dává jen ten produkt (jiné nákupy se jen zaznamenají).
-  const matches = !shop.product_id || !product || String(shop.product_id) === product;
-  const days = matches ? Math.max(1, Math.min(3650, Number(shop.days) || 183)) : 0;
+  const shop = (setting?.value ?? {}) as {
+    days?: number;
+    product_id?: string;
+    course_days?: number;
+    courses?: Record<string, { product_id?: string }>;
+  };
+  // Produkt jednoho kurzu odemkne jen ten kurz (ID produktů nastavuje správce v Platbách).
+  const courseId =
+    (product &&
+      Object.entries(shop.courses ?? {}).find(
+        ([, c]) => c?.product_id && String(c.product_id).trim() === product,
+      )?.[0]) ||
+    null;
+  // Pokud je nastavené ID produktu členství, členství dává jen ten produkt (jiné nákupy se jen zaznamenají).
+  const matches = courseId ? false : !shop.product_id || !product || String(shop.product_id) === product;
+  const days = courseId
+    ? Math.max(1, Math.min(3650, Number(shop.course_days) || 365))
+    : matches
+      ? Math.max(1, Math.min(3650, Number(shop.days) || 183))
+      : 0;
 
   const { data: row, error } = await admin
     .from("shop_purchases")
     .upsert(
-      { doc_id: doc, email, id_product: product || null, days, total, raw: { ...p, key: undefined } },
+      {
+        doc_id: doc,
+        email,
+        id_product: product || null,
+        course_id: courseId,
+        days,
+        total,
+        raw: { ...p, key: undefined },
+      },
       { onConflict: "doc_id", ignoreDuplicates: true },
     )
     .select("id")

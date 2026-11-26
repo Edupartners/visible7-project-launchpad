@@ -3,7 +3,8 @@ import { Copy, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/visible7/client";
-import { ShopSettings, kc, loadShop, monthsLabel, saveShop } from "@/lib/shop";
+import { SINGLE_COURSES, ShopSettings, coursePrice, courseDays, kc, loadShop, monthsLabel, saveShop } from "@/lib/shop";
+import { courseById } from "@/lib/courses";
 import { STUDY } from "@/lib/study";
 
 interface Purchase {
@@ -11,6 +12,7 @@ interface Purchase {
   email: string;
   total: number | null;
   days: number;
+  course_id: string | null;
   applied_at: string | null;
   created_at: string;
 }
@@ -32,7 +34,7 @@ export function ShopAdmin() {
     const db = supabase as any;
     db.rpc("admin_shop_webhook_url").then(({ data }: { data: string | null }) => setWebhook(data ?? ""));
     db.from("shop_purchases")
-      .select("id, email, total, days, applied_at, created_at")
+      .select("id, email, total, days, course_id, applied_at, created_at")
       .order("created_at", { ascending: false })
       .limit(30)
       .then(({ data }: { data: Purchase[] | null }) => setPurchases(data ?? []));
@@ -43,8 +45,13 @@ export function ShopAdmin() {
   const set = (k: keyof ShopSettings, v: string) =>
     setShop({
       ...shop,
-      [k]: ["price", "months", "days", "study_early_left", "install_price"].includes(k) ? Number(v) || 0 : v,
+      [k]: ["price", "months", "days", "study_early_left", "install_price", "course_price", "course_days"].includes(k)
+        ? Number(v) || 0
+        : v,
     });
+
+  const setCourse = (id: string, k: "product_id" | "checkout_url", v: string) =>
+    setShop({ ...shop, courses: { ...shop.courses, [id]: { ...shop.courses?.[id], [k]: v } } });
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +59,17 @@ export function ShopAdmin() {
     const studyUrl = (shop.study_checkout_url ?? "").trim();
     const studyInstUrl = (shop.study_installments_url ?? "").trim();
     const installUrl = (shop.install_checkout_url ?? "").trim();
-    if ([url, studyUrl, studyInstUrl, installUrl].some((u) => u && !/^https:\/\//.test(u))) {
+    const courses = Object.fromEntries(
+      SINGLE_COURSES.map((id) => [
+        id,
+        {
+          product_id: (shop.courses?.[id]?.product_id ?? "").trim(),
+          checkout_url: (shop.courses?.[id]?.checkout_url ?? "").trim(),
+        },
+      ]),
+    );
+    const courseUrls = Object.values(courses).map((c) => c.checkout_url);
+    if ([url, studyUrl, studyInstUrl, installUrl, ...courseUrls].some((u) => u && !/^https:\/\//.test(u))) {
       setMsg("Odkaz na objednávku musí začínat https://");
       return;
     }
@@ -65,6 +82,9 @@ export function ShopAdmin() {
         study_checkout_url: studyUrl,
         study_installments_url: studyInstUrl,
         install_checkout_url: installUrl,
+        courses,
+        course_price: coursePrice(shop),
+        course_days: courseDays(shop),
         study_early_left: Math.max(
           0,
           Math.min(STUDY.earlySeats, Math.round(shop.study_early_left ?? STUDY.earlySeats)),
@@ -199,6 +219,54 @@ export function ShopAdmin() {
             </label>
           </div>
         </div>
+        <div className="space-y-3 rounded-xl border border-border p-4 sm:col-span-2 lg:col-span-4">
+          <p className="font-semibold">Jednotlivé kurzy</p>
+          <p className="text-sm text-muted-foreground">
+            Pro každý kurz založte v SimpleShopu samostatný produkt a vložte do něj stejnou adresu webhooku jako u
+            členství. ID produktu sem zadejte vždy, jinak by nákup kurzu dal celé členství. Kurz bez odkazu na platbu se
+            samostatně nenabízí.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-[10rem_10rem]">
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Cena kurzu (Kč)</span>
+              <Input
+                type="number"
+                min={0}
+                value={shop.course_price ?? coursePrice(shop)}
+                onChange={(e) => set("course_price", e.target.value)}
+              />
+            </label>
+            <label className="space-y-1 text-sm">
+              <span className="font-semibold">Přístup (dní)</span>
+              <Input
+                type="number"
+                min={1}
+                value={shop.course_days ?? courseDays(shop)}
+                onChange={(e) => set("course_days", e.target.value)}
+              />
+            </label>
+          </div>
+          {SINGLE_COURSES.map((id) => (
+            <div key={id} className="grid gap-3 sm:grid-cols-[12rem_10rem_1fr] sm:items-end">
+              <p className="text-sm font-semibold sm:pb-2">{courseById(id)?.title ?? id}</p>
+              <label className="space-y-1 text-sm">
+                <span className="text-muted-foreground">ID produktu</span>
+                <Input
+                  value={shop.courses?.[id]?.product_id ?? ""}
+                  onChange={(e) => setCourse(id, "product_id", e.target.value)}
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span className="text-muted-foreground">Odkaz na platbu</span>
+                <Input
+                  value={shop.courses?.[id]?.checkout_url ?? ""}
+                  onChange={(e) => setCourse(id, "checkout_url", e.target.value)}
+                  placeholder="https://form.simpleshop.cz/…"
+                />
+              </label>
+            </div>
+          ))}
+        </div>
         <label className="space-y-1 text-sm sm:col-span-2 lg:col-span-4">
           <span className="font-semibold">Věta o hodnotě na ceníku</span>
           <Input value={shop.anchor} onChange={(e) => set("anchor", e.target.value)} maxLength={160} />
@@ -254,6 +322,9 @@ export function ShopAdmin() {
                   }`}
                 >
                   {p.applied_at ? `Připsáno (${p.days} dní)` : "Čeká na registraci"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {p.course_id ? `Kurz: ${courseById(p.course_id)?.title ?? p.course_id}` : "Členství"}
                 </span>
               </span>
             </li>

@@ -21,7 +21,23 @@ export interface ShopSettings {
   install_price?: number;
   /** Odkaz na platbu instalace (SimpleShop). Prázdné = platba po domluvě. */
   install_checkout_url?: string;
+  /** Cena jednoho kurzu v Kč vč. DPH */
+  course_price?: number;
+  /** Na kolik dní se kurz po zaplacení odemkne */
+  course_days?: number;
+  /** Kurzy na samostatný prodej: ID produktu v SimpleShopu (pro webhook) a odkaz na platbu */
+  courses?: Record<string, { product_id?: string; checkout_url?: string }>;
 }
+
+/** Kurzy, které jde koupit samostatně (bez členství). */
+export const SINGLE_COURSES = ["seo", "ai_viditelnost", "web"] as const;
+export const COURSE_PRICE_DEFAULT = 1490;
+export const coursePrice = (s: ShopSettings) => s.course_price || COURSE_PRICE_DEFAULT;
+export const courseDays = (s: ShopSettings) => s.course_days || 365;
+export const isSingleCourse = (id: string) => (SINGLE_COURSES as readonly string[]).includes(id);
+/** Odkaz na platbu kurzu; prázdný = kurz se zatím samostatně neprodává. */
+export const courseCheckoutUrl = (s: ShopSettings, id: string) =>
+  isSingleCourse(id) ? (s.courses?.[id]?.checkout_url ?? "").trim() : "";
 
 export const SHOP_DEFAULT: ShopSettings = {
   price: 6990,

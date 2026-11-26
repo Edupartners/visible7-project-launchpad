@@ -9,11 +9,14 @@ export const CourseCard = ({
   videos,
   watched,
   recommended = false,
+  price,
 }: {
   course: FeaturedCourse;
   videos: BlockVideoRow[];
   watched: Set<string>;
   recommended?: boolean;
+  /** Cena samostatného kurzu, když ho uživatel nemá v členství (např. „1 490 Kč“). */
+  price?: string;
 }) => {
   const minutes = videos.reduce((s, v) => s + videoMinutes(v), 0);
   const seen = videos.filter((v) => watched.has(v.id)).length;
@@ -50,6 +53,7 @@ export const CourseCard = ({
           {lessonsLabel(videos.length)}
           {minutes > 0 ? ` · ${hoursLabel(minutes)}` : ""}
         </p>
+        {price && <p className="mt-1 text-sm font-semibold text-leaf-700">Samostatně za {price}</p>}
         {seen > 0 && !done && (
           <div className="mt-3">
             <p className="text-sm font-semibold">Hotovo {Math.round((seen / videos.length) * 100)} %</p>

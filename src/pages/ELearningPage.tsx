@@ -18,7 +18,7 @@ import {
   useLessonStats,
   type FeaturedCourse,
 } from "@/lib/courses";
-import { MEMBER_ITEMS, canBuy, kc, nbsp, useShop } from "@/lib/shop";
+import { MEMBER_ITEMS, SINGLE_COURSES, canBuy, courseCheckoutUrl, coursePrice, kc, nbsp, useShop } from "@/lib/shop";
 import { track } from "@/lib/track";
 
 interface CatalogLesson {
@@ -178,7 +178,10 @@ export default function ELearningPage() {
               <p className="mt-1 text-4xl font-extrabold tracking-tight">{nbsp(price)}</p>
               <p className="text-sm text-white/70">na 12 měsíců, vč. DPH</p>
               <p className="mt-3 text-sm text-white/80">
-                Samostatně stojí jeden kurz {nbsp(kc(COURSE_PRICE))}. Ke kurzům máte i aplikaci, semináře a osvědčení.
+                {SINGLE_COURSES.some((id) => courseCheckoutUrl(shop, id))
+                  ? `Vybrané kurzy koupíte i samostatně za ${nbsp(kc(coursePrice(shop)))}.`
+                  : `Samostatně stojí jeden kurz ${nbsp(kc(COURSE_PRICE))}.`}{" "}
+                Ke kurzům máte i aplikaci, semináře a osvědčení.
               </p>
               <button
                 type="button"
@@ -307,6 +310,19 @@ export default function ELearningPage() {
                 <p className="text-sm">
                   <span className="font-bold">V ceně členství {nbsp(price)} na rok</span>
                   <span className="block text-muted-foreground">spolu s dalšími {count - 1} kurzy</span>
+                  {courseCheckoutUrl(shop, open.course.id) && (
+                    <a
+                      href={courseCheckoutUrl(shop, open.course.id)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() =>
+                        track("checkout_click", { source: `osnova-kurz:${open.course.id}`, price: coursePrice(shop) })
+                      }
+                      className="mt-1 inline-block font-semibold text-leaf-700 underline-offset-4 hover:underline"
+                    >
+                      nebo jen tento kurz za {nbsp(kc(coursePrice(shop)))}
+                    </a>
+                  )}
                 </p>
                 <button
                   type="button"

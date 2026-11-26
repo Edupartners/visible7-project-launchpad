@@ -6,6 +6,10 @@ import { GATE_NAMES } from "@/lib/certificates";
 import { FREE_GATES, TRIAL_OFFER, useAccess } from "@/lib/access";
 import { PromoRedeem } from "./PromoRedeem";
 import { useState } from "react";
+import { useAuth } from "@/components/AuthGate";
+import { useCourseAccess } from "@/lib/courseAccess";
+import { courseCheckoutUrl, courseDays, coursePrice, kc, nbsp, useShop } from "@/lib/shop";
+import { track } from "@/lib/track";
 
 /** Co nabídnout uživateli bez přístupu: kvíz za 3 dny zdarma (jednou) a ceník. */
 const UnlockOptions = ({ trialUsed }: { trialUsed: boolean }) => {
@@ -150,6 +154,78 @@ export const PremiumGate = ({
     <SidebarLayout>
       <main className="mx-auto max-w-2xl px-4 py-12 sm:px-8">
         <PremiumLock feature={feature} />
+      </main>
+    </SidebarLayout>
+  );
+};
+
+/**
+ * Obal kurzu, který jde koupit i samostatně: pustí dovnitř s členstvím (nebo zkušebním přístupem)
+ * i s koupeným kurzem. Jinak nabídne koupi kurzu a vedle členství.
+ */
+export const CourseLock = ({
+  courseId,
+  title,
+  children,
+}: {
+  courseId: string;
+  title: string;
+  children: React.ReactNode;
+}) => {
+  const access = useAccess();
+  const own = useCourseAccess();
+  const shop = useShop();
+  const { user } = useAuth();
+  if (access.loading || own.loading) return <Spinner />;
+  if (access.full || own.courses[courseId]) return <>{children}</>;
+  const url = courseCheckoutUrl(shop, courseId);
+  return (
+    <SidebarLayout>
+      <main className="mx-auto max-w-2xl px-4 py-12 sm:px-8">
+        <div className="rounded-3xl bg-primary p-8 text-white sm:p-10">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+            <Lock className="h-7 w-7 text-orange-300" />
+          </span>
+          <p className="mt-6 font-semibold text-orange-300">E-learning s osvědčením</p>
+          <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{title}</h1>
+          {url ? (
+            <>
+              <p className="mt-3 text-lg text-white/80">
+                Kurz si můžete koupit samostatně. Přístup máte {Math.round(courseDays(shop) / 30.4)} měsíců a po
+                dokončení si vystavíte osvědčení.
+              </p>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track("checkout_click", { source: `kurz:${courseId}`, price: coursePrice(shop) })}
+                className="v7-trap-btn v7-phi-sm mt-6 inline-flex h-12 items-center justify-center pl-6 pr-12 text-base font-bold text-signal-foreground"
+              >
+                Koupit kurz za {nbsp(kc(coursePrice(shop)))}
+              </a>
+              {user?.email && (
+                <p className="mt-3 text-sm text-white/70">
+                  Při platbě zadejte e-mail {user.email}, kurz se vám pak odemkne sám. Po zaplacení obnovte stránku.
+                </p>
+              )}
+              <p className="mt-6 border-t border-white/15 pt-5 text-white/80">
+                Nebo všechny kurzy, 7 bran a semináře v členství za {nbsp(kc(shop.price))} na rok.
+              </p>
+              <Link
+                to="/cenik"
+                className="mt-2 flex w-fit font-semibold text-white underline-offset-4 hover:underline"
+              >
+                Zobrazit členství
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-lg text-white/80">Kurz je v ceně členství spolu s dalšími kurzy a 7 branami.</p>
+              <UnlockOptions trialUsed={access.trialUsed} />
+            </>
+          )}
+          <PromoToggle dark onDone={access.refresh} />
+        </div>
       </main>
     </SidebarLayout>
   );
