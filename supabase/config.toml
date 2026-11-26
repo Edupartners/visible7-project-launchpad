@@ -19,3 +19,6 @@ verify_jwt = false
 
 [functions.bank-sync]
 verify_jwt = false
+
+[functions.migrate-users]
+verify_jwt = false

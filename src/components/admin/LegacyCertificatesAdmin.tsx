@@ -18,6 +18,8 @@ export function LegacyCertificatesAdmin() {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
+  const [waiting, setWaiting] = useState<number | null>(null);
+  const [migrating, setMigrating] = useState(false);
 
   const load = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,6 +28,26 @@ export function LegacyCertificatesAdmin() {
       .select("lw_cert_id, holder_name, bonus_key, pdf_path, applied_at")
       .order("holder_name");
     setRows((data as Row[]) ?? []);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { count } = await (supabase as any)
+      .from("shop_purchases")
+      .select("id", { count: "exact", head: true })
+      .eq("id_product", "learnworlds-prevod")
+      .is("applied_at", null);
+    setWaiting(count ?? 0);
+  };
+
+  const migrate = async () => {
+    setMigrating(true);
+    const { data, error } = await supabase.functions.invoke("migrate-users", { body: {} });
+    setMigrating(false);
+    const res = (data ?? {}) as { created?: number; failed?: string[]; error?: string };
+    setLog(
+      error || res.error
+        ? [`Chyba: ${res.error ?? error?.message}`]
+        : [`✓ Založeno účtů: ${res.created ?? 0}`, ...(res.failed ?? [])],
+    );
+    load();
   };
   useEffect(() => {
     load();
@@ -71,6 +93,29 @@ export function LegacyCertificatesAdmin() {
         {rows.length} certifikátů · {withPdf} s původním PDF · {issued} už vystaveno (člověk se zaregistroval). Původní
         PDF si majitel stáhne v profilu v sekci Osvědčení.
       </p>
+      <div className="mt-4 rounded-2xl bg-muted/50 p-4">
+        <p className="text-sm">
+          <span className="font-semibold">Účty převedených lidí:</span>{" "}
+          {waiting === null ? "…" : waiting === 0 ? "všichni mají účet." : `${waiting} ještě nemá účet.`}
+        </p>
+        {waiting !== null && waiting > 0 && (
+          <>
+            <button
+              type="button"
+              onClick={migrate}
+              disabled={migrating}
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary/90 disabled:opacity-60"
+            >
+              {migrating && <Loader2 className="h-4 w-4 animate-spin" />}
+              Založit účty ({waiting})
+            </button>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Účty vzniknou bez hesla a nikomu se nepošle e-mail. Členství na 12 měsíců a převedená osvědčení se přidělí
+              hned. Heslo si lidé nastaví přes „Zapomenuté heslo“ po vašem e-mailu.
+            </p>
+          </>
+        )}
+      </div>
       <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold hover:bg-muted">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
         Nahrát PDF (můžete vybrat všechny najednou)
