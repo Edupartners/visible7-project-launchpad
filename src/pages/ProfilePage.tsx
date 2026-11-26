@@ -11,6 +11,7 @@ import {
   Loader2,
   Map,
   Settings,
+  Star,
 } from "lucide-react";
 import { SidebarLayout } from "@/components/layout/AppSidebar";
 import { useAuth } from "@/components/AuthGate";
@@ -22,6 +23,8 @@ import { useAllBlockVideos } from "@/lib/blockVideos";
 import { Certificate, certificateTitle, legacyPdfUrl, linkedInAddUrl, listMyCertificates } from "@/lib/certificates";
 import { coursesProgress, hoursLabel, videoMinutes } from "@/lib/courses";
 import { useSupabaseProgress } from "@/hooks/useSupabaseProgress";
+import { ENTRY_KEY, type EntryDiagnosis } from "@/lib/entryDiagnosis";
+import { recommendedCourses, useMyCourses } from "@/lib/courseRecommend";
 import { useToast } from "@/hooks/use-toast";
 
 type TileId = "osvedceni" | "kurzy" | "cesta" | "clenstvi";
@@ -67,6 +70,76 @@ function Tile({
   );
 }
 
+/** Skupina kurzů v profilu: obrázek, název, postup, hvězdička „moje“ a odkaz do kurzu. */
+function CourseGroup({
+  title,
+  hint,
+  empty,
+  rows,
+  mine,
+  onToggle,
+}: {
+  title: string;
+  hint?: string;
+  empty?: string;
+  rows: CourseRow[];
+  mine: string[];
+  onToggle: (id: string) => void;
+}) {
+  if (rows.length === 0 && !empty) return null;
+  return (
+    <div>
+      <h2 className="text-lg font-bold">
+        {title} {hint && <span className="text-sm font-normal text-muted-foreground">· {hint}</span>}
+      </h2>
+      {rows.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">{empty}</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {rows.map((r) => {
+            const isMine = mine.includes(r.course.id);
+            return (
+              <li
+                key={r.course.id}
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 sm:gap-4"
+              >
+                <img
+                  src={r.course.cover}
+                  alt=""
+                  className="hidden h-14 w-24 shrink-0 rounded-lg object-cover sm:block"
+                />
+                <Link to={`/kurz/${r.course.id}`} className="min-w-0 flex-1 hover:underline">
+                  <p className="font-bold leading-snug">{r.course.title}</p>
+                  <div className="mt-1.5 flex items-center gap-3">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                      <div className="h-full bg-leaf-500" style={{ width: `${r.pct}%` }} />
+                    </div>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {r.done === r.total ? "Hotovo" : r.done > 0 ? `${r.done} z ${r.total} lekcí` : `${r.total} lekcí`}
+                    </span>
+                  </div>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => onToggle(r.course.id)}
+                  aria-pressed={isMine}
+                  aria-label={isMine ? "Odebrat z mých kurzů" : "Přidat do mých kurzů"}
+                  title={isMine ? "Odebrat z mých kurzů" : "Přidat do mých kurzů"}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl hover:bg-muted"
+                >
+                  <Star className={`h-5 w-5 ${isMine ? "fill-amber-400 text-amber-500" : "text-muted-foreground"}`} />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+type CourseRow = ReturnType<typeof coursesProgress>[number];
+
 /** Profil studenta: kdo jsem, co jsem dokázal(a) a rychlý vstup k osvědčením, kurzům, cestě a členství. */
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -77,7 +150,9 @@ export default function ProfilePage() {
   const { videos: all, watched, ready } = useAllBlockVideos();
   const [completed] = useSupabaseProgress<number[]>("completed_phases", []);
   const [certs, setCerts] = useState<Certificate[] | null>(null);
-  const [open, setOpen] = useState<TileId | null>(null);
+  const [open, setOpen] = useState<TileId | null>("kurzy");
+  const [diagnosis] = useSupabaseProgress<EntryDiagnosis | null>(ENTRY_KEY, null);
+  const { mine, toggle: toggleMine } = useMyCourses();
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -95,6 +170,7 @@ export default function ProfilePage() {
   }, [hash]);
 
   const rows = ready ? coursesProgress(all, watched) : [];
+  const recommended = recommendedCourses(diagnosis?.answers);
   const started = rows.filter((r) => r.done > 0);
   const finished = rows.filter((r) => r.done === r.total);
   const seenVideos = all.filter((v) => watched.has(v.id));
@@ -187,7 +263,7 @@ export default function ProfilePage() {
           />
           <Tile
             icon={<GraduationCap className="h-7 w-7" />}
-            value={ready ? String(started.length) : "…"}
+            value={ready ? String(new Set([...started.map((r) => r.course.id), ...mine]).size) : "…"}
             label="Kurzy"
             color="bg-leaf-600"
             active={open === "kurzy"}
@@ -280,36 +356,52 @@ export default function ProfilePage() {
         )}
 
         {open === "kurzy" && (
-          <section id="kurzy" aria-label="Moje kurzy" className="space-y-3">
-            {started.length === 0 ? (
-              <p className="rounded-2xl border border-border bg-card p-5 text-muted-foreground">
-                Zatím jste žádný kurz nezačali.{" "}
-                <Link to="/kurzy" className="font-semibold text-primary underline">
-                  Vybrat kurz v e-learningu
-                </Link>
-              </p>
-            ) : (
-              started.map((r) => (
-                <Link
-                  key={r.course.id}
-                  to={`/kurz/${r.course.id}`}
-                  className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 hover:bg-muted/40"
-                >
-                  <img src={r.course.cover} alt="" className="hidden h-14 w-24 rounded-lg object-cover sm:block" />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold leading-snug">{r.course.title}</p>
-                    <div className="mt-1.5 flex items-center gap-3">
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                        <div className="h-full bg-leaf-500" style={{ width: `${r.pct}%` }} />
-                      </div>
-                      <span className="shrink-0 text-xs text-muted-foreground">
-                        {r.done === r.total ? "Hotovo" : `${r.done} z ${r.total} lekcí`}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            )}
+          <section id="kurzy" aria-label="Moje kurzy" className="space-y-6">
+            {/* Cesta podle diagnostiky */}
+            <div className="rounded-2xl bg-leaf-50 p-5">
+              {diagnosis ? (
+                <p>
+                  <span className="font-bold">
+                    Vaše cesta: {diagnosis.answers.level === "start" ? "Rychlý start" : "Kompletní studium"}.
+                  </span>{" "}
+                  {diagnosis.answers.level === "start"
+                    ? "Stačí pár kurzů, které vás posunou ke startu nejrychleji. Brány můžete projít později."
+                    : "Projdete všechny doporučené kurzy a k tomu brány s vlastním projektem."}{" "}
+                  <Link to="/diagnostika" className="font-semibold text-primary underline">
+                    Změnit
+                  </Link>
+                </p>
+              ) : (
+                <p>
+                  <span className="font-bold">Nevíte, kde začít?</span> Za 4 minuty vám vstupní diagnostika doporučí
+                  kurzy na míru.{" "}
+                  <Link to="/diagnostika" className="font-semibold text-primary underline">
+                    Udělat diagnostiku
+                  </Link>
+                </p>
+              )}
+            </div>
+
+            <CourseGroup title="Studuji" rows={rows.filter((r) => r.done > 0)} mine={mine} onToggle={toggleMine} />
+            <CourseGroup
+              title="Moje vybrané kurzy"
+              empty="Zatím žádné. Kurz si přidáte hvězdičkou u doporučených níže nebo na stránce kurzu."
+              rows={rows.filter((r) => mine.includes(r.course.id) && r.done === 0)}
+              mine={mine}
+              onToggle={toggleMine}
+            />
+            <CourseGroup
+              title="Doporučené pro vás"
+              hint={diagnosis ? "podle vstupní diagnostiky" : undefined}
+              rows={rows.filter(
+                (r) => recommended.includes(r.course.id) && r.done === 0 && !mine.includes(r.course.id),
+              )}
+              mine={mine}
+              onToggle={toggleMine}
+            />
+            <Link to="/kurzy" className="inline-block font-semibold text-primary underline-offset-4 hover:underline">
+              Všechny kurzy v e-learningu
+            </Link>
           </section>
         )}
 
