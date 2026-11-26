@@ -449,17 +449,25 @@ export const courseTitleFor = (id: string) => courseById(id)?.title ?? LEGACY_CO
 
 Object.assign(COURSE_CERT, {
   ai_manazeri: {
-    certificateFor: "za absolvování kurzu Master kurz: AI pro manažery",
-    skills: ["využití AI v manažerské práci"],
-    topics: ["Využívá nástroje umělé inteligence v řízení a v každodenní práci manažera"],
+    certificateFor: "za absolvování prezenčního kurzu Master kurz: AI pro manažery (6 hodin)",
+    skills: ["využití AI v manažerské práci", "bezpečné používání AI ve firmě"],
+    topics: [
+      "Tvoří efektivní zadání pro umělou inteligenci",
+      "Pracuje s ChatGPT, Claude a nástroji Google AI",
+      "Využívá AI v pracovní komunikaci, při přípravě porad a zápisů",
+      "Analyzuje tabulky a připravuje manažerské reporty a provozní plánování s pomocí AI",
+      "Využívá AI v komunikaci se zaměstnanci a zákazníky",
+      "Používá AI bezpečně a chrání firemní data",
+    ],
   },
   grafika_adobe: {
-    certificateFor: "za absolvování kompletního kurzu grafiky v programech Adobe",
-    skills: ["grafika v Adobe Photoshop", "sazba v Adobe InDesign"],
+    certificateFor: "za absolvování online kurzu grafiky v programech Adobe (18 hodin, ověřeno vypracovanými úkoly)",
+    skills: ["grafický design v Adobe Photoshop a Illustrator", "sazba tiskovin v Adobe InDesign"],
     topics: [
-      "Upravuje fotografie v Adobe Photoshop",
-      "Kreslí vektorovou grafiku v Adobe Illustrator",
-      "Připraví tiskovou sazbu v Adobe InDesign",
+      "Upravuje a tvoří grafiku v Adobe Photoshop",
+      "Tvoří vektorovou grafiku a loga v Adobe Illustrator",
+      "Připraví sazbu tiskovin v Adobe InDesign",
+      "Navrhne časopis, obalový design, vizuální identitu značky a logo",
     ],
   },
 } satisfies Record<string, CourseCertContent>);

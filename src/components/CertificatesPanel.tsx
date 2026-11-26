@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Award, Download, Linkedin } from "lucide-react";
+import { Award, Download, FileText, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProject } from "@/contexts/ProjectContext";
 import { CertificateIssueDialog } from "@/components/CertificateIssueDialog";
@@ -10,6 +10,7 @@ import {
   GATE_NAMES,
   certificateTitle,
   linkedInAddUrl,
+  legacyPdfUrl,
   listMyCertificates,
 } from "@/lib/certificates";
 
@@ -106,7 +107,8 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
                     {certificateTitle(c.kind, c.phase, c.bonus_key)}
                   </Link>
                   <p className="truncate text-sm text-muted-foreground">
-                    {c.kind === "bonus" ? "Bonus" : c.kind === "course" ? "Kurz" : c.project_name}, vystaveno {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
+                    {c.kind === "bonus" ? "Bonus" : c.kind === "course" ? "Kurz" : c.project_name}, vystaveno{" "}
+                    {new Date(c.issued_at).toLocaleDateString("cs-CZ")}, kód {c.code}
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
@@ -116,6 +118,20 @@ export const CertificatesPanel = ({ completed }: { completed: number[] }) => {
                       Stáhnout PDF
                     </Link>
                   </Button>
+                  {c.legacy_pdf && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-[10px]"
+                      onClick={async () => {
+                        const url = await legacyPdfUrl(c.legacy_pdf!);
+                        if (url) window.location.href = url;
+                      }}
+                    >
+                      <FileText className="mr-1.5 h-4 w-4" />
+                      Původní certifikát
+                    </Button>
+                  )}
                   <Button asChild variant="outline" size="sm" className="rounded-[10px]">
                     <a href={linkedInAddUrl(c)} target="_blank" rel="noopener noreferrer">
                       <Linkedin className="mr-1.5 h-4 w-4" />

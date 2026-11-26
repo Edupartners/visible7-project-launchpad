@@ -17,6 +17,8 @@ export interface Certificate {
   ico?: string | null;
   /** U osvědčení za bonus (např. "ai_act") a za kurz (např. "ga4") */
   bonus_key?: string | null;
+  /** Původní PDF certifikát z předchozí platformy (cesta v úložišti legacy-certificates) */
+  legacy_pdf?: string | null;
 }
 
 export const GATE_NAMES: Record<number, string> = {
@@ -232,8 +234,18 @@ export async function verifyCertificate(code: string): Promise<Certificate | nul
 export async function listMyCertificates(): Promise<Certificate[]> {
   const { data, error } = await supabase
     .from("certificates")
-    .select("code, project_id, kind, phase, holder_name, project_name, launch_url, issued_at, ico, bonus_key")
+    .select(
+      "code, project_id, kind, phase, holder_name, project_name, launch_url, issued_at, ico, bonus_key, legacy_pdf",
+    )
     .order("issued_at", { ascending: false });
   if (error || !data) return [];
   return data as Certificate[];
+}
+
+/** Odkaz ke stažení původního PDF certifikátu (platí 2 minuty, jen pro majitele). */
+export async function legacyPdfUrl(path: string): Promise<string | null> {
+  const { data, error } = await supabase.storage
+    .from("legacy-certificates")
+    .createSignedUrl(path, 120, { download: path.split("/").pop() });
+  return error || !data ? null : data.signedUrl;
 }

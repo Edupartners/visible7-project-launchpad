@@ -30,6 +30,7 @@ import { InstallRequestsAdmin } from "@/components/admin/InstallRequestsAdmin";
 import { RemindersAdmin } from "@/components/admin/RemindersAdmin";
 import { DeadlinesAdmin } from "@/components/admin/DeadlinesAdmin";
 import { ShopAdmin } from "@/components/admin/ShopAdmin";
+import { LegacyCertificatesAdmin } from "@/components/admin/LegacyCertificatesAdmin";
 import { SeminarsAdmin } from "@/components/admin/SeminarsAdmin";
 import { BlockVideosAdmin } from "@/components/admin/BlockVideosAdmin";
 import { WorksheetsAdmin } from "@/components/admin/WorksheetsAdmin";
@@ -373,6 +374,7 @@ const AdminPage = () => {
             {tab === "prodej" && (
               <>
                 <ShopAdmin />
+                <LegacyCertificatesAdmin />
                 <PromoCodesAdmin emails={Object.fromEntries(users.map((u) => [u.id, u.email]))} />
               </>
             )}
