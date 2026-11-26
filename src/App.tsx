@@ -62,7 +62,8 @@ import MockBankPage from "./pages/MockBankPage";
 import MyBusinessPage from "./pages/MyBusinessPage";
 import TestPageEditor from "./pages/TestPageEditor";
 import TestPagePublic from "./pages/TestPagePublic";
-import { CourseLock, GateLock, PremiumGate } from "@/components/access/Locks";
+import { GateLock, PremiumGate } from "@/components/access/Locks";
+import { CourseLock } from "@/components/courses/CourseLock";
 import { isSingleCourse } from "@/lib/shop";
 import { PRIVACY, TERMS } from "./lib/legal";
 
@@ -75,7 +76,7 @@ const CourseGate = () => {
   const gate = c ? courseGate(c) : null;
   if (c && isSingleCourse(c.id))
     return (
-      <CourseLock courseId={c.id} title={c.title}>
+      <CourseLock course={c}>
         <CoursePage />
       </CourseLock>
     );
