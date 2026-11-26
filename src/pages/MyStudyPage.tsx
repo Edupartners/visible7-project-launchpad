@@ -93,9 +93,36 @@ export default function MyStudyPage() {
               </p>
             )}
 
+            <nav className="flex flex-wrap gap-2" aria-label="Sekce studia">
+              <Link
+                to="/zaverecny-projekt"
+                className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Závěrečný projekt
+              </Link>
+              {[
+                ...(next ? [["#dalsi", "Další setkání"]] : []),
+                ["#setkani", "Povinná setkání"],
+                ["#seminare", "Semináře"],
+                ["#zkouska", "Zkouška"],
+              ].map(([href, label]) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="rounded-full border border-border px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-foreground"
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+
             {/* Další setkání */}
             {next && (
-              <section className="rounded-3xl bg-primary p-6 text-white sm:p-8" aria-label="Další setkání">
+              <section
+                id="dalsi"
+                className="scroll-mt-20 rounded-3xl bg-primary p-6 text-white sm:p-8"
+                aria-label="Další setkání"
+              >
                 <p className="text-sm font-semibold text-signal">Další setkání · {next.code} z 20</p>
                 <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">{next.topic}</h2>
                 <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-white/80">
@@ -131,7 +158,7 @@ export default function MyStudyPage() {
             )}
 
             {/* Povinná setkání */}
-            <section>
+            <section id="setkani" className="scroll-mt-20">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className="text-xl font-bold">Povinná setkání</h2>
                 {sessions && (
@@ -187,7 +214,7 @@ export default function MyStudyPage() {
             </section>
 
             {/* Nepovinné semináře */}
-            <section>
+            <section id="seminare" className="scroll-mt-20">
               <h2 className="text-xl font-bold">Nepovinné semináře</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 V úterý 17:00–18:30. Máte je v ceně studia, přihlásíte se v Seminářích.
@@ -212,7 +239,7 @@ export default function MyStudyPage() {
             </section>
 
             {/* Zkouška */}
-            <section className="rounded-3xl border-[3px] border-signal bg-card p-6 sm:p-8">
+            <section id="zkouska" className="scroll-mt-20 rounded-3xl border-[3px] border-signal bg-card p-6 sm:p-8">
               <h2 className="text-xl font-bold">Zkouška profesní kvalifikace {NSK_QUALIFICATION.code}</h2>
               <p className="mt-2 text-muted-foreground">
                 Závěrečný den v Praze: obhajoba vlastního projektu a zkouška. Když napoprvé neuspějete, opakujete
