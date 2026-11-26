@@ -111,7 +111,7 @@ export function LegacyCertificatesAdmin() {
             </button>
             <p className="mt-2 text-xs text-muted-foreground">
               Účty vzniknou bez hesla a nikomu se nepošle e-mail. Členství na 12 měsíců a převedená osvědčení se přidělí
-              hned. Heslo si lidé nastaví přes „Zapomenuté heslo“ po vašem e-mailu.
+              hned. Heslo si lidé nastaví přes „Zapomněli jste heslo?“ na přihlášení.
             </p>
           </>
         )}
