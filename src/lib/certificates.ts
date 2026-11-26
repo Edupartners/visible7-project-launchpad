@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/visible7/client";
 import { bonusById } from "@/lib/bonuses";
-import { COURSE_CERT, courseById } from "@/lib/courses";
+import { COURSE_CERT, courseTitleFor } from "@/lib/courses";
 
 export type CertificateKind = "phase" | "zamer" | "gold" | "bonus" | "course";
 
@@ -34,7 +34,10 @@ export const ISSUER_ORG = "Edu Partners s.r.o.";
 
 /** Název osvědčení tak, jak se zobrazí na osvědčení a na LinkedInu. */
 export const certificateTitle = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
-  if (kind === "course") return `Kurz ${courseById(bonusKey ?? "")?.title ?? ""}`.trim();
+  if (kind === "course") {
+    const t = courseTitleFor(bonusKey ?? "");
+    return /kurz/i.test(t) ? t : `Kurz ${t}`.trim();
+  }
   if (kind === "bonus") return `VISIBLE7 Bonus – ${bonusById(bonusKey)?.title ?? "videokurz"}`;
   if (kind === "gold") return "VISIBLE7 Gold – Spuštěný projekt";
   if (kind === "zamer") return "Certifikovaný marketingový a projektový specialista";
@@ -145,7 +148,7 @@ export const certificateSkills = (kind: CertificateKind, phase: number | null, b
 export const certificateSyllabus = (kind: CertificateKind, phase: number | null, bonusKey?: string | null) => {
   if (kind === "course") {
     const c = COURSE_CERT[bonusKey ?? ""];
-    const title = courseById(bonusKey ?? "")?.title ?? "Kurz";
+    const title = courseTitleFor(bonusKey ?? "") || "Kurz";
     return c ? [{ phase: 0, name: title, skills: c.skills, topics: c.topics, outputs: [] as string[] }] : [];
   }
   if (kind === "bonus") {

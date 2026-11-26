@@ -438,3 +438,25 @@ export function coursesProgress(all: BlockVideoRow[], watched: Set<string>) {
     })
     .filter((r) => r.total > 0);
 }
+
+/** Kurzy převedené z původní platformy, které (zatím) nejsou v katalogu. Jen kvůli převedeným osvědčením. */
+export const LEGACY_COURSE_TITLES: Record<string, string> = {
+  ai_manazeri: "Master kurz: AI pro manažery",
+  grafika_adobe: "Kompletní kurz grafiky Adobe",
+};
+
+/** Název kurzu pro osvědčení: z katalogu, jinak z převedených kurzů. */
+export const courseTitleFor = (id: string) => courseById(id)?.title ?? LEGACY_COURSE_TITLES[id] ?? "";
+
+Object.assign(COURSE_CERT, {
+  ai_manazeri: {
+    certificateFor: "za absolvování kurzu Master kurz: AI pro manažery",
+    skills: ["využití AI v manažerské práci"],
+    topics: ["Praktické využití nástrojů umělé inteligence v řízení a každodenní práci manažera"],
+  },
+  grafika_adobe: {
+    certificateFor: "za absolvování kompletního kurzu grafiky v programech Adobe",
+    skills: ["grafika v Adobe Photoshop", "sazba v Adobe InDesign"],
+    topics: ["Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign"],
+  },
+} satisfies Record<string, CourseCertContent>);
