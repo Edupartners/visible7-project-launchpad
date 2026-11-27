@@ -137,7 +137,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
       aria-selected={isLogin === login}
       onClick={() => setIsLogin(login)}
       className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
-        isLogin === login ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+        isLogin === login ? "bg-primary text-primary-foreground shadow-sm" : "text-foreground/70 hover:bg-white hover:text-foreground"
       }`}
     >
       {label}
@@ -211,7 +211,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
             {!isLogin && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Křestní jméno</label>
+                  <label className="text-sm font-semibold text-foreground">Křestní jméno</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
@@ -219,19 +219,19 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Jan"
-                      className="pl-10 h-12 rounded-xl border-border/50 focus:border-primary"
+                      className="pl-10 h-12 rounded-xl border-2 border-signal bg-signal/5 placeholder:text-muted-foreground/70 focus:border-primary focus-visible:ring-2 focus-visible:ring-signal/40 focus-visible:ring-offset-0"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Příjmení</label>
+                  <label className="text-sm font-semibold text-foreground">Příjmení</label>
                   <Input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Novák"
-                    className="h-12 rounded-xl border-border/50 focus:border-primary"
+                    className="h-12 rounded-xl border-2 border-signal bg-signal/5 placeholder:text-muted-foreground/70 focus:border-primary focus-visible:ring-2 focus-visible:ring-signal/40 focus-visible:ring-offset-0"
                     required
                   />
                 </div>
@@ -239,7 +239,7 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">E-mailová adresa</label>
+              <label className="text-sm font-semibold text-foreground">E-mailová adresa</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
@@ -247,21 +247,21 @@ export const LoginPage = ({ onLogin, redirectTo }: LoginPageProps) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="vas-email@example.com"
-                  className="pl-10 h-12 rounded-xl border-border/50 focus:border-primary"
+                  className="pl-10 h-12 rounded-xl border-2 border-signal bg-signal/5 placeholder:text-muted-foreground/70 focus:border-primary focus-visible:ring-2 focus-visible:ring-signal/40 focus-visible:ring-offset-0"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Heslo</label>
+              <label className="text-sm font-semibold text-foreground">Heslo</label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={isLogin ? "Zadejte heslo" : "Minimálně 6 znaků"}
-                  className="h-12 rounded-xl border-border/50 focus:border-primary pr-10"
+                  className="h-12 rounded-xl border-2 border-signal bg-signal/5 placeholder:text-muted-foreground/70 focus:border-primary focus-visible:ring-2 focus-visible:ring-signal/40 focus-visible:ring-offset-0 pr-10"
                   required
                   minLength={isLogin ? undefined : 6}
                 />
