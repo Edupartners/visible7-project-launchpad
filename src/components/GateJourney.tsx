@@ -58,8 +58,8 @@ export const GateJourney = ({ gates, completed, onOpen, showHeader = true, showL
           </div>
         )}
 
-        <div className="-mx-2 overflow-x-auto px-2 pb-2 pt-1">
-          <ol className="grid min-w-[620px] grid-cols-7 gap-2.5">
+        <div className="pb-2 pt-1 sm:-mx-2 sm:overflow-x-auto sm:px-2">
+          <ol className="grid grid-cols-2 gap-x-4 gap-y-3 sm:min-w-[620px] sm:grid-cols-7 sm:gap-2.5">
             {gates.map((gate) => {
               const isDone = done.has(gate.id);
               const isCurrent = current?.id === gate.id;

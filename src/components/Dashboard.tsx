@@ -283,7 +283,7 @@ export const Dashboard = (_props: DashboardProps) => {
         {/* Dlaždice: kam dál. Primárně pro studium Specialista internetového obchodu. */}
         <nav
           aria-label="Kam dál"
-          className={`grid gap-3 sm:gap-4 ${isStudent ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-3"}`}
+          className={`grid grid-cols-2 gap-3 sm:gap-4 ${isStudent ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}
         >
           {isStudent && (
             <HomeTile
@@ -292,8 +292,16 @@ export const Dashboard = (_props: DashboardProps) => {
               value="Projekt"
               label="Závěrečný projekt"
               color="bg-primary"
+              className="col-span-2 lg:col-span-1"
             />
           )}
+          <HomeTile
+            to={resume(next?.route ?? "/expansion")}
+            icon={<Rocket className="h-7 w-7" />}
+            value={doneCount === 0 ? "Start" : next ? `Brána ${next.id}` : "7/7"}
+            label={doneCount === 0 ? "Start projektu" : next ? "Pokračovat v projektu" : "Projekt hotový"}
+            color="bg-amber-600"
+          />
           {isStudent ? (
             <HomeTile
               to="/moje-studium"
