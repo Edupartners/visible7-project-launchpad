@@ -512,7 +512,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.08em] text-leaf-700">Lektoři a poradci</p>
                 <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                  Učí vás lidé, kteří se tím živí. Nejste na to sami.
+                  Učí vás profíci z praxe. Nejste v tom sami.
                 </h2>
                 <p className="mt-4 text-lg text-muted-foreground">
                   16+ seniorních poradců z praxe, kteří vlastní byznys sami rozjeli: marketing, finance, právo, e-shopy
