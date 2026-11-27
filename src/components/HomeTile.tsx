@@ -24,7 +24,13 @@ export function HomeTile({
     >
       {icon}
       <span>
-        <span className="block truncate text-3xl font-extrabold leading-none tracking-tight sm:text-4xl">{value}</span>
+        <span
+          className={`block truncate font-extrabold leading-none tracking-tight ${
+            value.length > 6 ? "text-2xl sm:text-3xl" : "text-3xl sm:text-4xl"
+          }`}
+        >
+          {value}
+        </span>
         <span className="mt-1 block text-xs font-semibold leading-tight opacity-90 sm:text-sm">{label}</span>
       </span>
     </Link>

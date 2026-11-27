@@ -1,4 +1,5 @@
 import { HomeTile } from "@/components/HomeTile";
+import { GateJourney } from "./GateJourney";
 import { useIsStudent } from "@/lib/studySchedule";
 import { useAllBlockVideos } from "@/lib/blockVideos";
 import { coursesProgress } from "@/lib/courses";
@@ -45,7 +46,7 @@ import {
   GraduationCap,
   Map,
   Presentation,
-  Store,
+  UserRound,
 } from "lucide-react";
 
 const phases = [
@@ -168,7 +169,6 @@ export const Dashboard = (_props: DashboardProps) => {
   const diagnosis = entry || oldDiagnosis;
   const diagnosisLoading = oldLoading || entryLoading;
   const [certCount, setCertCount] = useState<number | null>(null);
-  const [allCerts, setAllCerts] = useState<number | null>(null);
   const isStudent = useIsStudent();
   const { videos: allVideos, watched, ready: videosReady } = useAllBlockVideos();
   const startedCourses = videosReady
@@ -179,7 +179,6 @@ export const Dashboard = (_props: DashboardProps) => {
     listMyCertificates().then((list) => {
       const mine = list.filter((c) => c.project_id === currentProject?.id);
       setCertCount(mine.length);
-      setAllCerts(list.length);
     });
   }, [currentProject?.id]);
 
@@ -274,44 +273,53 @@ export const Dashboard = (_props: DashboardProps) => {
         {/* Rozkoukaný kurz e-learningu */}
         <ContinueCourse showAllLink={false} />
 
-        {/* Dlaždice: kam dál (studenti kurzu vidí studium a závěrečný projekt) */}
-        <nav aria-label="Kam dál" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+        {/* Celá cesta – 7 bran */}
+        <GateJourney
+          gates={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
+          completed={completedPhases}
+          onOpen={(route) => navigate(resume(route))}
+          showHeader={false}
+          showList={false}
+        />
+
+        {/* Dlaždice: kam dál. Primárně pro studium Specialista internetového obchodu. */}
+        <nav
+          aria-label="Kam dál"
+          className={`grid grid-cols-2 gap-3 sm:gap-4 ${isStudent ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}
+        >
+          {isStudent && (
+            <HomeTile
+              to="/zaverecny-projekt"
+              icon={<ClipboardList className="h-7 w-7" />}
+              value="Projekt"
+              label="Závěrečný projekt"
+              color="bg-primary"
+              className="col-span-2 lg:col-span-1"
+            />
+          )}
+          <HomeTile
+            to={resume(next?.route ?? "/vision")}
+            icon={<Map className="h-7 w-7" />}
+            value={next ? `Brána ${next.id}` : "7/7"}
+            label={doneCount === 0 ? "Vstup do studia" : next ? "Pokračovat ve studiu" : "Studium dokončeno"}
+            color={isStudent ? "bg-amber-600" : "bg-primary"}
+          />
           {isStudent ? (
-            <>
-              <HomeTile
-                to="/zaverecny-projekt"
-                icon={<ClipboardList className="h-7 w-7" />}
-                value="Projekt"
-                label="Závěrečný projekt"
-                color="bg-primary"
-                className="col-span-2 lg:col-span-1"
-              />
-              <HomeTile
-                to="/moje-studium"
-                icon={<CalendarDays className="h-7 w-7" />}
-                value="Rozvrh"
-                label="Moje studium"
-                color="bg-sky-700"
-              />
-            </>
+            <HomeTile
+              to="/moje-studium"
+              icon={<CalendarDays className="h-7 w-7" />}
+              value="Rozvrh"
+              label="Moje studium"
+              color="bg-sky-700"
+            />
           ) : (
-            <>
-              <HomeTile
-                to="/muj-podnik"
-                icon={<Store className="h-7 w-7" />}
-                value="Start"
-                label="Začínám podnikat"
-                color="bg-primary"
-                className="col-span-2 lg:col-span-1"
-              />
-              <HomeTile
-                to="/seminare"
-                icon={<Presentation className="h-7 w-7" />}
-                value="Živě"
-                label="Semináře"
-                color="bg-sky-700"
-              />
-            </>
+            <HomeTile
+              to="/seminare"
+              icon={<Presentation className="h-7 w-7" />}
+              value="Živě"
+              label="Semináře"
+              color="bg-sky-700"
+            />
           )}
           <HomeTile
             to="/kurzy"
@@ -321,17 +329,10 @@ export const Dashboard = (_props: DashboardProps) => {
             color="bg-leaf-600"
           />
           <HomeTile
-            to={resume(next?.route ?? "/vision")}
-            icon={<Map className="h-7 w-7" />}
-            value={`${doneCount}/7`}
-            label="Moje cesta"
-            color="bg-amber-600"
-          />
-          <HomeTile
-            to="/profil#osvedceni"
-            icon={<Award className="h-7 w-7" />}
-            value={allCerts === null ? "…" : String(allCerts)}
-            label="Osvědčení"
+            to="/profil"
+            icon={<UserRound className="h-7 w-7" />}
+            value="Profil"
+            label="Můj profil"
             color="bg-slate-700"
           />
         </nav>
