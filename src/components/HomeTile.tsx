@@ -20,7 +20,7 @@ export function HomeTile({
   return (
     <Link
       to={to}
-      className={`flex h-36 w-full flex-col justify-between overflow-hidden p-4 text-white transition-[filter] hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-40 sm:p-5 ${color} ${className}`}
+      className={`flex h-36 w-full flex-col justify-between overflow-hidden rounded-2xl p-4 text-white transition-[filter] hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-40 sm:p-5 ${color} ${className}`}
     >
       {icon}
       <span>
