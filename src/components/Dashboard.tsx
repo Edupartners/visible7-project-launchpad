@@ -1,4 +1,7 @@
-import { MyBusinessTeaser } from "@/components/business/MyBusinessTeaser";
+import { HomeTile } from "@/components/HomeTile";
+import { useIsStudent } from "@/lib/studySchedule";
+import { useAllBlockVideos } from "@/lib/blockVideos";
+import { coursesProgress } from "@/lib/courses";
 import { ContinueCourse } from "@/components/courses/ContinueCourse";
 import { QuizDashboardCard } from "@/components/quiz/QuizCards";
 import { MembershipCard } from "@/components/access/MembershipCta";
@@ -8,7 +11,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarLayout } from "./layout/AppSidebar";
 import { Footer } from "./layout/Footer";
-import { GateJourney } from "./GateJourney";
 import { EntryDiagnosisCard } from "./diagnosis/EntryDiagnosisCard";
 import { JourneyGuide } from "./guide/JourneyGuide";
 import { stageFor } from "@/lib/guide";
@@ -38,6 +40,12 @@ import {
   BarChart3,
   X,
   PartyPopper,
+  CalendarDays,
+  ClipboardList,
+  GraduationCap,
+  Map,
+  Presentation,
+  Store,
 } from "lucide-react";
 
 const phases = [
@@ -160,11 +168,18 @@ export const Dashboard = (_props: DashboardProps) => {
   const diagnosis = entry || oldDiagnosis;
   const diagnosisLoading = oldLoading || entryLoading;
   const [certCount, setCertCount] = useState<number | null>(null);
+  const [allCerts, setAllCerts] = useState<number | null>(null);
+  const isStudent = useIsStudent();
+  const { videos: allVideos, watched, ready: videosReady } = useAllBlockVideos();
+  const startedCourses = videosReady
+    ? coursesProgress(allVideos, watched).filter((r) => r.done > 0 && r.done < r.total).length
+    : null;
 
   useEffect(() => {
     listMyCertificates().then((list) => {
       const mine = list.filter((c) => c.project_id === currentProject?.id);
       setCertCount(mine.length);
+      setAllCerts(list.length);
     });
   }, [currentProject?.id]);
 
@@ -208,12 +223,6 @@ export const Dashboard = (_props: DashboardProps) => {
 
         {/* Jen naléhavé stavy členství (končí zkušební přístup) */}
         <MembershipCard placement="top" />
-
-        {/* Rozkoukaný kurz e-learningu */}
-        <ContinueCourse fallback />
-
-        {/* Kdo už podniká: vstup do Můj podnik */}
-        <MyBusinessTeaser />
 
         {/* Na začátku cesty: vstupní diagnostika je první krok */}
         {!diagnosisLoading && !diagnosis && doneCount === 0 && <EntryDiagnosisCard />}
@@ -262,14 +271,70 @@ export const Dashboard = (_props: DashboardProps) => {
           </section>
         )}
 
-        {/* Celá cesta – jeden řádek */}
-        <GateJourney
-          gates={phases.map((p) => ({ ...p, name: GATE_NAMES[p.id] }))}
-          completed={completedPhases}
-          onOpen={(route) => navigate(resume(route))}
-          showHeader={false}
-          showList={false}
-        />
+        {/* Rozkoukaný kurz e-learningu */}
+        <ContinueCourse showAllLink={false} />
+
+        {/* Dlaždice: kam dál (studenti kurzu vidí studium a závěrečný projekt) */}
+        <nav aria-label="Kam dál" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+          {isStudent ? (
+            <>
+              <HomeTile
+                to="/zaverecny-projekt"
+                icon={<ClipboardList className="h-7 w-7" />}
+                value="Projekt"
+                label="Závěrečný projekt"
+                color="bg-primary"
+                className="col-span-2 lg:col-span-1"
+              />
+              <HomeTile
+                to="/moje-studium"
+                icon={<CalendarDays className="h-7 w-7" />}
+                value="Rozvrh"
+                label="Moje studium"
+                color="bg-sky-700"
+              />
+            </>
+          ) : (
+            <>
+              <HomeTile
+                to="/muj-podnik"
+                icon={<Store className="h-7 w-7" />}
+                value="Start"
+                label="Začínám podnikat"
+                color="bg-primary"
+                className="col-span-2 lg:col-span-1"
+              />
+              <HomeTile
+                to="/seminare"
+                icon={<Presentation className="h-7 w-7" />}
+                value="Živě"
+                label="Semináře"
+                color="bg-sky-700"
+              />
+            </>
+          )}
+          <HomeTile
+            to="/kurzy"
+            icon={<GraduationCap className="h-7 w-7" />}
+            value={startedCourses ? String(startedCourses) : "Kurzy"}
+            label={startedCourses ? "Rozkoukané kurzy" : "E-learning"}
+            color="bg-leaf-600"
+          />
+          <HomeTile
+            to={resume(next?.route ?? "/vision")}
+            icon={<Map className="h-7 w-7" />}
+            value={`${doneCount}/7`}
+            label="Moje cesta"
+            color="bg-amber-600"
+          />
+          <HomeTile
+            to="/profil#osvedceni"
+            icon={<Award className="h-7 w-7" />}
+            value={allCerts === null ? "…" : String(allCerts)}
+            label="Osvědčení"
+            color="bg-slate-700"
+          />
+        </nav>
 
         {/* Jeden tip na teď */}
         {tip === "certs" && (
