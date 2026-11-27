@@ -52,7 +52,7 @@ function Tile({
       type="button"
       onClick={onClick}
       aria-expanded={active}
-      className={`flex h-36 w-full flex-col justify-between overflow-hidden p-4 text-left text-white transition-[filter] hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-40 sm:p-5 ${color} ${
+      className={`flex h-36 w-full flex-col justify-between overflow-hidden rounded-2xl p-4 text-left text-white transition-[filter] hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-ring sm:h-40 sm:p-5 ${color} ${
         active ? "ring-4 ring-signal ring-offset-2 ring-offset-background" : ""
       }`}
     >
