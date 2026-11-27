@@ -232,7 +232,7 @@ export const Dashboard = (_props: DashboardProps) => {
         {!diagnosisLoading && !diagnosis && doneCount === 0 ? null : next && NextIcon ? (
           <section
             aria-label="Další krok"
-            className="v7-trap flex flex-col gap-5 bg-primary p-6 pr-12 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:p-8 sm:pr-16"
+            className="flex flex-col gap-5 rounded-2xl bg-primary p-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between sm:p-8"
           >
             <div className="flex items-start gap-5">
               <span className="v7-para flex h-16 w-16 shrink-0 items-center justify-center bg-signal text-2xl font-extrabold text-signal-foreground">
