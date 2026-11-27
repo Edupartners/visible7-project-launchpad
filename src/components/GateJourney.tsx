@@ -63,6 +63,11 @@ export const GateJourney = ({ gates, completed, onOpen, showHeader = true, showL
             {gates.map((gate) => {
               const isDone = done.has(gate.id);
               const isCurrent = current?.id === gate.id;
+              // Dokončené brány za sebou se spojí do jednoho pásu (jako dílky puzzle).
+              const joined = isDone && done.has(gate.id - 1);
+              const joinCls = joined
+                ? `${gate.id % 2 === 0 ? "-ml-6 w-[calc(100%+1.5rem)]" : "w-full"} sm:-ml-[1.125rem] sm:w-[calc(100%+1.125rem)]`
+                : "w-full";
               return (
                 <li key={gate.id} className="flex">
                   <button
@@ -72,7 +77,7 @@ export const GateJourney = ({ gates, completed, onOpen, showHeader = true, showL
                     aria-label={`Brána ${gate.id}: ${gate.name}${isDone ? " – hotovo" : isCurrent ? " – na řadě" : ""}. Otevřít fázi.`}
                   >
                     <span
-                      className={`flex h-[52px] w-full -skew-x-[14deg] items-center justify-center text-lg font-bold tabular-nums transition-transform duration-150 group-hover:-translate-y-0.5 ${
+                      className={`flex h-[52px] ${joinCls} -skew-x-[14deg] items-center justify-center text-lg font-bold tabular-nums transition-transform duration-150 group-hover:-translate-y-0.5 ${
                         isDone
                           ? "bg-emerald-700 text-white"
                           : isCurrent
