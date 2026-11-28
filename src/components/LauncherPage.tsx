@@ -352,7 +352,7 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
             </p>
             <h1 className="mt-8 font-extrabold tracking-[-0.035em]">
               <span className="block text-[2.3rem] leading-[1.08] min-[400px]:text-[2.7rem] sm:text-6xl lg:text-[4.25rem]">
-                Naučte se online byznys na vlastním projektu.
+                Naučte se online byznys na vlastním projektu s&nbsp;mentorem.
               </span>
               <span className="mt-8 block text-lg font-bold leading-relaxed sm:text-xl tracking-normal text-foreground sm:text-[1.375rem]">
                 Získejte profesní kvalifikaci{" "}
