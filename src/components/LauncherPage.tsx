@@ -401,6 +401,9 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               <p className="mt-1 text-[15px] text-muted-foreground">
                 Ukážete, kam se váš projekt posunul, a společně ho probereme s mentorem i ostatními studenty.
               </p>
+              <p className="mt-2 text-sm font-semibold">
+                Pro studenty a absolventy kurzu Specialista internetového obchodu. Pozvánku dostanete e-mailem.
+              </p>
             </div>
             <div className="rounded-xl bg-primary px-4 py-3 text-white sm:min-w-[14rem]">
               <p className="text-xs font-semibold text-signal">Nulté setkání</p>
