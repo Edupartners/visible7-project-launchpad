@@ -390,6 +390,24 @@ export const LauncherPage = ({ onAccessGranted }: LauncherPageProps) => {
               Semestrální studium {STUDY.dates}
             </Link>
           </div>
+          {/* Čtvrtletní setkání: prezentace projektů */}
+          <div
+            id="setkani"
+            className="mx-auto mt-10 grid max-w-3xl scroll-mt-24 gap-4 rounded-2xl border-2 border-signal bg-card p-5 text-left sm:grid-cols-[1fr_auto] sm:items-center sm:p-6"
+          >
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-leaf-700">Každé čtvrtletí naživo</p>
+              <p className="mt-1 text-lg font-bold leading-snug">Prezentace projektů a diskuse</p>
+              <p className="mt-1 text-[15px] text-muted-foreground">
+                Ukážete, kam se váš projekt posunul, a společně ho probereme s mentorem i ostatními studenty.
+              </p>
+            </div>
+            <div className="rounded-xl bg-primary px-4 py-3 text-white sm:min-w-[14rem]">
+              <p className="text-xs font-semibold text-signal">Nulté setkání</p>
+              <p className="font-bold">čt 7.&nbsp;1.&nbsp;2027, 17–20&nbsp;h</p>
+              <p className="text-sm text-white/80">Podolská 50, Praha&nbsp;4</p>
+            </div>
+          </div>
           <div id="video" className="mx-auto mt-12 max-w-3xl scroll-mt-24">
             <HeroVideo photo={author?.photo} />
           </div>
